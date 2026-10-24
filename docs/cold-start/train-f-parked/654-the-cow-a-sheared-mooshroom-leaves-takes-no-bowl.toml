@@ -1,0 +1,88 @@
+name = "the-cow-a-sheared-mooshroom-leaves-takes-no-bowl"
+about = "after shears turn a mooshroom into a cow, a bowl used on that cow does nothing: Cow has no bowl arm, so AbstractCow and Animal pass and no stew is added — where a mooshroom would have filled it"
+observe_from = "actor"
+observe = ["container_set_slot"]
+within = 1056
+settle_ms = 1500
+measured_step = "silent"
+
+# THE MECHANISM: `MushroomCow.shear` 12-30 converts through `Mob.convertTo(COW,
+# ...)`; the client is told of a new `minecraft:cow` (whose add_entity is in the
+# discarded setup recording) and the interact verb resolves the newest cow it
+# knows. `AbstractCow.mobInteract` 6-55 answers only a bucket, `Animal` only
+# `#cow_food`, `AgeableMob` only a golden dandelion on a baby: the bowl PASSES
+# and `createFilledResult` never runs. The same click on the mooshroom adds a
+# stew (`642`), so silence here is the conversion's consequence: a server that
+# left a mooshroom (or answered a cow as one) adds a stew, and one that made no
+# cow cannot resolve the target at all.
+#
+# THE RIG. `083`'s pit: digging [1,-1] and [1,-2] leaves a 1x1 shaft two deep
+# whose floor has no walkable neighbour, so the mob hatched at its bottom never
+# moves — its unseeded stroll and look goals reach nothing observed here. The
+# rig sits +1040 blocks out on z, perpendicular to the line the workspaces are
+# laid along (`-(n+1) * 32` on x), alternating sign with its neighbours in this
+# block and 80 further out every pair (640/641 at +-480 ... 652/653 at +-960),
+# so the nearest same-side rig is 64 blocks away on x and 80 on z: nothing it
+# leaves is tracked from another scenario and nothing another leaves is
+# tracked from it — the actor tracks to 64 blocks at view-distance 4. The mob is SILENT
+# (`minecraft:entity_data` `Silent` on the egg, applied by
+# `EntityType.updateCustomEntityTag` through `Entity.load`), because
+# `Mob.baseTick`'s ambient roll (`nextInt(1000) < ambientSoundTime++`, unseeded)
+# can land in any window; `Entity.playSound` refuses every sound of a silent
+# entity and the roll still happens, so its random stream is unchanged.
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 1040.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, 1041]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, 1041]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:mooshroom_spawn_egg"
+components = [{ type = "minecraft:entity_data", entity = "minecraft:mooshroom", silent = true }]
+
+[[setup]]
+do = "place"
+on = [1, -3, 1041]
+face = "up"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, 1040.95]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "hold"
+item = "minecraft:shears"
+
+[[setup]]
+do = "interact"
+target = "minecraft:mooshroom"
+
+[[setup]]
+do = "hold"
+item = "minecraft:bowl"
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[step]]
+do = "interact"
+target = "minecraft:cow"

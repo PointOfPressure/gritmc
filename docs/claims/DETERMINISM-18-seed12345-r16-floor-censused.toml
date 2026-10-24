@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 18
+slug   = "seed12345-r16-floor-censused"
+title  = "What the floor is MADE OF — the seed-12345 r=16 floor, censused (2026-08-10)"
+branch = "backfill"

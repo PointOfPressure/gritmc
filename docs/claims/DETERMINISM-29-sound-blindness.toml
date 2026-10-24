@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 29
+slug   = "sound-blindness"
+title  = "The gameplay corpus cannot see a sound, and four checks were named as controls for one (2026-08-10)"
+branch = "backfill"

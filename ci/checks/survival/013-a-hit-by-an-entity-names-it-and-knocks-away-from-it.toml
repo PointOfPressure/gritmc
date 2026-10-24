@@ -1,0 +1,35 @@
+name = "a-hit-by-an-entity-names-it-and-knocks-away-from-it"
+about = """
+`/damage oracle 1 minecraft:mob_attack by oracle_eye`.
+`DamageCommand.lambda$register$3` builds `new DamageSource(type, entity)`, so
+the eye is both the causing and the direct entity, and the `damage_event`
+carries it in both slots (`writeOptionalEntityId`, `id + 1`).
+
+`mob_attack` is NOT in `minecraft:no_knockback`, so `dealDefaultKnockback`
+runs. The direct entity is not a projectile, so the direction is
+`getSourcePosition() - position` in x and z (offsets 55..88), and
+`getSourcePosition()` is the eye's position. The observer stands
+`OBSERVER_OFFSET` blocks along +z from the actor, so the push is along -z at
+strength 0.4: `knockback` halves the old horizontal velocity and subtracts the
+normalised direction times 0.4, and on the ground sets
+`y = min(0.4, y/2 + 0.4)` (offsets 118..181). That velocity is what
+`set_entity_motion` carries. The direction is DETERMINISTIC here; a knockback
+with no source would re-roll x and z off the entity's own random (offsets
+25..95) and no two vanilla runs would agree.
+
+The hit is a player's: `ServerPlayer.hurtServer` checks `canHarmPlayer`
+(pvp on), and `mob_attack` scales only `when_caused_by_living_non_player`, so
+peaceful does not zero it. Health 20 -> 19.
+
+What would make it fail: a server that drops `by`, or writes the entities
+wrong, diverges on `cause`/`direct`; one with no knockback sends the actor's
+unchanged velocity; one that pushes toward the attacker has the sign wrong.
+"""
+console_restore = ["effect give oracle minecraft:instant_health 1 4 true"]
+observe_from = "both"
+observe = ["damage_event", "set_health", "set_entity_motion", "set_entity_data", "sound", "entity_event"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "damage oracle 1 minecraft:mob_attack by oracle_eye"

@@ -1,0 +1,25 @@
+name = "a-named-skull-reports-its-name-in-lower-case"
+about = "766's skeleton skull, placed from a stack carrying minecraft:custom_name (\"Bones\"). SkullBlockEntity.applyImplicitComponents (offsets 39-42) takes CUSTOM_NAME, but its saveAdditional stores it as custom_name (36-45), not the CustomName every container, banner and beacon uses; getUpdateTag is saveCustomOnly, so the block_entity_data on placement is {custom_name: \"Bones\"} where 766's is empty. What would make this fail: a server that writes every block entity's name under CustomName, or none for a skull."
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:skeleton_skull"
+components = [{ type = "minecraft:custom_name", text = "Bones" }]
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

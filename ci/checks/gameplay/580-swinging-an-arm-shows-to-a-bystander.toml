@@ -1,0 +1,52 @@
+name = "swinging-an-arm-shows-to-a-bystander"
+about = "`handleAnimate` runs `player.swing(hand)`, whose whole server-side effect is one `animate` broadcast — and it goes to `sendToTrackingPlayers`, not `...AndSelf`, so it is the bystander's stream that carries it and the swinger's that does not"
+observe_from = "observer"
+observe = ["animate"]
+settle_ms = 1000
+
+# **`within = -1` — unbounded, and this is not a convenience.**
+#
+# `animate` carries an entity id and **no coordinates at all**, so the only
+# spatial information the comparator has for it is where that entity was last
+# *seen*. For an item or a mob that memory is true. For one of the two clients
+# it is false by construction: `record::run_one` walks them to the next
+# workspace between scenarios, outside every measured window, so no packet
+# ever says they moved.
+#
+# `530-walking-away-drops-a-standing-player-from-view` makes a player leave a
+# tracking range and come back, which emits an `add_entity` for a **player**
+# inside a measured window — the one case `compare::place`'s own doc assumed
+# could never happen. Measured on the corpus run of 2026-08-06 it placed the
+# actor at absolute (-1984, -60, 73) and left it there; twelve scenarios later
+# this file's anchor is (-2368, -60, 0), so the `animate` was bounded against a
+# position **384 blocks** away, vanilla's projection came out empty, and this
+# check went `vacuous` — gate-red, and unable to pass however right the server
+# was. It read `match` in `ci/t2-gameplay-subset.sh` because a subset that does
+# not include 530 never makes the placement.
+#
+# **A subset run is not a gate, and this is what that sentence costs.**
+within = -1
+
+# **`observe_from = "observer"` is the check, not a detail of it.**
+#
+# `LivingEntity.swing(hand)` is `swing(hand, false)`, and the boolean picks
+# between `ServerChunkCache.sendToTrackingPlayersAndSelf` at offset 89 and
+# `sendToTrackingPlayers` at offset 99. It takes the second.
+# `ChunkMap.TrackedEntity.updatePlayer` returns at its first line when
+# `player == entity`, so the swinging player is never in `seenBy`.
+#
+# A version of this check reading the actor's stream would compare silence
+# with silence and report `match` against a server that drops `swing` on the
+# floor — the container family's trap exactly, and the reason this file names
+# the observer instead.
+#
+# There is nothing in the setup because there is nothing to build: the
+# observer already stands five blocks away in every scenario, and a swing
+# needs no block, no item and no target. That also means the reference cannot
+# be quiet for a rig reason — vanilla emits the `animate` for any swing at
+# all — so this does not lean on the runner's `vacuous` verdict to stay
+# honest.
+
+[[step]]
+do = "swing"
+hand = "main"

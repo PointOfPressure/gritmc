@@ -1,0 +1,92 @@
+name = "random-ticks-turn-covered-grass-to-dirt"
+about = "with random ticks running, a grass block whose light has been taken away turns to dirt — the corpus's only look at vanilla's `randomTick` tick section, which `ci/t2-gameplay.sh` shuts for every other check"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 4000
+
+# THIS CHECK TURNS A GAME RULE ON, AND IT IS THE ONLY ONE THAT DOES.
+#
+# `ci/t2-gameplay.sh` sends `random_tick_speed 0` before it records anything,
+# and `docs/PARITY-ROADMAP.md` §21.2 measures what that costs: vanilla's
+# `randomTick` profiler section is one of eight of its 120 per-tick sections
+# that the corpus can be *proved* never to run, and the proof is a game rule
+# of ours rather than anything about vanilla.
+#
+# It is not turned on globally, and the reason is the whole design of
+# `scenario::GameRule`: random ticks were running through every measurement
+# this corpus took before 2026-08-03 — the camelCase rule id was being
+# refused and nobody read the refusal — and what they did was turn the grass
+# under the rigs into dirt at unpredictable moments. So the rule is set after
+# this scenario's rig is built and quiet, and put back before the next
+# scenario starts.
+#
+# FROM THE JAR.
+#
+#   SpreadingSnowyBlock.randomTick, javap -p -c -constants
+#     29: baseBlock lookup Optional.isEmpty : ifeq 36 -> 35: return
+#     39: canStayAlive(state, level, pos)   : ifne 63
+#     58: ServerLevel.setBlockAndUpdate(pos, DIRT.defaultBlockState())
+#     62: return                             <- the branch this check takes
+#     63: getMaxLocalRawBrightness(pos.above()) < 9 : goto 197 (return)
+#     85..197  four spread attempts, each three nextInt draws
+#
+# The `setBlockAndUpdate` arm **returns**, so the wire answer is exactly one
+# block change at one position: `grass_block -> dirt` at [1, -1, 1]. The
+# spread arm below it is the one that draws from the generator, and it is not
+# reachable here — the block has no light, so `canStayAlive` is false and the
+# method is over before offset 63. That is why this mechanism has a stable
+# projection at all while the other two dark systems do not.
+#
+# WHY 1000 AND NOT VANILLA'S DEFAULT OF 3.
+#
+# `ServerLevel.tickChunk` draws `speed` positions per randomly-ticking section
+# per chunk per tick out of a section's 4096 blocks, so a named block is
+# picked with probability `1 - (1 - 1/4096)^speed` per tick. At vanilla's 3
+# that is 0.073% and the expected wait is over a minute — a settle window that
+# long would cost more than the rest of the corpus put together, and a check
+# that fires *most* of the time is a check that flaps. At 1000 it is 21.7% per
+# tick, and over the 82 ticks of this window the chance of not firing is about
+# 3e-9. The rate is turned up to make the observation certain, not to make it
+# happen: what is being observed is the same branch either way.
+#
+# WHAT THIS SCENARIO LEAVES BEHIND, which matters because the corpus shares one
+# world. Every earlier workspace holds rig blocks sitting on grass, and all of
+# that grass dies during this window too — 32 blocks away and further, so
+# `within` (16, the default) excludes it from both denominators. Nothing after
+# this scenario builds on ground this one has touched: workspaces march west
+# and this one is the last but one.
+#
+# THE SUBJECT CANNOT PASS THIS YET AND THAT IS THE POINT. `crates/rustmc-server/
+# src/randomtick.rs` ports the *selection* loop and no `randomTick` override,
+# and this server has no game rules to be told through, so its recording is
+# taken at `DEFAULT_SPEED = 0`. `absent` is the honest verdict and the worklist
+# entry; see that module's "why this is not wired into the tick loop".
+#
+# Everything is at relative z = +1, one side of the chunk boundary at z = 0.
+
+[[gamerule]]
+rule = "random_tick_speed"
+value = "1000"
+restore = "0"
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+# Placed on the top face of the ground at [1,-1,1], so the stone lands at
+# [1,0,1] and the grass it now covers is the block this check is about.
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+# The measured step does nothing. The mechanism is a server timer, so the whole
+# of this check is the settle window that follows — which is the shape
+# `settle_ms` exists for.
+[[step]]
+do = "wait"
+ms = 100

@@ -1,0 +1,143 @@
+name = "a-player-that-leaves-the-ground-is-resynced"
+about = "an entity whose on-ground flag changes is sent as a full `entity_position_sync` rather than as a delta — `ServerEntity.sendChanges` ends its forced-teleport disjunction with `wasOnGround != entity.onGround()`, so the same two-block walk is one packet type with the flag set and another with it clear, and the flag is the only thing that differs between the two steps"
+observe_from = "observer"
+# **These are projection kinds, not packet names**, and the first draft of
+# this line named the packets — `entity_position_sync`, `move_entity_pos`,
+# `move_entity_pos_rot`. `trace::decode` emits none of those: it folds
+# `entity_position_sync` and `teleport_entity` into `entity_position`, and the
+# three delta packets into `move_entity` or `move_entity_heartbeat` depending
+# on how far the entity went. A projection naming kinds that are never
+# produced filters everything away and scores `absent` for ever, on both
+# servers, whatever either of them does — the fifteenth instance of the
+# "check that could not fail" family in this corpus, caught before its first
+# run rather than after.
+#
+# `move_entity_heartbeat` is deliberately **not** in the list. It is the
+# 60-tick keep-alive rebroadcast, so whether one lands inside a 1,500 ms
+# window is a question about phase rather than about this mechanism, and
+# `520-a-standing-player-is-rebroadcast-on-a-timer` already owns it.
+observe = ["entity_position", "move_entity"]
+settle_ms = 1500
+
+# WHY THIS CHECK EXISTS, AND WHY IT IS NOT A FIX
+#
+# `ServerEntity.sendChanges` chooses between a forced sync and a delta:
+#
+# ```text
+#   offsets 648..691
+#     if (entity.getRequiresPrecisePosition()          -> sync
+#         || <the long-distance flag>                  -> sync
+#         || teleportDelay > 400                       -> sync
+#         || wasRiding                                 -> sync
+#         || wasOnGround != entity.onGround())         -> sync
+#     694: wasOnGround = entity.onGround();
+#          teleportDelay = 0;
+#          packet = ClientboundEntityPositionSyncPacket.of(entity);
+#     728: ...otherwise the move_entity_* delta packets
+# ```
+#
+# The last disjunct is ported — `crate::tracker`, and a unit test named
+# `a_change_of_ground_flag_forces_a_position_sync` covers it — and **no
+# scenario in this corpus has ever reached it**, because `Session::hop_to`
+# wrote a literal 1 into the flag byte of every `MOVE_PLAYER_POS` it sent. So
+# this check is *coverage of an existing port*, not the red half of a fix, and
+# it is worth being exact about that: the run that adds it is expected to be
+# green, and a check that is green on its first run has not been shown capable
+# of failing.
+#
+# It was therefore falsified deliberately rather than assumed falsifiable —
+# see the run note below, which records what happened with the disjunct
+# removed.
+#
+# WHY TWO STEPS AND NOT ONE
+#
+# `wasOnGround` starts true, because a player joins standing on the ground. A
+# single walk with the flag clear proves only that *a* transition produces a
+# sync. Two walks — the flag clear, then the flag set — cross the predicate in
+# both directions and should produce **two** syncs, which is what separates
+# the arm from a server that simply syncs every walk. This corpus has fourteen
+# recorded cases of a check that pinned one value and so could not tell a
+# mechanism from a constant.
+#
+# WHY THE WALK IS SHORT, AND ON +z
+#
+# Three blocks, so nothing else in `sendChanges` fires: the `i16` delta arm
+# needs more than eight blocks between two body runs, and a player's
+# `updateInterval` is 2 ticks, so a three-block hop cannot reach it. The
+# on-ground bit is then the only input that differs between the two steps.
+#
+# On +z because workspaces are spaced 32 blocks along **x**
+# (`record::WORKSPACE_SPACING`) and a walk along x would approach the next
+# scenario's rig. Nothing is built on +z. Three blocks is far inside both
+# servers' 64-block tracking limit, so no visibility change can be confused
+# with this one — that is `530`'s question and this check must not re-ask it.
+#
+# `observe_from = "observer"` because these are packets *about* the actor: the
+# actor is never sent its own entity's movement, so a check reading the acting
+# client's stream would see nothing at all and score `absent` for ever.
+#
+# THE PREDICTION, WRITTEN BEFORE THE RUN THAT MEASURES IT
+#
+# `match`, with two `entity_position_sync` and no `move_entity_pos` on the
+# observer's stream, on both servers. That is an unusual thing to predict here
+# — every other new check in this corpus has been predicted red — and it is
+# predicted only because the arm it exercises is already ported and unit
+# tested. If it comes back `diverge` the port is wrong in a way no unit test
+# reached, which is a better outcome than the prediction being right; if it
+# comes back `absent` the rig is not sending what it thinks it is, and the
+# flag byte is the first thing to read.
+#
+# **MEASURED 2026-08-04: `diverge`. The prediction was wrong and its own
+# second sentence cashed.** Both projections, from `oracle-runner explain`:
+#
+# ```text
+#   vanilla 3 observations, ours 2
+#   [0] van entity_position [0,0,3] step 0    our entity_position [0,0,3] step 0
+#   [1] van entity_position [0,0,3] step 0    our entity_position [0,0,0] step 1
+#   [2] van move_entity d=[0,0,-12288] step 1 our (nothing)
+# ```
+#
+# Vanilla syncs **twice inside step 0** and sends the return walk as a delta;
+# this server syncs once and sends the return walk as a sync. One cause:
+# vanilla's second sync is the flag going back **true inside the same step
+# with no packet saying so**, because the player is standing on a superflat
+# block and vanilla's own tick restores `onGround`. `wasOnGround` is therefore
+# already true when the walk back claims true, the forced-sync disjunct is
+# false, and `sendChanges` takes the `move_entity` branch — 3 blocks x 4096 =
+# 12288 exactly.
+#
+# **This server treats the client's ground flag as authoritative; vanilla
+# treats it as a claim.** `handleMovePlayer` never calls `setDeltaMovement` —
+# it calls `player.move(MoverType.PLAYER, vec)` and
+# `setOnGroundWithMovement(...)` — and the server's own tick is what puts the
+# player back on the floor. Underneath that, the `rest` digests differ even at
+# `[0]`, where the two sides are structurally the same packet, because
+# `ClientboundEntityPositionSyncPacket.of` reads `getDeltaMovement()` and this
+# server never sets a player's movement vector at all.
+#
+# Both are the same missing thing — **no server-side player physics** — and it
+# is not the one bit this check's rig cost. Left red at `diverge` rather than
+# deleted or weakened.
+#
+# **It was falsified rather than assumed falsifiable**, which is what makes
+# the `diverge` worth anything: with `|| self.was_on_ground != e.on_ground`
+# deleted from `crate::tracker`, the verdict moves `diverge -> absent` and
+# this server emits nothing at all here. Three distinguishable states, driven
+# by exactly the arm this file names.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# Off the ground. `wasOnGround` was true, so this crosses the predicate.
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 3.0]
+on_ground = false
+
+# Back onto it. `wasOnGround` is now false, so this crosses it the other way.
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 0.0]
+on_ground = true

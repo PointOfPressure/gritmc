@@ -1,0 +1,91 @@
+name = "a-block-on-top-of-a-wall-raises-its-connection-to-tall"
+about = "a solid block set on top of a connected wall lifts that wall's side from `low` to `tall` — the second of the pair with `730`, and the only thing in the corpus that can tell `WallSide` apart from a boolean"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 1500
+
+# THIS FILE EXISTS BECAUSE `730` CANNOT FAIL AGAINST A CONSTANT.
+#
+# `730` places three walls and every connected side it produces is `low`. A
+# server that implements `WallBlock` as a four-boolean connection model — the
+# fence model — and writes `low` wherever it means "connected" passes `730`
+# for ever, and the corpus would have recorded a pass for a block class it
+# had got structurally wrong. This directory's README calls that shape out by
+# name (`230`/`235`, `330`/`335`); this is the same pattern applied to the
+# largest unobserved schema in the block-state registry.
+#
+# FROM THE JAR, same dump as `730`:
+#
+#   makeWallState(boolean connected, VoxelShape above, VoxelShape side)
+#      6: isCovered(above, side) : ifeq 16
+#     12: WallSide.TALL     areturn
+#     16: WallSide.LOW      areturn
+#
+# `above` is the shape of the block occupying the space **over the wall
+# itself**, not over the neighbour. So the discriminating action is to put a
+# full cube on top of one wall of a connected pair and watch only that wall
+# move: its neighbour's own `above` is still air and its side stays `low`.
+# That asymmetry is the check. A server that raises both sides has read the
+# wrong position; a server that raises neither has no tri-state.
+#
+#   shouldRaisePost, offset 7: `above` being a wall with UP set forces the
+#   post. It is not a wall here — it is stone — so this step moves the sides
+#   and leaves the post to the straight-run test, which the two-wall rig
+#   already settled in the setup.
+#
+# WHAT VANILLA ACTUALLY SAYS. Measured — `ci/place-subset-probe.sh`,
+# 2026-08-12, cold vanilla 26.2 on the Threadripper:
+#
+#   block_update           [1,0,1]  cobblestone_wall[east=TALL,up=true,...]
+#   block_update           [1,1,1]  minecraft:stone
+#   section_blocks_update  [1,0,1] east=tall  /  [1,1,1] minecraft:stone
+#
+# **`[2,0,1]` does not appear in any of it**, and that absence is the check.
+# The neighbour is still connected and still `low`, because its own `above` is
+# air; only the wall the stone was put on is raised. A server that recomputes
+# the whole connected run instead of the one position emits a third entry and
+# fails here while passing `730`.
+#
+# Both packet kinds appear, as in `730`: the `block_update` pair is the placing
+# client's own correction and the `section_blocks_update` is the broadcast.
+# Observing only the former would still see the tall side here, but the pair is
+# declared together for the reason `730`'s header gives.
+#
+# WHY THE SETUP IS TWO WALLS AND NOT ONE. A lone wall has no connected side,
+# and `makeWallState` returns `NONE` before it ever reaches `isCovered` — the
+# `ifeq 20` at offset 1. Putting a block on top of a lone wall therefore
+# changes nothing about its sides and the check would measure the placement
+# and nothing else. The connection has to exist before it can be raised.
+#
+# THE RIG IS ENTIRELY AT RELATIVE z = +1.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:cobblestone_wall"
+
+# Two walls side by side: [1,0,1] and [2,0,1] connect to each other, one
+# `low` side each, posts still up because neither is a straight run.
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [2, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+# The measured step. Stone lands at [1,1,1], directly over the west wall of
+# the pair, and only that wall's east side may move.
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "up"

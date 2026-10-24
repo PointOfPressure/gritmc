@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 106
+slug   = "enchantment-registry-and-maths"
+title  = "The enchantment registry is data, the maths is transcribed, and nothing can observe either yet — 2026-09-06, branch `enchantments`"
+branch = "enchantments"

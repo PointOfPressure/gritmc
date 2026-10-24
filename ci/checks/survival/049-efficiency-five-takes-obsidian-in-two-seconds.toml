@@ -1,0 +1,67 @@
+name = "efficiency-five-takes-obsidian-in-two-seconds"
+about = """
+Efficiency as the attribute it is in 26.2: `minecraft:efficiency`'s effect is
+`minecraft:attributes`, `add_value` of `levels_squared + 1` to
+`mining_efficiency`, and `Player.getDestroySpeed` offsets 12-28 add that to a
+tool speed above 1. A diamond pickaxe with Efficiency V on obsidian is
+`(8 + 26) / 50 / 30` = 0.0227 a tick against a plain one's 0.0053. The STOP
+goes out 250 ms in (the dig step's own wait), far below 0.7, so the server
+finishes the dig on its own clock: tick 43 — 2.2 s — enchanted, tick 187
+unenchanted, which is outside this window. The observer sees stages 0..10
+climb (collapse_repeats: each stage once, whatever step it lands in), then
+the 2001 and the block_update; the pickaxe takes one point of damage, and
+its container_set_slot carries the enchantments entry before the damage one
+(the patch map's insertion order: the command set one, `setDamageValue` the
+other). The drop is obsidian. What would make it fail: efficiency ignored
+(no break in the window), applied without the square, or added to a speed
+of 1.
+"""
+# The console gave this rig its items; `clear` takes them back so the
+# next scenario starts empty-handed, on both servers.
+console_restore = ["clear oracle"]
+# Three blocks out: the drop lands beyond the digger's pickup box
+# (player AABB inflated by 1 horizontally), so the check grades the dig and
+# not item pickup, which this server does not have — at [1, 0, 0] vanilla
+# picked the cobblestone up into slot 37 450 ms after the break, and at
+# [2, 0, 0] it still did in one of two runs (2026-10-01): the item's own
+# random velocity carries it most of a block.
+observe_from = "both"
+observe = ["block_destruction", "level_event", "set_entity_data", "container_set_slot", "block_update", "block_changed_ack"]
+collapse_repeats = ["block_destruction"]
+settle_ms = 3000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "console"
+text = "clear oracle"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:obsidian"
+
+[[setup]]
+do = "place"
+on = [3, -1, 0]
+face = "up"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:diamond_pickaxe[enchantments={efficiency:5}]"
+
+[[setup]]
+do = "wait"
+ms = 300
+
+[[step]]
+do = "dig"
+at = [3, 0, 0]
+face = "up"
+
+[[step]]
+do = "finish_dig"
+at = [3, 0, 0]
+face = "up"

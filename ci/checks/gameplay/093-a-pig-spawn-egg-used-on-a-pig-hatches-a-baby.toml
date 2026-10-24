@@ -1,0 +1,83 @@
+name = "a-pig-spawn-egg-used-on-a-pig-hatches-a-baby"
+about = "a pig spawn egg used on a pig makes a baby pig at the pig's own position: Mob.checkAndHandleImportantInteractions hands the egg to SpawnEggItem.spawnOffspringFromSpawnEgg, which breeds the pig with itself, sets the child's age to -24000 and adds it, so the client is paired with a pig whose baby flag is set, and SUCCESS_SERVER swings the player's arm"
+observe_from = "actor"
+observe = ["set_entity_data", "animate"]
+within = 336
+settle_ms = 1500
+
+# THE MECHANISM, read from the pinned jar:
+#
+#   Mob.checkAndHandleImportantInteractions
+#                               38-45  getItem() instanceof SpawnEggItem
+#                               69-82  spawnOffspringFromSpawnEgg(player, this,
+#                                      getType(), level, position(), stack)
+#                              101-114 empty -> PASS, else SUCCESS_SERVER
+#   SpawnEggItem.spawnOffspringFromSpawnEgg
+#                                0-12  spawnsEntity(stack, type)
+#                               13-36  AgeableMob -> getBreedOffspring(level, this)
+#                               61-78  setBaby(true); isBaby() or empty
+#                               79-98  snapTo(pos.x, pos.y, pos.z, 0F, 0F)
+#                              108-111 addFreshEntityWithPassengers(baby)
+#   Pig.getBreedOffspring        0-56  EntityTypes.PIG.create(level, BREEDING);
+#                                      setVariant(random.nextBoolean() ? mine
+#                                      : partner's) — the partner is the pig
+#                                      itself, so either arm is its variant
+#   AgeableMob.setBaby / setAge        setAge(-24000) flips DATA_BABY_ID (16)
+#
+# What reaches the actor: the baby's pairing `set_entity_data` (health 10.0 at
+# accessor 9, baby true at 16 — the constructor's `setHealth(getMaxHealth())`
+# and the age), then `animate 0`, then on the next tick the same two values
+# again from `sendDirtyEntityData`, as for any fresh mob (`081`). The baby's
+# `add_entity` is not observed: `LivingEntity.<init>` draws `yHeadRot` from
+# the baby's own unseeded random and `snapTo` does not touch it.
+
+# THE RIG, AND WHY IT IS OUT HERE. The pit is `083`'s: digging [1,-1] and
+# [1,-2] leaves a 1x1 shaft two deep whose floor has no walkable neighbour, so
+# every path a pig in it is ever given is its own node and it never moves —
+# its unseeded `RandomStrollGoal` and look goals cannot reach anything this
+# check observes. The rig sits +320 blocks out on z, past `083`-`089`'s
+# rigs at +-80 and +-160 and alternating sign with its neighbours here (same
+# sign 64 apart on x and 80 on z), so no other scenario's mob is tracked from
+# it and nothing it leaves is tracked from theirs: the actor tracks to 64
+# blocks at view-distance 4. `within` is opened to reach the rig; the observer
+# stays at the workspace and tracks none of it, hence `observe_from = "actor"`.
+# Coordinates in the steps carry the offset.
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 320.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, 321]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, 321]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [1, -3, 321]
+face = "up"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, 320.95]
+
+[[setup]]
+do = "wait"
+ms = 1500
+
+[[step]]
+do = "interact"
+target = "minecraft:pig"

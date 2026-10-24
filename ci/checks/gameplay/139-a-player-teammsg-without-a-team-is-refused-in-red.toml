@@ -1,0 +1,26 @@
+name = "a-player-teammsg-without-a-team-is-refused-in-red"
+about = """
+a permission-level-0 player typing `/teammsg hello` and then `/tm hello` is
+answered each time with ONE red chat line,
+`commands.teammsg.failed.noteam`, and the other player hears nothing
+
+`teammsg` has no `requires`, so it is one of the ten roots vanilla tells a
+non-operator about, and `tm` is a bare `redirect` into it.
+`TeamMsgCommand`'s executor asks `getEntityOrException().getTeam()` and
+raises `ERROR_NOT_ON_TEAM` when it is null — which it is for both harness
+players, who are on no team. `ExecutionCommandSource.handleError` sends that
+to the source alone, red. A server that did not register the root (the
+unknown-command pair), did not follow the redirect, or broadcast the message,
+moves `chat`.
+"""
+observe_from = "both"
+observe = ["chat"]
+settle_ms = 1500
+
+[[step]]
+do = "command"
+text = "teammsg hello"
+
+[[step]]
+do = "command"
+text = "tm hello"

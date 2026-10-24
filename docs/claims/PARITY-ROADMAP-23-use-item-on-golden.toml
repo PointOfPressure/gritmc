@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 23
+slug   = "use-item-on-golden"
+title  = "The other half of the right-click: `use_item_on.json`, and the two bindings it needed — 2026-08-12, branch `golden-useitemon-axis`"
+branch = "golden-useitemon-axis"

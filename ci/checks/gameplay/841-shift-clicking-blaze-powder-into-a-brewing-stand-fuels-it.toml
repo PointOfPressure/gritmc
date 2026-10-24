@@ -1,0 +1,38 @@
+name = "shift-clicking-blaze-powder-into-a-brewing-stand-fuels-it"
+about = "blaze powder shift-clicked from the hotbar into an open brewing stand. BrewingStandMenu.quickMoveStack tests FuelSlot.mayPlaceItem first (offsets 90-136), so the powder goes to slot 4 although it is also a potion ingredient — and the successful fuel move returns EMPTY straight away. The next tick the stand burns it into 20 fuel, so the menu is then corrected twice more: slot 4 emptied and container_set_data id 1 = 20. A server that tested the ingredient slot first puts the powder in slot 3 and never fuels"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:brewing_stand"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:blaze_powder"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 32
+input = "quick_move"

@@ -1,0 +1,25 @@
+name = "a-named-banner-reports-its-name"
+about = "763's banner, placed from a stack carrying minecraft:custom_name (\"Flag\"). BannerBlockEntity.applyImplicitComponents (offsets 26-29) takes CUSTOM_NAME, its saveAdditional stores it as CustomName (34-43), and getUpdateTag is saveWithoutMetadata — so the block_entity_data vanilla sends on placement is {CustomName: \"Flag\", components: {}} instead of 763's bare {components: {}}. What would make this fail: a name taken only by containers, whose update packets are null, leaves the banner's packet 763's."
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:white_banner"
+components = [{ type = "minecraft:custom_name", text = "Flag" }]
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

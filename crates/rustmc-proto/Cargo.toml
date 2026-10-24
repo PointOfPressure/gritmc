@@ -1,0 +1,16 @@
+[package]
+name = "rustmc-proto"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+flate2 = { workspace = true }
+
+[dev-dependencies]
+# `tests/crypt.rs` reads the crypt golden, which is a JSON document.
+serde_json.workspace = true
+
+[lints]
+workspace = true

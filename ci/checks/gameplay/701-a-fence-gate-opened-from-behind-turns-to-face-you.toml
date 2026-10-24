@@ -1,0 +1,71 @@
+name = "a-fence-gate-opened-from-behind-turns-to-face-you"
+about = "the same gate, the same click, the player turned round — opening a fence gate whose `facing` is the opposite of the player's own rewrites `facing` to the player's before it sets `open`, so this check and `700` differ in exactly the property being claimed and nothing else. Without it a server that toggles `open` and never touches `facing` passes `700` for ever"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack", "sound"]
+settle_ms = 1500
+
+# `sound` IS ONE-SIDED HERE, EXACTLY AS IN `700` — see that file's SOUND
+# paragraph. `FenceGateBlock.useWithoutItem` plays through
+# `Level.playSound(player, …)`, whose leading argument is the entity excluded
+# from the broadcast, so the actor is sent no sound by a correct server and
+# this kind can only ever fire against a port that broadcasts it to everyone.
+# The harness's `we never sent: sound` advisory line prints on any diverge
+# here and does **not** mean vanilla sent one to the actor; it did not.
+#
+# THE PAIR RULE, AND WHY THIS ONE EXISTS.
+#
+# `ci/checks/gameplay/README.md`: a check exercises one input, and a mechanism
+# that reads something *from* that input can be faked by a constant which the
+# single input never distinguishes. `700` opens a gate from the front. The
+# `facing` rewrite is on the other branch, so `700` cannot see it, and a server
+# that implements `FenceGateBlock.useWithoutItem` as "cycle OPEN" is
+# indistinguishable there.
+#
+# The branch, from the jar (offsets as in `700`'s header):
+#
+#     43: Direction d = player.getDirection()
+#     50: if state.getValue(FACING) == d.getOpposite()
+#     65:   state = state.setValue(FACING, d)
+#
+# The setup places the gate while looking yaw 0.0 — south — so FACING=south,
+# exactly as in `700`. The step then looks yaw 180.0, which is north, and
+# clicks: `d` is north, `d.getOpposite()` is south, FACING is south, the
+# branch is taken, and the gate ends FACING=north as well as OPEN=true.
+#
+# **The look is a step and not setup, deliberately.** Setup observations are
+# discarded, and the turn is half of what this check claims — putting it in
+# `setup` would leave the recording unable to show that the player was facing
+# north when the click landed. It costs one `move_entity_rot`-shaped
+# observation from the actor's own stream, which is the actor's own action and
+# so is subtracted by the `inert` test rather than counted as an answer.
+#
+# One block, one click, one property more than `700`. Everything at relative
+# z = 0.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_fence_gate"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "look"
+yaw = 180.0
+pitch = 0.0
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

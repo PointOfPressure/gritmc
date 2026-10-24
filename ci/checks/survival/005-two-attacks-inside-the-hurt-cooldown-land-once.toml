@@ -1,0 +1,94 @@
+name = "two-attacks-inside-the-hurt-cooldown-land-once"
+about = "two identical attacks eight ticks apart. `LivingEntity.hurtServer` sets `invulnerableTime = 20` on the first and the second arrives while it is still above 10, so the second is refused outright — `damage <= lastHurt` at offset 206 — and vanilla answers ONE damage_event and ONE set_health for two attack packets. `001` shows that a single attack is answered; this shows that the second is not, which is a different claim and the one a server that models damage without the cooldown gets wrong."
+observe_from = "actor"
+observe = ["sound", "damage_event", "set_health", "entity_event"]
+settle_ms = 2000
+
+# WHAT THIS IS FOR, AND WHY IT IS NOT `001` WITH AN EXTRA STEP.
+#
+# `001` grades "an attack on a hurtable target produces damage". A server
+# that answered every attack with a damage_event would pass it. This one
+# grades the *refusal*, which is the half of `LivingEntity.hurtServer` that a
+# reimplementation drops:
+#
+#   hurtServer, javap -p -c -constants on the pinned jar
+#     184: invulnerableTime > 10.0f            (i2f at 188)
+#     196: !source.is(BYPASSES_COOLDOWN)
+#     206: damage <= lastHurt : ifgt 217 -> 215: return FALSE
+#     217: actuallyHurt(damage - lastHurt); lastHurt = damage; fullHit = false
+#     240: else: lastHurt = damage; invulnerableTime = 20;
+#          actuallyHurt(damage); hurtDuration = hurtTime = 10
+#
+# Two things follow and both are visible on the wire.
+#
+#   * The second attack deals the same 1.0 as the first, so `damage <=
+#     lastHurt` holds and the whole call returns at 215 — **before**
+#     actuallyHurt, before the health write and before
+#     `broadcastDamageEvent`.
+#   * Even if it had been larger, `fullHit` would be false and offsets
+#     283..370 — the damage_event broadcast, markHurt and the knockback —
+#     are all inside `if (fullHit)`. So a hit that lands inside the cooldown
+#     moves health silently.
+#
+# `crates/rustmc-server/src/hurt.rs` transcribes both, and
+# `hurt::tests::a_smaller_hit_inside_the_cooldown_is_refused_entirely` and
+# `...lands_for_the_difference_and_is_silent` are the unit half. This file is
+# the half that compares against vanilla rather than against a second reading
+# of the same bytecode.
+#
+# THE EIGHT TICKS.
+#
+# `invulnerableTime` is set to 20 and decremented once per tick by
+# `Entity.baseTick`, and the gate is `> 10`, so the refusal window is the
+# first NINE ticks after a hit (20, 19, ... 11) and the tenth tick onward
+# lets a hit through. 400 ms is eight ticks: comfortably inside the window
+# with a tick of slack either side. A `wait` of 550 ms would be the *other*
+# check — the one where the cooldown has expired and both attacks land — and
+# it is deliberately not written here, because a scenario whose outcome
+# depends on which side of a boundary a millisecond timer lands is a scenario
+# that flaps.
+#
+# NO `hold` STEP. `handleSetCreativeModeSlot` refuses the packet outright for
+# a non-creative player, silently, so a `hold` on this substrate does nothing
+# at all rather than failing. `001`'s own comment records the same thing; an
+# empty hand is 1.0 base ATTACK_DAMAGE either way.
+#
+# WHAT THIS SERVER DOES TODAY: nothing. There is no health, no hurt cooldown
+# and no damage_event on the wire, so the honest verdict is the same
+# `diverge` that `001` reports, with damage_event and set_health in
+# missing_kinds. `crates/rustmc-server/src/{health,hurt}.rs` are the state
+# machines a later branch wires to the attack handler; until then this file
+# is a red that names the gap rather than a green that hides it.
+#
+# NOT SWEPT, AND SAYING SO IS THE POINT. `ci/corpus-falsifiable.py`'s
+# `DEFAULT_CHECKS` is `ci/checks/gameplay` and its ledger is
+# `ci/checks/gameplay-falsifiable.toml`; nothing sweeps `ci/checks/survival`
+# and no gate reads a survival falsifiability ledger, so this check carries
+# **no tier**. It is not a tier-2 check and must not be quoted as one. The
+# script does take `--checks` and `--ledger`, so the sweep is possible on a
+# survival recording; what is missing is the ledger and the T0 hook that
+# reads it.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 3.0]
+
+[[step]]
+do = "attack"
+target = "minecraft:player"
+
+# Eight ticks. See the note above for why not nine or eleven.
+[[step]]
+do = "wait"
+ms = 400
+
+# The measured step. Identical to the first, which is what makes
+# `damage <= lastHurt` hold rather than the difference arm run.
+[[step]]
+do = "attack"
+target = "minecraft:player"

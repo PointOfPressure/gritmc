@@ -1,0 +1,35 @@
+name = "console-worldborder-set-reaches-a-client"
+about = """
+a world border set from the server's own console reaches a standing client as
+`set_border_size` — the packet, its double, and the fact that a `set` with no
+time is the immediate packet and not the lerp one
+
+This is the first check in the corpus driven from the CONSOLE rather than from
+a client. `/worldborder` requires permission level 2 and the harness's two
+players are level 0 on both servers, so `do = "command"` cannot reach it; see
+`scenario::Step::Console`. `ci/t2-gameplay.sh` already passes `--console` on
+both record passes, so the line reaches vanilla and rustmc alike.
+
+`set_border_size` carries one f64 and nothing else, so a wrong value is the
+whole packet wrong; and the `time`-less form is the branch that must NOT send
+`set_border_lerp_size` (`WorldBorderCommand.setSize`, offsets 84..161).
+
+Level 2, so it goes through the console — see `scenario::Step::Console`.
+
+`console_restore` is the load-bearing half of this check and it is exact. The
+border is global server state and every rig in this corpus sits 32 blocks
+further out in −x than the last, so a border left at 137 puts every LATER
+scenario outside it: vanilla answers each placement with `build.tooHigh` and
+each container right-click with silence. That is measured, not hypothetical —
+it happened on 2026-09-05 and cost ninety checks. `59999968` is
+`WorldBorder.MAX_SIZE`, which is both the size a fresh border has and the
+maximum `/worldborder set` accepts.
+"""
+console_restore = ["worldborder set 59999968"]
+observe_from = "actor"
+observe = ["set_border_size", "set_border_lerp_size"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "worldborder set 137"

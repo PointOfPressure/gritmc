@@ -1,0 +1,89 @@
+name = "a-golden-dandelion-locks-a-baby-pigs-age"
+about = "a golden dandelion used on a baby pig locks its age: AgeableMob.mobInteract finds the dandelion, a baby and a run-out cooldown, setAgeLocked flips AGE_LOCKED and the next tick's sendChanges carries it — and nothing swings, because the result is plain SUCCESS"
+observe_from = "actor"
+observe = ["set_entity_data", "animate"]
+within = 336
+settle_ms = 1500
+
+# THE MECHANISM, read from the pinned jar:
+#
+#   AgeableMob.mobInteract       6-19  canUseGoldenDandelion(stack, isBaby(),
+#                                      ageLockParticleTimer, this)
+#                               22-43  setAgeLocked(this, this::isAgeLocked,
+#                                      player, stack, m -> setAgeLockedData()),
+#                                      SUCCESS
+#   AgeableMob.canUseGoldenDandelion 0-33  GOLDEN_DANDELION && baby &&
+#                                      timer == 0 && !#cannot_be_age_locked
+#   AgeableMob.setAgeLockedData  0-30  setAgeLocked(!isAgeLocked()) — accessor
+#                                      17; setAge(-24000); timer = 40
+#   AgeableMob.setAgeLocked(Mob,..) 0-68  consume, persistence, the use sound
+#
+# The baby is hatched in setup by a pig spawn egg used on the pig (`093`), so
+# it stands at its parent's exact position in the same pit and is the newest
+# pig the actor knows. `SUCCESS` is a client swing, so the server sends no
+# `animate`: a server that answered SUCCESS_SERVER here is visible. The use
+# sound is not observed — the two pigs' ambient sounds, on their unseeded
+# randoms, would land in the same projection.
+
+# THE RIG, AND WHY IT IS OUT HERE. The pit is `083`'s: digging [1,-1] and
+# [1,-2] leaves a 1x1 shaft two deep whose floor has no walkable neighbour, so
+# every path a pig in it is ever given is its own node and it never moves —
+# its unseeded `RandomStrollGoal` and look goals cannot reach anything this
+# check observes. The rig sits -320 blocks out on z, past `083`-`089`'s
+# rigs at +-80 and +-160 and alternating sign with its neighbours here (same
+# sign 64 apart on x and 80 on z), so no other scenario's mob is tracked from
+# it and nothing it leaves is tracked from theirs: the actor tracks to 64
+# blocks at view-distance 4. `within` is opened to reach the rig; the observer
+# stays at the workspace and tracks none of it, hence `observe_from = "actor"`.
+# Coordinates in the steps carry the offset.
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, -320.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, -321]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, -321]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [1, -3, -321]
+face = "up"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, -319.95]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "interact"
+target = "minecraft:pig"
+
+[[setup]]
+do = "hold"
+item = "minecraft:golden_dandelion"
+
+[[setup]]
+do = "wait"
+ms = 1500
+
+[[step]]
+do = "interact"
+target = "minecraft:pig"

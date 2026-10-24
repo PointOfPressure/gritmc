@@ -1,0 +1,90 @@
+name = "walking-into-the-next-chunk-moves-the-cache-centre"
+about = "the actor walks north out of its workspace chunk and back, so `ChunkMap.applyChunkTrackingView` moves the client's chunk-cache centre once each way — the first corpus check on any part of the chunk stream, and the reason `trace::FAMILIES` opened the family"
+observe_from = "actor"
+observe = ["set_chunk_cache_center"]
+# The packet carries no world position — it carries a CHUNK coordinate — so
+# there is nothing for `compare::near` to bound and the check says so rather
+# than relying on `bound == None` passing by default. `580`/`581`/`582` use
+# the same declaration for the same reason.
+within = -1
+settle_ms = 3000
+
+# WHY THIS CHECK EXISTS
+#
+# Until 2026-09-06 `trace::is_housekeeping` dropped `SET_CHUNK_CACHE_CENTER`
+# before any decoder arm ran, so no scenario in this corpus could observe any
+# part of the chunk stream and none was written. `origin/chunk-streaming`
+# ported `ChunkTrackingView`, `ChunkLevel`, `PlayerChunkSender` and the ticket
+# arithmetic against a live capture taken OUTSIDE the corpus, and recorded the
+# reason as a killed null: "the gameplay corpus cannot observe this area at
+# all". This is the first check that can.
+#
+# WHY THIS PACKET AND NOT THE OTHER FOUR
+#
+# `set_chunk_cache_center` is the only member of the chunk-view family whose
+# value is a pure function of what the scenario controls. Out of
+# `ChunkMap.applyChunkTrackingView`, offsets 43-56:
+#
+# ```java
+#   if (!(old instanceof Positioned p) || !p.center().equals(now.center()))
+#       connection.send(new ClientboundSetChunkCacheCenterPacket(
+#           now.center().x(), now.center().z()));
+# ```
+#
+# The centre is the player's own chunk and the send is gated on it having
+# CHANGED. Nothing else about the packet depends on the view distance, on
+# which chunks have finished generating, or on the client's acknowledgement
+# rate.
+#
+# The other four all do, and `ci/checks/ambient-families.toml` carries the
+# measurement rather than the argument:
+#
+#   * `chunk_batch_start` / `chunk_batch_finished` — the batch split is driven
+#     by the client's own reported milliseconds-per-chunk through
+#     `PlayerChunkSender.batchQuota`, so the number of batches and the size of
+#     each is a property of the harness's scheduling;
+#   * `forget_level_chunk` — deterministic in content (a `ChunkTrackingView
+#     .difference` over two views that are pure functions of position) but its
+#     arrival is queued on a server tick;
+#   * `light_update` — conditional on a light section actually changing, which
+#     nothing here provokes.
+#
+# WHY THE COORDINATES ARE RELATIVE
+#
+# `trace::Normalizer::rel_chunk` subtracts the anchor's own chunk (`>> 4`, an
+# arithmetic shift, which is floor division on a negative index and is what
+# `ChunkPos.<init>(BlockPos)` does). The two servers do not put their spawn in
+# the same place, so an absolute chunk index would differ for a reason having
+# nothing to do with either server's chunk tracking. Subtracting the anchor's
+# BLOCK position instead — the treatment every other position in the recorder
+# gets — would be wrong by up to fifteen sixteenths of a chunk.
+#
+# WHY +z AND WHY 20 BLOCKS
+#
+# `record.rs` spaces workspaces along **x** at 32 blocks (`WORKSPACE_SPACING`),
+# so walking on x would cross another scenario's rig. Workspaces sit at
+# `z = 0`, so `z = 20` is chunk z 1 and `z = 0` is chunk z 0: exactly one
+# border each way, which is one centre move each way. Twenty rather than
+# sixteen so the walk finishes clear of the boundary and a one-block
+# undershoot cannot decide the verdict. Four blocks a packet — eight is
+# refused by vanilla with `oracle moved too quickly!` and one makes short
+# walks flap; `530` establishes both.
+#
+# WHAT EACH SERVER SHOULD SAY
+#
+# ```text
+#   step 0  walk to z = 20   centre moves from (0, 0) to (0, 1): one packet
+#   step 1  walk to z = 0    centre moves back:                  one packet
+# ```
+#
+# Two observations, relative chunk z of +1 then 0. A server that sends the
+# packet on every border crossing regardless of whether the centre moved says
+# more; one that never moves the centre says nothing and is `absent`.
+
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 20.0]
+
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 0.0]

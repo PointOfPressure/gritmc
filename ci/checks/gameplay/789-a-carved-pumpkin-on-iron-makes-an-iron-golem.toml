@@ -1,0 +1,60 @@
+name = "a-carved-pumpkin-on-iron-makes-an-iron-golem"
+about = "the five-block iron golem pattern, whose empty positions are as load-bearing as its full ones"
+observe = ["block_update", "section_blocks_update", "level_event", "set_entity_data", "update_attributes", "sound"]
+settle_ms = 1500
+
+# `BlockPatternBuilder.aisle("~^~", "###", "~#~")`, top row first, with
+# `'#' = Blocks.IRON_BLOCK` and — this is the part a rig gets wrong —
+# **`'~' = Blocks.AIR`**. The four `~` positions must be empty, so the two arm
+# blocks cannot be stacked up from the ground: they are placed against the
+# west and east faces of the neck. A rig that builds two columns and puts a
+# pumpkin on top matches nothing and records `inert`.
+#
+# `IronGolem.setPlayerCreated(true)` is called before the spawn (offsets
+# 88-91), and the golem is placed at `match.getBlock(1,2,0)` rather than at
+# the pumpkin, so this check also pins *where* a golem lands relative to a
+# pattern that is not symmetric about the trigger block. 788 cannot: its
+# pattern is one column wide.
+#
+# See 788 for the spawn-mechanism argument and 777 for why `add_entity` is not
+# observed. This check leaves a live iron golem in the world; 788's closing
+# paragraph is why that is safe here and was not for the snow golem this
+# branch removed.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_block"
+
+[[setup]]
+do = "place"
+on = [2, -1, -2]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [2, 0, -2]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [2, 1, -2]
+face = "west"
+
+[[setup]]
+do = "place"
+on = [2, 1, -2]
+face = "east"
+
+[[setup]]
+do = "hold"
+item = "minecraft:carved_pumpkin"
+
+[[step]]
+do = "place"
+on = [2, 1, -2]
+face = "up"

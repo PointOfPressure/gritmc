@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 47
+slug   = "nether-floor-is-a-biome-statement"
+title  = "A nether floor is a statement about the window's biome mix: 15.6% of the r=16 window carries 98.9% of it — 2026-08-18, branch `nether-biome-census`"
+branch = "nether-biome-census"

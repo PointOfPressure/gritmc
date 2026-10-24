@@ -1,0 +1,65 @@
+name = "walking-into-the-next-chunk-sends-the-row-ahead"
+about = "the same walk as 546 and 547, watching the chunks that ENTER the tracked set: each crossing sends one `LEVEL_CHUNK_WITH_LIGHT` per chunk the new view gains, and in this superflat corpus every one of them carries no block entity, so they are recorded as `chunk_no_block_entities` and this check counts how many arrive after each step"
+observe_from = "actor"
+observe = ["chunk_no_block_entities"]
+# The observation carries no world position — an empty block-entity list has
+# no block to anchor `at` to — so there is nothing for `compare::near` to
+# bound, and the check says so rather than relying on `bound == None` passing
+# by default. `547` makes the same declaration for the same reason.
+within = -1
+settle_ms = 3000
+
+# WHY THIS CHECK EXISTS
+#
+# `chunk_no_block_entities` is the kind `trace::observe` gives a chunk packet
+# whose block-entity list is empty. `main` dropped that case at RECORD time
+# (`return None`), on the argument that one observation per chunk entering
+# view is chunk streaming — "which chunk batch landed inside the measured
+# window" — and not either server's behaviour. `recorder-housekeeping` forbids
+# record-time drops, so the case is recorded under its own kind, and a kind
+# needs a class a measurement supports.
+#
+# The measurement refutes the argument on the censused set. Two independent
+# vanilla runs over the twenty `5*` scenarios
+# (`AMBIENT_GLOB='5*' ./ci/ambient-census.sh` at 9b89855ac):
+#
+# ```text
+#   chunk_no_block_entities   231 and 231 observations, 20/20 scenarios agree
+#                             on values AND on the step each landed after;
+#                             189 from this server
+# ```
+#
+# Per scenario and step it is 11 per crossing on vanilla and 9 on this
+# server, in every one of the four scenarios that cross a chunk boundary.
+# The batch packets around these chunks flap (`chunk_batch_start` 19/20 on
+# the step) because `PlayerChunkSender.batchQuota` splits the SAME chunks
+# into a client-driven number of batches; the chunks themselves, and the step
+# they land after, do not move. So the kind is graded rather than tagged, and
+# `FAMILIES` requires a scenario naming it before it may be. This is that
+# scenario.
+#
+# WHAT EACH SERVER SHOULD SAY, AND WHY IT DIVERGES TODAY
+#
+# `ChunkMap.applyChunkTrackingView` calls `ChunkTrackingView.difference(old,
+# now, markSent, dropChunk)`; `markSent` queues every chunk the new view
+# gains, and `PlayerChunkSender` sends each as one chunk packet. Vanilla's
+# view is `ChunkTrackingView$Positioned.isWithinDistance`, a Euclidean disc
+# padded by two, so the row a crossing gains at view distance 4 is eleven
+# chunks wide (`-5..=5`). `crates/rustmc-server/src/world_send.rs`'s
+# `ChunkView` walks a Chebyshev square, whose row is nine (`-4..=4`). One
+# crossing each way: vanilla 11 + 11, this server 9 + 9. The same geometry is
+# what `547` sees from the other side, on `forget_level_chunk`.
+#
+# It is expected to diverge on this branch and on `main`, and a diverging
+# check is the honest reading. What it must not be is a check that cannot go
+# red: every observation carries an identical value, so the content it grades
+# is the COUNT per step, and a count the subject gets wrong is exactly what a
+# mutation of the measured step (and this server) moves.
+
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 20.0]
+
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 0.0]

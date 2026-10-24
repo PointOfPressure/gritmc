@@ -1,0 +1,22 @@
+name = "place-log-axis"
+about = "a pillar takes the axis of the face it was clicked on — RotatedPillarBlock.getStateForPlacement, which no table of block states can answer on its own"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_log"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "east"

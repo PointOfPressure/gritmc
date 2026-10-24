@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 70
+slug   = "chunk-send-order"
+title  = "The chunk-send path: order, batch framing and what no recording can see"
+branch = "chunk-send-path"
+status = "written"

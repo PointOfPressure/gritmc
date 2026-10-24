@@ -1,0 +1,36 @@
+name = "console-fill-a-hollow-box-above-a-player"
+about = """
+`execute at oracle_eye run fill ~1 ~3 ~-1 ~3 ~5 ~1 minecraft:glass hollow`
+from the console writes the 26-block shell of a 3x3x3 box above and east of the observer
+and leaves its centre air, and both players are told in the tick's coalesced
+`section_blocks_update`s
+
+`FillCommand.fillBlocks` walks `BlockPos.betweenClosed` and asks
+`Mode.HOLLOW`'s filter for each position: the block on an edge face,
+`HOLLOW_CORE` (air) strictly inside. Every write goes through
+`BlockInput.place` with flags `2 | 256`, so it is recorded for the tick's
+broadcast, and `ChunkHolder.broadcastChanges` sends one
+`section_blocks_update` per section touched rather than 26 `block_update`s.
+A server that filled the core, wrote nothing for the air core it was asked to
+write over air (an unchanged block is not a change), broadcast per block, or
+counted wrong moves the observation. The count is in the console's log; chat
+stays silent.
+
+**The box sits one block east of the observer, inside one chunk, and that
+is load-bearing.** Centred on the observer it straddled a chunk edge, and
+vanilla's `ServerChunkCache.chunkHoldersToBroadcast` is a
+`ReferenceOpenHashSet` — identity-hash order — so which chunk's
+`section_blocks_update` went first was not a property of the server
+(`cmdexec2-rec1`, 2026-10-01: within-section order matched, chunk order did
+not). One chunk, one packet per player.
+
+Level 2, through the console. The restore fills the same box with air.
+"""
+console_restore = ["execute at oracle_eye run fill ~1 ~3 ~-1 ~3 ~5 ~1 minecraft:air"]
+observe_from = "both"
+observe = ["block_update", "section_blocks_update", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "execute at oracle_eye run fill ~1 ~3 ~-1 ~3 ~5 ~1 minecraft:glass hollow"

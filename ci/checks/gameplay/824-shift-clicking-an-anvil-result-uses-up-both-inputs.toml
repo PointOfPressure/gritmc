@@ -1,0 +1,60 @@
+name = "shift-clicking-an-anvil-result-uses-up-both-inputs"
+about = "the anvil's result shift-clicked is `ItemCombinerMenu.quickMoveStack`'s result arm — `moveItemStackTo` into the player's 36 reversed, then `slot.onTake` — so the pickaxe lands at the far end of the hotbar and `AnvilMenu.onTake` spends both inputs and plays level event 1030 exactly as a plain take does"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data", "set_cursor_item", "level_event"]
+settle_ms = 1000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:anvil"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_pickaxe"
+components = [{ type = "minecraft:damage", varint = 200 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_ingot"
+slot = 1
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 31
+
+[[step]]
+do = "container_click"
+slot = 1
+
+[[step]]
+do = "container_click"
+slot = 2
+input = "quick_move"

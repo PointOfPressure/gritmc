@@ -1,0 +1,17 @@
+[package]
+name = "worldgen-dump"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+# The one place the stages are ordered and the extract is read, shared with
+# the gates so there is a single answer to "what does rustmc generate".
+worldgen-assembly.workspace = true
+rustmc-worldgen = { workspace = true }
+rustmc-world = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

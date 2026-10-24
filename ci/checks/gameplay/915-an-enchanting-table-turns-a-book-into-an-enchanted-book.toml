@@ -1,0 +1,51 @@
+name = "an-enchanting-table-turns-a-book-into-an-enchanted-book"
+about = "pressing the first offer for a book runs `lambda$clickMenuButton$0`: the book is `transmuteCopy`'d into an enchanted book carrying the rolled enchantment in `STORED_ENCHANTMENTS`, and `onEnchantmentPerformed` sets `lastSentExp = -1`, so the next tick sends a `set_experience` even though a creative player's level stays 0; `ENCHANTMENT_TABLE_USE` plays at the block before the slot goes out; the seed it redraws is unseeded and is not observed here, nor is the advancement the first enchantment grants"
+observe_from = "actor"
+observe = ["container_set_slot", "set_experience", "sound"]
+settle_ms = 1000
+
+# EnchantmentMenu: item 0, lapis 1, then the 36 — hotbar 0 is 2 + 27 = 29.
+# Ten data slots: costs 0..2, the seed at 3, enchantClue 4..6, levelClue
+# 7..9. The seed is `Player.enchantmentSeed`, 0 for a player with no save
+# file — which every corpus actor is — so the offers are a function of the
+# item and the bookshelf count (none here) and nothing else.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:enchanting_table"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:book"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 29
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_button_click"
+button = 0

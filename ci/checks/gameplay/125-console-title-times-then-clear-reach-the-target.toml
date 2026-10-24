@@ -1,0 +1,28 @@
+name = "console-title-times-then-clear-reach-the-target"
+about = """
+`title oracle times 10 3s 20` then `title oracle clear` from the console send
+the target `set_titles_animation` (10, 60, 20) and then `clear_titles` with
+`resetTimes` false — and send the other player nothing
+
+`TitleCommand.setTimes` builds one `ClientboundSetTitlesAnimationPacket` from
+three `TimeArgument.time()` values, and `3s` is 60 ticks by the time it
+arrives, so a server that read the suffix as ticks or dropped it moves the
+`stay` field. `clearTitle` sends `ClientboundClearTitlesPacket(false)`; the
+`true` form is `reset`, a different command, and sending it here moves the
+`reset` field. Both replies go to the console's log, so `chat` stays silent.
+
+Level 2, through the console. The restore is `title oracle reset`, which puts
+the target's title times back to the client's defaults.
+"""
+console_restore = ["title oracle reset"]
+observe_from = "both"
+observe = ["set_titles_animation", "clear_titles", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "title oracle times 10 3s 20"
+
+[[step]]
+do = "console"
+text = "title oracle clear"

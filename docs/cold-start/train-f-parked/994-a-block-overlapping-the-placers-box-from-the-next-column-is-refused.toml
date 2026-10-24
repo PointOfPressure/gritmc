@@ -1,0 +1,12 @@
+name = "a-block-overlapping-the-placers-box-from-the-next-column-is-refused"
+about = "the player stands on the block corner (relative x = z = 0), so their 0.6-wide box reaches 0.3 into the column at x = -1: BlockItem.canPlace's isUnobstructed refuses stone placed there, and the client is resynced with air. A floor-column test (floor(x) == -1?) places it. Two blocks out (992's rig) is clear"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[step]]
+do = "place"
+on = [-1, -1, 0]
+face = "up"

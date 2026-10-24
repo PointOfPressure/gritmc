@@ -1,0 +1,23 @@
+name = "a-log-placed-with-a-block-state-takes-its-axis"
+about = "an oak log carrying minecraft:block_state {axis: z} is placed on a block's top face, where RotatedPillarBlock.getStateForPlacement alone gives axis=y (030). BlockItem.place offsets 106-130: while the position still holds the placed block, updateBlockStateFromTag applies BlockItemStateProperties to it and, because the state changed, writes it again with flag 2 — so the log stands on its side. What would make this fail: a placement that ignores the stack's block_state and leaves 030's axis=y."
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_log"
+components = [{ type = "minecraft:block_state", properties = { axis = "z" } }]
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

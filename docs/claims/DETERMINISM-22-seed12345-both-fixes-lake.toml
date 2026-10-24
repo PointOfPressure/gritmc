@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 22
+slug   = "seed12345-both-fixes-lake"
+title  = "The seed-12345 window on a tip carrying BOTH open fixes, and the lake that iced its own footprint — 4,140 -> 3,113 (2026-08-10)"
+branch = "backfill"

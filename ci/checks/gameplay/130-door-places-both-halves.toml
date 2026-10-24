@@ -1,0 +1,13 @@
+name = "door-places-both-halves"
+about = "placing a door puts down TWO blocks — DoorBlock writes the upper half itself with a second setBlock that getStateForPlacement does not describe, so a server driven only by the placement table leaves a doorway with no top"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_door"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

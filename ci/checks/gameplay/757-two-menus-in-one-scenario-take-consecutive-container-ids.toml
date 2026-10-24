@@ -1,0 +1,91 @@
+name = "two-menus-in-one-scenario-take-consecutive-container-ids"
+about = "opening two menus inside one scenario allocates two container ids, and the second is one past the first — `ServerPlayer.nextContainerCounter` is `containerCounter % 100 + 1` and `closeContainer`/`doCloseContainer` do not touch the field, so a close between them does not rewind it. Both menus here are crafting tables, so the two `open_screen` frames are identical in every field except the window id: this check's entire content is the counter. What would make it fail: a server that allocates a constant id, one that answers on window 0 — the player's own InventoryMenu, the one id the counter must never return — one that rewinds the counter on close, or one that increments by something other than one."
+observe_from = "actor"
+observe = ["open_screen"]
+settle_ms = 1500
+
+# WHY THIS CHECK EXISTS, AND WHAT WOULD BE UNGUARDED WITHOUT IT.
+#
+# `compare::rebase_session_counters` rebases the `window` field onto the
+# scenario, so what is compared is each observation's distance from the first
+# one in the check's own projection. That is correct and it is what makes menu
+# coverage able to scale at all — before it, the window id in the Nth menu
+# check was a statement about the N-1 menus before it, and the corpus
+# documented the menu checks as "one indivisible item in corpus order".
+#
+# But it gives something up, and `ci/window-coupling.py` measures exactly
+# what: on a corpus whose scenarios open **at most one menu each**, the rebase
+# maps that menu to 1 whatever its raw id was, so a server that allocates the
+# same id every time and never increments the counter is indistinguishable
+# from a correct one. Measured, not argued — the `freeze` mutation in that
+# script moved nothing on the 17 scenarios that carried a window id before
+# this file existed.
+#
+# That is not a fault in the rebase. A single-menu scenario carries no
+# evidence about the counter's *step*, and a lens cannot invent evidence it
+# was not given. The fix is on the corpus side: a scenario that opens two
+# menus has the ids 1 and 2 as a **within-scenario** fact, which is
+# history-independent by construction and therefore survives the rebase whole.
+#
+# So this check is the one place the container-id allocator is adjudicated,
+# and it is deliberately the narrowest possible statement of it.
+#
+# WHY TWO CRAFTING TABLES RATHER THAN A CHEST AND A FURNACE.
+#
+# A menu whose type, title, slot count and data-slot count all differ from the
+# other one's would fail on any of five fields, and a failure would not say
+# which. Two crafting tables make every other field identical by construction,
+# so the only thing left that can differ is the number this check is named
+# after. It also means the check can reach `match` on the server as it stands
+# — `crafting_table` is one of the menus already implemented — which a
+# detector has to be able to do: an `absent` detector adjudicates nothing.
+#
+# WHY THE CLOSE IS EXPLICIT.
+#
+# `ServerPlayer.openMenu` closes an open menu before opening the next, so the
+# close would happen anyway. Naming it makes this check a statement about the
+# counter alone rather than about the implicit-close path as well: without it,
+# a server that never implemented the implicit close would fail here and the
+# verdict would point at the counter. `611` is the check that owns close
+# behaviour; this one borrows it and asserts nothing about it.
+#
+# WHAT IT LEAVES BEHIND. Two crafting tables in the workspace and a closed
+# menu. `record.rs` resets the menu structurally before every scenario, and
+# the blocks are in the shared workspace like every other placement here.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:crafting_table"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "close_container"
+
+[[step]]
+do = "place"
+on = [2, 0, 0]
+face = "up"

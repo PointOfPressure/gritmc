@@ -1,0 +1,68 @@
+name = "container-click-quick-move-retrieves-a-stored-item"
+about = "the reverse of 601 — shift-clicking a stone already sitting in the chest instead of one on the hotbar. AbstractContainerMenu.doClick dispatches QUICK_MOVE to a per-menu quickMoveStack(player, index), and ChestMenu's implementation branches on whether the clicked index is inside the container's own slots or the player's: 601 clicks a hotbar index and the item goes into the chest, this clicks a chest index and the item has to come back out. What would make this fail: a server whose QUICK_MOVE only ever moves toward the container — a plausible one-directional stub, since that is the direction every crafting/storing check before this one has needed — would pass 601 and fail this."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot"]
+settle_ms = 1000
+
+# The chest lid repeats on a free-running 5-tick timer for as long as the chest
+# is open — `ContainerOpenersCounter.recheckOpeners` re-arms unconditionally
+# (offsets 178-186 call `Level.scheduleTick(pos, block, 5)`) and calls
+# `openerCountChanged` on both paths (offset 84's `if_icmpeq 167` lands on the
+# call itself), and `ChestBlockEntity.signalOpenCount` offsets 0-13 turn that
+# into `level.blockEvent(pos, block, 1, newCount)`. So the same `block_event`
+# goes out every 250 ms, forever.
+#
+# This check does not observe `block_event` and so never saw them declared.
+# It sees them under `strict`, where **how many arrived and which step each
+# was stamped with are set by where a free-running timer's edges fell against
+# this window** — measured on the 2026-08-07 07:10 subset pair, six of the
+# seven scenarios that leave a chest open disagreed on step attribution while
+# agreeing on the total.
+#
+# What stops being tested here: the repeat count and the step attribution of
+# `block_event`. What is still tested: that the lid opens at all, at the right
+# position, with the right viewer count, on the right stream — and the cadence
+# itself, in `rustmc_server::containers::tests::
+# the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`, which measures
+# the gap rather than the count.
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# Store it the 560 way first — two plain PICKUP clicks — so the QUICK_MOVE
+# below is the only click in this file whose branch is in question.
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0
+
+# THE MEASURED CLICK. Slot 0 now holds the stone this same trace just put
+# there, so unlike 602 this is not clicking something guaranteed empty.
+[[step]]
+do = "container_click"
+slot = 0
+input = "quick_move"

@@ -1,0 +1,84 @@
+name = "a-second-edit-of-the-same-sign-is-ignored"
+about = "a sign accepts exactly one edit per opening — `updateSignText` clears the permitted editor before it broadcasts, so the second `sign_update` at the same position is refused with no packet and no error, and a server that answers every one of them sends a `block_entity_data` vanilla does not"
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+# THE MEASURED STEP ASSERTS A SILENCE, AND SAYS SO.
+#
+# This check's point is that the last `[[step]]` provokes nothing. Its
+# measured step — step 2 — therefore contributes zero declared
+# observations on both sides, and `compare` would otherwise report
+# `mute`: exactly the shape of `607` passing by comparing two silences.
+#
+# Measured, not assumed, and on two independent recordings so that a
+# single run's phase cannot be what is being read: the corpus traces in
+# `work-blueice` (2026-08-08 21:26, 86 scenarios) and `rustmc-cov2`
+# (2026-08-10 13:16, 93 scenarios) both put zero declared observations at
+# this step on both sides. What raw traffic lands there is *not* stable
+# between those two runs — the lid timer's repeat count, an idle-player
+# rebroadcast, a stray `entity_position` — and all of it is either
+# outside this check's `observe` list or deleted by the projection, which
+# is why the declared reading is the one worth writing down.
+#
+# The silence is still compared. A subject that spoke at this step would
+# `Diverge`, which is what this check is for; the declaration suppresses
+# `mute` and nothing else.
+#
+# The distinction is not in the actions — `608`'s measured click and
+# `607`'s are the same `container_click` on the same rig — it is in what
+# the check claims, and only this file knows that. Absent, the field
+# means "must speak", so a check that forgets it goes red rather than
+# quietly green.
+measured_step = "silent"
+
+# **This is 570 with one extra step, and it is the discriminating half of the
+# pair.** 570 says the text should land; on its own it is satisfied by any
+# implementation that writes a sign and broadcasts it, including one that does
+# so on every packet for ever.
+#
+# `SignBlockEntity.updateSignText` calls `setAllowedPlayerEditor(null)` at
+# offsets 57-61, *before* `sendBlockUpdated`. So the token that authorised the
+# first edit is spent by the time the second arrives, the second fails the
+# `getPlayerWhoMayEdit()` test at offsets 7-18, and the whole of its effect is
+# a `LOGGER.warn` on the console. Vanilla emits **one** `block_entity_data`
+# from these two steps, not two.
+#
+# The wrong implementation this refuses is the obvious one: treat `sign_update`
+# as "write the text and broadcast". That passes 570 and fails here with an
+# extra `block_entity_data`, which is the same shape as `561` refusing the
+# echo-the-clicked-slot fix that 560 would have accepted.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_sign"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "sign_update"
+pos = [1, 0, 0]
+front = true
+lines = ["first", "", "", ""]
+
+# Different text on purpose. If this one were ever accepted the digest would
+# differ as well as the count, so the failure names itself instead of looking
+# like a duplicate.
+[[step]]
+do = "sign_update"
+pos = [1, 0, 0]
+front = true
+lines = ["second", "", "", ""]

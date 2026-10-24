@@ -1,0 +1,199 @@
+name = "a-full-creative-inventory-takes-an-item-and-it-vanishes"
+about = "a stone is thrown, and before its pickup delay runs out the slot it left is filled, so all 36 slots hold something else. Inventory.add moves nothing — and for a player with infinite materials its tail sets the stack to 0 and answers true: the stone is taken (take_item_entity, count 1) and removed, and no slot changes. A survival-only Inventory.add leaves it on the floor; a server with no pickup says nothing"
+# The 35 other slots are filled before the throw so that only one hold has to
+# land inside the 40-tick delay. Hotbar holds go by hotbar index; the main
+# inventory is reached with a negative `slot` (`36 + slot` is the menu slot,
+# so -27..-1 is 9..35).
+observe = ["take_item_entity", "remove_entities", "container_set_slot"]
+settle_ms = 4000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 90.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:dirt"
+slot = -27
+
+[[setup]]
+do = "hold"
+item = "minecraft:cobblestone"
+slot = -26
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_planks"
+slot = -25
+
+[[setup]]
+do = "hold"
+item = "minecraft:sand"
+slot = -24
+
+[[setup]]
+do = "hold"
+item = "minecraft:gravel"
+slot = -23
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_log"
+slot = -22
+
+[[setup]]
+do = "hold"
+item = "minecraft:glass"
+slot = -21
+
+[[setup]]
+do = "hold"
+item = "minecraft:bricks"
+slot = -20
+
+[[setup]]
+do = "hold"
+item = "minecraft:granite"
+slot = -19
+
+[[setup]]
+do = "hold"
+item = "minecraft:diorite"
+slot = -18
+
+[[setup]]
+do = "hold"
+item = "minecraft:andesite"
+slot = -17
+
+[[setup]]
+do = "hold"
+item = "minecraft:netherrack"
+slot = -16
+
+[[setup]]
+do = "hold"
+item = "minecraft:clay"
+slot = -15
+
+[[setup]]
+do = "hold"
+item = "minecraft:snow_block"
+slot = -14
+
+[[setup]]
+do = "hold"
+item = "minecraft:ice"
+slot = -13
+
+[[setup]]
+do = "hold"
+item = "minecraft:pumpkin"
+slot = -12
+
+[[setup]]
+do = "hold"
+item = "minecraft:melon"
+slot = -11
+
+[[setup]]
+do = "hold"
+item = "minecraft:bookshelf"
+slot = -10
+
+[[setup]]
+do = "hold"
+item = "minecraft:obsidian"
+slot = -9
+
+[[setup]]
+do = "hold"
+item = "minecraft:terracotta"
+slot = -8
+
+[[setup]]
+do = "hold"
+item = "minecraft:white_wool"
+slot = -7
+
+[[setup]]
+do = "hold"
+item = "minecraft:red_wool"
+slot = -6
+
+[[setup]]
+do = "hold"
+item = "minecraft:blue_wool"
+slot = -5
+
+[[setup]]
+do = "hold"
+item = "minecraft:green_wool"
+slot = -4
+
+[[setup]]
+do = "hold"
+item = "minecraft:yellow_wool"
+slot = -3
+
+[[setup]]
+do = "hold"
+item = "minecraft:black_wool"
+slot = -2
+
+[[setup]]
+do = "hold"
+item = "minecraft:spruce_planks"
+slot = -1
+
+[[setup]]
+do = "hold"
+item = "minecraft:birch_planks"
+slot = 1
+
+[[setup]]
+do = "hold"
+item = "minecraft:jungle_planks"
+slot = 2
+
+[[setup]]
+do = "hold"
+item = "minecraft:acacia_planks"
+slot = 3
+
+[[setup]]
+do = "hold"
+item = "minecraft:dark_oak_planks"
+slot = 4
+
+[[setup]]
+do = "hold"
+item = "minecraft:sandstone"
+slot = 5
+
+[[setup]]
+do = "hold"
+item = "minecraft:mossy_cobblestone"
+slot = 6
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone_bricks"
+slot = 7
+
+[[setup]]
+do = "hold"
+item = "minecraft:end_stone"
+slot = 8
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[step]]
+do = "drop"
+
+[[step]]
+do = "hold"
+item = "minecraft:prismarine"

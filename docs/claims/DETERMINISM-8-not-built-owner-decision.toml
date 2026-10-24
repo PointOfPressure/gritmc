@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 8
+slug   = "not-built-owner-decision"
+title  = "What was not built, and the decision that belongs to the owner"
+branch = "backfill"

@@ -1,0 +1,296 @@
+# THE STANDING CORPUS FLOOR — GENERATED. Do not hand-edit.
+#
+#     ci/corpus-floor.py update <floor.json> --out ci/checks/gameplay-floor.toml
+#
+# How much of the gameplay corpus **vanilla cannot reproduce against itself**,
+# measured over the ensemble named below. This is the corpus analogue of the
+# twin-mask floor every worldgen figure in `docs/PARITY.md` is quoted beside,
+# and it exists for the same reason: a residual smaller than the floor is not
+# a defect, it is the reference disagreeing with itself.
+#
+# FOUR THINGS TO READ BEFORE QUOTING ANYTHING HERE.
+#
+# 0. **`projection` is which comparator measured it, and it is the field that
+#    decides whether the rest may be quoted at all.** A floor is a count of
+#    scenarios two vanilla runs project differently, so it is a number *under a
+#    projection*, and until 2026-08-09 it did not say which one.
+#    `ci/t2-gameplay.sh` checked this file's `scenarios` against the run's — 88
+#    against 88 — and called that staleness; it did not check the comparator.
+#    `gameplay-container-throw` then became the first branch ever to change
+#    `compare::project`, dropping an item entity's spawn yaw, and two of the
+#    nine names below are scenarios that change converts. The denominator was
+#    still 88, so the gate printed `9/88` and stayed green while the figure
+#    described a comparator that no longer existed — a check that could not
+#    fail, in the file that exists to catch them. `ci/t2-gameplay.sh` now
+#    re-derives the identity from the binary it is about to run and prints
+#    `STALE PROJECTION` beside the score, withdrawing the floor's quotability,
+#    when it does not match. `oracle-runner projection-id --explain` says which
+#    source moved.
+#
+# 1. **The floor is a LOWER BOUND and it grows with N.** `docs/PARITY.md` §4
+#    records the trap in its sharpest form: for the End, two references
+#    agreeing gave a floor of 0 and six gave 252. `p_hide` below is what this
+#    N could not have seen — at N = 6 a scenario flapping less than 39% of the
+#    time can still show six identical runs. Quote the floor with its N and its
+#    `p_hide` or do not quote it.
+#
+# 2. **It is reported beside a corpus score and never subtracted from one.**
+#    Nothing here changes a verdict, moves the baseline ratchet, or makes a
+#    scenario stop failing. `ci/t2-gameplay.sh` prints
+#    `declared X/N ... floor F` and the floor is an annotation on the
+#    denominator, not a deduction from the numerator.
+#
+# 3. **`class` says whose the instability is.** `reference` and `mixed` are
+#    vanilla's and belong in `ci/checks/gameplay-unstable.toml`; `boundary` and
+#    `silent` are OURS and belong in that file's `[[harness]]` table, which is
+#    a list of repair orders. `ci/corpus-floor.py adjudicate` refuses a claim
+#    filed under the wrong one, in both directions.
+#
+# `knife_edge` is the half a flap-only instrument cannot reach: a step boundary
+# with less than one server tick of observed slack in front of it. Those
+# scenarios have never flapped. They are one shortened window from it.
+
+[floor]
+ensemble = "main108-n6-20260905"
+projection = "proj:1277e43a7e157183"
+runs = 6
+pairs = 15
+scenarios = 108
+floor = 5
+floor_reference = 5
+floor_ours = 0
+alpha = 0.05
+p_hide = 0.393038
+tick_ms = 50
+recorders = 1
+homogeneous_subset = ["r1", "r2", "r3", "r4", "r5", "r6"]
+knife_edge = []
+knife_edge_from = ["r1", "r2", "r3", "r4", "r5", "r6"]
+knife_edge_recorder = "rec:706159cd67984eb2"
+not_in_every_recording = []
+
+# The (kind, field) pairs THIS ENSEMBLE's decoder emitted. Not what the
+# comparator does with them — that is `projection` above. A gate run whose
+# own recording carries a pair absent from this list is being compared with
+# a field the floor's runs never had, and the floor is not quotable beside
+# its score; `ci/corpus-floor-report.py` says so and names the pairs. The
+# reverse (a run missing one of these) is normal and is not a warning — see
+# `vocabulary_not_in_every_recording`, which is the same thing happening
+# INSIDE this ensemble.
+vocabulary = [
+  "add_entity.at",
+  "add_entity.data",
+  "add_entity.entity",
+  "add_entity.kind_id",
+  "add_entity.rest",
+  "add_entity.x_rot",
+  "add_entity.y_head_rot",
+  "add_entity.y_rot",
+  "animate.action",
+  "animate.entity",
+  "animate.rest",
+  "block_changed_ack.rest",
+  "block_changed_ack.seq",
+  "block_entity_data.at",
+  "block_entity_data.block_entity_type",
+  "block_entity_data.rest",
+  "block_event.at",
+  "block_event.b0",
+  "block_event.b1",
+  "block_event.block",
+  "block_event.rest",
+  "block_update.at",
+  "block_update.rest",
+  "block_update.state",
+  "block_update.state_id",
+  "chat.rest",
+  "chat.text",
+  "container_set_content.carried",
+  "container_set_content.rest",
+  "container_set_content.slots",
+  "container_set_content.state",
+  "container_set_content.window",
+  "container_set_slot.item",
+  "container_set_slot.rest",
+  "container_set_slot.slot",
+  "container_set_slot.state",
+  "container_set_slot.window",
+  "entity_event.entity",
+  "entity_event.event",
+  "entity_event.rest",
+  "entity_position.at",
+  "entity_position.entity",
+  "entity_position.rest",
+  "level_event.at",
+  "level_event.data",
+  "level_event.event",
+  "level_event.rest",
+  "move_entity.d",
+  "move_entity.entity",
+  "move_entity.rest",
+  "move_entity_heartbeat.d",
+  "move_entity_heartbeat.entity",
+  "move_entity_heartbeat.rest",
+  "move_entity_rot.entity",
+  "move_entity_rot.rest",
+  "open_screen.menu",
+  "open_screen.rest",
+  "open_screen.window",
+  "open_sign_editor.at",
+  "open_sign_editor.front",
+  "open_sign_editor.rest",
+  "packet:0x00.rest",
+  "packet:0x13.rest",
+  "packet:0x4A.rest",
+  "packet:0x8A.rest",
+  "player_chat.global_index",
+  "player_chat.index",
+  "player_chat.rest",
+  "player_chat.sender",
+  "player_chat.signed",
+  "player_chat.text",
+  "remove_entities.entities",
+  "remove_entities.rest",
+  "rotate_head.entity",
+  "rotate_head.rest",
+  "section_blocks_update.at",
+  "section_blocks_update.blocks",
+  "section_blocks_update.rest",
+  "set_cursor_item.item",
+  "set_cursor_item.rest",
+  "set_entity_data.entity",
+  "set_entity_data.rest",
+  "set_entity_motion.entity",
+  "set_entity_motion.rest",
+  "set_entity_motion.v",
+  "set_equipment.entity",
+  "set_equipment.rest",
+  "set_equipment.slots",
+  "set_player_inventory.item",
+  "set_player_inventory.rest",
+  "set_player_inventory.slot",
+  "sound.at",
+  "sound.rest",
+  "sound.sound",
+  "sound.source",
+  "sound.volume",
+  "take_item_entity.count",
+  "take_item_entity.item",
+  "take_item_entity.rest",
+  "take_item_entity.taker",
+  "update_attributes.entity",
+  "update_attributes.rest",
+]
+vocabulary_not_in_every_recording = ["take_item_entity.count", "take_item_entity.item", "take_item_entity.rest", "take_item_entity.taker"]
+
+[[recording]]
+id = "r1"
+sha256 = "22e042cb560662dbdb87245ff9d3c0621c9fcab0ebbf87918d2f57a82034f3a5"
+recorded = "2026-08-19T02:42:19Z"
+tree = "/home/sayer/rustmc-struct"
+recorder_digest = "rec:706159cd67984eb2"
+
+[[recording]]
+id = "r2"
+sha256 = "d6e5285d389cd20288378acc814a490797b8a4b4477df57ff11d44b10e0aac6e"
+recorded = "2026-08-17T18:41:20Z"
+tree = "/home/sayer/rustmc-refcache-bw-A"
+recorder_digest = "rec:706159cd67984eb2"
+
+[[recording]]
+id = "r3"
+sha256 = "7ee783218235577e6ce2d12531b046a69f9922ebe0ccac8464829850ef11b6d6"
+recorded = "2026-08-18T17:57:05Z"
+tree = "/home/sayer/rustmc-hold"
+recorder_digest = "rec:706159cd67984eb2"
+
+[[recording]]
+id = "r4"
+sha256 = "01ab4af9c6815d38e9533a39585a35447e46220cf484775983939f3a9f24936e"
+recorded = "2026-09-05T13:42:32Z"
+tree = "/home/sayer/rustmc-corpus"
+recorder_digest = "rec:706159cd67984eb2"
+
+[[recording]]
+id = "r5"
+sha256 = "af05c1c156fe471357095b844bd076c48a747a7dce0aa9206bb7cd432fa32458"
+recorded = "2026-08-18T09:15:04Z"
+tree = "/home/sayer/rustmc-corpusgap"
+recorder_digest = "rec:706159cd67984eb2"
+
+[[recording]]
+id = "r6"
+sha256 = "f56053447195067d0f27bf37a91c7a5af58f34be8eafc46819ff4ad590aabdbf"
+recorded = "2026-08-17T20:17:56Z"
+tree = "/home/sayer/grit/work-sndev"
+recorder_digest = "rec:706159cd67984eb2"
+
+[[evidence]]
+name = "a-daylight-detector-inverts-when-right-clicked"
+class = "reference"
+flaps = 5
+pairs = 15
+runs = 6
+distinct_projections = 2
+blind_flaps = 5
+homogeneous_flaps = 5
+homogeneous_pairs = 15
+recorder_suspect = false
+at_ms_range = [0, 69]
+first_difference = "at 0: one run {\"fields\":{\"at\":[1,0,0],\"rest\":\"cbf29ce484222325\",\"state\":\"minecraft:daylight_detector[inverted=true,power=0]\",\"state_id\":11279},\"kind\":\"block_update\",\"step\":0,\"when\":null,\"who\":\"actor\"}, the other {\"fields\":{\"at\":[1,0,0],\"rest\":\"cbf29ce484222325\",\"state\":\"minecraft:daylight_detector[inverted=false,power=7]\",\"state_id\":11302},\"kind\":\"block_update\",\"step\":0,\"when\":null,\"who\":\"actor\"}"
+
+[[evidence]]
+name = "a-dropped-item-goes-into-your-inventory"
+class = "reference"
+flaps = 15
+pairs = 15
+runs = 6
+distinct_projections = 6
+blind_flaps = 15
+homogeneous_flaps = 15
+homogeneous_pairs = 15
+recorder_suspect = false
+at_ms_range = [16, 527]
+first_difference = "at 0: one run {\"fields\":{\"at\":[1.3445830510936505,1.3656150553126167,0.6752144723279919],\"data\":0,\"entity\":0,\"kind_id\":71,\"rest\":\"cbf29ce484222325\",\"x_rot\":0,\"y_head_rot\":0},\"kind\":\"add_entity\",\"step\":0,\"when\":null,\"who\":\"actor\"}, the other {\"fields\":{\"at\":[1.624822395080173,1.5508224449554715,0.40399436146532847],\"data\":0,\"entity\":0,\"kind_id\":71,\"rest\":\"cbf29ce484222325\",\"x_rot\":0,\"y_head_rot\":0},\"kind\":\"add_entity\",\"step\":0,\"when\":null,\"who\":\"actor\"}"
+
+[[evidence]]
+name = "a-player-that-leaves-the-ground-is-resynced"
+class = "reference"
+flaps = 5
+pairs = 15
+runs = 6
+distinct_projections = 2
+blind_flaps = 5
+homogeneous_flaps = 5
+homogeneous_pairs = 15
+recorder_suspect = false
+at_ms_range = [62, 598]
+first_difference = "at 0: one run {\"fields\":{\"at\":[0.0,0.0,3.0],\"entity\":0,\"rest\":\"e3e08e2b2ee20519\"},\"kind\":\"entity_position\",\"step\":0,\"when\":null,\"who\":\"observer\"}, the other {\"fields\":{\"d\":[0,0,12288],\"entity\":0,\"rest\":\"af72d84c8601b62c\"},\"kind\":\"move_entity\",\"step\":0,\"when\":null,\"who\":\"observer\"}"
+
+[[evidence]]
+name = "dropping-an-item-throws-it-on-the-floor"
+class = "reference"
+flaps = 15
+pairs = 15
+runs = 6
+distinct_projections = 6
+blind_flaps = 15
+homogeneous_flaps = 15
+homogeneous_pairs = 15
+recorder_suspect = false
+at_ms_range = [3, 3085]
+first_difference = "at 1: one run {\"fields\":{\"entity\":0,\"rest\":\"043387bf9e94bcd5\",\"v\":[-0.004333760605505721,0.0,0.14386864432643587]},\"kind\":\"set_entity_motion\",\"step\":0,\"when\":null,\"who\":\"actor\"}, the other {\"fields\":{\"entity\":0,\"rest\":\"e19cfdf906ffc930\",\"v\":[0.007263626930354539,0.0,0.1419764389916376]},\"kind\":\"set_entity_motion\",\"step\":0,\"when\":null,\"who\":\"actor\"}"
+
+[[evidence]]
+name = "spawn-egg-makes-a-mob"
+class = "reference"
+flaps = 15
+pairs = 15
+runs = 6
+distinct_projections = 6
+blind_flaps = 15
+homogeneous_flaps = 15
+homogeneous_pairs = 15
+recorder_suspect = false
+at_ms_range = [40, 155]
+first_difference = "at 0: one run {\"fields\":{\"at\":[1.5,0.0,0.5],\"data\":0,\"entity\":0,\"kind_id\":100,\"rest\":\"cbf29ce484222325\",\"x_rot\":0,\"y_head_rot\":-37,\"y_rot\":-37},\"kind\":\"add_entity\",\"step\":0,\"when\":null,\"who\":\"actor\"}, the other {\"fields\":{\"at\":[1.5,0.0,0.5],\"data\":0,\"entity\":0,\"kind_id\":100,\"rest\":\"cbf29ce484222325\",\"x_rot\":0,\"y_head_rot\":42,\"y_rot\":42},\"kind\":\"add_entity\",\"step\":0,\"when\":null,\"who\":\"actor\"}"

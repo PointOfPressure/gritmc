@@ -1,0 +1,6 @@
+doc    = "DETERMINISM"
+number = 54
+slug   = "a-walk-order-is-a-state-machine"
+title  = "A container's walk order is its whole state machine, not its hash function"
+branch = "bcast-order"
+status = "written"

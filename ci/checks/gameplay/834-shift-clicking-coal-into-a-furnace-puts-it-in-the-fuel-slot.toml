@@ -1,0 +1,38 @@
+name = "shift-clicking-coal-into-a-furnace-puts-it-in-the-fuel-slot"
+about = "coal shift-clicked from the hotbar into an open furnace. AbstractFurnaceMenu.quickMoveStack (offsets 0-259) asks canSmelt first and isFuel second for a player-side slot, and coal is not an input of any smelting recipe, so it goes to slot 1 and nowhere else. broadcastChanges then corrects slot 1 and the emptied hotbar slot, in that order. A server using the chest's rule (player slot -> the first container slot) puts it in the ingredient slot; one that declines an untranscribed quick move answers nothing"
+observe_from = "actor"
+observe = ["container_set_slot"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:furnace"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:coal"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+input = "quick_move"

@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 31
+slug   = "chunk-block-entity-channel"
+title  = "The chunk payload is the only channel 29 block entity types are on, and the corpus could not send one — 2026-08-12, branch `trace-chunk-block-entities`"
+branch = "trace-chunk-block-entities"

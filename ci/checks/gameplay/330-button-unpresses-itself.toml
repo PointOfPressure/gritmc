@@ -1,0 +1,42 @@
+name = "button-unpresses-itself"
+about = "a pressed button releases on its own a second later — the SECOND scheduled-tick behaviour in the corpus after the coral, and the one that proves the tick queue carries a delay rather than firing everything on the next tick"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 4000
+# **The delay is the claim, so the delay is compared.** Without this the
+# projection nulls `at_ms` and the un-press is the same observation whether it
+# arrived after 20 ticks or after one, as long as it arrived inside
+# `settle_ms` — and this check's whole subject is that the tick queue carries
+# a delay. It is the pair with 335: 20 ticks here, 30 there, and neither can
+# say anything without a bucket.
+#
+# 500 ms is the difference the pair must detect (`ticksToStayPressed` 20 vs
+# 30). `Timing::Bucket` rounds to the nearest multiple, so the un-press rounds
+# to 1000 here and 1500 in 335, and the nearest boundary is 250 ms away.
+# Measured un-press arrivals, Threadripper 2026-08-03, two selfcheck runs on
+# both streams: 956, 972, 986, 1002 ms — a spread of 46 ms against 250 ms of
+# margin.
+timing = { bucket = { ms = 500 } }
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone_button"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

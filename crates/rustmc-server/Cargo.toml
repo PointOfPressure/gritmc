@@ -1,0 +1,57 @@
+[package]
+name = "rustmc-server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+rustmc-proto.workspace = true
+rustmc-world.workspace = true
+rustmc-worldgen.workspace = true
+rustmc-entity.workspace = true
+rustmc-behavior.workspace = true
+rustmc-api.workspace = true
+rustmc-data.workspace = true
+rustmc-loot.workspace = true
+# The plugin contract. See the note in the workspace manifest for why this is a
+# path into the sibling `grit-plugins` checkout rather than a copy in here.
+grit-plugin-api.workspace = true
+# The vanilla-extract loaders. They live in `tools/worldgen-assembly` because
+# `rustmc-worldgen` is data-free on purpose, and its module docs name the rule
+# that matters here: the loaders exist in ONE place so a gate and a server
+# cannot drift apart (ORACLE.md §5b). A third consumer is the point of that
+# arrangement, not a violation of it.
+worldgen-assembly.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+# `crate::shutdown` only. See the workspace manifest.
+libc.workspace = true
+
+[dev-dependencies]
+# Integration tests link against the crate plus its dev-dependencies only, so
+# the two the decorated-world gate drives have to be named again here.
+worldgen-assembly.workspace = true
+rustmc-worldgen.workspace = true
+serde_json.workspace = true
+# `tests/plugin_tick_lock.rs` writes a real plugin, and `tests/dig_throughput.rs`
+# builds a real packet, so both names come back for the same reason as above.
+grit-plugin-api.workspace = true
+rustmc-proto.workspace = true
+# `tests/world_border.rs` and `tests/mob_effects_table.rs` gate their goldens
+# through the fixture guard, and an integration test sees only the crate plus
+# its dev-dependencies — a normal dependency of the library is not in scope.
+rustmc-data.workspace = true
+
+[features]
+# Forwarded so `cargo test -p rustmc-server --features t1-sabotage` arms the module in
+# `rustmc-data`. Off by default; see `rustmc_data::sabotage`.
+t1-sabotage = ["rustmc-data/t1-sabotage"]
+# The corpus positive-control battery. See crates/rustmc-server/src/sabotage.rs.
+# OFF by default and asserted off by ci/t0.sh: a control that can be switched
+# on in a shipped server is not a control.
+corpus-sabotage = []
+
+[lints]
+workspace = true
+

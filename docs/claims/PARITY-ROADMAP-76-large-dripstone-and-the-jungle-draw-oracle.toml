@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 76
+slug   = "large-dripstone-and-the-jungle-draw-oracle"
+title  = "large_dripstone is ported, and vanilla's draw log was aborting"
+branch = "feat-worldgen-refused"
+status = "written"

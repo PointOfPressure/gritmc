@@ -1,0 +1,64 @@
+name = "a-spawned-chicken-syncs-its-movement-speed-a-tick-later"
+about = "one tick after a chicken is hatched from an egg it tells every player tracking it its movement speed, which nothing drawn at spawn touches"
+observe_from = "actor"
+observe = ["update_attributes"]
+within = 976
+settle_ms = 3000
+
+# THE MECHANISM: `081`'s, for this kind's attribute supplier. One tick after
+# `addFreshEntity` the mob's MOVEMENT_SPEED (0.25, `createAttributes`) is
+# synced because `Mob.finalizeSpawn`'s follow-range bonus marked the map dirty
+# and `LivingEntity.getSyncableAttributes` sends every syncable instance;
+# nothing about it is drawn, so it is the one packet of a fresh mob every
+# recording agrees on.
+#
+# THE RIG. `083`'s pit: digging [1,-1] and [1,-2] leaves a 1x1 shaft two deep
+# whose floor has no walkable neighbour, so the mob hatched at its bottom never
+# moves — its unseeded stroll and look goals reach nothing observed here. The
+# rig sits -960 blocks out on z, perpendicular to the line the workspaces are
+# laid along (`-(n+1) * 32` on x), alternating sign with its neighbours in this
+# block and 80 further out every pair (640/641 at +-480 ... 652/653 at +-960),
+# so the nearest same-side rig is 64 blocks away on x and 80 on z: nothing it
+# leaves is tracked from another scenario and nothing another leaves is
+# tracked from it — the actor tracks to 64 blocks at view-distance 4. The mob is SILENT
+# (`minecraft:entity_data` `Silent` on the egg, applied by
+# `EntityType.updateCustomEntityTag` through `Entity.load`), because
+# `Mob.baseTick`'s ambient roll (`nextInt(1000) < ambientSoundTime++`, unseeded)
+# can land in any window; `Entity.playSound` refuses every sound of a silent
+# entity and the roll still happens, so its random stream is unchanged.
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, -960.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, -961]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, -961]
+face = "up"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, -960.95]
+
+[[setup]]
+do = "hold"
+item = "minecraft:chicken_spawn_egg"
+components = [{ type = "minecraft:entity_data", entity = "minecraft:chicken", silent = true }]
+
+[[setup]]
+do = "wait"
+ms = 500
+
+[[step]]
+do = "place"
+on = [1, -3, -961]
+face = "up"

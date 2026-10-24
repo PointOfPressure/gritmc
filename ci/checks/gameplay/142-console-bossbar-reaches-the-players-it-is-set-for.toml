@@ -1,0 +1,49 @@
+name = "console-bossbar-reaches-the-players-it-is-set-for"
+about = """
+a console `/bossbar` is added for nobody, set for the actor (one ADD to the
+actor), filled to 40 (one UPDATE_PROGRESS of 0.4 to the actor), turned red
+(one UPDATE_STYLE to the actor), set for `@a` (one ADD to the observer
+only), and hidden (one REMOVE to each)
+
+`CustomBossEvent` keeps the UUIDs it is FOR and `ServerBossEvent` the
+connections that HOLD it; only holders are sent anything, an update only
+while the bar is visible, and `setVisible` sends every holder ADD or REMOVE.
+`setPlayers` adds only the players it did not have, so the second set adds
+the observer and leaves the actor alone; `setValue` is
+`setProgress(value / max)` over the default max of 100. A server that sent
+the bar to everyone, re-added the actor, broadcast to non-holders, or kept
+the max at zero, moves the observation. The bar's UUID is a level-random
+draw and is dropped by the decoder; the operation and the body after it are
+compared. The success lines are the console's log, so `chat` is silent.
+
+Level 2, through the console. The restore removes the bar, which — hidden by
+then — sends nobody anything.
+"""
+console_restore = ["bossbar remove cmdexec:probe"]
+observe_from = "both"
+observe = ["boss_event", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = 'bossbar add cmdexec:probe "Probe"'
+
+[[step]]
+do = "console"
+text = "bossbar set cmdexec:probe players oracle"
+
+[[step]]
+do = "console"
+text = "bossbar set cmdexec:probe value 40"
+
+[[step]]
+do = "console"
+text = "bossbar set cmdexec:probe color red"
+
+[[step]]
+do = "console"
+text = "bossbar set cmdexec:probe players @a"
+
+[[step]]
+do = "console"
+text = "bossbar set cmdexec:probe visible false"

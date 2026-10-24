@@ -1,0 +1,85 @@
+# The stages that may stand down, and the environment that makes them able to.
+#
+# `ci/lib/box_env.py` makes a check that cannot run print one `BOX-SKIP` line.
+# `ci/box-skip-audit.py` reads this file and reds on any skip not listed here,
+# so a stage cannot start skipping without a commit that says so.
+#
+# THE RULE THESE ROWS ARE READ AGAINST
+#
+#   A stage may skip only in an environment that could not have run it, and the
+#   gate fails if it skips in one that could.
+#
+# Both halves are enforced. This file is the first: an undeclared skip is RED.
+# The second is `--require-ran`, which `ci/t0.sh` passes for every check below
+# whenever the tree HAS an object store — so these rows permit the skip in a
+# hand-assembled copy and forbid it everywhere the store was shipped.
+#
+# A row is not permission to leave a check broken. Every one of these ran
+# nowhere at all until 2026-08-18, and the repair that mattered was
+# `ci/t0-remote.sh` shipping a bare object store so they run in the box copy
+# too. These rows cover what is left: a tree somebody rsynced by hand, and the
+# `git archive` preflight, which strips `.git` and cannot be given one.
+
+[[skip]]
+check = "check-cited-audits"
+why = """No git object store in the tree. The check asks `git show <sha>:<path>`
+for each citation and there is nothing to ask. It cannot be answered from data
+shipped alongside: a recorded answer would be this check's own previous verdict
+written down, and a check that verifies its own cache is the unfalsifiable
+class. Ship a store with ci/t0-remote.sh, or set RUSTMC_GIT_DIR."""
+
+[[skip]]
+check = "figure-provenance"
+why = """No git object store in the tree. The derivation is `git log -S` over
+full history, so it needs the history and not a summary of it. Before
+2026-08-18 the absence was reported as 56 of 56 figures NO WITNESS — a blanket
+red on every branch that looked exactly like a real finding."""
+
+[[skip]]
+check = "check-cited-audits-falsify:green-control"
+why = """No git object store, so the LIVE ledger's citations cannot be
+re-verified. Only the green control stands down: the three injected faults run
+against a repository this falsifier builds itself with `git init`, so a checker
+that has stopped being able to go red is still caught here in a box copy. That
+split exists because the first repair to `ci/check-cited-audits.py` put a hole
+straight through this file — with the checker skipping, all three injected
+faults came back green and T0 said so. A skip is never on its own a repair."""
+
+[[skip]]
+check = "corpus-floor-falsify:replay"
+why = """No saved measurement at `oracle-work/corpus-floor/floor.json`, so the
+cases ran against a synthetic ensemble. This is NOT equivalent coverage and the
+row exists so a green from a stateless tree cannot be read as one from a tree
+with a real measurement. Measured on pristine origin/main (cf443588), rsynced
+gitless, ci/checks/gameplay-floor.toml untouched: 39 passed / 0 failed
+synthetically, 31 passed / 9 failed against a real measurement whose ensemble
+AND projection both match the committed floor file. `oracle-work` is excluded
+from ci/t0-remote.sh's rsync and gate directories are reused, so which route a
+branch gets is decided by which directory it lands in."""
+
+[[skip]]
+check = "tick-section-classify:selftest"
+why = """The pinned `server-26.2.jar` is not in this tree. `oracle-work` is
+excluded from ci/t0-remote.sh's rsync, so the jar is present only because the
+setup ritual in docs/AGENT-BRIEF.md symlinks it in; a gate directory that has
+not had that done cannot run the five controls. Before 2026-08-18 this was a
+`zipfile` FileNotFoundError traceback out of a T0 stage, which reads as a
+broken instrument rather than an incomplete tree. A real (non-selftest) run
+still REFUSES with exit 2 — there is no degraded mode for a classifier whose
+whole input is the jar."""
+
+[[skip]]
+check = "lockfile-falsify:tree-stays-clean"
+why = """Either the tree is not a git repository — a box copy has no `.git`, so
+"dirty" is not observable and the case would pass over nothing — or `Cargo.lock`
+is already modified, in which case the case refuses to touch a file somebody has
+uncommitted work in. `ci/t0.sh` requires this to have RUN whenever both are
+false, so the skip cannot cover a tree that could have answered."""
+
+[[skip]]
+check = "figure-provenance:selftest-resolved"
+why = """No git object store, so the self-test's five string cases drove only
+the fallback arm of the provenance predicate and the RESOLVING arm — the one
+every real gate takes — was not exercised. Declared rather than silent because
+a self-test that quietly covers half its subject is the defect it exists to
+catch. `ci/t0.sh` requires this to have run wherever a store is present."""

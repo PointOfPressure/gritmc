@@ -1,0 +1,30 @@
+name = "water-spreads"
+about = "a water source emptied onto the ground flows outward over the following ticks — the fluid tick, which no amount of block-placement machinery produces on its own, and one of the most player-visible mechanics there is"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 5000
+
+# Re-armed 2026-08-03. It sat in `open/` because it used `place`, and
+# `BucketItem` is not a `BlockItem`: it goes through `use_item`, which
+# ray-traces from the player's own eyes, so a right-click *on a block face*
+# does nothing at all. Vanilla's own resync said so — `[2,0,0] air` — and this
+# server, which has no fluid ticks whatsoever, produced exactly the same
+# nothing. Two servers agreeing to do nothing is a match, and it is worthless.
+#
+# The second half of the reason is a harness bug fixed the same day:
+# `use_item` **carries the rotation in its packet** and the harness hardcoded
+# `(0.0, 0.0)`, so a `look` step was silently ignored and the ray always went
+# out horizontally at eye level — which on flat ground hits nothing inside
+# reach. Looking straight down is unambiguous: the ray hits the block under
+# the player and the bucket empties into the space above it.
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 90.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:water_bucket"
+
+[[step]]
+do = "use_item"

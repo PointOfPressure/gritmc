@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 19
+slug   = "20260722-per-block-readjudicated"
+title  = "The 20260722 window, re-adjudicated per block — one defect comes back, the window does not (2026-08-10)"
+branch = "backfill"

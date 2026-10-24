@@ -1,0 +1,12 @@
+name = "a-block-overlapping-another-players-box-is-refused"
+about = "the observer stands on a block corner five blocks out (relative z = 5), so their box reaches 0.3 into the column at z = 4: stone placed there is refused for them as it would be for the placer (EntityGetter.isUnobstructed walks every blocksBuilding entity, players included), and nobody is sent a placement. A server that only tests the placer's own position places it, and the observer sees it go down"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[step]]
+do = "place"
+on = [0, -1, 4]
+face = "up"

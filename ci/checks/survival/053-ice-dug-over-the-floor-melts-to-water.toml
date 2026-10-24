@@ -1,0 +1,80 @@
+name = "ice-dug-over-the-floor-melts-to-water"
+about = """
+`IceBlock.playerDestroy`, offsets 13-87: after `super.playerDestroy` (the
+ice table drops nothing without silk touch), a tool with no
+`#minecraft:prevents_ice_melting` enchantment in an overworld position
+(`WATER_EVAPORATES` false) reads the block below, and because the floor
+`blocksMotion()`, writes `IceBlock.meltsInto()` — a water source — with
+`setBlockAndUpdate`. `ServerPlayerGameMode.destroyBlock` 121-130 has already
+written air, so the position ends the tick as water and the change set
+carries water, not air. The ice is walled in by four stone blocks so the
+source has nowhere to spread: this server has no fluid ticks, and a free
+source would spread on vanilla and not here, which is a different check.
+Dug bare-handed (0.5 destroy time, no tool needed: `1 / 0.5 / 30` a tick, past
+0.7 well inside the second). What would make it fail: a server that runs
+`Block.playerDestroy` for ice sends air.
+"""
+console_restore = ["clear oracle"]
+observe_from = "both"
+observe = ["level_event", "block_update", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "console"
+text = "clear oracle"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:stone 4"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [4, -1, 0]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [3, -1, 1]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [3, -1, -1]
+face = "up"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:ice"
+
+[[setup]]
+do = "place"
+on = [3, -1, 0]
+face = "up"
+
+[[setup]]
+do = "wait"
+ms = 300
+
+[[step]]
+do = "dig"
+at = [3, 0, 0]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 1000
+
+[[step]]
+do = "finish_dig"
+at = [3, 0, 0]
+face = "up"

@@ -1,0 +1,262 @@
+# Every field the corpus projection removes before the comparison.
+#
+# Written and checked by `ci/projection-drops.py`. Read that file's header for
+# what makes a drop different from an opaque field: `rest` digests the bytes
+# the decoder did **not** consume and compares them exactly, so a field left
+# unread is still live, and a field read without being emitted is gone. Every
+# row here is the second kind.
+#
+# `impact` is the column the whole file exists for, and it has three values:
+#
+#   * `decides` — the drop removes what a live check turns on. Its green is
+#     not evidence. This is the class `sound.pitch` was in.
+#   * `armed`   — the field carries real server behaviour and merely happens to
+#     be hard to compare. No check turns on it today; the next one that wants
+#     it will find nothing there and no failure to tell it so. `damage_event`'s
+#     unnormalised entity ids sat here for weeks.
+#   * `note`    — the field carries **no** server behaviour: a random id, a
+#     wall clock, a signature over a wall clock. Nothing can ever be decided by
+#     it, so the drop is free. Listed so that a later reading of the wire
+#     format cannot quietly move it into one of the other two.
+#
+# The axis is deliberately *not* "does any check observe this kind". Eleven
+# checks observe `add_entity` and none of them could ever have wanted its uuid.
+#
+# `observed_by_count` is on every row and `observed_by` names the checks when
+# there are few enough to read. Both are re-derived and both are checked: a
+# count catches a check being added or retired, and the list catches one being
+# renamed. A long list is carried as a count alone rather than as eighty names
+# nobody would re-read.
+#
+# `stage` is the third checked column and it is the one that says what a drop
+# costs to undo: a `decode` drop is gone from `rest` and needs the recorder
+# rebuilt, a `project` or `informative` drop was recorded and needs only a
+# projection edited. It is compared against the site carrying the marker, since
+# 2026-08-19 and because it had been wrong for a day without anything noticing.
+#
+# Both are re-derived from `ci/checks/gameplay/*.toml` on every run and the
+# check refuses a row that disagrees. That is deliberate: whether a drop
+# matters is a property of the check files, which move far more often than the
+# decoder does, so this ranking cannot be allowed to be a memory.
+
+[[drop]]
+name = "add_entity.uuid"
+kind = "add_entity"
+observed_by_count = 18
+stage = "decode"
+wire = "sixteen bytes, `ClientboundAddEntityPacket.write` field 2"
+why = "a fresh 128-bit value on both servers, so it can never match and its bytes must not reach the digest"
+impact = "note"
+residual = "that the field is *present* is still checked, because a body too short to hold it fails to decode and is recorded as `packet:0x..` rather than dropped"
+observed_by = ["070-sand-falls-when-unsupported", "080-spawn-egg-makes-a-mob", "350-a-dropped-item-goes-into-your-inventory", "500-dropping-an-item-throws-it-on-the-floor", "530-walking-away-drops-a-standing-player-from-view", "605-container-click-throw-drops-one-item", "606-container-click-throw-drops-the-whole-stack", "645-shears-shear-a-sheep", "682-an-orb-beside-a-player-is-picked-up", "683-an-orb-four-blocks-away-creeps-to-the-player", "684-an-orb-of-count-two-is-taken-twice", "773-an-item-frame-hangs-on-a-blocks-side", "774-an-end-crystal-sits-on-obsidian", "775-a-minecart-sits-on-a-rail", "776-a-boat-is-placed-by-right-clicking-the-world", "873-a-powered-dropper-drops-its-item", "877-a-hopper-catches-what-a-dropper-drops", "878-a-powered-crafter-makes-planks"]
+
+[[drop]]
+name = "add_entity.movement"
+kind = "add_entity"
+observed_by_count = 18
+stage = "project"
+wire = "`Vec3.LP_STREAM_CODEC`, three packed shorts, written before the rotations — **emitted as a `movement` field since 2026-08-18** and removed by `compare::drop_add_entity_movement` for two entity types"
+why = "`ServerEntity.getLastSentMovement()` is a draw for two of the eleven types this corpus reaches and a constant for the other nine. `minecraft:item` is four fresh `nextFloat()` draws, read at six distinct values in six runs. `minecraft:player` is a tick-phase coin toss — which tick vanilla's last motion packet went out on — and is the half no recording has yet been taken of"
+impact = "armed"
+residual = "**This row moved from `decode` to `project` and that is a change of what is RECOVERABLE, not of what is compared.** Until 2026-08-18 `trace::decode` read the three shorts and threw them away, so the bytes left `rest` and the field was invisible to every instrument here — `ci/trace_vocabulary.py` could not list it, `ci/determinism-gap.py` could not count it, `ci/hidden-stream-audit.py` could not read it out of the discarded client. `armed` was a ceiling imposed by where the discard sat and not a verdict anyone had reached. Named and dropped one layer up, the projected observation is byte-identical and the field is a question a recording can answer. It then was: `ci/entity-spawn-probe.sh`, N = 6 cold vanilla servers, found nine types constant at `[0.0, 0.0, 0.0]` and narrowed the drop to `minecraft:item` and `minecraft:player`, so **the other nine are compared now and were not before**. `tracker::add_entity_announces_the_last_sent_movement` still asserts this server puts the real value in rather than zero"
+observed_by = ["070-sand-falls-when-unsupported", "080-spawn-egg-makes-a-mob", "350-a-dropped-item-goes-into-your-inventory", "500-dropping-an-item-throws-it-on-the-floor", "530-walking-away-drops-a-standing-player-from-view", "605-container-click-throw-drops-one-item", "606-container-click-throw-drops-the-whole-stack", "645-shears-shear-a-sheep", "682-an-orb-beside-a-player-is-picked-up", "683-an-orb-four-blocks-away-creeps-to-the-player", "684-an-orb-of-count-two-is-taken-twice", "773-an-item-frame-hangs-on-a-blocks-side", "774-an-end-crystal-sits-on-obsidian", "775-a-minecart-sits-on-a-rail", "776-a-boat-is-placed-by-right-clicking-the-world", "873-a-powered-dropper-drops-its-item", "877-a-hopper-catches-what-a-dropper-drops", "878-a-powered-crafter-makes-planks"]
+
+[[drop]]
+name = "add_entity.y_rot_of_an_item"
+kind = "add_entity"
+observed_by_count = 18
+stage = "project"
+wire = "one byte, `yRot` in 256ths of a turn"
+why = "`ItemEntity(EntityType, Level)` calls `setYRot(this.random.nextFloat() * 360.0F)` from an unseeded source, so the byte is unreproducible by vanilla against itself"
+impact = "note"
+residual = "`rustmc_server::dropitem::tests::every_dropped_item_gets_a_random_spawn_yaw` asserts a hundred spawns give >90 distinct yaws; the exemption is on `minecraft:item` alone and leaves `x_rot`, `y_head_rot` and `data` compared"
+observed_by = ["070-sand-falls-when-unsupported", "080-spawn-egg-makes-a-mob", "350-a-dropped-item-goes-into-your-inventory", "500-dropping-an-item-throws-it-on-the-floor", "530-walking-away-drops-a-standing-player-from-view", "605-container-click-throw-drops-one-item", "606-container-click-throw-drops-the-whole-stack", "645-shears-shear-a-sheep", "682-an-orb-beside-a-player-is-picked-up", "683-an-orb-four-blocks-away-creeps-to-the-player", "684-an-orb-of-count-two-is-taken-twice", "773-an-item-frame-hangs-on-a-blocks-side", "774-an-end-crystal-sits-on-obsidian", "775-a-minecart-sits-on-a-rail", "776-a-boat-is-placed-by-right-clicking-the-world", "873-a-powered-dropper-drops-its-item", "877-a-hopper-catches-what-a-dropper-drops", "878-a-powered-crafter-makes-planks"]
+
+[[drop]]
+name = "sound.seed"
+kind = "sound"
+observed_by_count = 37
+stage = "decode"
+wire = "one long, last field of `ClientboundSoundPacket`"
+why = "`Level.playSound` fills it from `soundSeedGenerator.nextLong()`, one fresh draw per sound, so digesting it made every sound-observing check permanently unmatchable — for vanilla against itself as much as for us"
+impact = "note"
+residual = "the seed selects which variant a multi-sample event plays on the client; no server behaviour depends on its value and no check claims one"
+observed_by = ["123-console-xp-points-carry-into-a-level", "124-console-xp-fifth-level-plays-the-levelup-sound", "143-console-playsound-reaches-every-listener-inline", "163-an-empty-bucket-takes-a-water-source-back", "164-lava-poured-onto-water-beside-a-water-source-becomes-obsidian", "165-water-poured-between-lava-makes-obsidian-on-one-side-and-cobblestone-on-the-other", "167-a-water-bucket-waterlogs-a-slab-instead-of-replacing-it", "169-a-water-bucket-fills-a-cauldron-and-an-empty-one-takes-it-back", "321-a-fire-being-lit-is-heard-by-everyone-else", "380-a-piston-extends-when-powered", "390-a-piston-pushes-the-block-in-front", "420-a-comparator-switches-to-subtract-mode", "430-a-note-block-retunes-when-right-clicked", "457-a-comparator-subtracts-its-side-input", "550-attacking-another-player", "551-attacking-from-out-of-range", "643-shears-turn-a-mooshroom-into-a-cow", "645-shears-shear-a-sheep", "681-xp-levels-to-five-plays-the-level-up-sound", "700-a-fence-gate-opens-when-right-clicked", "701-a-fence-gate-opened-from-behind-turns-to-face-you", "730-deepslate-and-tuff-blocks-each-place-with-their-own-sound", "731-nether-blocks-each-place-with-their-own-sound", "732-soul-mud-and-sculk-blocks-each-place-with-their-own-sound", "733-soft-blocks-each-place-with-their-own-sound", "734-cave-blocks-each-place-with-their-own-sound", "735-newer-blocks-each-place-with-their-own-sound", "773-an-item-frame-hangs-on-a-blocks-side", "777-an-armor-stand-is-placed-as-a-living-entity", "788-a-carved-pumpkin-on-copper-makes-a-copper-golem", "789-a-carved-pumpkin-on-iron-makes-an-iron-golem", "795-a-bell-rings-when-its-side-is-clicked", "813-taking-a-stonecutter-result-spends-the-stone", "816-shift-clicking-a-stonecutter-result-sends-it-to-the-hotbars-far-end", "862-taking-a-loom-result-spends-the-banner-and-the-dye", "890-a-skeleton-skull-goes-on-top-of-a-note-block-instead-of-playing-it", "915-an-enchanting-table-turns-a-book-into-an-enchanted-book"]
+
+[[drop]]
+name = "player_chat.timestamp"
+kind = "player_chat"
+observed_by_count = 1
+stage = "decode"
+wire = "one long, `SignedMessageBody.timeStamp`"
+why = "`SignedMessageBody.unsigned` substitutes `Instant.now()`, so the field carries the sending server's wall clock and two runs of one scenario against one jar differ"
+impact = "note"
+residual = "everything after it — salt, the empty last-seen list, the filter mask, the chat-type holder, the sender's display name — stays in `rest` and is compared byte for byte"
+observed_by = ["112-a-player-says-something"]
+
+[[drop]]
+name = "player_chat.signature"
+kind = "player_chat"
+observed_by_count = 1
+stage = "decode"
+wire = "256 bytes, present only when the preceding boolean is set"
+why = "a signature over a body containing a wall clock cannot repeat across runs even for one server against itself"
+impact = "note"
+residual = "**that the message is signed at all is compared** — the boolean is emitted as `signed`, so a server that stopped signing, or started, still fails. The 256 bytes were consumed silently until this ledger; they are the one drop in this file that had no comment of its own"
+observed_by = ["112-a-player-says-something"]
+
+[[drop]]
+name = "ambient_unless_observed"
+kinds = ["chunk_batch_finished", "chunk_batch_start", "entity_position", "keep_alive", "light_update", "move_entity_heartbeat", "ping", "player_info_update", "set_time", "tab_list", "update_advancements"]
+kinds_are = "ambient"
+observed_by_count = 5
+stage = "project"
+wire = "the whole observation"
+why = "every `trace::FAMILIES` row of `Class::Ambient`, each with its own measured reason in that table and in `ci/checks/ambient-families.toml` (two independent vanilla runs per census). It replaced, on 2026-09-24, the two rows that stood here: `heartbeat_unless_observed` (`ServerEntity.sendChanges` rebroadcasts on `tickCount % 60 == 0`, a phase coin flip) and `entity_position_unless_observed` (sent on the client's own on-ground bit, so the reference and subject sessions are independent draws). Those two filters, and the twelve kinds `is_housekeeping` dropped at RECORD time, are now this one projection-time filter"
+impact = "armed"
+residual = "a check that names an ambient kind in its own `observe` list gets every one of them: `520` names the heartbeat, `080`, `540` and `776` name `entity_position`, and `683` names it for an experience orb's ground-flag resync, which is server-side and not a draw. `ci/ambient-falsify.py` refuses a row whose tag the census contradicts, and graded families (`forget_level_chunk`, `set_chunk_cache_center`, `chunk_no_block_entities`) are not in this list"
+observed_by = ["080-other-player-is-an-entity", "520-a-standing-player-is-rebroadcast-on-a-timer", "540-a-player-that-leaves-the-ground-is-resynced", "683-an-orb-four-blocks-away-creeps-to-the-player", "776-a-boat-is-placed-by-right-clicking-the-world"]
+
+[[drop]]
+name = "chunk_block_entities.heightmaps"
+kind = "chunk_block_entities"
+observed_by_count = 1
+stage = "decode"
+wire = "`ClientboundLevelChunkWithLightPacket`: the heightmap map (type id and packed longs), the section blob, and the light payload after the block-entity list — everything in the packet except the chunk position and the block-entity list"
+why = "the observation exists to compare which block entities a chunk carries; the terrain in the same packet is the superflat world, identical by construction, and every change to it the corpus causes is already compared as `block_update` / `section_blocks_update`"
+impact = "note"
+residual = "a server that sent a wrong heightmap or wrong light in the chunk payload would pass here; no check in the corpus reads either, and `788-a-chest-is-in-its-chunks-payload-when-the-chunk-returns` names only the block-entity list"
+observed_by = ["788-a-chest-is-in-its-chunks-payload-when-the-chunk-returns"]
+
+[[drop]]
+name = "informative.block_changed_ack"
+kind = "block_changed_ack"
+observed_by_count = 108
+stage = "informative"
+wire = "the whole observation, for the vacuity count only"
+why = "the packet is a receipt for the sequence number the step sent, so a scenario that did nothing at all still produces one; counting it would make every step look informative"
+impact = "armed"
+residual = "the observation is **still compared** — this drop is from the vacuity count alone, not from the projection, so a server that stopped acking still fails the 69 checks that name the kind"
+
+[[drop]]
+name = "informative.block_update_allowance"
+kind = "block_update"
+observed_by_count = 165
+stage = "informative"
+wire = "one observation per (step, unconditionally-placed position), for the vacuity count only"
+why = "a `place` step puts a block down whatever the server believes about the mechanic under test, so that one `block_update` is evidence the step ran and not evidence about the claim"
+impact = "decides"
+residual = "**this is the subtraction that emptied claim 420.** 420's step is a `place`, so the allowance removes the `block_update` carrying the comparator's new mode and leaves the sound as the only informative observation — and the sound's pitch, the one field that separates subtract from compare, was itself dropped. The check read `match` for a state it could not distinguish. The subtraction is right; what was wrong is that the observation it left behind had been hollowed out by another row in this file"
+
+# ---------------------------------------------------------------------------
+# NORMALISATIONS — the third class, and the one that is easiest to mistake for
+# a comparison that is still happening.
+#
+# A discard removes a field. A normalisation *rewrites* it, so something is
+# still compared and the absolute value is not. `window = 7` against
+# `window = 3` becomes `window = 1` against `window = 1`: the two menus are
+# now the same menu as far as any check can tell, which is right — a container
+# id is allocated per connection and no two runs agree — and is still a loss
+# nobody had written down.
+#
+# These rows carry `anchor` instead of a marked site, because there is no one
+# line to mark: the behaviour is the whole function. The checker requires the
+# anchor to still exist in the named file, so deleting or renaming one of these
+# goes stale rather than silently un-declaring the loss.
+
+[[drop]]
+name = "normalise.entity_ids"
+kind = "add_entity"
+observed_by_count = 18
+stage = "project"
+class = "normalise"
+anchor = "fn renumber_entities"
+file = "compare.rs"
+wire = "every `entity` field, on every kind that carries one"
+why = "an entity id is a per-session counter, and it is not even stable across two runs of one server — measured vanilla against vanilla on `sand-falls-when-unsupported`, the same falling block at the same position with a byte-identical tail was numbered 0 in one run and 1 in the next"
+impact = "note"
+residual = "the *relation* survives in full: two observations naming one entity still name one entity, and an observation naming a different one still differs. What cannot be compared is the number itself, which no server chooses"
+observed_by = ["070-sand-falls-when-unsupported", "080-spawn-egg-makes-a-mob", "350-a-dropped-item-goes-into-your-inventory", "500-dropping-an-item-throws-it-on-the-floor", "530-walking-away-drops-a-standing-player-from-view", "605-container-click-throw-drops-one-item", "606-container-click-throw-drops-the-whole-stack", "645-shears-shear-a-sheep", "682-an-orb-beside-a-player-is-picked-up", "683-an-orb-four-blocks-away-creeps-to-the-player", "684-an-orb-of-count-two-is-taken-twice", "773-an-item-frame-hangs-on-a-blocks-side", "774-an-end-crystal-sits-on-obsidian", "775-a-minecart-sits-on-a-rail", "776-a-boat-is-placed-by-right-clicking-the-world", "873-a-powered-dropper-drops-its-item", "877-a-hopper-catches-what-a-dropper-drops", "878-a-powered-crafter-makes-planks"]
+
+[[drop]]
+name = "normalise.session_counters"
+kind = "container_set_slot"
+observed_by_count = 90
+stage = "project"
+class = "normalise"
+anchor = "fn rebase_session_counters"
+file = "compare.rs"
+wire = "`seq`, `window` and `state`, rebased so the first value seen becomes the base"
+why = "`seq` and `window` are allocated once per connection and `state` once per menu, so the absolute values are properties of the session and not of the scenario"
+impact = "armed"
+residual = "differences survive and absolutes do not, which is the intended half — but `window` is rebased into `1..` while a literal 0 passes through untouched, so **the distinction between the inventory and the first menu opened is real and compared**, and anything finer is not. A check wanting to assert a particular container id cannot. The count is of `container_set_slot`; `open_screen` and `container_set_content` carry `window` too and are rebased with it"
+
+[[drop]]
+name = "normalise.collapse_repeats"
+kind = "block_update"
+observed_by_count = 165
+stage = "project"
+class = "normalise"
+anchor = "fn collapse_repeats"
+file = "compare.rs"
+wire = "a whole observation, when it repeats the previous one of its own kind"
+why = "a free-running rebroadcast inside a fixed window has a count decided by where the boundary falls, not by the server — the chest in `490` re-announces about every 250 ms, and vanilla was sampled 10 times against our 9 on one run with both servers repeating at the same rate"
+impact = "armed"
+residual = "opt-in per check, and keyed on the previous observation *of that kind* rather than on adjacency in the whole projection — the older rule made one declaration behave differently in the declared and strict denominators of the same comparison. What stops being compared for a declaring check is **how many** times a thing repeated"
+
+[[drop]]
+name = "normalise.timing_ignored"
+kind = "block_changed_ack"
+observed_by_count = 108
+stage = "project"
+class = "normalise"
+anchor = "Timing::Ignore => serde_json::Value::Null"
+file = "compare.rs"
+wire = "`when`, the arrival-time bucket"
+why = "the default for a check that makes no timing claim: two servers doing the same thing at different speeds are not diverging, and a corpus that compared raw arrival times would be measuring the box"
+impact = "armed"
+residual = "**order still is compared** — the observations stay in sequence — so this removes the clock and not the sequence. A check that wants a duration declares `timing` and gets buckets; nothing else can fail on when anything arrived, and `335-a-wooden-button-stays-pressed-longer` is the corpus's only claim that needs the difference"
+
+# The two axes a CHECK chooses, rather than ones the harness applies to
+# everything. They are here because the question this file answers is "what
+# can no check fail on", and a per-check axis answers it per check — which is
+# how 102 of 115 checks came to discard a whole recorded client without anyone
+# counting them.
+
+[[drop]]
+name = "project.observe_from"
+kind = "sound"
+observed_by_count = 37
+stage = "project"
+class = "normalise"
+anchor = "crate::scenario::From::Actor => o.who == Who::Actor"
+file = "compare.rs"
+wire = "every observation from one of the two clients, whole"
+why = "each scenario stands an actor and an observer, and most claims are about one of them — 420 reads the bystander because `PlayerList.broadcast` skips the interacting player, so reading the actor would make it inert"
+impact = "decides"
+residual = "**95 of 115 checks keep the actor alone, 7 keep the observer alone, 13 keep both**, so for 102 there is a fully recorded stream no comparison reads. The numerator did not move when the corpus grew 108 -> 115: every one of the seven checks the entity family added keeps both clients, so the discarding set is the same 102 checks against a larger corpus, and **11 of the 13 that keep both are entity checks**. `ci/hidden-stream-audit.py` reads it. Its first hit was `551`'s step sounds, read from one pair as vanilla four against our five — **corrected the same day**: over every recording on the box vanilla is 4 in 32 and 5 in 39, and we are 5 in 66 of 66, so the difference is a distribution and not an observation (`ci/determinism-gap.py`). Unfailable either way — a player is not sent their own step sounds, so the evidence only ever lands in the stream 551 discards. Not gateable: it needs recordings and T0 is tree-only"
+observed_by = ["123-console-xp-points-carry-into-a-level", "124-console-xp-fifth-level-plays-the-levelup-sound", "143-console-playsound-reaches-every-listener-inline", "163-an-empty-bucket-takes-a-water-source-back", "164-lava-poured-onto-water-beside-a-water-source-becomes-obsidian", "165-water-poured-between-lava-makes-obsidian-on-one-side-and-cobblestone-on-the-other", "167-a-water-bucket-waterlogs-a-slab-instead-of-replacing-it", "169-a-water-bucket-fills-a-cauldron-and-an-empty-one-takes-it-back", "321-a-fire-being-lit-is-heard-by-everyone-else", "380-a-piston-extends-when-powered", "390-a-piston-pushes-the-block-in-front", "420-a-comparator-switches-to-subtract-mode", "430-a-note-block-retunes-when-right-clicked", "457-a-comparator-subtracts-its-side-input", "550-attacking-another-player", "551-attacking-from-out-of-range", "643-shears-turn-a-mooshroom-into-a-cow", "645-shears-shear-a-sheep", "681-xp-levels-to-five-plays-the-level-up-sound", "700-a-fence-gate-opens-when-right-clicked", "701-a-fence-gate-opened-from-behind-turns-to-face-you", "730-deepslate-and-tuff-blocks-each-place-with-their-own-sound", "731-nether-blocks-each-place-with-their-own-sound", "732-soul-mud-and-sculk-blocks-each-place-with-their-own-sound", "733-soft-blocks-each-place-with-their-own-sound", "734-cave-blocks-each-place-with-their-own-sound", "735-newer-blocks-each-place-with-their-own-sound", "773-an-item-frame-hangs-on-a-blocks-side", "777-an-armor-stand-is-placed-as-a-living-entity", "788-a-carved-pumpkin-on-copper-makes-a-copper-golem", "789-a-carved-pumpkin-on-iron-makes-an-iron-golem", "795-a-bell-rings-when-its-side-is-clicked", "813-taking-a-stonecutter-result-spends-the-stone", "816-shift-clicking-a-stonecutter-result-sends-it-to-the-hotbars-far-end", "862-taking-a-loom-result-spends-the-banner-and-the-dye", "890-a-skeleton-skull-goes-on-top-of-a-note-block-instead-of-playing-it", "915-an-enchanting-table-turns-a-book-into-an-enchanted-book"]
+
+[[drop]]
+name = "project.spatial_bound"
+kind = "add_entity"
+observed_by_count = 18
+stage = "project"
+class = "normalise"
+anchor = "fn near"
+file = "compare.rs"
+wire = "every observation whose position falls outside the check's `within` radius"
+why = "scenarios share one world and one pair of sessions, so one scenario's leftovers land in the next one's window — `080` spawns a mob, never removes it, goes on rotating its head, and seven of its packets landed in `090`'s strict projection 32 blocks away, six of them before `090`'s first step ran"
+impact = "armed"
+residual = "**a packet the filter cannot place is admitted, not excluded** — `place` returns `None` and `near` takes its \"nobody ever told me where this is\" branch — so the bound is a filter that fails open, which is the direction that admits noise rather than hiding a divergence. Three checks turn it off outright with `within = -1` (580, 581, 582) because their observations carry no position of their own, and those three see every leftover in the corpus by their own choice"
+
+[[drop]]
+name = "boss_event.id"
+kind = "boss_event"
+observed_by_count = 1
+stage = "decode"
+wire = "the UUID, the first sixteen bytes of every `ClientboundBossEventPacket`"
+why = "`BossBarCommands.createBar` hands `CustomBossEvents.create` the level random, and `Mth.createInsecureUUID` draws the id from it — two fresh `nextLong`s per bar, which no second run reproduces"
+impact = "note"
+residual = "the id only names the bar to the client across operations; one bar per scenario means every operation in a window refers to the same one, and the operation ordinal and its body are compared"
+observed_by = ["142-console-bossbar-reaches-the-players-it-is-set-for"]

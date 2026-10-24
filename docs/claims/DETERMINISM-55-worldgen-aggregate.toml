@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 55
+slug   = "worldgen-aggregate"
+title  = "What worldgen parity may honestly be stated as, today — the inventory, and why the aggregate is still refused"
+branch = "worldgen-aggregate"

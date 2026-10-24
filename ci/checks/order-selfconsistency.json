@@ -1,0 +1,170 @@
+{
+  "findings": [
+    {
+      "rows": [
+        {
+          "scenario": "a-bat-left-far-away-despawns-and-a-pig-does-not",
+          "verdict": "NOT-SELF-CONSISTENT"
+        },
+        {
+          "scenario": "a-carved-pumpkin-on-copper-makes-a-copper-golem",
+          "verdict": "SELF-CONSISTENT"
+        },
+        {
+          "scenario": "a-carved-pumpkin-on-iron-makes-an-iron-golem",
+          "verdict": "SELF-CONSISTENT"
+        },
+        {
+          "scenario": "a-chest-is-in-its-chunks-payload-when-the-chunk-returns",
+          "verdict": "NOT-SELF-CONSISTENT"
+        },
+        {
+          "scenario": "a-spawned-pig-syncs-its-movement-speed-a-tick-later",
+          "verdict": "SELF-CONSISTENT"
+        },
+        {
+          "scenario": "an-armor-stand-is-placed-as-a-living-entity",
+          "verdict": "SELF-CONSISTENT"
+        },
+        {
+          "scenario": "spawn-egg-makes-a-mob",
+          "verdict": "SELF-CONSISTENT"
+        },
+        {
+          "scenario": "walking-away-drops-a-standing-player-from-view",
+          "verdict": "NOT-SELF-CONSISTENT"
+        }
+      ],
+      "site": "AttributeMap.attributes + attributesToSync",
+      "verdict": null
+    },
+    {
+      "rows": [],
+      "site": "ChunkMap.entityMap",
+      "verdict": "UNMEASURABLE"
+    },
+    {
+      "rows": [],
+      "site": "EntityTickList.active + EntityLookup.byId + ClassInstanceMultiMap.allInstances",
+      "verdict": "UNMEASURABLE"
+    },
+    {
+      "rows": [],
+      "site": "ServerChunkCache.chunkHoldersToBroadcast",
+      "verdict": "NOT-SELF-CONSISTENT"
+    }
+  ],
+  "population": {
+    "note": "the recordings these verdicts were measured over, by the sha256 of the scenario block. `seen_at` is where each one was on the day it was declared and is a hint for restoring it, not an identity: the digest is the identity.",
+    "recordings": [
+      {
+        "seen_at": "/home/sayer/rustmc-gamerules/oracle-work/gameplay/vanilla.json",
+        "sha256": "053e9df86d458096b79d42003f5b218f2722b27bb41265a84ea569168cd6c40a"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-land/oracle-work/gameplay/vanilla.json",
+        "sha256": "058b4dbc6c89a9f20317ae52813935598364bc97c996317e393f7a5fcbbbe010"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-rs/oracle-work/gameplay/vanilla.json",
+        "sha256": "08104446881cebc1300f838f63b25b8cc176c2e441e5946dd27d4037814e099a"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-beh/oracle-work/gameplay/vanilla.json",
+        "sha256": "2913540f1e0e2ddaca13cb1f775bb28f79dd334cedc68efb3b0b0ae5644fb1c2"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-stack/oracle-work/gameplay/vanilla.json",
+        "sha256": "2999adc5165cfd1c500edb2cfa18fe247739abfb3bafce10837f336c3d3cc533"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-combat/oracle-work/gameplay/vanilla.json",
+        "sha256": "2c9d506d409f9f88f07ae13cab5fd172b7f012f2b5b4995656b39d592e41868d"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-fluid2/oracle-work/gameplay/vanilla.json",
+        "sha256": "406259db35c254ecbb1cbe2ed70d9fc25accdeb5c4e85c3680956f4a675778f5"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-rec/oracle-work/gameplay/vanilla.json",
+        "sha256": "450d1af21bad559b1693a1931e17f165ef0085d57b617dc549b74eccc452b891"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-corpusgap/oracle-work/gameplay/vanilla.json",
+        "sha256": "49ec63c9632dd8d7201d5c54cc366b4a12db1691d3fb01e8bc16598f68737157"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-gpland/oracle-work/gameplay/vanilla.json",
+        "sha256": "69b16723812ec149cd180f21421f61eb0589b7074ee3320ca45527297e78e6c6"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-uio/oracle-work/gameplay/vanilla.json",
+        "sha256": "6c7fdd5151ff5aa6050dad6c20a6764adc026e6c28c6afae0452f65c5f53b141"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-mobs/oracle-work/gameplay/vanilla.json",
+        "sha256": "764d5811f36fc95ff5d28ea4ffd2c070cbd622032dc3457694a4e2279e97e7dd"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-struct/oracle-work/gameplay/vanilla.json",
+        "sha256": "9d5ce47f62d016687e7c8e46984d22cafa6ba913a9767b0a541daff0e9629750"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-refcache-quick/oracle-work/gameplay/vanilla.json",
+        "sha256": "a0dc328c3bc48db9c7726b1bc51b69244e4fcf50278036af1033ee8e51afd7a3"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-unported/oracle-work/gameplay/vanilla.json",
+        "sha256": "a2a6bc2fa37372ea4ae31cb0c8fee5496c666e92752c2944dd57871e5c415022"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-move/oracle-work/gameplay/vanilla.json",
+        "sha256": "ad928eabfb9478f58ca28180dd8489726099dd81b74b586aec85bdfd31c47d08"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-misc2/oracle-work/gameplay/vanilla.json",
+        "sha256": "add4f851a814516998f43f16dba7f9b592f6649d184e0a627395d0688942cb5c"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-bcast/oracle-work/gameplay/vanilla.json",
+        "sha256": "bb0caa93c4bf772808cda0ba67d7fe1c91b82cfec97a84fc82d0e301c913b48c"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-cov4/oracle-work/gameplay/vanilla.json",
+        "sha256": "bc171df778f3a9347333fc12f39d62445fcd4f54c3fce80457f39785fc716a7e"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-light/oracle-work/gameplay/vanilla.json",
+        "sha256": "d8fde77115f991f12cd56bf7d08d10b8d433d1a76430f0b852b25ec1635b638f"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-refcache-bw-A/oracle-work/gameplay/vanilla.json",
+        "sha256": "dbf26981894601f39b026208855649403f66ffb5a196cfab0f557bb7e1962e8a"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-hold/oracle-work/gameplay/vanilla.json",
+        "sha256": "e120b8a864f644bd8b2ecb0eb89e43a0b661e7a417f70b04f1a5cf7035256f64"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-pitch/oracle-work/gameplay/vanilla.json",
+        "sha256": "e141c09c36dd9cc96dfbfe8972056b1b9076071bbc3cb75f9eb4177383426d7d"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-proto/oracle-work/gameplay/vanilla.json",
+        "sha256": "ee8dbf56c3af0e2cd4ecc6601d831cd96f9881bdaa3a8f91460236ff46ebc847"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-corpus/oracle-work/gameplay/vanilla.json",
+        "sha256": "f3df6e6d4035db67b1a3be708cd1aab261decf8fcb6977c499681b62de764590"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-chunksend/oracle-work/gameplay/vanilla.json",
+        "sha256": "f7ecff363d8247d9371e9bb50d3c34d18add8c8468d3e94743e8d2a36b24d42b"
+      },
+      {
+        "seen_at": "/home/sayer/rustmc-lanetest-1/oracle-work/gameplay/vanilla.json",
+        "sha256": "fc2621f9ffaa2eb6eb11cee0855b37af5b5fab5411fb77240ecd4229c1dec8f7"
+      }
+    ]
+  }
+}

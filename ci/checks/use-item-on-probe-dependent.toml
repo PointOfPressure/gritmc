@@ -1,0 +1,598 @@
+# use-item-on-probe-dependent.toml - every row of `data/vanilla/use_item_on.json`
+# whose recorded answer is a reading of the probe's own player rather than of
+# the block.
+#
+# The sibling of `ci/checks/use-probe-dependent.toml`, enforced by the same
+# `ci/check-use-probe.py` against the same twelve `UseGolden.STANCES`. Read that
+# file's header for what an allowlist here means and why carrying an entry is
+# worse than porting the block; nothing in it is repeated.
+#
+# # What is different about this half of the use path
+#
+# `useItemOn` is handed the held stack and `useWithoutItem` is not, and the
+# stack is the thing a player's *game mode* acts through. `ItemStack.consume`
+# is `if (entity == null || !entity.hasInfiniteMaterials()) shrink(n)`, and
+# `Player.hasInfiniteMaterials` is `abilities.instabuild` - so every rule that
+# takes the item off you reads the probe's ability set, and the recorded
+# `stackAfter` is a fact about that. That is why `game_master` is the axis on
+# eight of the entries below and appears nowhere in the other file: it is the
+# only stance in the sweep that sets `instabuild`.
+#
+# **These are not defects to be ported away, and that is the difference between
+# the two files.** In `use-probe-dependent.toml` an entry is a debt: the
+# fence gate really does flip to face the player, and the table records one
+# quarter of the circle. Here, eight of the twenty-five entries are the
+# *creative-mode* branch of item consumption, which our server has to implement
+# on both sides anyway - the row is right for a survival player and right for a
+# creative one, and the table simply cannot hold both under one probe. The
+# closing move for those is a consumer that reads `instabuild` itself, not a
+# hand port. The seventeen `CandleBlock` entries are the other kind and are a
+# real debt: `mayBuild` gates whether a candle can be added to a cake at all.
+#
+# # How to add an entry
+#
+# Measure it. Every field below was read out of the table
+# `ci/use-item-on-golden.sh` refused to write, which is the only way an entry
+# gets here: the generator names the block, the class and the exact axes, and
+# `axes` is compared for equality rather than membership.
+
+[meta]
+recorded = "2026-08-12"
+# Every stance in `UseGolden.STANCES`, `base` included. Pinned for the same
+# reason as in the sibling file, and checked against it by
+# `ci/check-use-probe-falsify.sh`: two allowlists declaring the same sweep are
+# two places for that number to drift, and an allowlist pinned to the wrong
+# sweep width is the `sweep-shrank` injection arriving by copy-paste.
+# 12 -> 14 on 2026-08-18, matching `ci/checks/use-probe-dependent.toml`.
+# `hungry` and `invulnerable` are the two halves of `Player.canEat(false)`; see
+# that file's header. Neither moves a row in this table, and the count is pinned
+# here for the same reason it is pinned there — a sweep that quietly stops
+# sweeping makes every row look constant.
+stances = 14
+# Empty since 2026-08-12, and the emptiness is the finding.
+# `full_inventory` was unavailable in both tables until
+# `UseGolden.bindItemComponents` was added: `new ItemStack` reads
+# `Holder.Reference.components()`, which `Bootstrap.bootStrap()` alone does not
+# bind. `useItemOn` cannot be probed at all without an `ItemStack`, so this
+# table could not have existed under that limit - which is why the fix landed
+# with it rather than after it.
+unavailable = []
+
+# The eight `game_master` entries. `instabuild` is the only ability the
+# sweep sets that `ItemStack.consume` and `ItemUtils.createFilledResult`
+# read, and both are how a rule takes the item off you - so what moves in
+# these rows is `stackAfter`, not the block write. Measured 2026-08-12; the
+# call chains below were read out of the pinned jar with
+# `javap -p -c -constants`, not inferred from the axis.
+
+[[block]]
+id = "minecraft:cake"
+class = "CakeBlock"
+reads = ["ItemStack.consume -> LivingEntity.hasInfiniteMaterials"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:cauldron"
+class = "CauldronBlock"
+reads = ["CauldronInteraction.interact -> ItemUtils.createFilledResult -> Player.hasInfiniteMaterials"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:water_cauldron"
+class = "LayeredCauldronBlock"
+reads = ["CauldronInteraction.interact -> ItemUtils.createFilledResult -> Player.hasInfiniteMaterials"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:lava_cauldron"
+class = "LavaCauldronBlock"
+reads = ["CauldronInteraction.interact -> ItemUtils.createFilledResult -> Player.hasInfiniteMaterials"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:powder_snow_cauldron"
+class = "LayeredCauldronBlock"
+reads = ["CauldronInteraction.interact -> ItemUtils.createFilledResult -> Player.hasInfiniteMaterials"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:flower_pot"
+class = "FlowerPotBlock"
+reads = ["ItemStack.consume -> LivingEntity.hasInfiniteMaterials"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:composter"
+class = "ComposterBlock"
+reads = ["ItemStack.consume -> LivingEntity.hasInfiniteMaterials"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:respawn_anchor"
+class = "RespawnAnchorBlock"
+reads = ["ItemStack.consume -> LivingEntity.hasInfiniteMaterials"]
+axes = ["game_master"]
+unknown = []
+
+# The seventeen candles, and these are the real debt. `CandleBlock.useItemOn`
+# is `if (stack.isEmpty() && player.getAbilities().mayBuild && state.getValue(LIT))
+# { extinguish(...); return SUCCESS; }` - so whether an empty-handed click puts
+# a candle out is a fact about the probe's build permission, and the table
+# records the permitted answer for all seventeen.
+
+[[block]]
+id = "minecraft:candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:white_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:orange_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:magenta_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:light_blue_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:yellow_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:lime_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:pink_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:gray_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:light_gray_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:cyan_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:purple_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:blue_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:brown_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:green_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:red_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:black_candle"
+class = "CandleBlock"
+reads = ["Player.getAbilities -> Abilities.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+# --- the 48 signs, 2026-08-18 --------------------------------------------
+#
+# These entered the table when `UseGolden.TableLevel` started answering
+# `getBlockEntity` with the real block entity. Until then this dumper refused
+# on the *ask* — 2,593 refusals, one cause, no others — so every sign was
+# `NoBlockEntity` for every item and no stance could move a row that did not
+# exist.
+#
+# With a real `SignBlockEntity`, `SignBlock.useItemOn` reaches
+# `player.mayBuild()` before it will let an item edit or wax a sign, and
+# `no_build` is the stance that turns it. This is the **same kind of entry as
+# the seventeen `CandleBlock` ones** and not the creative-consumption kind: it
+# is a real gate on whether the interaction happens at all, and the table
+# records the answer for a player who may build.
+
+[[block]]
+id = "minecraft:acacia_hanging_sign"
+class = "CeilingHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:acacia_sign"
+class = "StandingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:acacia_wall_hanging_sign"
+class = "WallHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:acacia_wall_sign"
+class = "WallSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:bamboo_hanging_sign"
+class = "CeilingHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:bamboo_sign"
+class = "StandingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:bamboo_wall_hanging_sign"
+class = "WallHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:bamboo_wall_sign"
+class = "WallSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:birch_hanging_sign"
+class = "CeilingHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:birch_sign"
+class = "StandingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:birch_wall_hanging_sign"
+class = "WallHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:birch_wall_sign"
+class = "WallSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:cherry_hanging_sign"
+class = "CeilingHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:cherry_sign"
+class = "StandingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:cherry_wall_hanging_sign"
+class = "WallHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:cherry_wall_sign"
+class = "WallSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:crimson_hanging_sign"
+class = "CeilingHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:crimson_sign"
+class = "StandingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:crimson_wall_hanging_sign"
+class = "WallHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:crimson_wall_sign"
+class = "WallSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:dark_oak_hanging_sign"
+class = "CeilingHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:dark_oak_sign"
+class = "StandingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:dark_oak_wall_hanging_sign"
+class = "WallHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:dark_oak_wall_sign"
+class = "WallSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:jungle_hanging_sign"
+class = "CeilingHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:jungle_sign"
+class = "StandingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:jungle_wall_hanging_sign"
+class = "WallHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:jungle_wall_sign"
+class = "WallSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:mangrove_hanging_sign"
+class = "CeilingHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:mangrove_sign"
+class = "StandingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:mangrove_wall_hanging_sign"
+class = "WallHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:mangrove_wall_sign"
+class = "WallSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:oak_hanging_sign"
+class = "CeilingHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:oak_sign"
+class = "StandingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:oak_wall_hanging_sign"
+class = "WallHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:oak_wall_sign"
+class = "WallSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:pale_oak_hanging_sign"
+class = "CeilingHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:pale_oak_sign"
+class = "StandingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:pale_oak_wall_hanging_sign"
+class = "WallHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:pale_oak_wall_sign"
+class = "WallSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:spruce_hanging_sign"
+class = "CeilingHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:spruce_sign"
+class = "StandingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:spruce_wall_hanging_sign"
+class = "WallHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:spruce_wall_sign"
+class = "WallSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:warped_hanging_sign"
+class = "CeilingHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:warped_sign"
+class = "StandingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:warped_wall_hanging_sign"
+class = "WallHangingSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:warped_wall_sign"
+class = "WallSignBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []

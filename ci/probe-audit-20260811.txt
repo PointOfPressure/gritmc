@@ -1,0 +1,110 @@
+probe-reads: /home/sayer/grit/work-probe/data/vanilla/use_without_item.json
+  122 of 184 rows sit on a useWithoutItem that reads the player (34 of 47 block classes)
+
+  AnvilBlock                   rows=3   via AnvilBlock
+      Player.openMenu                                             (self)
+  BarrelBlock                  rows=1   via BarrelBlock
+      Player.openMenu                                             (self)
+  BeaconBlock                  rows=1   via BeaconBlock
+      Player.openMenu                                             (self)
+  BedBlock                     rows=16  via BedBlock
+      Player.startSleepInBed                                      (self)
+  BlastFurnaceBlock            rows=1   via AbstractFurnaceBlock
+      Player.openMenu                                             FurnaceBlock.openContainer
+  BrewingStandBlock            rows=1   via BrewingStandBlock
+      Player.openMenu                                             (self)
+  CartographyTableBlock        rows=1   via CartographyTableBlock
+      Player.openMenu                                             (self)
+  ChestBlock                   rows=1   via ChestBlock
+      Player.openMenu                                             (self)
+  ComparatorBlock              rows=1   via ComparatorBlock
+      Player.getAbilities                                         (self)
+  CopperChestBlock             rows=4   via ChestBlock
+      Player.openMenu                                             (self)
+  CrafterBlock                 rows=1   via CrafterBlock
+      Player.openMenu                                             (self)
+  CraftingTableBlock           rows=1   via CraftingTableBlock
+      Player.openMenu                                             (self)
+  DaylightDetectorBlock        rows=1   via DaylightDetectorBlock
+      Player.mayBuild                                             (self)
+  DispenserBlock               rows=1   via DispenserBlock
+      Player.openMenu                                             (self)
+  DropperBlock                 rows=1   via DispenserBlock
+      Player.openMenu                                             (self)
+  EnchantingTableBlock         rows=1   via EnchantingTableBlock
+      Player.openMenu                                             (self)
+  EnderChestBlock              rows=1   via EnderChestBlock
+      Player.getEnderChestInventory                               (self)
+      Player.openMenu                                             (self)
+  FenceGateBlock               rows=12  via FenceGateBlock
+      Player.getDirection                                         (self)
+  FlowerPotBlock               rows=39  via FlowerPotBlock
+      Player.addItem                                              (self)
+      Player.drop                                                 (self)
+  FurnaceBlock                 rows=1   via AbstractFurnaceBlock
+      Player.openMenu                                             FurnaceBlock.openContainer
+  GrindstoneBlock              rows=1   via GrindstoneBlock
+      Player.openMenu                                             (self)
+  HopperBlock                  rows=1   via HopperBlock
+      Player.openMenu                                             (self)
+  LecternBlock                 rows=1   via LecternBlock
+      Player.openMenu                                             LecternBlock.openScreen
+  LightBlock                   rows=1   via LightBlock
+      Player.canUseGameMasterBlocks                               (self)
+  LoomBlock                    rows=1   via LoomBlock
+      Player.openMenu                                             (self)
+  RedStoneWireBlock            rows=1   via RedStoneWireBlock
+      Player.getAbilities                                         (self)
+  RepeaterBlock                rows=1   via RepeaterBlock
+      Player.getAbilities                                         (self)
+  RespawnAnchorBlock           rows=1   via RespawnAnchorBlock
+      ServerPlayer.getRespawnConfig                               (self)
+  ShulkerBoxBlock              rows=17  via ShulkerBoxBlock
+      Player.openMenu                                             (self)
+  SmithingTableBlock           rows=1   via SmithingTableBlock
+      Player.openMenu                                             (self)
+  SmokerBlock                  rows=1   via AbstractFurnaceBlock
+      Player.openMenu                                             FurnaceBlock.openContainer
+  StonecutterBlock             rows=1   via StonecutterBlock
+      Player.openMenu                                             (self)
+  TrappedChestBlock            rows=1   via ChestBlock
+      Player.openMenu                                             (self)
+  WeatheringCopperChestBlock   rows=4   via ChestBlock
+      Player.openMenu                                             (self)
+
+  no player read at all (13 classes): ButtonBlock, CaveVinesBlock, CaveVinesPlantBlock, ComposterBlock, DoorBlock, DragonEggBlock, LeverBlock, MovingPistonBlock, NoteBlock, SweetBerryBushBlock, TrapDoorBlock, WeatheringCopperDoorBlock, WeatheringCopperTrapDoorBlock
+
+  SPLIT (denominator: 184 rows in the table)
+    reads the probe                      122
+      of which the row MOVES              17   ComparatorBlock, DaylightDetectorBlock, FenceGateBlock, LightBlock, RedStoneWireBlock, RepeaterBlock
+      of which constant across stances   105
+        - every cell a refusal            38   (constant because unmeasured)
+        - some cells refusals             16
+        - fully measured and constant     51
+    never reads the probe                 62
+    a stance refused where base did not    0
+
+  THE 17, BY NAME — every row whose recorded answer is a reading of one
+  player. These are not rows to bulk-convert on suspicion; they are the
+  list whoever ports them works from.
+    minecraft:acacia_fence_gate        FenceGateBlock           adjacent_south, facing_east, facing_north, facing_west
+    minecraft:bamboo_fence_gate        FenceGateBlock           adjacent_south, facing_east, facing_north, facing_west
+    minecraft:birch_fence_gate         FenceGateBlock           adjacent_south, facing_east, facing_north, facing_west
+    minecraft:cherry_fence_gate        FenceGateBlock           adjacent_south, facing_east, facing_north, facing_west
+    minecraft:comparator               ComparatorBlock          no_build
+    minecraft:crimson_fence_gate       FenceGateBlock           adjacent_south, facing_east, facing_north, facing_west
+    minecraft:dark_oak_fence_gate      FenceGateBlock           adjacent_south, facing_east, facing_north, facing_west
+    minecraft:daylight_detector        DaylightDetectorBlock    no_build
+    minecraft:jungle_fence_gate        FenceGateBlock           adjacent_south, facing_east, facing_north, facing_west
+    minecraft:light                    LightBlock               game_master
+    minecraft:mangrove_fence_gate      FenceGateBlock           adjacent_south, facing_east, facing_north, facing_west
+    minecraft:oak_fence_gate           FenceGateBlock           adjacent_south, facing_east, facing_north, facing_west
+    minecraft:pale_oak_fence_gate      FenceGateBlock           adjacent_south, facing_east, facing_north, facing_west
+    minecraft:redstone_wire            RedStoneWireBlock        no_build
+    minecraft:repeater                 RepeaterBlock            no_build
+    minecraft:spruce_fence_gate        FenceGateBlock           adjacent_south, facing_east, facing_north, facing_west
+    minecraft:warped_fence_gate        FenceGateBlock           adjacent_south, facing_east, facing_north, facing_west
+
+    stances swept: 11 of 12  (unavailable: full_inventory)
+
+STAMP        jar=183c0499c5f8 table=a8ea838f6439 dumper=da270904d2ea audit=240aafe7cf46 rows=184 reads=122 moves=17

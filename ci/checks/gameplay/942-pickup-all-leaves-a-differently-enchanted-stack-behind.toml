@@ -1,0 +1,83 @@
+name = "pickup-all-leaves-a-differently-enchanted-stack-behind"
+about = "607's double-click gather, with one of the two donor stones carrying minecraft:enchantments (mending I). AbstractContainerMenu.doClick's PICKUP_ALL sweep (offsets 1667-1867) takes a slot only when canItemQuickReplace(slot, carried, true) holds, and that is ItemStack.isSameItemSameComponents — the item AND the whole component patch. So vanilla gathers the plain stone into the cursor (two) and leaves the enchanted one in chest slot 2. What would make this fail: a server whose same-stack test compares the item id alone — which is what this server's was until its stacks carried a patch — sweeps all three onto the cursor and empties slot 2."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot", "set_cursor_item"]
+settle_ms = 1500
+
+# The lid repeats every 5 ticks while the chest is open; collapsed as in 607.
+collapse_repeats = ["block_event"]
+
+# 607's three-slot shape: two plain stone and one enchanted, each in its own
+# hotbar slot because `[[setup]]` cannot hand an item over twice.
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+slot = 2
+
+# mending is enchantment 23 in the synchronised registry both servers send
+# (941 measures the same bytes on a book); `ItemEnchantments.STREAM_CODEC` is
+# a count, then (id, level).
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+slot = 3
+components = [{ type = "minecraft:enchantments", bytes = [1, 23, 1] }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# Into chest slots 0, 1 and 2: hotbar 0, 2 and 3 are menu slots 54, 56, 57.
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 56
+
+[[step]]
+do = "container_click"
+slot = 1
+
+[[step]]
+do = "container_click"
+slot = 57
+
+[[step]]
+do = "container_click"
+slot = 2
+
+# Lift slot 0 onto the cursor, then double-click the emptied slot (607's
+# reason: the sweep runs only on an empty clicked slot).
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 0
+input = "pickup_all"

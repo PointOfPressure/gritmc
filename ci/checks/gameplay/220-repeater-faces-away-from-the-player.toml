@@ -1,0 +1,18 @@
+name = "repeater-faces-away-from-the-player"
+about = "a repeater placed on the ground points away from whoever placed it — DiodeBlock takes getHorizontalDirection().getOpposite(), the reverse of what a stair takes from the identical click, so one yaw is enough to tell the two rules apart"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:repeater"
+
+[[step]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

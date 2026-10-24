@@ -1,0 +1,141 @@
+name = "a-roosting-bat-wakes-when-a-player-comes-within-four-blocks"
+about = "a bat roosting under stone wakes when the player steps to 3.67 blocks of it in its line of sight: Bat.customServerAiStep finds a player through BAT_RESTING_TARGETING, forNonCombat().range(4.0), clears the resting flag and plays the take-off level event 1025 at its own block"
+observe_from = "actor"
+observe = ["level_event"]
+collapse_repeats = ["level_event"]
+within = 176
+settle_ms = 1500
+
+# The mechanism and the rig are `087`'s, read its header first: the same stone
+# cell with a 0.5-tall slot in its west face, the same bat hatched from 5.81
+# away. `087` stands the player at 4.63 and asserts silence; this stands it at
+# 3.67 — sqrt(3.5^2 + 1.1^2), bat at (5.5, 1.1, 1.5), player feet at
+# (2.0, 0, 1.5) — and asserts the wake. The line from the bat's eye (y 1.55) to
+# the player's (1.62) runs through the slot (y 1.5..2.0 over x 4..5), which is
+# what `Sensing.hasLineOfSight` clips with `ClipContext.Block.COLLIDER`.
+#
+# WHY `collapse_repeats` AND WHY ONLY `level_event`. The woken bat cannot leave
+# the cell, and the cell's ceiling is a conductor, so `customServerAiStep`
+# 481-509 lets it roost again on any tick with probability 1/100 — a draw on
+# the bat's own unseeded random — and with the player still in range and in
+# sight it wakes again on the next tick with another 1025. How many of those
+# land in the window is the bat's random, not either server's mechanics. Every
+# one of them is the same observation — 1025, data 0, at the cell's block,
+# because a roost is only possible at a block under the ceiling and the cell
+# has one — so collapsing by value leaves exactly the claim: the bat woke, here,
+# with this event. The flag toggles with every roost, so `set_entity_data` is
+# NOT observed here (`087` and `086` observe it where it cannot repeat). The
+# step attribution the collapse drops is what `087` measures instead.
+#
+# The rig sits inside one chunk on z (README), in the far field `083` explains.
+
+
+# THE RIG IS OUT AT z = -80, AND `within` IS OPENED TO REACH IT. See the
+# FAR FIELD note in `083`'s header.
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, -80.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "walk"
+to = [2.0, 0.0, -80.0]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+# floor of the cell
+[[setup]]
+do = "place"
+on = [5, -1, -79]
+face = "up"
+
+# north wall, on its footing
+[[setup]]
+do = "place"
+on = [5, -1, -80]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [5, 0, -80]
+face = "up"
+
+# south wall, on its footing
+[[setup]]
+do = "place"
+on = [5, -1, -78]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [5, 0, -78]
+face = "up"
+
+# east wall, on its footing
+[[setup]]
+do = "place"
+on = [6, -1, -79]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [6, 0, -79]
+face = "up"
+
+# footing of the west face
+[[setup]]
+do = "place"
+on = [4, -1, -79]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone_slab"
+
+# the bottom slab that closes the lower half of the west face
+[[setup]]
+do = "place"
+on = [4, 0, -79]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+# the block over the slot, on the slab
+[[setup]]
+do = "place"
+on = [4, 1, -79]
+face = "up"
+
+# the ceiling, off the block over the slot
+[[setup]]
+do = "place"
+on = [4, 2, -79]
+face = "east"
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, -80.0]
+
+[[setup]]
+do = "hold"
+item = "minecraft:bat_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [5, 0, -79]
+face = "up"
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[step]]
+do = "walk"
+to = [2.0, 0.0, -78.5]

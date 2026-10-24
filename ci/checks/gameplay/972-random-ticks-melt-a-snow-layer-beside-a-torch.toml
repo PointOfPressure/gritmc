@@ -1,0 +1,52 @@
+name = "random-ticks-melt-a-snow-layer-beside-a-torch"
+about = "a snow layer lit to 13 by a torch beside it melts on its first random tick and the grass under it stops being snowy in the same tick — the BLOCK light layer alone decides it, so this is the corpus's first check whose outcome is a light level"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 8000
+
+# `SnowLayerBlock.randomTick` (javap -p -c -constants, 26.2):
+#
+#    5: level.getBrightness(LightLayer.BLOCK, pos) > 11
+#   16: dropResources(state, level, pos)
+#   22: level.removeBlock(pos, false)
+#
+# The torch emits 14 and the snow is one step away, entering a cell whose
+# opacity is max(1, 0): 13 > 11. `removeBlock` writes air with flags 3, and
+# the grass below runs `SnowyBlock.updateShape` for its UP neighbour:
+# `snowy = isSnowySetting(air)` = false. Both writes land in one tick and in
+# one section, so they reach a client together.
+#
+# No draw is involved: the melt happens on the first pick of the layer.
+# The grass under the torch survives — a torch has no occlusion shape and
+# dampens nothing, so `canStayAlive` holds there.
+
+[[gamerule]]
+rule = "random_tick_speed"
+value = "4096"
+restore = "0"
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:snow"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:torch"
+
+[[setup]]
+do = "place"
+on = [2, -1, 1]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 100

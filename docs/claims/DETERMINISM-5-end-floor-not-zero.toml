@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 5
+slug   = "end-floor-not-zero"
+title  = "A published figure this refutes: the End's floor is not zero"
+branch = "backfill"

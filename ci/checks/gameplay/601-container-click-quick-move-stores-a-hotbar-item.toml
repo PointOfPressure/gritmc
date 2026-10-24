@@ -1,0 +1,63 @@
+name = "container-click-quick-move-stores-a-hotbar-item"
+about = "shift-clicking the stone straight from the hotbar into an open chest moves it in one click instead of 560's two — AbstractContainerMenu.doClick's ContainerInput.QUICK_MOVE arm (javap -p -c -constants on the pinned jar, offsets 569..663) is a different branch from PICKUP's, reached only when the packet's own containerInput names it, and it never touches the cursor at all. What would make this fail: a server that maps every ContainerInput id it does not specifically implement onto PICKUP — which is exactly what OutOfBoundsStrategy.ZERO does for an out-of-range wire value — would answer this click with silence (a plain pickup of a chest-menu slot with nothing on the cursor and nothing under it does nothing), where vanilla answers with a correction on the hotbar slot and one inside the chest."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot"]
+settle_ms = 1000
+
+# The chest lid repeats on a free-running 5-tick timer for as long as the chest
+# is open — `ContainerOpenersCounter.recheckOpeners` re-arms unconditionally
+# (offsets 178-186 call `Level.scheduleTick(pos, block, 5)`) and calls
+# `openerCountChanged` on both paths (offset 84's `if_icmpeq 167` lands on the
+# call itself), and `ChestBlockEntity.signalOpenCount` offsets 0-13 turn that
+# into `level.blockEvent(pos, block, 1, newCount)`. So the same `block_event`
+# goes out every 250 ms, forever.
+#
+# This check does not observe `block_event` and so never saw them declared.
+# It sees them under `strict`, where **how many arrived and which step each
+# was stamped with are set by where a free-running timer's edges fell against
+# this window** — measured on the 2026-08-07 07:10 subset pair, six of the
+# seven scenarios that leave a chest open disagreed on step attribution while
+# agreeing on the total.
+#
+# What stops being tested here: the repeat count and the step attribution of
+# `block_event`. What is still tested: that the lid opens at all, at the right
+# position, with the right viewer count, on the right stream — and the cadence
+# itself, in `rustmc_server::containers::tests::
+# the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`, which measures
+# the gap rather than the count.
+collapse_repeats = ["block_event"]
+
+# THE RIG IS 560's, UP TO THE CLICK.
+#
+# 560 needs two clicks — grab onto the cursor, then place — because it is
+# testing PICKUP. QUICK_MOVE is the verb for doing both in one packet, and
+# `container_input_value` already accepts the name; nothing here needed a new
+# verb.
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 54
+input = "quick_move"

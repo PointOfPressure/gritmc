@@ -1,0 +1,145 @@
+name = "a-block-broken-out-of-view-is-not-broadcast"
+about = "the actor walks seven chunks up +z, breaks a block there, walks back and breaks one beside the observer — so the observer's stream carries the second and not the first, which is the whole of `ChunkMap.getPlayers(pos, false)` and the only filter `ChunkHolder.broadcastChanges` has"
+observe_from = "observer"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 3000
+
+# WHY THIS CHECK EXISTS
+#
+# `ChunkHolder.broadcastChanges` resolves its recipients once, at offsets
+# 111-125, with `getPlayers(pos, false)`, and `ChunkMap.getPlayers`'s whole
+# filter is
+#
+# ```java
+# ChunkMap.isChunkTracked(player, x, z)
+#     = player.getChunkTrackingView().contains(x, z)
+#       && !player.connection.chunkSender.isPending(ChunkPos.pack(x, z))
+# ```
+#
+# There is no distance-to-the-block test and no exclusion of whoever acted.
+# Until 2026-09-05 this server had no filter of any kind on that path —
+# `ChangedBlocks::flush` went through `Players::broadcast` — so **every
+# connected client received every block change in the world**, and no check
+# in this corpus could see it, for one structural reason: every scenario
+# writes blocks inside its own workspace, and both clients stand in that
+# workspace. A rig in which the two clients hold the same chunks cannot
+# distinguish a server that filters from one that does not.
+#
+# So this check separates them, and the only lever the harness gives is the
+# actor's own feet: `record::run_one` walks the observer to
+# `workspace + [0, 0, OBSERVER_OFFSET]` at setup and never moves it again —
+# every `[[step]]` is executed by the actor alone
+# (`record.rs`: `actor.act(step, tables)`). The actor therefore carries the
+# rig away from the observer rather than the other way round.
+#
+# WHY SEVEN CHUNKS, AND WHY NOT SIX
+#
+# `ci/vanilla-server.sh` and `ci/t2-gameplay.sh` both run `view-distance=4`.
+# The tracked set is `ChunkTrackingView$Positioned`, a Euclidean disc padded
+# by two:
+#
+# ```java
+# int pad = 2;
+# long dx = Math.max(0, Math.abs(x - cx) - pad);
+# long dz = Math.max(0, Math.abs(z - cz) - pad);
+# return dx * dx + dz * dz < (long) (viewDistance * viewDistance);
+# ```
+#
+# The observer stands at absolute z = 5 (`OBSERVER_OFFSET`), which is chunk
+# z 0, and it never moves, so its view stays centred there. Along an axis the
+# disc therefore reaches:
+#
+# ```text
+#   |dz| = 5   ->  (5 - 2)^2 = 9   <  16   tracked
+#   |dz| = 6   ->  (6 - 2)^2 = 16  is not < 16   NOT tracked
+# ```
+#
+# so chunk z 6 is already outside. Seven is used rather than six because six
+# is the boundary and the boundary is where an off-by-one in either
+# implementation lands: a check sitting on it would go red for a `<=` where
+# vanilla has `<`, which is a real defect but not this one, and it would do so
+# without saying which. Chunk z 7 is z = 112..127, and the dig is at z = 112.
+#
+# WHY +z AND NOT -z OR x
+#
+# `record.rs` spaces workspaces along **x** at 32 blocks
+# (`WORKSPACE_SPACING`), so a 112-block walk on x would cross three other
+# scenarios' rigs and could break their blocks. The corpus README's rule about
+# keeping a rig one side of relative z = 0 is satisfied: both digs are at
+# z >= 0, so neither can pair with the other in a `section_blocks_update`
+# across the z = 0 chunk boundary. `530` already walks +z to 85 for the same
+# reasons and does not collide with anything.
+#
+# WHAT EACH SERVER SHOULD SAY
+#
+# ```text
+#   step 0  walk to z = 112     nothing: no block changes
+#   step 1  dig [1, -1, 112]    chunk z 7, outside the observer's view
+#                               vanilla: SILENT on the observer's stream
+#   step 2  walk back to z = 0  nothing
+#   step 3  dig [1, -1, 0]      chunk z 0, which the observer holds
+#                               vanilla: one block_update
+# ```
+#
+# One observation, at step 3. A server with no recipient filter says **two**,
+# the extra one at step 1, and diverges. That is the red this check was
+# written to see and it was seen before the fix landed — see the branch's
+# cold start for the two subset runs.
+#
+# WHY THE MEASURED STEP IS THE LAST ONE AND NOT THE INTERESTING ONE
+#
+# `ci/corpus-falsifiable.py` grades a check by whether an EDIT of the step it
+# is named for moves the verdict, and an EDIT needs subject observations to
+# edit. Step 1 has **none by design** — its whole claim is silence — so a
+# scenario ending there would be gradeable only by `speak`, which is tier 1
+# unless the check declares its measured step silent, and this one does not:
+# it declares that the near dig arrives. Ending on the near dig puts a real
+# observation at the measured step, so `drop-measured`, `retype`, `perturb`
+# and the rest all bite, and the silence at step 1 rides along as an extra
+# observation the comparator counts. Both halves are scored; only one of them
+# is scored by mutation.
+#
+# WHAT THIS DOES NOT TEST, SAID RATHER THAN IMPLIED
+#
+# * **The `isPending` limb.** Both clients have been standing in their chunks
+#   for the whole corpus by the time this runs, so nothing either of them
+#   tracks is still queued. The limb is real — it is what withholds a change
+#   in a chunk that has been *promised* and not *delivered* — and it is
+#   covered by `broadcast::a_change_in_a_pending_chunk_is_withheld_and_not_deferred`,
+#   which also asserts the change is dropped rather than replayed when the
+#   chunk lands.
+# * **`boundaryOnly = true`.** `getPlayers`' other arm feeds the light update
+#   at `broadcastChanges` offsets 33-47, and this server sends no
+#   `light_update` outside a chunk body. `players::only_the_rim_of_a_view_is_on_the_tracked_border`
+#   is what that arm has instead.
+# * **Our tile boundary.** `ci/t2-gameplay.sh` runs this server with
+#   `--radius 2`, so chunk z 7 is outside the spawn tile and is generated on
+#   demand while the actor walks to it. If it were not ready the dig would
+#   write nothing, this server would be silent at step 1 for the wrong
+#   reason, and the check would agree with vanilla by accident. That is why
+#   the subset run that established the red is the evidence and not this
+#   paragraph: a server without the filter was observed emitting the step-1
+#   packet, which it could only do having generated the chunk.
+
+# Out to chunk z 7, four blocks a packet — the hop size `530`'s header
+# establishes as legal: eight is refused by vanilla with `oracle moved too
+# quickly!` and one makes short walks flap.
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 112.0]
+
+# The block the observer must NOT be told about.
+[[step]]
+do = "dig"
+at = [1, -1, 112]
+face = "up"
+
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 0.0]
+
+# The block it must be told about — the control, and the measured step.
+[[step]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"

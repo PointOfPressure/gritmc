@@ -1,0 +1,21 @@
+# The packet kinds that never enter a recording, and what each costs.
+#
+# Written and checked by `ci/never-recorded.py`. Read that file's header for the
+# distinction this file turns on: `ci/checks/projection-drops.toml` enumerates
+# dropped *fields*, which leave an observation with a hole in it, while a kind
+# dropped at RECORD time — `trace::observe` returning `None` before `decode`
+# runs — leaves no observation at all.
+#
+# **THERE ARE NO ROWS, AND THAT IS THE MEASUREMENT — 2026-09-24.** Twelve stood
+# here while `trace::is_housekeeping` refused twelve kinds. `recorder-
+# housekeeping` deleted it: all twelve are recorded, and every row became a
+# stale-row refusal of `ci/never-recorded.py`'s own. Each is now a
+# `trace::FAMILIES` row with a class, a measured tag and a reason, checked by
+# `ci/ambient-falsify.py` against two-run vanilla censuses — and the `vacant`
+# verdict this file carried for `PING` and `TAB_LIST` is that table's
+# `no-emitter` tag, checked against the jar by `ci/packet-emitter-sites.py`.
+# The twelve rows are kept verbatim as `never-recorded.fixture.toml`, which the
+# falsifier uses; see its header.
+#
+# A row belongs here again only if `observe` starts dropping a kind, which
+# `ci/ambient-falsify.py` R1 refuses in T0 before this file is consulted.

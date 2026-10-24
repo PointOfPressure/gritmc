@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 44
+slug   = "jigsaw-piece-stream"
+title  = "The jigsaw driver's piece stream: what it is, what it costs in block states, and why that answer is not the one the item was written expecting"
+branch = "worldgen-jigsaw-random"

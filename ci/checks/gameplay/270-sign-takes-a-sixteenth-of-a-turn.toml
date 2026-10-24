@@ -1,0 +1,18 @@
+name = "sign-takes-a-sixteenth-of-a-turn"
+about = "everything a standing sign puts on the placer's stream, of which the sixteenth of a turn is the part that already MATCHES. RotationSegment.convertToSegment is still the only placement rule in the game with more than eight values — Math.round((yaw + 180) * 16/360) & 15, so this rig's yaw 22.5 is rotation 9 and 460's yaw 0 is rotation 8 — and both are reproduced exactly, so the name of this check is the mechanism it VERIFIES and not the one it is blocked on. What it diverges on is the rest of its observe list, measured 2026-08-04 against the real trace: vanilla sends an extra block_update at the sign's position AHEAD of handleUseItemOn's two forced resyncs (a plain stone placement has no such packet — compare 020, which matches at four observations), then open_sign_editor, then block_entity_data. This server sends none of the three, 4 observations against 7. So deleting the two sign-specific kinds from observe would NOT make this match: the extra block_update is an ordinary one and would still be missing"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack", "open_sign_editor", "block_entity_data"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_sign"
+
+[[step]]
+do = "look"
+yaw = 22.5
+pitch = 0.0
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

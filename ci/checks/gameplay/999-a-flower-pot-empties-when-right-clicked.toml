@@ -1,0 +1,150 @@
+name = "a-flower-pot-empties-when-right-clicked"
+about = "potting a dandelion and then right-clicking the pot with something unplaceable in hand — `FlowerPotBlock.useWithoutItem` gives the plant back and resets the block to an empty pot. Thirty-nine blocks share that one implementation, the largest of the 28 the corpus does not reach, and the potting step in the setup covers `FlowerPotBlock.useItemOn` on the way past"
+observe_from = "actor"
+observe = [
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+    "container_set_slot",
+]
+settle_ms = 1500
+
+# RENUMBERED 790 -> 999 ON 2026-08-13, branch `gameplay-block-schemas`, and the
+# README paragraph this file is the subject of is the one that authorises it.
+#
+# `Scenario::load_dir` sorts by path, so corpus order is filename order, and
+# this check must run LAST: it ends with a dandelion in the actor's inventory,
+# which moves the free-slot layout every later `hold` resolves against. The
+# README's rule is "number a new check below 790, or move 790 up and say in
+# its header that you did". `960`-`963` were allocated to this branch by its
+# brief, above 790, so the second arm is the one taken.
+#
+# THIS IS NOT A TIDINESS MOVE. This check is baselined `diverge` — the port is
+# missing — so after it runs, vanilla's inventory and ours are already
+# different, and any check placed after it inherits a free-slot layout that
+# differs BETWEEN THE TWO SERVERS. A schema check downstream of that would
+# read a difference that has nothing to do with the schema it names. That is
+# the "side effects reach another scenario" case, and the corpus deletes
+# checks for it rather than declaring them.
+#
+# Nothing about the check itself changed. Its `name` is unchanged, so its row
+# in `ci/checks/gameplay-baseline.toml` and its entry in
+# `ci/checks/gameplay-unstable.toml` are untouched — those are keyed by name,
+# not by filename — and its baselined verdict does not move. Corpus ORDER is
+# also unchanged for every pre-existing check: this file was last before and
+# is last now.
+
+# THIS CHECK IS NUMBERED 790 ON PURPOSE AND MUST STAY LAST.
+#
+# `Player.addItem` at offset 28 puts the dandelion into the actor's inventory,
+# and the actor is one connection that plays every scenario in the corpus. Two
+# session-long counters are downstream of that:
+#
+#   * ~~`AbstractContainerMenu.incrementStateId` on the player's own inventory
+#     menu — window 0, which never closes.~~ **NO LONGER A REASON, 2026-08-11.**
+#     `compare::rebase_session_counters` rebases `container_set_slot.state`
+#     onto the scenario, scoped per `(connection, window)`, so a later check
+#     compares each packet's distance from the first one on that menu in its
+#     own projection and inherits nothing through this field. Vanilla's
+#     counter still runs for the whole session — the mechanism is unchanged —
+#     but it is no longer an observable this corpus compares. Three
+#     `ci/checks/gameplay-unstable.toml` entries that existed only for it,
+#     this scenario's included, were retired with the decoder.
+#   * the inventory itself. A stray dandelion in the first free slot moves
+#     what a later `hold` into a hotbar slot lands beside.
+#
+# **THE RULE SURVIVES ON THE SECOND LEG ALONE AND IS UNCHANGED IN FORCE.** One
+# of the two reasons was removed; the free-slot layout is not a counter, is not
+# rebased by anything, and is enough on its own. Do not read the retirement of
+# the first as licence to renumber.
+#
+# So this check writes state that every check after it would inherit, and the
+# cheapest correct answer is for there to be no check after it. It is the
+# highest-numbered file in the directory; `Scenario::load_dir` sorts by path,
+# so that is what "last" means here. **A new check must not be numbered above
+# 790** without moving this one.
+#
+# **AMENDED 2026-08-13, AND THE RULE IS NARROWED RATHER THAN LIFTED.** What
+# this check leaks is one item in the actor's first free inventory slot. That
+# reaches a later check through exactly one route: a `hold` into a hotbar slot
+# lands beside a different set of items than it would have. So the rule the
+# file numbers have to enforce is not "nothing may follow 790", it is
+# **nothing that reads the actor's inventory layout may follow 790** — and the
+# two coincided for as long as every check in the corpus was an actor check.
+#
+# `920-acknowledging-a-teleport-twice-is-refused.toml` is the first that is
+# not. It opens a third connection (`crate::trace::Who::Probe`), sends one
+# packet on it, reads that connection's own socket, and never holds, places,
+# digs or clicks anything; its `observe_from` is `probe`, so the actor's
+# stream is not even in its projection. A dandelion in the actor's inventory
+# is not an input to it in any sense.
+#
+# **The check that follows 790 must be able to say that about itself.** If you
+# are adding one and it holds an item, it belongs below 790 and this rule is
+# unchanged in force for it.
+#
+# WHY THE POTTING IS IN SETUP AND NOT A STEP.
+# Setup observations are discarded. Potting is a real `useItemOn` and is worth
+# covering, but this check claims the *emptying*, and a rig that showed both
+# would report a difference in either as one verdict. The potting is still
+# load-bearing — `useWithoutItem` returns `CONSUME` and puts nothing on the
+# wire on an empty pot (offset 0: `if (isEmpty()) return CONSUME`), so without
+# it this check would be `inert` and the gate would refuse it. That is the
+# whole reason the mechanism has to be armed in setup rather than assumed.
+#
+# FROM THE JAR:
+#
+#   FlowerPotBlock.useItemOn
+#      0: stack.getItem() instanceof BlockItem
+#     21: POTTED_BY_CONTENT.getOrDefault(blockItem.getBlock(), AIR)
+#     53: if that state isAir -> return TRY_WITH_EMPTY_HAND
+#         else pot it
+#
+#   FlowerPotBlock.useWithoutItem
+#      0: if (isEmpty()) return InteractionResult.CONSUME
+#     11: ItemStack out = new ItemStack(this.potted)
+#     28: if (!player.addItem(out)) player.drop(out, false)
+#     43: Level.setBlock(pos, Blocks.FLOWER_POT.defaultBlockState(), 3)
+#     56: Level.gameEvent(player, BLOCK_CHANGE, pos)
+#     66: return InteractionResult.SUCCESS
+#
+# `minecraft:dandelion` is a `BlockItem` for `Blocks.DANDELION`, which is in
+# `POTTED_BY_CONTENT`, so the setup's second placement pots rather than trying
+# to put a flower on the ground beside the pot: the block's own `useItemOn`
+# returns SUCCESS and `Item.useOn` is never reached.
+#
+# `container_set_slot` is observed because `addItem` is the visible half of
+# this mechanism and a server that changed the block and gave nothing back
+# would otherwise pass. Everything at relative z = 0.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:flower_pot"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:dandelion"
+
+[[setup]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

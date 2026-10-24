@@ -1,0 +1,222 @@
+# docs/DETERMINISM.md is append-only with hand-numbered `## N.` sections:
+# every edit is a whole new tail written after the last one, never a change
+# to existing text. `merge=appendonly` names a driver that keeps the common
+# base and concatenates both sides' new tail — the correct 3-way answer for a
+# file with that shape, not a keep-both hack. The driver itself lives at
+# `ci/merge-appendonly.py` and is registered locally (git attributes cannot
+# carry a driver command) by `ci/setup-merge-drivers.sh`, called from
+# `ci/t0.sh`. See that script and the driver's own header for the rest.
+#
+# docs/WORKLIST.md must never carry `merge=union` OR `merge=appendonly`, and
+# the reason is unchanged: it is self-evolving — the three `## NOW` blocks are
+# edited in place, not appended to — and a union on a file like that is
+# precisely the defect that produced a stale figure surviving as a duplicate
+# block. That damage is still legible in the file: the COLD START INDEX today
+# holds `ci-unfalsifiable-root` twice, with "10 of 84" in one row and "4 of 84"
+# in the other, because a branch replaced its own row and a union kept both.
+#
+# What it carries instead, since 2026-08-16, is `merge=docregions` — a driver
+# that resolves an add/add hunk ONLY inside a region the file itself declares
+# with `MERGE-REGION BEGIN/END` markers, and only when neither side touched
+# existing text. WORKLIST declares exactly one such region, around the COLD
+# START INDEX table body, which is where 36 of the last 40 commits to the file
+# landed. All three `## NOW` blocks are outside it and merge exactly as they
+# did before, conflicting when they genuinely disagree.
+#
+# docs/PARITY-ROADMAP.md and ci/figures.toml are the same shape with the
+# region at the tail: every branch appends a new `## N.` section, or a new
+# `[[figure]]`, at EOF. They were the next two most common collisions —
+# measured 2026-08-16 over 48 unmerged branches, 26 of which would not rebase
+# onto main: WORKLIST 13, PARITY-ROADMAP 11, figures.toml 4.
+#
+# docs/DETERMINISM.md stays on `appendonly`. It is the one file where EVERY
+# edit really is a whole new tail, that driver's byte-prefix refusal is the
+# strictest thing available, and it is proven; there is no measured collision
+# there to justify moving it to a more general driver.
+#
+# ci/checks/gameplay-falsifiable.toml and ci/checks/gameplay-baseline.toml are
+# the same shape again, measured 2026-08-17 as the new top collision once the
+# three above stopped being one: gameplay-falsifiable.toml conflicted on 4 of
+# that day's gameplay branches and gameplay-baseline.toml on 2, both for the
+# same reason — every branch appends rows at the tail. gameplay-falsifiable.toml
+# gets `to-eof check=toml-scenarios`, no key: its rows are multi-line
+# `[[scenario]]` stanzas, and a real re-sweep of an EXISTING scenario still
+# conflicts by line exactly as before, which is correct — only a clean new
+# stanza reaches the append rule. gameplay-baseline.toml gets
+# `key=toml-key check=unique-toml-key`: its rows are one `key = "verdict"`
+# assignment per line, the same shape WORKLIST's index table is, just without
+# the Markdown.
+#
+# ci/t0.sh is measured 2026-08-17 as the single biggest source of merge
+# contention in the queue: six branches touched it that day with zero
+# deletions between them, each adding a new check block next to the existing
+# one it is topically closest to rather than at a shared tail. Its region is
+# therefore the whole executable body — `checks`, BEGIN right after `cd`, END
+# right before the closing sentinel — not one table or a `to-eof` tail, and it
+# carries `check=bash-syntax` rather than a key: a check block is not named
+# anywhere the merge can read, so the one thing left to verify unconditionally
+# is that the result still parses. This is executable code, so a wrong merge
+# breaks the gate for every branch, not just its author's; see
+# `ci/merge-docregions.py`'s own header for why the width of the region does
+# not weaken what it refuses. `ci/t1.sh` was checked the same day and is NOT
+# this shape — real edits, not appends, on a fixed two-call sequence whose
+# order is load-bearing — so it carries no attribute here.
+#
+# Both drivers are registered per checkout by `ci/setup-merge-drivers.sh` —
+# git attributes cannot carry a driver command — which `ci/t0.sh`,
+# `ci/t0-remote.sh` and `ci/lanes.sh` all call. See those scripts and each
+# driver's own header for the rest.
+docs/DETERMINISM.md merge=appendonly
+docs/WORKLIST.md merge=docregions
+docs/PARITY-ROADMAP.md merge=docregions
+ci/figures.toml merge=docregions
+ci/checks/gameplay-falsifiable.toml merge=docregions
+ci/checks/gameplay-baseline.toml merge=docregions
+ci/t0.sh merge=docregions
+# Added 2026-09-05 with the survival corpus, by KIND and not by the measured
+# ranking below — that ranking is over files that existed on 2026-08-18 and
+# this one did not. It is the same shape as gameplay-falsifiable.toml in the
+# only respect the driver cares about: `ci/corpus-falsifiable.py --sweep`
+# rewrites the WHOLE document, so without a region marker a re-swept ledger
+# gets the driver's refusals and none of its resolutions, and several lanes
+# append survival scenarios to one tail. The seventh-driver bar below is about
+# spending a day ranking candidates; it is not an argument for shipping a
+# second ledger of a driven kind undriven.
+ci/checks/survival-falsifiable.toml merge=docregions
+docs/FINDINGS.md merge=docregions
+ci/checks/test-targets.toml merge=docregions
+
+# ---------------------------------------------------------------------------
+# THE COVERAGE IS DONE. Measured 2026-08-18 — do not go looking for a seventh.
+# ---------------------------------------------------------------------------
+#
+# Every driver above was added because somebody measured what it would free.
+# The obvious next question is which file to add next, and it has now been
+# answered by exhaustion rather than by guessing, so nobody has to spend a day
+# on it again.
+#
+# THE INSTRUMENT. All 46 queued branches, all 1035 pairs, three-way merged
+# against main with `git merge-tree --write-tree --name-only`, and every
+# conflicted path recorded. No worktree, no rebase, no gate — about eight
+# minutes. NOTE THE ONE TRAP: `git merge-tree` does NOT run custom merge
+# drivers, so the files above still report as conflicts under it. They are
+# resolved in a real gate and must be subtracted before ranking; a ranking
+# that skips that step just rediscovers the drivers already here, which is
+# what the first pass of this measurement did.
+#
+# THE RESULT.
+#
+#     79 of 1035 pairs conflict at all                     (7.6%)
+#     60 of those 79 conflict ONLY in files driven above
+#     19 pairs have a conflict in an UNDRIVEN file
+#
+# and those 19 are spread over 20 different files. The whole undriven ranking:
+#
+#     5  ci/t2-regiondiff.sh
+#     3  ci/checks/gameplay/README.md
+#     2  tools/region-differ/src/main.rs
+#     2  tools/oracle-runner/src/trace.rs
+#     2  ci/vanilla-reach-census.py
+#     1  each — sixteen further files, one pair apiece
+#
+# THE BAR THIS HAS TO CLEAR, AND WHY NOTHING CLEARS IT. The docregions pair
+# (gameplay-falsifiable.toml + gameplay-baseline.toml) freed 39 pairs and saved
+# six recordings, ~4.0 h. The best remaining candidate frees 5 — an eighth of
+# that — and it is not even the right kind of file:
+#
+#   * `ci/t2-regiondiff.sh` is a 22-line stub on main that four branches each
+#     grow independently, to 45, 45, 289 and 292 lines. Two of the four agree
+#     (blob 919d48dc); the other two disagree with them and with each other.
+#     That is four branches rewriting one young file, not several branches
+#     appending to a shared one, and a driver that kept both sides would
+#     produce a script that is the concatenation of two different scripts. It
+#     is the `## NOW` case exactly: the conflict is visible and the silently
+#     merged result would not be.
+#   * `ci/checks/gameplay/README.md` frees 3, over 12 commits with 12 distinct
+#     hunk starts — scattered edits, no region structure to declare.
+#   * everything else frees one pair, which is one rebase somebody does by hand
+#     once.
+#
+# Same verdict, same method and same reasons as `ci/t1.sh` and `docs/BENCH.md`,
+# both of which were examined and rejected earlier — and `docs/BENCH.md` shows
+# up here at exactly one pair, which corroborates that call from a direction it
+# was not made from.
+#
+# So: the remaining conflict surface is 19 pairs of 1035 spread over 20 files,
+# and adding a driver to any of them would be adding machinery, and a marker
+# line every future edit has to respect, to buy back a rebase or two. **Reopen
+# this only with a fresh sweep showing a single undriven file above ~20 pairs**,
+# not because a file feels collision-prone.
+#
+# ---------------------------------------------------------------------------
+# REOPENED ONCE, ON THE TERMS ABOVE — docs/FINDINGS.md, 2026-09-05.
+# ---------------------------------------------------------------------------
+#
+# The sweep above was taken 2026-08-18. `docs/FINDINGS.md` was created on
+# **2026-08-19**, the day after, so it could not appear in that ranking and its
+# absence from it says nothing. It is now by a wide margin the largest
+# collision in the queue, and the file's own header is the reason: every lane
+# appends one bullet at the tail and nothing else about the file changes, which
+# is an add/add hunk at a single anchor between every pair of lanes that
+# reports a finding.
+#
+# THE INSTRUMENT. The 37 branches ahead of main that touch the file, all 666
+# pairs, three-way merged on that path alone — `git merge-file` for git's own
+# answer and `ci/merge-docregions.py` for the driver's, on inputs carrying the
+# marker, which is the state after main has it and both sides have rebased.
+# 595 of the 666 have the file in their merge base; the other 71 are an add/add
+# of the whole file, which the driver handles from an empty base.
+#
+#     588 of 595 pairs conflict under git's default three-way   (98.8%)
+#      37 of 595 conflict under merge=docregions                 (6.2%)
+#     ---
+#     551 pairs freed, 93.8% of the collisions on that path
+#
+# That is 14x the 39 pairs the gameplay-falsifiable/baseline pair freed, and
+# 110x the best remaining candidate in the ranking above. It clears the ~20-pair
+# bar by 27x. The 37 that remain are real disagreements — two lanes correcting
+# the same finding — and must stay conflicts.
+#
+# It gets `to-eof check=unique-bullet-line`, no key: a finding is a Markdown
+# bullet rather than a keyed row, so the post-condition counts the bullets'
+# own first lines and refuses a merge that asserts one more often than the side
+# asserting it most. `ci/merge-appendonly-falsify.sh` cases 29, 29b, 29c and
+# 29d are its proof, and 29b and 29c are the ones that matter: a rewritten
+# finding still conflicts, and a lane replacing its own earlier line does not
+# get it back beside the replacement. That last is the exact defect `merge=union`
+# left legible in WORKLIST.
+#
+# ---------------------------------------------------------------------------
+# AND A SECOND, ON THE SAME TERMS — ci/checks/test-targets.toml, 2026-09-05.
+# ---------------------------------------------------------------------------
+#
+# 36 branches ahead of main touch it, and 193 of their 630 pairs conflict on it
+# — the second-largest collision in the queue and ~10x the ~20-pair bar. It is
+# absent from the 2026-08-18 ranking for a different reason from FINDINGS: it
+# existed, and that sweep ranked whole-merge conflicts after subtracting the
+# driven files, so a pair conflicting BOTH here and in a driven file was
+# counted once, under the driven file. The undriven ranking is a ranking of
+# pairs whose ONLY conflict is undriven; it is the right question for "what
+# should be driven next" and the wrong one for "what does this file cost".
+#
+#     193 of 630 pairs conflict under git's default three-way   (30.6%)
+#      18 of 630 conflict under merge=docregions                 (2.9%)
+#     ---
+#     175 pairs freed, 90.7%
+#
+# Its shape is `ci/t0.sh`'s, not `ci/figures.toml`'s: a branch adding a cargo
+# target adds a whole `[[bucket]]` stanza beside the bucket it is topically
+# closest to, and `light-engine-2`'s six hunks start at lines 182, 250, 274,
+# 287, 628 and 709. So the region is the whole body and `check=toml-buckets`
+# carries the weight — the file must parse, `[[bucket]]` ids must be unique,
+# and no target may be listed in two buckets, which is the sharper of the two:
+# two lanes can add differently-named buckets and still put one target in both,
+# and `ci/check-test-targets.py` is entitled to assume a target runs in one
+# gate. `ci/merge-appendonly-falsify.sh` cases 30, 30b, 30c, 30d, 30e; 30 puts
+# both sides' bucket at a MID-FILE anchor, because an append at the tail would
+# be resolved by the tail rule alone and would not exercise the region's width.
+#
+# The ranking above stands for everything else. These are two files, measured,
+# on the terms that paragraph set — not a licence to add a ninth on a feeling,
+# and the honest reading of both is that the paragraph's METHOD was right and
+# its ranking had a blind spot the method itself explains.

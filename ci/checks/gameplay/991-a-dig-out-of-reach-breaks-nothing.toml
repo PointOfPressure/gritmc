@@ -1,0 +1,33 @@
+name = "a-dig-out-of-reach-breaks-nothing"
+about = """
+`ServerPlayerGameMode.handleBlockBreakAction` opens with
+`isWithinBlockInteractionRange(pos, 1.0)` (offsets 0-22): the squared
+distance from the player's eyes to the block's box must be under
+`(4.5 + 1.0)^2`. The first dig, `[1, -1, 0]`, is inside that and breaks —
+the control that the rig is live. The second, `[7, -1, 0]`, is 7 blocks out
+along x from a player standing on the anchor, so vanilla returns before it
+reads the action: no block_update, nothing destroyed (`handlePlayerAction`
+still acks, which is not projected, so the measured step is declared
+silent). What would make it fail: a server with no reach check breaks the
+second block too, which this one did for every dig until the check was
+ported. The first version of this file dug only out of reach and was
+`inert` — vanilla's whole answer was the forced ack.
+"""
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update"]
+measured_step = "silent"
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[step]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "dig"
+at = [7, -1, 0]
+face = "up"

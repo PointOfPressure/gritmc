@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 90
+slug   = "useitemon-server-level-gates"
+title  = "The other half of the right-click is gated too: seven rules, 56 blocks, all seven silent"
+branch = "useitemon-gates"
+status = "written"

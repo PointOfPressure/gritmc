@@ -1,0 +1,28 @@
+name = "digging-the-top-of-a-door-takes-the-bottom"
+about = "breaking the TOP of a door removes the bottom as well. It is a separate check from 260 because vanilla reaches the two by different routes: only the **upper** half runs `DoorBlock.playerWillDestroy`, which calls `DoublePlantBlock.preventDropFromBottomPart` — the *same static method* the tall flower uses — whenever `preventsBlockDrops() || !hasCorrectToolForDrops()`, always true in creative. 260 never touches that method, because it fires only when the block being broken is the upper half. What the two share is the typed rule: `update_shape.json` carries 32 rows for `oak_door` and every one of them is `half=lower, dir=DOWN`, the lost-its-support rule, so **neither** direction of the door's own cascade is table-answered and both go through `crate::shapes::typed_update_shape`. Verified by mutation on 2026-08-04 — forcing `is_door` to answer false takes 260 and this check to `diverge` together while the tall flower's 238 is untouched, which is what says this pair tests the typed rule and not the table"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 1500
+
+# 260's rig with the dug position moved up one, so the pair differs in exactly
+# which half is broken.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_door"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# [1, 1, 0] is the upper half; 260 digs [1, 0, 0].
+[[step]]
+do = "dig"
+at = [1, 1, 0]
+face = "up"

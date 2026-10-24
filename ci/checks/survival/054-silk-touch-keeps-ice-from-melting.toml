@@ -1,0 +1,56 @@
+name = "silk-touch-keeps-ice-from-melting"
+about = """
+`053`'s ice, dug with a Silk Touch pickaxe. `IceBlock.playerDestroy` offset
+21: `EnchantmentHelper.hasTag(tool, PREVENTS_ICE_MELTING)` — the tag holds
+`minecraft:silk_touch` — returns before the block below is read, so the
+position stays the air `removeBlock` wrote. The ice table's silk-touch
+branch drops the ice itself, graded by its `set_entity_data` (pairing and
+first tracker tick), and the pickaxe takes its one point of damage
+(`Item.mineBlock`, destroy time 0.5 is not 0). No walls: nothing is written
+that could spread. What would make it fail: water where the ice was, no
+drop, or no durability update.
+"""
+console_restore = ["clear oracle"]
+observe_from = "both"
+observe = ["set_entity_data", "container_set_slot", "block_update", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "console"
+text = "clear oracle"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:ice"
+
+[[setup]]
+do = "place"
+on = [3, -1, 0]
+face = "up"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:diamond_pickaxe[enchantments={silk_touch:1}]"
+
+[[setup]]
+do = "wait"
+ms = 300
+
+[[step]]
+do = "dig"
+at = [3, 0, 0]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 1000
+
+[[step]]
+do = "finish_dig"
+at = [3, 0, 0]
+face = "up"

@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 55
+slug   = "empty-missing-kinds-hid-a-block-change"
+title  = "400's empty `missing_kinds` hid a whole block change, and the port was one missing call — 2026-08-18, branch `gameplay-corpus-gaps`"
+branch = "gameplay-corpus-gaps"

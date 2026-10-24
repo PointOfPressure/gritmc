@@ -1,0 +1,29 @@
+name = "attacking-a-player-who-can-be-hurt"
+about = "the same attack `550` makes, against a target that is not invulnerable. `550` and `551` are `match`/`match` and neither is evidence that damage is modelled: both project [\"sound\", \"damage_event\", \"set_health\", \"entity_event\"] and on the creative substrate vanilla's whole projected trace is ONE observation, the attack sound — the other three kinds are empty on the reference side, so three of the four names carry no signal at all. That is not a check that passes; it is a check with nothing in it to fail. `Player.hurtServer` reads `abilities.invulnerable` at offset 15 and returns false at 31-32, and `GameType.CREATIVE` is what sets that field, so no work on this server could ever have produced a `damage_event` here. This file is the same attack with the gate open. What would make it fail: a server that answers the attack packet with the right sound and models no damage — which is precisely what this server does today — arrives here as `diverge` with damage_event and set_health in missing_kinds, and that is the first honest reading of combat this corpus has ever taken."
+observe_from = "actor"
+observe = ["sound", "damage_event", "set_health", "entity_event"]
+settle_ms = 2000
+
+# NO `hold` STEP, AND THAT IS FORCED RATHER THAN CHOSEN.
+#
+# `550` holds a stick. `ServerGamePacketListenerImpl.handleSetCreativeModeSlot`
+# refuses the whole packet when `!player.isCreative()` — silently, with no
+# error and nothing in the log — so on this substrate a `hold` does not fail,
+# it *does nothing*, and the scenario would run with whatever the hand already
+# held. An empty hand is the honest version of the same test: `550`'s own text
+# says the stick is "deliberately NOT a placeable block and NOT a weapon", and
+# an empty hand is more of both. Base `ATTACK_DAMAGE` for a player is 1.0 with
+# or without a stick.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 3.0]
+
+[[step]]
+do = "attack"
+target = "minecraft:player"

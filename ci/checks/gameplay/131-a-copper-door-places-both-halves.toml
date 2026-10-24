@@ -1,0 +1,13 @@
+name = "a-copper-door-places-both-halves"
+about = "placing a COPPER door puts down two blocks. What this measures is `setPlacedBy` — `set_placed_by.json` carries 64 states for `WeatheringCopperDoorBlock` as a class of its own, so this asks whether the placement table covers the subclass and not only `DoorBlock`. It is deliberately **not** a check on the typed `updateShape` rule, which is the other place the door family is resolved by walking the superclass map: a placement never reaches that rule. 132 does. The `about` here claimed the `updateShape` hazard until 2026-08-04, which was the same overclaim 290 was corrected for on the same day — a check's text has to name the mechanism the check's own actions actually reach"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:copper_door"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

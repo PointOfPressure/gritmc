@@ -1,0 +1,95 @@
+name = "a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put"
+about = "a pig at the bottom of a two-deep pit, tempted by a potato held in the main hand from beyond its stop distance, is sent after the player every goal tick and cannot go: it turns its head a quarter turn after the player and sends no movement, because the only path out of a two-deep shaft is its own node"
+observe_from = "actor"
+observe = ["rotate_head", "move_entity"]
+within = 176
+settle_ms = 1500
+
+# The rig and the determinism argument are `083`'s — read its header first.
+# What differs is the ARM of `TemptGoal.tick` and the ITEM.
+#
+# THE ARM. Horizontal 1.77 from the shaft's axis at both stands, against a
+# two-block drop: 3D distance 2.67, over the 2.5 `stopDistance`, so
+# `TemptGoal.tick` 64-69 calls `navigateTowards(player)` =
+# `PathNavigation.moveTo(player, 1.2)` every goal tick instead of stopping.
+# The path the walk evaluator returns from the shaft floor is the start node
+# alone, `followThePath` advances past it at once (the pig stands on the node
+# centre, inside `maxDistanceToWaypoint` 0.45), the navigation is done before
+# `LookControl.tick` reads it, and no wanted position ever reaches
+# `MoveControl`. So vanilla sends NO `move_entity` — which is the half of this
+# check a server with a pathfinder that climbs two blocks, or a tempt that
+# steers the move control straight at the player, gets wrong.
+#
+# THE ITEM. `ItemTags.PIG_FOOD` in the pinned jar is carrot, potato and
+# beetroot (`data/minecraft/tags/item/pig_food.json`). Wheat is NOT in it:
+# a wheat-holding player does not tempt a pig in 26.2, and a check built on
+# that premise would be grading the pig's random look goals. The potato is
+# the tag member `083` does not use, held in the main hand, so
+# `TemptGoal.shouldFollow`'s first test (offset 5-8, `getMainHandItem`) is the
+# one that answers.
+#
+# THE TURN. Start (0.30, 2.80): head 42.71 degrees, byte 30.37. End (0.20,
+# 0.30): 132.71, byte 94.37 — 90.00 degrees, inside the 95 a tick, one
+# `rotate_head`. Both target pitches are over 58 degrees and clamp at 40, so
+# no `move_entity_rot` is sent. The walk between them is one hop (2.50) and
+# keeps the player's box off the shaft.
+
+
+# THE RIG IS OUT AT z = -80, AND `within` IS OPENED TO REACH IT. See the
+# FAR FIELD note in `083`'s header.
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, -80.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, -79]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, -79]
+face = "up"
+
+# **The pig is SILENT, and that is what makes this check's strict verdict
+# a fact about the head rather than a coin.** `Mob.baseTick` (javap 24-55)
+# plays the ambient sound when `random.nextInt(1000) < ambientSoundTime++`;
+# the field starts at 0 on a fresh mob and only drops to
+# `-getAmbientSoundInterval()` after a sound, so every tick from just after
+# spawn until the first sound can roll one. Measured 2026-10-01 over ten full
+# recordings (`~/grit/shard-eq-results/{base,fix1}`): a pig ambient `sound`
+# landed in this window on vanilla's side 3 times and ours 2, each flipping
+# the strict verdict. The egg's `minecraft:entity_data` `Silent` is applied by
+# `EntityType.updateCustomEntityTag` (a pig is not `onlyOpCanSetNbt`) through
+# `Entity.load`, and `Entity.playSound` refuses every sound of a silent
+# entity — the ambient roll still happens, so the mob's random stream and
+# its goals are unchanged. The head this check grades is untouched.
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+components = [{ type = "minecraft:entity_data", entity = "minecraft:pig", silent = true }]
+
+[[setup]]
+do = "place"
+on = [1, -3, -79]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:potato"
+
+[[setup]]
+do = "walk"
+to = [0.3, 0.0, -77.2]
+
+[[setup]]
+do = "wait"
+ms = 1500
+
+[[step]]
+do = "walk"
+to = [0.2, 0.0, -79.7]

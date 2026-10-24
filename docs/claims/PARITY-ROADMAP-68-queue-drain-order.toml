@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 68
+slug   = "queue-drain-order"
+title  = "What actually drains the merge queue, measured"
+branch = "queue-drain-order"
+status = "written"

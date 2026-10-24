@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 26
+slug   = "per-scenario-gamerule"
+title  = "Three systems were dark because we turned them off, and one of them can be turned back on — 2026-08-12, branch `corpus-dark-systems`"
+branch = "corpus-dark-systems"

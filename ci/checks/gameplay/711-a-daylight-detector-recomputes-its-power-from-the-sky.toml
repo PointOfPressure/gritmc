@@ -1,0 +1,98 @@
+name = "a-daylight-detector-recomputes-its-power-from-the-sky"
+about = "clicking a daylight detector back to un-inverted makes it recompute `power` from the sun's angle — `DaylightDetectorBlock.updateSignalStrength`, offset 67 of `useWithoutItem`, which this server transcribed into a comment and did not run until 2026-08-18. It is `710`'s second click and it exists because `710`'s first one cannot see this: on the substrate's pinned noon the inverted answer is `15 - 15 = 0`, which is exactly what a server that never computes anything writes."
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 1500
+
+# WHY THIS CHECK EXISTS AND `710` DOES NOT COVER IT
+#
+# `710` clicks a detector once and observes
+# `minecraft:daylight_detector[inverted=true,power=0]`. Measured on
+# `~/rustmc-corpusgap/oracle-work/gameplay/rustmc.json` (2026-08-18, main):
+# **this server's whole trace for `710` is byte-identical to vanilla's** —
+# every field of every observation, including `state_id`. It is not merely
+# passing, it is exact, and it was exact while `updateSignalStrength` did not
+# exist in this crate at all.
+#
+# The reason is arithmetic, not luck, and it holds at every daytime tick:
+#
+#   inverted:      b = 15 - getEffectiveSkyBrightness(pos)
+#
+# and under open sky in the day `getEffectiveSkyBrightness` is 15, so the
+# inverted answer is 0 — which is also the `power` a freshly placed detector
+# already carries and the only `power` a server with no sky can produce. The
+# two agree for reasons that have nothing to do with each other.
+#
+# THE SECOND CLICK IS WHERE THEY SEPARATE:
+#
+#   not inverted:  b = round(15 * cos(sunAngle))
+#
+# and at the substrate's pinned noon the sun angle is 0, `cos` is 1, and the
+# answer is **15**. A server that does not run `updateSignalStrength` writes
+# `inverted=false,power=0` here and vanilla writes `inverted=false,power=15`.
+#
+# MEASURED RED BEFORE IT WAS MEASURED GREEN. See
+# `docs/cold-start/sky-light-model.md` for both readings and the commit each
+# was taken at; `ci/t2-gameplay-subset.sh` is what took them.
+#
+# WHY NOON, AND WHY THE SUBSTRATE PINS IT AT ALL
+#
+# `advance_time=false` stops the sun; it does not agree with two servers about
+# where it stopped. Each freezes wherever its day time had got to when the
+# console command landed, and `round(15 * cos(a))` moves by one for roughly
+# every 200 ticks of drift — so this check without `SUBSTRATE_DAY_TIME` would
+# be a coin toss dressed as a measurement. `ci/t2-gameplay.sh` pins 6000 on
+# both sides from one constant. Noon is chosen on top of that because the
+# sun-angle track is at its extremum there: 6000 +- 500 ticks all answer 15,
+# so the check does not depend on the pin being delivered on an exact tick.
+#
+# WHAT IS NOT BEING TESTED HERE, SAID SO THE GREEN IS NOT OVER-READ
+#
+# `DaylightDetectorBlock.tickEntity` — the block-entity ticker that fires on
+# `getGameTime() % 20 == 0` — is ported and is NOT graded by this check. Both
+# clicks compute `power` from the sky themselves, so the check would pass with
+# the ticker deleted. It is not graded because it cannot be, on this harness:
+# the only way to observe it is to place a detector and wait, and whether the
+# placement's write and the ticker's write land on the same server tick is a
+# one-in-twenty coin flip **independently on each server**. `tickEntity` fires
+# on `getGameTime() % 20 == 0` and the two game clocks start when each process
+# starts, so their phase modulo 20 is the boot skew. `SUBSTRATE_DAY_TIME` pins
+# the DAY time and does nothing about that: they are different counters and
+# `advance_time` stops only one of them. See
+# `docs/cold-start/sky-light-model.md` for the arithmetic and for what would
+# make it gradeable.
+#
+# Everything at relative z = 0. The detector goes on top of the block at
+# (1, -1, 0), so it sits at (1, 0, 0) with nothing above it — open sky, which
+# is the one sky light `crate::light` can prove.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:daylight_detector"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+# The first click — `710`'s whole check, here only to get the detector into
+# `inverted=true` so the measured step can bring it back. Its own answer is
+# the ambiguous `power=0` and is deliberately not the measured step.
+[[setup]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

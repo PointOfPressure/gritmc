@@ -1,0 +1,72 @@
+name = "an-observer-watching-a-furnace-pulses-when-it-lights"
+about = "raw iron and coal clicked into a furnace that an observer is watching. On the next tick the furnace's ticker lights it — AbstractFurnaceBlockEntity.serverTick offsets 396-399, setBlock(pos, state.setValue(LIT, true), 3) — and a Level.setBlock without UPDATE_KNOWN_SHAPE runs updateNeighbourShapes, so the observer's updateShape sees its watched block change and pulses: two block updates at the observer, POWERED on then off, after the furnace's own lit update. A server that writes the ticker's state without setBlock's neighbour and shape updates lights the furnace and leaves the observer still"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 2500
+
+# The furnace goes down FIRST and the observer second, facing it: an observer
+# fires on a change to the block it watches, not on being placed, so nothing
+# pulses during setup. Facing south, the observer at (1, 0, 0) watches
+# (1, 0, 1) — the 440 layout with the stone replaced by a furnace.
+#
+# A furnace menu is input, fuel, result and then the player's 36, so hotbar 0
+# is menu slot 30 and hotbar 2 is 32. The stick in hotbar 1 is selected, so
+# the right-click opens the furnace rather than placing anything.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:furnace"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:observer"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:raw_iron"
+
+[[setup]]
+do = "hold"
+item = "minecraft:coal"
+slot = 2
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 32
+
+[[step]]
+do = "container_click"
+slot = 1

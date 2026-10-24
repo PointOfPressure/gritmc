@@ -1,0 +1,88 @@
+name = "a-chest-is-in-its-chunks-payload-when-the-chunk-returns"
+about = "a chest placed in a chunk is in that chunk's payload the next time the chunk is sent — the only channel 29 of the 49 block entity types are ever on, since `BlockEntity.getUpdatePacket()` returns null for all of them and `block_entity_data` is therefore never sent for a chest"
+observe_from = "actor"
+observe = ["chunk_block_entities"]
+settle_ms = 2000
+
+# WHY THIS CHECK EXISTS: THE DECODER ARM IT CONTROLS COULD NOT OTHERWISE FIRE
+#
+# `trace::decode` gained a `LEVEL_CHUNK_WITH_LIGHT` arm on 2026-08-12 so that
+# the 29 block entity types with no `block_entity_data` channel could be seen
+# at all (`docs/PARITY-ROADMAP.md` §31, §25.2). Measured immediately
+# afterwards, on five container scenarios against cold vanilla: **the arm
+# fired zero times**, and not because the payload was empty — a build that
+# recorded empty chunks too counted **zero chunk packets of any kind** inside
+# any measured window.
+#
+# `record::run_one` is why, and it is by design: it walks to the next
+# workspace, runs the setup into a discarded recording, and then
+# `Session::settle` waits for 250 ms of quiet before the measured window opens
+# — with chunk streaming deliberately *not* counted as liveness, precisely so
+# that a client whose chunks are still landing is not treated as having
+# arrived. So every chunk a scenario is going to be sent has been sent before
+# anything is measured, and a block entity placed in setup is placed into a
+# chunk the client already has.
+#
+# An arm that cannot fire is the shape this project keeps refusing: a gate
+# that cannot fail. This check is the positive control for it.
+#
+# HOW IT MAKES THE CHUNK COME BACK
+#
+# `ci/vanilla-server.sh` writes `view-distance=4`, so a chunk leaves a
+# client's tracking view about 64 blocks out and is re-sent when it comes
+# back. The actor places a chest, walks 100 blocks on +z — far enough that the
+# workspace's own chunk is dropped — and walks back, at which point vanilla
+# sends the chunk again with `ClientboundLevelChunkPacketData`'s block-entity
+# list carrying the chest.
+#
+# MEASURED BEFORE THIS FILE WAS WRITTEN, on vanilla 26.2, seed 20260803,
+# superflat/creative, Threadripper 2026-08-12:
+#
+# ```text
+#   chunk packets inside the window   132   of which non-empty   1
+#   the one that carries anything     actor, step 1, 2420 ms
+#     at [1, 0, 0]  block_entity_type 1 = minecraft:chest
+#     tag af72e84c8601b7df = digest of a single 0x00 = NULL
+# ```
+#
+# **The null tag is the finding, not a defect.** `BlockEntityInfo.create`
+# stores `getUpdateTag(provider).isEmpty() ? null : tag`, and of the block
+# entity classes in the pinned jar only seventeen override `getUpdateTag` —
+# chest is not one of them. So this channel says a chest *exists, here, and is
+# a chest*, and says nothing about what is in it. Anyone reaching for this
+# check to assert container contents will find there are none to assert.
+#
+# WHY THE OTHER 131 CHUNK PACKETS ARE NOT HERE
+#
+# `trace::observe` drops a chunk whose block-entity list is empty. Recording
+# those would make this scenario's own counts — and `530`'s 176 — a function
+# of which chunk batch landed inside the window, which is the harness's
+# scheduling against a settle timer and not either server's behaviour. The
+# asymmetry that matters survives: vanilla holding a block entity where this
+# server holds none still produces an observation on one side and not the
+# other, which is exactly what this check is for.
+#
+# WHY +z AND NOT +x
+#
+# Workspaces are spaced 32 blocks along **x** (`record::WORKSPACE_SPACING`),
+# so a 100-block walk on x would cross three other scenarios' rigs. `530`
+# walks +z for the same reason and nothing is ever built there.
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Out past `view-distance=4`, so the workspace's chunk is dropped.
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 100.0]
+
+# And back, which is what re-sends it.
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 0.0]

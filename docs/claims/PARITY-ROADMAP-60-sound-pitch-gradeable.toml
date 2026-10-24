@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 60
+slug   = "sound-pitch-gradeable"
+title  = "`sound.pitch` is graded per call site, and what that did and did not rescue — 2026-08-17, branch `corpus-sound-pitch`"
+branch = "corpus-sound-pitch"

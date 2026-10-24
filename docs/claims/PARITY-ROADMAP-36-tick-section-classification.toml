@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 36
+slug   = "tick-section-classification"
+title  = "Eighty unknowns were seventy sections that run, and \"provably never run\" was measuring the wrong thing — 2026-08-12, branch `corpus-tick-sections`"
+branch = "corpus-tick-sections"

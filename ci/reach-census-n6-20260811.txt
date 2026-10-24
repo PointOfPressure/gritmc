@@ -1,0 +1,70 @@
+pinned jar   oracle-work/vanilla-26.2/versions/26.2/server-26.2.jar
+recordings   6 vanilla runs, 93 scenarios, from /home/sayer/rustmc-cov2/oracle-work/gameplay-selfcheck/r[0-9]*.json
+corpus       92 checks under ci/checks/gameplay
+STAMP        jar=183c0499c5f8 recordings=a9dff28db35c(n=6) census=3cd2e663aab0 corpus=92
+world        advance_time=false, advance_weather=false, random_tick_speed=0, spawn_mobs=false
+             difficulty=peaceful, gamemode=creative, generate-structures=false, spawn-monsters=false, spawn-radius=0
+
+== UNIT 1 — clientbound play packet types (denominator: GameProtocols) ==
+    141  registered in the protocol
+     36  vanilla EMITTED during the corpus
+     31  named by >= 1 check
+     29  emitted AND named
+  -> 31/141 = 22.0% of the protocol
+  -> 29/36 = 80.6% of what the corpus provokes
+
+== UNIT 2 — vanilla's own per-tick sections (denominator: the jar's profiler) ==
+    120  named sections reachable from MinecraftServer.tickServer
+      5  push sites with a non-constant name (excluded, not counted above)
+      8  PROVABLY OFF — vanilla's own game-rule gate, shut by this harness
+     33  PROVABLY UNPOPULATED — per-mob, and no recording ever held that mob
+     79  unclassified — UNKNOWN, not covered
+  -> 41/120 = 34.2% of vanilla's tick is provably never run
+
+     off   customSpawners               gamerule spawn_mobs=false
+     off   filteringSpawningChunks      gamerule spawn_mobs=false
+     off   naturalSpawnCount            gamerule spawn_mobs=false
+     off   randomTick                   gamerule random_tick_speed=0
+     off   shuffleSpawningChunks        gamerule spawn_mobs=false
+     off   spawner                      gamerule spawn_mobs=false
+     off   tickSpawningChunks           gamerule spawn_mobs=false
+     off   weather                      gamerule advance_weather=false
+     -- asserted gate pairs that did NOT verify against the jar, and are not counted:
+        thunder                      advance_weather      section does not reference GameRules.ADVANCE_WEATHER
+
+== UNIT 3 — vanilla's registries (denominator: reports/registries.json) ==
+  registry              touched       of      pct   untouched
+  sound_event                29     1968    1.47%   1939
+  block                      43     1196    3.60%   1153
+  entity_type                 4      158    2.53%   154
+  block_entity_type           1       49    2.04%   48
+  menu                        3       25   12.00%   22
+  block_state                87    32366    0.27%   32279
+  item                       —     1537        —   not legible: ItemStack is inside `rest`
+
+== reproducibility — the same census, one recording at a time ==
+  sound_event          per-run 27..28   pooled 29
+  block                per-run 43..43   pooled 43
+  entity_type          per-run 4..4   pooled 4
+  block_entity_type    per-run 1..1   pooled 1
+  menu                 per-run 3..3   pooled 3
+
+== SENSITIVITY — the same corpus, five units ==
+   80.56%       29 / 36      clientbound types the corpus provokes, named by a check
+   21.99%       31 / 141     clientbound types in the protocol, named by a check
+   65.83%       79 / 120     vanilla tick sections not provably dead
+    2.53%        4 / 158     entity types ever present
+    3.60%       43 / 1196    blocks ever seen change
+    1.47%       29 / 1968    sound events ever heard
+  -> the answer moves 55x between the most and least flattering unit
+
+== RANKED — the largest systems with zero corpus evidence ==
+   1. sound emission                       1939 sound events     one packet type, an enormous vocabulary
+   2. block behaviour                      1153 blocks           32279 block states unseen
+   3. mob AI and mob behaviour              154 entity types     33 per-mob tick sections provably never ran
+   4. block entities                         48 block entity types only `sign` has ever been observed
+   5. container menus                        22 menu types       3 of 25 ever opened
+   6. natural + custom spawning               6 tick sections    gamerule spawn_mobs=false
+   7. random ticks, growth, fire, ice         1 tick sections    gamerule random_tick_speed=0
+   8. weather and thunder                     1 tick sections    gamerule advance_weather=false
+

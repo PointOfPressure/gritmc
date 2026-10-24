@@ -1,0 +1,32 @@
+name = "digging-the-top-of-a-tall-flower-takes-the-bottom"
+about = "breaking the TOP of a sunflower removes the bottom as well, and this is the mirror of 237 rather than a repeat of it — `docs/SERVER.md` has said since 2026-08-03 that `update_shape.json` carries 2 rows for `sunflower`, both halves at `dir=DOWN`, so the lower half has no rule at all for a change coming from above: \"No check covers the upper-half dig; adding one would report `diverge` today.\" A defect we wrote down in our own prose and never measured is not a known issue, it is an untested claim, and this check is what turns it into one that can fail"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 1500
+
+# Deliberately byte-for-byte 237's rig apart from the dug position. The two
+# checks differ in exactly one thing — which half is broken — so a verdict
+# that differs between them is attributable to that and to nothing else.
+# 237 breaking the lower half is answered by the `half=upper, dir=DOWN` row;
+# this one has to be answered by a rule the extract does not carry.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:sunflower"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# [1, 1, 0] is the UPPER half. The lower one is at [1, 0, 0], which is what
+# 237 digs.
+[[step]]
+do = "dig"
+at = [1, 1, 0]
+face = "up"

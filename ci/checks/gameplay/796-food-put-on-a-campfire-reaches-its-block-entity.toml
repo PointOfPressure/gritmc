@@ -1,0 +1,35 @@
+name = "food-put-on-a-campfire-reaches-its-block-entity"
+about = "right-clicking a lit campfire with a porkchop puts it in slot 0 and the food reaches the client as a `block_entity_data` beside a `block_update` that changes nothing. `CampfireBlock.useItemOn` has four guards and no `LIT` test among them — the block entity is a `CampfireBlockEntity` (offset 13), the stack tests true against `RecipePropertySet.CAMPFIRE_INPUT` (46), the level is a `ServerLevel` (56), and `placeFood` found a free slot (76) — and `placeFood` ends in `markUpdated`, which is `setChanged()` plus `Level.sendBlockUpdated(pos, state, state, 3)` with the SAME state on both sides. That marks the position in `ChunkHolder.changedBlocksPerSection`, so `broadcastChanges` sends the block update and then `broadcastBlockEntityIfNeeded`; `CampfireBlockEntity` is one of the nineteen types that declare `getUpdatePacket`, so the payload carries `Items`. It is the cheapest wire-visible block-entity write in this corpus and the only one whose `block_update` names a state identical to the one already there — a server that suppressed a no-op `setBlock` would send the tag and not the update, and `762` cannot see that because it measures a placement"
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:campfire"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# A porkchop is a `campfire_cooking` ingredient and is not a block, so the
+# click cannot fall through to a placement whatever the campfire answers.
+[[setup]]
+do = "hold"
+item = "minecraft:porkchop"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

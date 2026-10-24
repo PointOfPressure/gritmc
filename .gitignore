@@ -1,0 +1,69 @@
+# Build
+/target
+**/target
+
+# Never commit decompiled vanilla reference or extracted jars (ORACLE.md §1 —
+# same rule as Minecom: read-only, cite classes, never copy, never commit).
+vanilla-src/
+*.jar
+
+# Worker/CI runtime state
+/swarm/logs/
+/swarm/state/
+/ci/logs/
+*.mca
+# Without the trailing slash too: a git worktree points these at the primary
+# checkout's copies with a **symlink**, and `foo/` does not match a symlink
+# named `foo`. `git add -A` will happily commit it, which is how the vanilla
+# extract briefly became part of the tree.
+/oracle-work/
+/oracle-work
+
+# The tree marker the r=16 window scripts write and then read back: an rsynced
+# tree carries no .git, so `ci/ow-r16-window*.sh` stamps the commit here before
+# shipping. Untracked and unignored it leaves every measuring worktree dirty,
+# and a dirty worktree makes `ci/handoff.sh` refuse the gate.
+/.rp-commit
+
+# Local env
+.env
+config.local.toml
+
+# Extracted vanilla data — local only, Mojang-derived (data/README.md)
+/data/vanilla/
+/data/vanilla
+
+# Vanilla server run logs (Mojang-derived output, local only)
+/logs/
+
+# Python bytecode from ci helpers
+__pycache__/
+*.pyc
+
+# agent worktrees
+.claude/
+
+# ci/plugin-hook-falsify.sh stashes the pristine files here while it mutates.
+.plugin-hook-falsify-backup/
+
+# A log written at the repo root was not covered: the rules above are all
+# log DIRECTORIES (/logs/, /ci/logs/, /swarm/logs/), so `ci/t0.sh > t0.log`
+# in a worktree root is tracked. `claims-allocator` committed a 20K T0 log
+# that way on 2026-08-18 via `git add -A`.
+*.log
+
+# scratch from the floor-N campaign; the durable copies live in ci/
+/build-*.log
+/floors-*.sh
+/floor-vs-n-12345.sh
+
+# The rule-18 answer, stamped by ci/figure-provenance.py --snapshot in the
+# worktree that has history and shipped by ci/t0-remote.sh to the gate that does
+# not. Generated on every sync; same idiom and same reason as /.rp-commit above.
+/.figure-provenance
+
+# Scratch output of a lane's detached corpus chain — the report the run
+# wrote and the verdicts pulled out of it. Untracked and ignored so that a
+# gate reading a dirty tree does not refuse on them.
+/.beh2-report.json
+/.beh2-verdicts

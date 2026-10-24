@@ -1,0 +1,76 @@
+name = "random-ticks-melt-ice-beside-a-torch"
+about = "ice in a one-block pit, lit to 12 through the air above it by a torch on the rim, melts to a water source on its first random tick — `IceBlock` subtracts its own light dampening from the threshold, so the same torch that melts a snow layer at 13 melts ice at 12 and not at 10"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 8000
+
+# `IceBlock.randomTick` (javap -p -c -constants, 26.2):
+#
+#    5: level.getBrightness(LightLayer.BLOCK, pos)
+#    8: 11 - state.getLightDampening()        (ice: 1)
+#   15: if_icmple -> return; else melt(state, level, pos)
+#
+#   melt: WATER_EVAPORATES ? removeBlock : setBlockAndUpdate(pos, WATER)
+#         then level.neighborChanged(pos, WATER, null)
+#
+# The torch at [2, 0, 1] emits 14; the air above the ice is 13; entering
+# the ice costs max(1, 1): 12 > 10.
+#
+# WHY A PIT, AND WHY STONE UNDER IT. Ice on the surface melts into a source
+# that flows across the superflat for seven blocks — a fluid simulation,
+# not this check. In a one-deep pit walled by grass and floored by stone the
+# source has nowhere to go: its scheduled fluid tick finds no free side and
+# writes nothing. The floor is stone and not the dirt that was there
+# because dirt under ice is a grass-spread target (ice dampens light by 1,
+# so `canStayAlive` holds on it) and a spread racing the melt would make the
+# window's order a coin flip.
+
+[[gamerule]]
+rule = "random_tick_speed"
+value = "4096"
+restore = "0"
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "dig"
+at = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -3, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:ice"
+
+[[setup]]
+do = "place"
+on = [1, -2, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:torch"
+
+[[setup]]
+do = "place"
+on = [2, -1, 1]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 100

@@ -1,0 +1,91 @@
+BENCH REGRESSION ATTRIBUTION — instructions retired, the primary metric
+==========================================================================
+
+Generated from the run logs in ~/grit/logs by ci/bench-attrib-run.sh, 2026-08-09
+20:18-21:23, Threadripper 1920X, seed 20260722, three centres, two or four reps.
+
+WHY INSTRUCTIONS AND NOT CPU-SECONDS. Every one of these runs shared the box:
+the harness's own `contend=` column records 7 to 13 competing processes per run.
+CPU-seconds is contaminated to that extent and instructions retired is not, so
+each log carries both and the PRIMARY block is the one quoted. The secondary
+CPU-s block of the same logs reads +18.11% where the primary reads +7.03% —
+quoting the wrong block of the right artefact is a real way to be wrong here,
+and it is why this file exists rather than a pointer to the logs.
+
+WORKERS IS RECORDED. `ins1` ran at RUSTMC_WORKERS=1 and `cpu12` at 12. Their
+instructions-per-chunk agree to 1.4% on the same arm (717,497,369 against
+707,482,291 for C), which is the pipeline doc's invariance claim holding across
+two independent runs at a 12x difference in pool width.
+
+
+--- ins1-r7-chambers-C-vs-D
+    arms              C=5b0d5aed  D=d2f7c6e5
+    radius            r=7, 225 chunks delivered per square
+    RUSTMC_WORKERS    1
+    per chunk         C 717,497,369   D 767,188,751
+    PAIRED RATIO      D/C: 1.0703  (+7.03%)
+    95% CI            1.0302 .. 1.1119  (+3.02% .. +11.19%)   n=6 pairs
+    log               ~/grit/logs/bench-attrib-ins1-r7-chambers-C-vs-D.log
+
+--- ins1-r7-span-A-vs-B
+    arms              A=ed0a29ec  B=9b4afd4e
+    radius            r=7, 225 chunks delivered per square
+    RUSTMC_WORKERS    1
+    per chunk         A 716,946,444   B 767,441,656
+    PAIRED RATIO      B/A: 1.0715  (+7.15%)
+    95% CI            1.0313 .. 1.1132  (+3.13% .. +11.32%)   n=6 pairs
+    log               ~/grit/logs/bench-attrib-ins1-r7-span-A-vs-B.log
+
+--- ins1-r7-retake-A-vs-today
+    arms              A=ed0a29ec  T=35b3bde5
+    radius            r=7, 225 chunks delivered per square
+    RUSTMC_WORKERS    1
+    per chunk         A 716,743,421   T 882,182,636
+    PAIRED RATIO      T/A: 1.2222  (+22.22%)
+    95% CI            1.1149 .. 1.3397  (+11.49% .. +33.97%)   n=6 pairs
+    log               ~/grit/logs/bench-attrib-ins1-r7-retake-A-vs-today.log
+
+--- ins1-r16-chambers-C-vs-D
+    arms              C=5b0d5aed  D=d2f7c6e5
+    radius            r=16, 1089 chunks delivered per square
+    RUSTMC_WORKERS    1
+    per chunk         C 589,934,972   D 613,565,601
+    PAIRED RATIO      D/C: 1.0408  (+4.08%)
+    95% CI            1.0251 .. 1.0567  (+2.51% .. +5.67%)   n=6 pairs
+    log               ~/grit/logs/bench-attrib-ins1-r16-chambers-C-vs-D.log
+
+--- cpu12-r7-chambers-C-vs-D
+    arms              C=5b0d5aed  D=d2f7c6e5
+    radius            r=7, 225 chunks delivered per square
+    RUSTMC_WORKERS    12
+    per chunk         C 707,482,291   D 756,726,281
+    PAIRED RATIO      D/C: 1.0706  (+7.06%)
+    95% CI            1.0469 .. 1.0948  (+4.69% .. +9.48%)   n=12 pairs
+    log               ~/grit/logs/bench-attrib-cpu12-r7-chambers-C-vs-D.log
+
+--- cpu12-r7-retake-A-vs-today
+    arms              A=ed0a29ec  T=35b3bde5
+    radius            r=7, 225 chunks delivered per square
+    RUSTMC_WORKERS    12
+    per chunk         A 706,796,083   T 871,539,286
+    PAIRED RATIO      T/A: 1.2244  (+22.44%)
+    95% CI            1.1603 .. 1.2919  (+16.03% .. +29.19%)   n=12 pairs
+    log               ~/grit/logs/bench-attrib-cpu12-r7-retake-A-vs-today.log
+
+WHAT THIS ATTRIBUTES AND WHAT IT LEAVES OPEN.
+
+  chambers alone C->D  +7.03%  at r=7   and  +4.08% at r=16
+  whole span     A->B  +7.15%  at r=7
+
+The two are the same number inside noise and their intervals overlap almost
+completely, so the trial chambers are the WHOLE of the published-to-remeasured
+drift and not one contributor among several — the beardifier, FlowingFluid
+post-processing, nether_fossil, the column evaluator and the multiface/lake/disk
+work are all inside that span and none of them moves it further.
+
+  A->today (35b3bde5)  +22.44% n=12 (cpu12)  /  +22.22% n=6 (ins1)
+
+Roughly double the chambers-only figure. About fourteen points landed on top of
+the chambers cost between 9b4afd4e and 35b3bde5 and NOBODY HAS ATTRIBUTED IT.
+That is the open item.
+

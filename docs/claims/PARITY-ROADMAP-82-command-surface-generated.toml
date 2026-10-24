@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 82
+slug   = "command-surface-generated"
+title  = "The registered command surface, generated from the jar"
+branch = "commands-surface"
+status = "written"

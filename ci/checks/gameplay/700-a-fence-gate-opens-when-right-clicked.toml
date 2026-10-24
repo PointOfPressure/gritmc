@@ -1,0 +1,90 @@
+name = "a-fence-gate-opens-when-right-clicked"
+about = "right-clicking a fence gate with something unplaceable in hand toggles `open`, and sends the actor no sound while doing it — `FenceGateBlock.useWithoutItem`, the largest uncovered implementation of that method that opens no menu. Twelve blocks share it and the corpus reached none of them, and those twelve are one implementation rather than twelve — measured, not assumed: `ci/block-class-predicts.py` compares every member of the class at every state and `FenceGateBlock` answers identically across all 384 cells (`docs/PARITY-ROADMAP.md` §39). `ci/corpus-surface.py` scored `use_without_item` at 11 of 39 implementations when this check was written and scores it at 15 of 39 now"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack", "sound"]
+settle_ms = 1500
+
+# WHY THIS IS NOT JUST ANOTHER DOOR, FROM THE JAR.
+#
+#   FenceGateBlock.useWithoutItem, javap -p -c -constants on the pinned jar
+#      0: state.getValue(OPEN) : ifeq 43
+#     16:   -> setValue(OPEN, false); Level.setBlock(pos, state, 10)
+#     43:   Direction d = player.getDirection()
+#     50:   if state.getValue(FACING) == d.getOpposite()
+#     65:     -> setValue(FACING, d)          <- THE SECOND PROPERTY
+#     78:   setValue(OPEN, true); Level.setBlock(pos, state, 10)
+#    102: playSound(WoodType.fenceGateOpen / fenceGateClose, BLOCKS, 1.0f,
+#                   0.9f + level.getRandom().nextFloat() * 0.1f)
+#
+# So the mechanism reads **two** inputs, not one: the current `open`, and the
+# player's facing — and it can rewrite `FACING`, which a door never does.
+# This check pins only the first. `701` is its pair and pins the second, per
+# this directory's rule that a check exercising one input cannot tell a
+# mechanism from a constant.
+#
+# THE SOUND IS SAFE TO OBSERVE AND THAT IS NOT OBVIOUS. Its pitch is
+# `0.9f + nextFloat() * 0.1f` — an unseeded draw, different every run. It is
+# observable anyway because `trace::decode`'s SOUND arm reads the pitch and
+# throws it away beside the seed, deliberately, and records only the event,
+# the source, the position and the volume. Without that this projection would
+# be pure noise and the check would be worse than nothing.
+#
+# BUT THE ACTOR NEVER HEARS IT, SO `sound` HERE IS A ONE-SIDED CHECK AND THE
+# `about` LINE ABOVE OVERCLAIMED UNTIL 2026-08-10. Measured, not argued: in
+# the subset recording vanilla emits exactly one `sound` for this scenario and
+# it is `who = "observer"`, never `who = "actor"`. The jar says why —
+# `FenceGateBlock.useWithoutItem` at offset 162 calls
+# `Level.playSound(Entity, BlockPos, SoundEvent, SoundSource, float, float)`
+# with the acting `Player` (slot 4, the same local `getDirection()` reads at
+# offset 45) in the leading `Entity` position, and that parameter is the
+# entity **excluded** from the broadcast. `observe_from = "actor"` therefore
+# cannot see this sound in any run of any server that is correct.
+#
+# So do not read a green here as "the open sound matches". What this pins is
+# the *silence*: vanilla sends the actor no fence-gate sound, and a port that
+# broadcast it to everybody — the obvious way to write `playSound` if you miss
+# the excluded-entity argument — would be caught here and nowhere else in the
+# corpus. That is worth keeping, and it is a strictly weaker claim than the
+# one this file used to make. `701` inherits the same limitation; the pitch
+# paragraph above is still true and is now beside the point.
+#
+# PLACEMENT IS DETERMINISTIC HERE, ALSO FROM THE JAR.
+# `getStateForPlacement` sets FACING from `context.getHorizontalDirection()`
+# — the player's own facing, not its opposite — IN_WALL from the west and
+# east neighbours, and POWERED from `Level.hasNeighborSignal`. The setup looks
+# yaw 0.0, which is south, so the gate is placed FACING=south with no wall
+# beside it and nothing powering it.
+#
+# Then the click: `player.getDirection()` is south, its opposite is north, and
+# FACING is south — so the branch at offset 50 is **not** taken and this check
+# sees the plain toggle. That is the point of the split, and it is why 701 has
+# to turn the player round rather than stand somewhere else.
+#
+# Everything is at relative z = 0, on one side of the chunk boundary, per this
+# directory's README.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_fence_gate"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Deliberately unplaceable, exactly as `280` and `290` do it: a block in hand
+# would be placed against the gate instead of falling through to the block's
+# own `useWithoutItem`, and the check would measure a placement.
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

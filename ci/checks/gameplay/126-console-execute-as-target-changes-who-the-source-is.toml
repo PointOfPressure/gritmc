@@ -1,0 +1,28 @@
+name = "console-execute-as-target-changes-who-the-source-is"
+about = """
+`execute as oracle run gamemode survival` from the console changes the
+actor's mode exactly as 117 does — `player_abilities`, `game_event` 3,
+`player_abilities` — but sends it NO chat line, where 117's
+`gamemode survival oracle` sends `gameMode.changed`
+
+`execute as` is `source.withEntity(e)`: the entity, name and display name
+change and the `CommandSource` — the console — does not. So `/gamemode`'s
+self form resolves `getPlayerOrException()` to the actor, and
+`GameModeCommand.logGamemodeChange` takes its `source.getEntity() ==
+player` arm: `sendSuccess(commands.gamemode.success.self)`, which goes to the
+CommandSource, the console's log. The `gameMode.changed` line is the OTHER
+arm. A server that ignored `as` would refuse the self form from the console
+(`permissions.requires.player`, also to the log) and change nothing, moving
+`game_event`; one that treated the entity as the reply's destination would
+put a chat line on the actor.
+
+Level 2, through the console. The restore puts the actor back in creative.
+"""
+console_restore = ["gamemode creative oracle"]
+observe_from = "both"
+observe = ["player_abilities", "game_event", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "execute as oracle run gamemode survival"

@@ -1,0 +1,53 @@
+name = "quick-move-does-not-merge-into-a-differently-enchanted-stack"
+about = "a plain stone sits in chest slot 0 and an enchanted stone (minecraft:enchantments, mending I) is shift-clicked in from the hotbar. ChestMenu.quickMoveStack calls moveItemStackTo(stack, 0, 27, false), whose first pass merges only into a slot holding ItemStack.isSameItemSameComponents and whose second pass takes the first empty slot — so vanilla puts the enchanted stone in slot 1 and leaves slot 0 at one plain stone. What would make this fail: a same-stack test on the item id alone merges it into slot 0 as a stack of two, and the enchantment is lost or kept on the wrong stack."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot"]
+settle_ms = 1000
+
+# The lid repeats every 5 ticks while the chest is open; collapsed as in 601.
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+# mending I, as in 942.
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+slot = 2
+components = [{ type = "minecraft:enchantments", bytes = [1, 23, 1] }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# The plain stone into chest slot 0 (hotbar 0 is menu slot 54).
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0
+
+# THE MEASURED STEP: shift-click the enchanted stone (hotbar 2, menu slot 56).
+[[step]]
+do = "container_click"
+slot = 56
+input = "quick_move"

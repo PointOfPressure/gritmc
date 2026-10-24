@@ -1,0 +1,241 @@
+# Every `setPlacedBy` / `useWithoutItem` override the pinned 26.2 jar declares
+# that its golden table carries no row for, with the read that causes the
+# absence taken off the bytecode rather than guessed.
+#
+# Derived and checked by `ci/probe-absences.py`. Read its header first.
+#
+# # THIS FILE HAD 22 ENTRIES AND HAS 4
+#
+# On 2026-08-18 it read: 22 overrides with no row over 102 registry blocks, 20
+# of them the probe's environment, hiding 100 blocks. `UseGolden.TableLevel`
+# answered `Blocks.AIR` for a position it was not given and `null` for a block
+# entity, so a rule that read either took the empty branch, wrote nothing,
+# scheduled nothing and produced **no row** rather than a refusal.
+#
+# The level answers now. It builds the real `BlockEntity`, it records what it
+# answered out of an empty world on the row itself (`reads`), it refuses when
+# vanilla raises its own alarm, and the emit no longer drops a cell whose only
+# content is one of those facts. What is left is three overrides and three
+# blocks:
+#
+#   1  StructureBlock     out-of-scope   writes only block entity data
+#   1  JukeboxBlock       out-of-scope   needs a placement input this table does not sweep
+#   1  PitcherCropBlock   no-op          `0: return`
+#
+# **and the environment count is 0, from 100.** Each of the other 100 is now a
+# row or a refusal, and every retired entry was retired because
+# `ci/probe-absences.py --check` said STALE on it, not because somebody
+# remembered to.
+#
+# `CommandBlock` was the last one, and it was retired on 2026-08-18 by
+# `ci/server-level-gates.py`: its three blocks have rows in `set_placed_by.json`
+# now, carrying `gated: ["blockEntityWritten", "writes"]`. **Nothing was
+# ported.** The rule is exactly as unreachable as it was — the whole body is
+# behind `instanceof ServerLevel` and this project has neither a gamerule store
+# nor command block entities — but a row that says which column the branch
+# decided is not an absence, and `environment` counts absences the table is
+# wrong about. The debt did not vanish; it moved to a ledger that can hold it,
+# `ci/checks/server-level-gates.toml`, where it is `needs-subsystem`.
+#
+# `verdict` is one of three and only the first is debt:
+#
+#   environment    the rule took a branch it would not take in a real world.
+#                  The table is not silent here, it is WRONG: it records a
+#                  decline that vanilla does not make.
+#   out-of-scope   the rule does something this table does not record at all.
+#                  Absence is the correct answer for this table and the debt,
+#                  if any, belongs to a different one.
+#   no-op          the override cannot write or schedule under any world.
+#
+# **`out-of-scope` is not a place to file something inconvenient**, and two of
+# the three below were `environment` this morning. Each moved on a measurement
+# and the measurement is in its note: the structure block because it now runs to
+# the end and what it does is not in this table's columns, the jukebox because
+# the harness now holds the stack `BlockItem.place` holds and the answer did not
+# change. A verdict that moved for any other reason is a verdict nobody checked.
+#
+# `blocks` is the count this class covers in the registry and is carried so a
+# reader can weigh an entry without re-deriving it; `ci/probe-absences.py`
+# recomputes it and does not trust it.
+
+# ---------------------------------------------------------------------------
+# setPlacedBy -> set_placed_by.json
+# 16 overrides in the jar, 4 with no row, covering 6 registry blocks.
+# ---------------------------------------------------------------------------
+
+[[absent]]
+probe   = "setPlacedBy"
+class   = "StructureBlock"
+blocks  = 1
+verdict = "out-of-scope"
+reads   = "StructureBlockEntity.createdBy(placer) — block entity data, not a block"
+note   = """
+Was `environment` on the same guess as `CommandBlock` and is not the same
+shape. With a real `StructureBlockEntity` the method runs to the **end**:
+`isClientSide()` is false, the placer is non-null, and `createdBy` sets the
+author on the block entity. No `setBlock`, no scheduled tick, and no
+`Level.blockEntityChanged` either — checked, because this harness records that
+one — so there is nothing in any column `set_placed_by.json` has.
+
+The absence is therefore correct for this table. The debt, such as it is, is
+that no table anywhere records block entity data on placement, and that is a
+different table's item rather than a hole in this one.
+"""
+
+[[absent]]
+probe   = "setPlacedBy"
+class   = "JukeboxBlock"
+blocks  = 1
+verdict = "out-of-scope"
+reads   = "ItemStack.get(DataComponents.BLOCK_ENTITY_DATA) on the placed item"
+note   = """
+Was `environment` because the harness held `ItemStack.EMPTY`, and that was the
+right verdict for as long as it did. `PlacedGolden` now holds
+`block.asItem().getDefaultInstance()` — what `BlockItem.place` holds — because
+the `Components not bound yet` throw that forced `EMPTY` was fixed in
+`UseGolden.bindItemComponents` on 2026-08-12 and nothing had carried it across.
+
+**The answer did not move, and that is the measurement.** A plain jukebox item
+carries no `BLOCK_ENTITY_DATA`; only one middle-clicked off a jukebox that
+already holds a record does. So vanilla writes nothing on a plain placement
+either, and the absence is a fact about the mechanic. What would move it is a
+*placement input this table does not sweep*, which is a different item from a
+world this harness cannot build. Zero other rows changed when the stack did,
+which is what says the switch measured something rather than disturbing
+everything.
+"""
+
+[[absent]]
+probe   = "setPlacedBy"
+class   = "PitcherCropBlock"
+blocks  = 1
+verdict = "no-op"
+reads   = "nothing"
+note    = """
+`0: return`. It exists to *cancel* `DoublePlantBlock.setPlacedBy`, which would
+otherwise write the upper half — a pitcher crop starts as one block and grows
+the second later. The absence is the correct and complete answer.
+
+It was one of twenty-two and is now one of four, and it is the only one of the
+four that was right the first time.
+"""
+
+# ---------------------------------------------------------------------------
+# useWithoutItem -> use_without_item.json
+# 54 overrides in the jar, **0 with no row**.
+#
+# Thirteen entries stood here this morning, covering 90 registry blocks — 48
+# signs, 17 candle cakes, 13 fences and twelve singletons — and every one of
+# them was `environment`. They are gone because the table has a row or a
+# refusal for all 90, not because the standard moved:
+#
+#   48 signs               refusal, on vanilla's own `Expected to only call
+#                          this on server`
+#   17 candle cakes + 1 cake     probeOnly on `hungry` and `invulnerable`
+#   13 fences              row, `reads: ["no-entities"]`
+#    3 command blocks, 1 structure block, 1 jigsaw, 1 test block,
+#    1 test instance block       probeOnly on `game_master`
+#    1 chiseled bookshelf, 1 bell    faceOnly
+#    1 decorated pot, 1 jukebox      row, `consumes: true`
+#
+# `ci/probe-absences.py --check` refuses an entry for a class the table now
+# represents, so this section cannot quietly grow back: a regression puts the
+# block back in the derived set and the check says UNEXPLAINED, which is louder
+# than a stale entry ever was.
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# CITATIONS
+#
+# The same tie `ci/refusal-ledger.py --cite` puts on the refusal counts, on the
+# absence counts. This branch put ten new absence figures into five documents,
+# and a figure with nothing tying it to its derivation is precisely what the
+# other half of this ledger spent six commits repairing.
+#
+# `value` is one of the figures `ci/probe-absences.py` publishes:
+#
+#   absent.rules / absent.blocks
+#   environment.rules / environment.blocks
+#   <probe>.overrides / <probe>.absent / <probe>.absentBlocks
+#   <probe>.<Class>.blocks
+#
+# `{}` goes where the number does. `--cite` renders it with the value derived
+# from the jar and refuses if neither the plain nor the comma form appears.
+# ---------------------------------------------------------------------------
+
+[meta]
+min_cites = 8
+
+[[cite]]
+file  = "docs/PARITY-ROADMAP.md"
+value = "absent.rules"
+quote = "cannot appear in the table. **{} overrides"
+
+[[cite]]
+file  = "docs/PARITY-ROADMAP.md"
+value = "absent.blocks"
+quote = "have no row, covering {} registry blocks; none of the 3 is the probe's"
+
+[[cite]]
+file  = "docs/PARITY-ROADMAP.md"
+value = "environment.blocks"
+quote = "environment, hiding {} blocks.**"
+
+
+[[cite]]
+file  = "docs/cold-start/refusal-ledger.md"
+value = "absent.blocks"
+quote = "the derivation now says 3 overrides with no row, **{} registry blocks,**"
+
+[[cite]]
+file  = "docs/cold-start/probe-answering-environment.md"
+value = "absent.rules"
+quote = "table: **{} overrides with no row** over 3 registry blocks"
+
+[[cite]]
+file  = "docs/cold-start/probe-answering-environment.md"
+value = "environment.blocks"
+quote = "over 3 registry blocks, {} of them the"
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "useWithoutItem.absent"
+quote = "**{} of the jar's 54 `useWithoutItem`"
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "useWithoutItem.absentBlocks"
+quote = "overrides have no row in this table now, covering **{} registry blocks** —"
+
+[[cite]]
+file  = "crates/rustmc-server/src/useblock.rs"
+value = "useWithoutItem.absent"
+quote = "//! **{} of the 54 `useWithoutItem` overrides have no row, covering 0 registry"
+
+[[cite]]
+file  = "crates/rustmc-server/src/useblock.rs"
+value = "useWithoutItem.absentBlocks"
+quote = "//! blocks, and none are the probe's environment.**"
+
+# --- the gate the block entity did not close --------------------------------
+#
+# `serverLevel.*` is derived from the bytecode of the probe overrides
+# themselves, not from any table, and it is REPORTED rather than refused: six of
+# the eight rules behind it have rows, and refusing them all would delete every
+# chest and barrel row over a branch this project may never be able to take.
+# Counted here because a number nobody publishes is a number nobody re-checks.
+
+[[cite]]
+file  = "docs/PARITY-ROADMAP.md"
+value = "serverLevel.gates"
+quote = "curiosity about two classes. **{} probe rules in the"
+
+[[cite]]
+file  = "docs/PARITY-ROADMAP.md"
+value = "serverLevel.silent"
+quote = "over 82 registry blocks, and {} of them"
+
+[[cite]]
+file  = "docs/cold-start/probe-answering-environment.md"
+value = "serverLevel.silentBlocks"
+quote = "{} registry blocks, and only one of the eight"

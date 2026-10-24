@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 4.3
+slug   = "harvest-order-a-h"
+title  = "The harvest order of a..h, measured rather than assumed"
+branch = "backfill"

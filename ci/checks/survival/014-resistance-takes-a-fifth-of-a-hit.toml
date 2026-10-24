@@ -1,0 +1,37 @@
+name = "resistance-takes-a-fifth-of-a-hit"
+about = """
+`/effect give oracle minecraft:resistance 30 0` in setup, then `/damage oracle 5
+minecraft:generic`. `LivingEntity.getDamageAfterMagicAbsorb`: with Resistance
+and a source not in `minecraft:bypasses_resistance`, `i = (amplifier + 1) * 5`,
+`j = 25 - i`, `damage = max(damage * j / 25, 0)` — so level I takes a fifth
+and the hit costs 4.0, not 5.0: health 20 -> 16, and the synched health says
+the same. This is the reduction a corpus player can reach: armour needs an
+equipped item, which a survival harness cannot hold (`handleSetCreativeModeSlot`
+refuses the packet) and this server's console has no `/item` to place.
+
+`EffectCommands.giveEffect` offsets 11..75 make 2 seconds 40 ticks — long
+enough to cover the hit ~16 ticks later and gone before the next check, which
+the restore does not clear (this console has no `effect clear`) — and
+`addEffect` sends `update_mob_effect` in setup, where it is not measured.
+
+What would make it fail: a server that ignores active effects in the absorb
+deals the full 5; one that applies Resistance as a flat point or as a
+percentage of health lands elsewhere.
+"""
+console_restore = ["effect give oracle minecraft:instant_health 1 4 true"]
+observe_from = "both"
+# `set_entity_data` is NOT observed: vanilla sends a second one ~340 ms after
+# the hit, when the Resistance instance ends and `LivingEntity`'s effect
+# particle accessors change — synched effect state this server does not
+# carry. Named in docs/FINDINGS.md rather than graded here, because this check
+# is about the absorb and the particle list is not.
+observe = ["damage_event", "set_health", "sound"]
+settle_ms = 1500
+
+[[setup]]
+do = "console"
+text = "effect give oracle minecraft:resistance 2 0"
+
+[[step]]
+do = "console"
+text = "damage oracle 5 minecraft:generic"

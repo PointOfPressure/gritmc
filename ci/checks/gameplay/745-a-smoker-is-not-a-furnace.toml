@@ -1,0 +1,36 @@
+name = "a-smoker-is-not-a-furnace"
+about = "the third AbstractFurnaceBlock, opening `MenuType.SMOKER` with the title container.smoker -- 734 alone cannot tell a server that special-cases the blast furnace from one that reads the menu type off the block, and this is the second value of that same property"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content"]
+settle_ms = 1500
+
+# `open_screen` decodes the `minecraft:menu` **registry id** as its own field
+# and digests the rest of the body, which is the menu's title component. The
+# `container_set_content` that `initMenu` sends immediately after it digests
+# the whole slot list. So this check pins three independent things about the
+# menu — which registry entry, which title, and how many slots — and a server
+# that answered with a chest here would miss on all three.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:smoker"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

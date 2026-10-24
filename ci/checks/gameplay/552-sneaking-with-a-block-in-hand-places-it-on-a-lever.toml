@@ -1,0 +1,63 @@
+name = "sneaking-with-a-block-in-hand-places-it-on-a-lever"
+about = "a sneaking player right-clicking a lever with a placeable block in hand places the block instead of flipping the lever — `Player.isSecondaryUseActive()` reads `isShiftKeyDown()` and that is the branch deciding whether a right-click reaches the block's own `use` at all; `docs/SERVER.md` names this exact divergence and until the `sneak` verb existed no check could observe it"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 1500
+
+# THE NAMED DIVERGENCE, WITH A CHECK AGAINST IT FOR THE FIRST TIME.
+#
+# `docs/SERVER.md`: "a sneaking player holding a block flips a lever here and
+# places the block on vanilla". That sentence has been in the docs describing a
+# known, reproducible behavioural difference, and there has been no way to
+# write a regression check against it — not because nobody wrote one, but
+# because `scenario.rs` had no verb for sneaking. It was one of 33 mechanics
+# with zero coverage and one of the five whose gap was an unwritten verb rather
+# than an unwritten check.
+#
+# The sneak flag is set by the packet and then holds:
+#
+#   handlePlayerInput, javap -p -c -constants on the pinned jar
+#     16: player.setLastClientInput(packet.input())
+#     24: hasClientLoaded : ifeq 51 -> 51: return
+#     42: packet.input().shift()
+#     48: player.setShiftKeyDown(...)
+#
+# so one packet before the click is the whole of what this needs, and the flag
+# is still set when the click arrives.
+#
+# THE RIG is 290's, unchanged, so the two checks differ in exactly one thing.
+# 290 right-clicks this lever holding a stick and the lever flips; this one
+# right-clicks it holding stone. Everything sits at relative z = 0, on one side
+# of the chunk boundary, per this directory's README.
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# A **placeable** block, which is the other half of what makes this new. Every
+# interactive check in this corpus holds `minecraft:stick` — confirmed by
+# listing the `hold` before each of 090, 190, 210, 220, 280, 281, 290, 330,
+# 335, 420, 430, 470, 480 and 490 — and a stick sidesteps the ordering question
+# entirely, because there is nothing for the fall-through to place. So the
+# right-click-ordering rule had 14 checks and none of them could see it.
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "sneak"
+on = true
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

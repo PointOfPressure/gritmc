@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 37
+slug   = "harvest-nondeterminism-is-concurrency"
+title  = "The harvest floor is concurrency, not decoration order: -Dmax.bg.threads=1 makes it exactly zero — 2026-08-16, branch `regiondiff-live-fixture`"
+branch = "regiondiff-live-fixture"

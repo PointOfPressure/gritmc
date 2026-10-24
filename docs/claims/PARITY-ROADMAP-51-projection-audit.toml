@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 51
+slug   = "projection-audit"
+title  = "Ten fields, twelve packet kinds and one whole client — what the projection cannot see — 2026-08-18, branch `corpus-projection-audit`"
+branch = "corpus-projection-audit"

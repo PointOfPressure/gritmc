@@ -1,0 +1,46 @@
+name = "a-stop-for-another-block-breaks-nothing"
+about = """
+STOP_DESTROY_BLOCK for a position that is not `destroyPos` does nothing at
+all: `handleBlockBreakAction` offsets 494-502 are `pos.equals(destroyPos)`,
+`ifeq 630`, and 630 is a `debugLogging` that sends nothing. The first three
+steps are the live control — `040`'s on-time dig of `[3, -1, 0]`, which
+breaks — and the measured step is a STOP for `[2, -1, 0]` while the dig in
+progress is at `[1, -1, 0]`: declared silent, acks not projected. A server
+that trusts the client's STOP — which is what this one did until the dig
+state machine landed, making survival mining instant — breaks `[2, -1, 0]`
+on the spot. The first version of this file had no control and was `inert`:
+vanilla's whole projected answer was the two acks (2026-10-01).
+"""
+observe_from = "actor"
+observe = ["block_update"]
+measured_step = "silent"
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[step]]
+do = "dig"
+at = [3, -1, 0]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 1000
+
+[[step]]
+do = "finish_dig"
+at = [3, -1, 0]
+face = "up"
+
+[[step]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "finish_dig"
+at = [2, -1, 0]
+face = "up"

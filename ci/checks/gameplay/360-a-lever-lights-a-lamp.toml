@@ -1,0 +1,63 @@
+name = "a-lever-lights-a-lamp"
+about = "flipping a lever lights a redstone lamp attached to it — power crossing from one block to another, which is `neighborChanged` rather than `updateShape` and is the half of a block update this server carries a flag for and does not yet fill in"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 2000
+
+# **The whole rig is offset one block on +z so that the lamp and the lever land
+# in the same chunk, for the reason check 235 documents.** Workspaces sit at
+# absolute `(-(n+1) * 32, spawn_y, 0)`, so the workspace origin is *on* a chunk
+# boundary: anything a rig writes at relative z = 0 is in chunk z = 0 and
+# anything at z = -1 is in chunk z = -1.
+#
+# Written with the lamp at [2, 0, 0] and the lever on its north face at
+# [2, 0, -1], this check did exactly what 235 did. Vanilla cannot carry two
+# chunks in one `section_blocks_update`, so it sent the lamp and the lever as
+# separate `block_update`s and their order is whatever the per-chunk tracker
+# produced that run. Measured across three cold vanilla runs on 2026-08-03,
+# all five observations arriving inside the same millisecond:
+#
+#     lever, air, LAMP, lever      1 of 3 runs
+#     lever, air, lever, LAMP      2 of 3 runs
+#
+# Found by raising `ci/t2-gameplay-selfcheck.sh` from two runs to twelve; the
+# two-run design had never seen it. `LeverBlock.pull` is one `Level.setBlock`
+# followed by `updateNeighbours`, and `RedstoneLampBlock` lights immediately on
+# the way up, so both changes are made in the same tick — they are only split
+# because they are in different chunks.
+#
+# Offsetting to [2, 0, 1] for the lamp and [2, 0, 0] for the lever puts both at
+# absolute z 1 and 0, which is chunk z 0 for both. The geometry is otherwise
+# identical: a lever on the lamp's north face, flipped.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_lamp"
+
+[[setup]]
+do = "place"
+on = [2, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [2, 0, 1]
+face = "north"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [2, 0, 0]
+face = "north"

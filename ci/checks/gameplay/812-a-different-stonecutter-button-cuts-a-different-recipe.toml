@@ -1,0 +1,50 @@
+name = "a-different-stonecutter-button-cuts-a-different-recipe"
+about = "pressing button 5 of a stonecutter holding one stone runs `StonecutterMenu.clickMenuButton`, which sets `selectedRecipeIndex` to 5 and assembles entry 5 of `stonecutterRecipes().selectByInput(stone)` into the result slot — the list is in recipe-id order because `RecipeManager.prepare` scans into a TreeMap; stone_brick_slab_from_stone_stonecutting, entry 5, is two `minecraft:stone_brick_slab` — the same count as 811 and a different item, so a server that answered every press with one recipe fails one of the two"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1000
+
+# The press is `ServerboundContainerButtonClickPacket` (packet 17), handled
+# by `handleContainerButtonClick`: `clickMenuButton`, and `broadcastChanges`
+# only when it returns true. `setupResultSlot` broadcasts on its own first,
+# outside any click, so the result slot and the data slot go out from there.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stonecutter"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 29
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_button_click"
+button = 5

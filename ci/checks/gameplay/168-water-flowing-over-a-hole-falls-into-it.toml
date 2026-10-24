@@ -1,0 +1,43 @@
+name = "water-flowing-over-a-hole-falls-into-it"
+about = "water that reaches a two-deep hole flows into its top and falls to its bottom as full-height FALLING water (level 8), one fluid tick per block — FlowingFluid.spread's down-first rule, getNewLiquid's UP arm (getFlowing(8, true)) and getSpread's isWaterHole slope search"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 2000
+timing = { bucket = { ms = 250 } }
+#
+# # The rig
+#
+# (1, -1, 0) is dug one deep and holds the source; (1, -1, 1) and (1, -2, 1)
+# beside it are dug two deep. The source's `getSpread` finds the hole at
+# distance 0 and writes level 1 into its top at +5; that block's own tick at
+# +10 spreads DOWN first, and what it writes below is `getFlowing(8, true)` —
+# falling water, legacy level 8 — because the block above it is the same
+# liquid. A port that treated falling as a source, or as amount 8 flowing
+# sideways, writes something else at +10.
+
+[[setup]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, 1]
+face = "up"
+
+[[setup]]
+do = "look"
+yaw = -74.5
+pitch = 54.5
+
+[[setup]]
+do = "hold"
+item = "minecraft:water_bucket"
+
+[[step]]
+do = "use_item"

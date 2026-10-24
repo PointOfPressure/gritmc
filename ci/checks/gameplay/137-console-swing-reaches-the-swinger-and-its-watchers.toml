@@ -1,0 +1,31 @@
+name = "console-swing-reaches-the-swinger-and-its-watchers"
+about = """
+`swing oracle` then `swing oracle_eye offhand` from the console send BOTH
+players an `animate` for each swing — action 0 for the main hand, 3 for the
+off hand — including the player who swung
+
+`SwingCommand.swing` calls `LivingEntity.swing(hand, true)`, and the `true`
+is `updateSelf`: the packet goes out through `sendToTrackingPlayersAndSelf`,
+so unlike a player's own arm swing (`swing(hand)`, which reaches only the
+players tracking it) the swinging player is told too. A server that reused
+the arm-swing path leaves the actor silent on the first step and the
+observer silent on the second; one that mapped the off hand to its ordinal
+(1) rather than to action 3 moves the second step's `action`. The success
+lines are the console's log, so `chat` is silent.
+
+Level 2, through the console. A swing leaves nothing behind, so the restore
+only needs to be declared: it sets `send_command_feedback` to the value it
+already has.
+"""
+console_restore = ["gamerule send_command_feedback true"]
+observe_from = "both"
+observe = ["animate", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "swing oracle"
+
+[[step]]
+do = "console"
+text = "swing oracle_eye offhand"

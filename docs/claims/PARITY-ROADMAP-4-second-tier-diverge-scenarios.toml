@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 4
+slug   = "second-tier-diverge-scenarios"
+title  = "Second tier — the declared-`diverge` scenarios, grouped by shared mechanism"
+branch = "backfill"

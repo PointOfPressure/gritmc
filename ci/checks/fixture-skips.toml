@@ -1,0 +1,38 @@
+# Raw fixture-skip sites: every `eprintln!("skipping...")` that has NOT adopted
+# `rustmc_data::fixture::available`.
+#
+# A RATCHET, in the shape of `t1-known-red.toml`, not a pass list.
+# `ci/check-fixture-skips.py` reads this. Lower it in the commit that converts
+# the sites; a measurement BELOW the declaration is as red as one above,
+# because a bound nobody lowers stops being evidence.
+#
+# # WHY THESE ARE HOLES AND NOT SKIPS
+#
+# A Rust test that prints and returns early **passes**, and `cargo test` never
+# prints a passing test's stdout or stderr. So none of the 115 lines below can
+# reach any log, and `ci/t1-gate.sh`'s `grep -c "skipping: no vanilla"` — the
+# guard its own comment calls "the whole point" of the stage — is 0 on every
+# run whether or not a single test ran its check. Measured on this tree:
+# 27 of the 119 skip-message sites even use a wording that grep matches; the
+# largest single wording, `skipping: no datagen extract` (36 sites), does not.
+#
+# `crates/rustmc-data/src/fixture.rs` fixed this on 2026-08-05 by inverting the
+# default — a missing fixture PANICS unless `RUSTMC_FIXTURES=optional`. It was
+# adopted at 2 call sites. This file is the distance still to go.
+#
+# MEASURED 2026-08-18 on `main` (f82b2ebbf) in ~/rustmc-t1 by
+# `ci/check-fixture-skips.py --emit`.
+# # SITES DELIBERATELY LEFT, AND WHY
+#
+# `crates/rustmc-worldgen/tests/golden_village_start.rs` keeps one raw skip on
+# purpose. Its fixture, `oracle-work/van-village-31415926`, **does not exist in
+# any tree on this box** — not in the shared `~/rustmc/oracle-work` and not in
+# any gate directory — so `the_vector_still_matches_the_world_it_came_from` has
+# never compared the committed vector against the live world it claims to
+# re-derive. Converting it would turn T1 red for every lane over a world only a
+# vanilla boot can produce. Declared here so the hole is counted and named.
+
+total = 1
+
+[files]
+"crates/rustmc-worldgen/tests/golden_village_start.rs" = 1

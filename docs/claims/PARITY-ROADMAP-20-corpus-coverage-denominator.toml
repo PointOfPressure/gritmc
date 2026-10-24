@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 20
+slug   = "corpus-coverage-denominator"
+title  = "The corpus scored 0 of 88 against us because nobody had measured its denominator — 2026-08-10, branch `corpus-coverage-audit`"
+branch = "corpus-coverage-audit"

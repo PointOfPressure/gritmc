@@ -1,0 +1,83 @@
+name = "a-smelted-gold-ingot-pays-its-experience-when-taken"
+about = """
+raw gold smelted in a furnace and taken from the result slot pops its
+experience at the taker's feet, and the orb is picked up on the taker's next
+tick: `take_item_entity`, `remove_entities`, `set_experience` (one point)
+
+`FurnaceResultSlot.onTake` -> `checkTakeAchievements` ->
+`AbstractFurnaceBlockEntity.awardUsedRecipesAndPopExperience(player)`, which
+reads `recipesUsed` (one entry, written by `setRecipeUsed` when the smelt
+completed) and calls `createExperience(level, player.position(), 1, 1.0f)`.
+Raw gold is the recipe chosen on purpose: its experience is a whole 1.0, so
+`Mth.frac` is zero and the `nextFloat` that a 0.7 recipe draws against itself
+is never made. The orb comes from `ExperienceOrb.award` and so has a random
+yaw and velocity; this check does not observe `add_entity`, only what the
+pickup produces, which the velocity cannot move — the orb starts inside the
+taker's touch box.
+
+Setup builds and feeds the furnace exactly as `797` does and then waits out
+the 200-tick smelt; the measured window is the one click on slot 2. The menu's
+`container_set_slot`s are not observed: their window id is a statement about
+every menu opened earlier in the session.
+"""
+console_restore = ["xp add oracle -1000000 levels"]
+observe_from = "actor"
+observe = ["take_item_entity", "remove_entities", "set_experience"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:furnace"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:coal"
+
+[[setup]]
+do = "hold"
+item = "minecraft:raw_gold"
+slot = 2
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[setup]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[setup]]
+do = "container_click"
+slot = 30
+
+[[setup]]
+do = "container_click"
+slot = 1
+
+[[setup]]
+do = "container_click"
+slot = 32
+
+[[setup]]
+do = "container_click"
+slot = 0
+
+[[setup]]
+do = "wait"
+ms = 11000
+
+[[step]]
+do = "container_click"
+slot = 2

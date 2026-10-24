@@ -1,0 +1,340 @@
+# Every sentence in the tree that quotes one of the four golden tables'
+# populations, tied to the value it quotes.
+#
+# Checked by `ci/refusal-ledger.py --cite`, which renders each `quote` with the
+# **derived** value — in both plain and thousands-separated form — and refuses
+# if neither rendering appears in the file. Two different refusals:
+#
+#   CITATION       the sentence is there with a different number in it. That is
+#                  the `199` against a table of `160` case, caught at the
+#                  sentence instead of never.
+#   CITATION-GONE  no rendering matches at all: reworded or moved. A reworded
+#                  claim is an unchecked claim, so it is red until re-tagged.
+#
+# The five figures this branch repaired by hand had all been wrong for days.
+# Every one of them would have been caught here on the commit that broke it.
+#
+# `value` is a path into `ci/refusal-ledger.py`'s derivation, split on `.json.`
+# because every table name contains a dot:
+#
+#   <table>.json.refused / .answered / .population / .universe
+#   <table>.json.other.<name>          connective, quiet, tickRows, ...
+#   <table>.json.causes.<cause>        the per-cause refusal counts
+#
+# Put `{}` where the number goes. Keep the quote long enough to be unique and
+# short enough to survive an unrelated edit to the same paragraph.
+#
+# # THE TWO SELF-ASSERTIONS, AND WHY A LEDGER-DRIVEN CHECK NEEDS THEM
+#
+# `ci/check-figures.py`'s header names the defect class this must not join:
+# "register nothing and it passes, register only figures you already verified
+# and it passes forever". So this ledger asserts against itself as well:
+#
+#   min_cites   a floor on how much is registered. Emptying it is red.
+#   scan        every occurrence of a derived value in these files must sit
+#               inside a registered citation, so the ledger cannot rot by
+#               omission while the docs grow. Four digits and up only: `12` and
+#               `160` occur all over a codebase for unrelated reasons, and a
+#               scan that cries wolf is a scan that gets switched off.
+
+[meta]
+# RE-TIGHTENED 2026-08-18 on `shape-three-position-extract`, and the reason is
+# the one `ci/figures.toml`'s own meta block was re-tightened for the same day:
+# **this floor had stopped guarding anything.** It read 15 against a ledger of
+# 38, so a lane could have deleted twenty-three citations — every sentence
+# tying the shape tables to their derivation — and stayed green. That is the
+# failure the floor exists to make impossible, wearing the number that made it
+# impossible when the ledger was a third of its size.
+#
+# `ci/figures.toml` was fixed and this file was not, which is worth naming: the
+# two ledgers are the same mechanism against different artefacts, and repairing
+# one of a matched pair is how the other keeps its defect.
+#
+# It is a FLOOR and not a COUNT, so it keeps a deliberate gap beneath the live
+# number. Retiring a citation is a normal operation and must not require
+# editing this block; what is refused is a lane that removes a tenth of the
+# ledger without noticing.
+min_cites = 38            # 42 today
+scan = [
+    "docs/SERVER.md",
+    "docs/cold-start/redstone-power.md",
+    "crates/rustmc-server/src/power.rs",
+    "crates/rustmc-server/src/useblock.rs",
+    "crates/rustmc-server/src/placedby.rs",
+    "crates/rustmc-server/src/shapes.rs",
+    "tools/goldengen/vanilla/ShapeGolden.java",
+]
+
+# --- update_shape.json ------------------------------------------------------
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "update_shape.json.refused"
+quote = "* **{} refused** — the rule read more of the world than the neighbour"
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "update_shape.json.answered"
+quote = "* **{} carried** — the pairs whose sweep produced the state itself and"
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "update_shape.json.other.connective"
+quote = "* **{} connective** — several alternatives, which is a *connection*"
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "update_shape.json.population"
+quote = "  32366 states, {} sensitive (state, direction) pairs"
+
+[[cite]]
+file  = "crates/rustmc-server/src/shapes.rs"
+value = "update_shape.json.other.connective"
+quote = "/// ({} pairs) and not carried, which is the same gap"
+
+[[cite]]
+file  = "tools/goldengen/vanilla/ShapeGolden.java"
+value = "update_shape.json.refused"
+quote = "// # {} refused is not {} owed"
+
+# --- signal.json ------------------------------------------------------------
+
+[[cite]]
+file  = "crates/rustmc-server/src/power.rs"
+value = "signal.json.refused"
+quote = "//!      carried, {} refused, 29,744 measured silent"
+
+[[cite]]
+file  = "crates/rustmc-server/src/power.rs"
+value = "signal.json.causes.0,1,0"
+quote = "//!      not the server's debt.** {} of them are `redstone_wire`"
+
+[[cite]]
+file  = "crates/rustmc-server/src/power.rs"
+value = "signal.json.answered"
+quote = "//!      signal a state emits in each direction, weak and strong. {} states"
+
+[[cite]]
+file  = "docs/cold-start/redstone-power.md"
+value = "signal.json.refused"
+quote = "`signal.json` is 32,366 states: **1,372 carried, {} refused, 29,744"
+
+# --- use_without_item.json --------------------------------------------------
+
+[[cite]]
+file  = "crates/rustmc-server/src/useblock.rs"
+value = "use_without_item.json.refused"
+quote = "//! **{} states of 32,366 refused** — the probe read something its level did"
+
+[[cite]]
+file  = "crates/rustmc-server/src/useblock.rs"
+value = "use_without_item.json.causes.environmentAttributes"
+quote = "//!   {} states  16 blocks  UseGolden's level was asked for environmentAttributes"
+
+[[cite]]
+file  = "crates/rustmc-server/src/useblock.rs"
+value = "use_without_item.json.answered"
+quote = "//! **247 blocks with behaviour, {} of 32,366 states with something worth"
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "use_without_item.json.refused"
+quote = "  **{} states refused** during extraction, in four causes:"
+
+# --- set_placed_by.json -----------------------------------------------------
+
+[[cite]]
+file  = "crates/rustmc-server/src/placedby.rs"
+value = "set_placed_by.json.answered"
+quote = "//! **59 blocks with behaviour, {} of 32,366 states doing something**,"
+
+[[cite]]
+file  = "crates/rustmc-server/src/placedby.rs"
+value = "set_placed_by.json.other.tickRows"
+quote = "//!   * **The {} tick rows are all `crafter`**"
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "set_placed_by.json.other.tickRows"
+quote = "them are `crafter`** — `crafting=true, triggered=true`, delay 4"
+
+# --- found by the coverage scan on the commit that added it -----------------
+#
+# Every one of these was a live quotation of a derived value with nothing tying
+# it to the table. That is the omission rot the scan exists for, and it found
+# four of them immediately.
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "set_placed_by.json.answered"
+quote = "`data/vanilla/set_placed_by.json` — 59 blocks, {} of 32,366 states."
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "use_without_item.json.answered"
+quote = "behaviour, {} of 32,366 states with something worth recording**, identical"
+
+[[cite]]
+file  = "crates/rustmc-server/src/shapes.rs"
+value = "update_shape.json.refused"
+quote = "/// # {} refused is not {} owed, and this comment used to imply it was"
+
+[[cite]]
+file  = "crates/rustmc-server/src/shapes.rs"
+value = "update_shape.json.answered"
+quote = "    // measured answer for {} pairs and the hand ports are a handful; a"
+
+[[cite]]
+file  = "docs/PARITY-GAP.md"
+value = "use_without_item.json.other.soundBlocks"
+quote = "**{} blocks have at least one sounding state**, of which 15 are the"
+
+# --- the census figures -----------------------------------------------------
+#
+# `census.*` reaches into `ci/checks/shape-refusal-census.json`. These are the
+# most-quoted numbers this branch produced and they live in a file that takes
+# five minutes to regenerate — exactly the kind that goes stale unnoticed.
+
+# RETAGGED 2026-08-18 on `shape-three-position-extract`. These three used to
+# quote `census.discoveryMissed`, which was 164 and is now **0**, because
+# `ShapeGolden`'s discovery reads all 32,366 states. The figure a reader wants
+# is `census.missedAtDefaults` — what the *old* 1,196-default breadth would
+# still be dropping, which is a property of the jar and stays 164.
+#
+# Both are published, and that is the point: retagging to the number that
+# survives the fix, rather than deleting the sentence, is what keeps the check
+# able to fail. `ci/refusal-ledger.py` separately asserts `discoveryMissed == 0`.
+[[cite]]
+file  = "docs/SERVER.md"
+value = "census.missedAtDefaults"
+quote = "on it. `ShapeReadsGolden` did: **{} pairs move that the 1,196-default breadth"
+
+# The figure the extract is SCOPED BY, tied in all four places that quote it.
+#
+# `census.byExtraPositionCount.1` is how many refused pairs read exactly one
+# position past their own neighbour, and it is the population
+# `data/vanilla/update_shape3.json` exists to answer. Every sentence of the form
+# "a three-position extract is the shape of the fix" rests on it. If it moves —
+# a jar change, a filler change in the widened probe — then the extract's scope
+# moved and four documents are describing a different job.
+#
+# It is a dict value under an integer-ish key, which `resolve()` reaches
+# because it walks dicts by key rather than by a fixed schema.
+[[cite]]
+file  = "docs/SERVER.md"
+value = "census.byExtraPositionCount.1"
+quote = "are the block above, and 43,021 pairs read `0,1,0` and nothing else; {} of"
+
+[[cite]]
+file  = "docs/PARITY-ROADMAP.md"
+value = "census.byExtraPositionCount.1"
+quote = "nothing else, and {} of 79,113 read exactly one position past their own"
+
+[[cite]]
+file  = "crates/rustmc-server/src/shapes.rs"
+value = "census.byExtraPositionCount.1"
+quote = "/// `NoteBlock` that is 84% of the whole refusal population. {} of the"
+
+[[cite]]
+file  = "docs/cold-start/refusal-ledger.md"
+value = "census.byExtraPositionCount.1"
+quote = "  before re-scoping this row.** {} of the 79,113 read exactly one position"
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "census.insensitive"
+quote = "pairs read 32,366 instead of 1,196. `insensitive` is **{}** — the pairs"
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "census.discoveryMissedByClass.ChestBlock"
+quote = "  ChestBlock                  {}"
+
+[[cite]]
+file  = "docs/SERVER.md"
+value = "census.verdicts.world"
+quote = "  {}  60.8%  world         real debt; needs a world, not a wider harness"
+
+[[cite]]
+file  = "docs/PARITY-ROADMAP.md"
+value = "census.missedAtDefaults"
+quote = "**{} pairs move that the 1,196-default breadth drops** — `CopperChestBlock`"
+
+[[cite]]
+file  = "docs/PARITY-ROADMAP.md"
+value = "census.verdicts.recoverable"
+quote = "  {}  27.8%  recoverable   one alternative, invariant under all three fillers"
+
+[[cite]]
+file  = "docs/cold-start/refusal-ledger.md"
+value = "census.verdicts.world"
+quote = "takes the 79,113 apart: {} need a world, 22,010 are a single-alternative"
+
+[[cite]]
+file  = "crates/rustmc-server/src/shapes.rs"
+value = "census.missedAtDefaults"
+quote = "/// table had accounted for everything. **{} pairs moved that the default"
+
+[[cite]]
+file  = "tools/goldengen/vanilla/ShapeGolden.java"
+value = "census.verdicts.world"
+quote = "// level that answers past the neighbour, and of the 79,113: {} need a real"
+
+# --- the optional fifth table -----------------------------------------------
+#
+# Checked only in a tree that generated it; `ci/refusal-ledger.py` skips a
+# citation whose value it cannot resolve there rather than reddening. See the
+# `optional-skipped` arm.
+
+[[cite]]
+file  = "docs/PARITY-ROADMAP.md"
+value = "use_item_on.json.refused"
+quote = "  {} states refused outright, all on `recipeAccess`, 25 more in part"
+
+[[cite]]
+file  = "docs/cold-start/refusal-ledger.md"
+value = "use_item_on.json.refused"
+quote = "`use_item_on.json` refuses **{}** states, all on `recipeAccess`, and records"
+
+# --- the sky model, counted three times in three units ----------------------
+#
+# `crate::useblock` holds the sun-angle arithmetic written and not run. The
+# same missing model refuses states in one table and pairs in another, and no
+# single sighting says it is one gap. These are tied so a lane closing it can
+# see all three move together.
+
+[[cite]]
+file  = "crates/rustmc-server/src/useblock.rs"
+value = "use_without_item.json.causes.environmentAttributes"
+quote = "//!   use_without_item.json    {} states refused on environmentAttributes"
+
+[[cite]]
+file  = "crates/rustmc-server/src/useblock.rs"
+value = "update_shape.json.causes.LevelReader.environmentAttributes"
+quote = "//!   update_shape.json         {} pairs refused on LevelReader.environmentAttributes"
+
+[[cite]]
+file  = "crates/rustmc-server/src/useblock.rs"
+value = "update_shape.json.causes.BlockAndLightGetter.getLightEngine"
+quote = "//!                                and {} on BlockAndLightGetter.getLightEngine,"
+
+[[cite]]
+file  = "crates/rustmc-server/src/useblock.rs"
+value = "census.verdicts.refused"
+quote = "//! level that answers past the neighbour, and **{} pairs survive that — every"
+
+[[cite]]
+file  = "crates/rustmc-server/src/useblock.rs"
+value = "update_shape.json.refused"
+quote = "//! one of them one of these three causes and nothing else.** So of the {}"
+
+# The third copy of the same arithmetic. `docs/PARITY-GAP.md` said 182 and was
+# corrected to 70/55 this morning; `crate::useblock` said 184 and 180 and was
+# corrected to 71/43 this evening; both were `blocks with behaviour` standing in
+# for `blocks that play a sound`, which assumes every rule that does something
+# also sounds. Tied now, in both places.
+
+[[cite]]
+file  = "crates/rustmc-server/src/useblock.rs"
+value = "use_without_item.json.other.soundBlocks"
+quote = "least one sounding state**, the four transcribed families cover 28 of"

@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 6
+slug   = "end-is-exact"
+title  = "The End is exact"
+branch = "backfill"

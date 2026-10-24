@@ -1,0 +1,29 @@
+name = "a-sword-breaks-nothing-in-creative"
+about = """
+A creative START is `destroyAndAck`, and `destroyAndAck` is only as good as
+`destroyBlock`'s first line: `ItemStack.canDestroyBlock` ->
+`Item.canDestroyBlock`, offsets 0-58, which is false when the held item's
+`minecraft:tool` component says `can_destroy_blocks_in_creative = false` and
+the player has `instabuild`. Every sword, the mace and the trident say so.
+`destroyBlock` returns false, and `destroyAndAck` offsets 19-42 resend the
+block's CURRENT state to the digger — grass, not air — before the ack. What
+would make it fail: a server that breaks whatever a creative player digs
+sends a block_update of air, which is what this server did until the dig
+state machine asked the tool.
+"""
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:diamond_sword"
+
+[[step]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"

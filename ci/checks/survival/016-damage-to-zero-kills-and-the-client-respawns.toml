@@ -1,0 +1,56 @@
+name = "damage-to-zero-kills-and-the-client-respawns"
+about = """
+`/damage oracle 20 minecraft:generic` against a player at 20.0 (the check
+before this one ends with the Instant Health restore), then — after the twenty ticks `LivingEntity.tickDeath` takes — the
+client's `perform_respawn`. The first check in either corpus that reaches
+`ServerPlayer.die`.
+
+What vanilla sends, from the jar, in order:
+
+* `damage_event` (hurtServer 324), then at 392 `makeSound(getDeathSound())` —
+  `entity.player.death` to the OBSERVER (`Player.playSound` excludes the
+  player) — and `die(source)`;
+* `ServerPlayer.die`: `player_combat_kill` to the actor (43..65) carrying
+  `CombatTracker.getDeathMessage()` — `death.attack.generic` with the actor's
+  display name, since a `generic` source has no entity and no kill credit —
+  then `broadcastSystemMessage` of the same component to both (99), then
+  `entity_event` 3 to tracking+self (282);
+* `set_health` 0.0 on the next `doTick`;
+* twenty ticks later `tickDeath` (offsets 11..50): `entity_event` 60 to
+  tracking+self and `remove(KILLED)`;
+* `perform_respawn`: `handleClientCommand` passes the `getHealth() > 0` gate
+  at offset 139 this time, and `PlayerList.respawn` sends the new player
+  `respawn`, a teleport, and `sendPlayerPermissionLevel` — `entity_event`
+  24 (level 0) — and its first `doTick` sends `set_health` 20.0.
+
+`chat` is observed for the death message. What would make it fail: a server
+that clamps health at zero and never calls `die` sends none of the death
+packets; one that respawns without being asked, or ignores the respawn, gets
+the tail wrong; one that sends the death sound to the dying player sends it to
+the actor.
+
+LAST IN THE DIRECTORY, AND IT MUST STAY LAST: a respawned player is back at
+the world spawn, and every rig after this one is further out than the walk
+the harness can make without starving the observer's keep-alive (measured
+2026-09-30). A check added to this directory goes BEFORE this file.
+`console_restore` is required of every console `damage` and is harmless here.
+"""
+console_restore = ["effect give oracle minecraft:instant_health 1 4 true"]
+observe_from = "both"
+# `set_entity_data` is NOT observed: in one of two vanilla runs another entity
+# near the rig (id 4, not a player) sent two of its own at the death tick, and
+# the kind has no entity filter. `set_health` carries the health it would.
+observe = ["damage_event", "set_health", "entity_event", "sound", "chat"]
+settle_ms = 2500
+
+[[step]]
+do = "console"
+text = "damage oracle 20 minecraft:generic"
+
+[[step]]
+do = "wait"
+ms = 1500
+
+[[step]]
+do = "client_command"
+action = "perform_respawn"

@@ -1,0 +1,30 @@
+[package]
+name = "rustmc-entity"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+rustmc-data.workspace = true
+# The entity RNG is a LegacyRandomSource and the head-turn maths goes
+# through Mth.sin/cos and fastInvSqrt, all of which worldgen already ports.
+rustmc-worldgen.workspace = true
+# `spawn::tables` loads three generated JSON tables in `src`, not in a
+# test: the biome spawner lists, SpawnPlacements' 83 registrations and the
+# EntityType spawn facts are data the spawner cannot run without, so they
+# are a dependency and not a fixture.
+# The 26.2 trade tables are two generated JSON extracts and the loot-system
+# fields inside them (`given_item_modifiers`, `merchant_predicate`) are
+# carried across as JSON rather than interpreted here.
+serde_json.workspace = true
+
+[features]
+# Forwarded so `cargo test -p rustmc-entity --features t1-sabotage` arms the
+# module in `rustmc-data`. Off by default; `ci/t0.sh` refuses a tree where it
+# is in a default set, because a control that can be switched on in production
+# is not a control. See `rustmc_data::sabotage` and `ci/t1-sabotage.sh`.
+t1-sabotage = ["rustmc-data/t1-sabotage"]
+
+[lints]
+workspace = true

@@ -1,0 +1,78 @@
+name = "an-item-frame-hangs-on-a-blocks-side"
+about = "an item frame is an entity, not a block — right-clicking the side of a block puts one in the world facing out of that face"
+observe = ["add_entity", "set_entity_data", "block_update", "section_blocks_update", "sound"]
+settle_ms = 1500
+
+# THE FIRST FOUR CHECKS OF THIS FAMILY (773-776) OBSERVE `add_entity`. THE
+# THREE AFTER THEM (777, 788, 789) CANNOT, AND THE REASON IS ONE BYTE.
+#
+# `ClientboundAddEntityPacket` carries `yHeadRot`, filled from
+# `Entity.getYHeadRot()`. `javap -p -c -constants` on the pinned jar:
+#
+#     Entity.getYHeadRot()        0: fconst_0   1: freturn
+#     LivingEntity.getYHeadRot()  0: aload_0    1: getfield yHeadRot   4: freturn
+#
+# So for anything that is **not** a `LivingEntity` the field is a compile-time
+# zero and there is nothing in it to be unstable. For a `LivingEntity` it is
+# whatever `LivingEntity.<init>` left there, and that constructor is
+#
+#     176: getfield random:RandomSource
+#     ...  nextFloat()
+#     184: ldc 6.2831855f          // *radians* worth of *degrees*
+#     187: invokevirtual setYRot:(F)V
+#     195: putfield yHeadRot:F
+#
+# — an unseeded draw in [0, 6.2832) **degrees**, which is wire bytes 0..4.
+# `Entity.snapTo(DDDFF)` sets `yRot` and `xRot` and never touches `yHeadRot`,
+# so a spawn path that positions a living entity leaves the draw in place.
+#
+# **THAT CONSTRUCTOR LINE IS NOT A NEW FINDING AND THE SECOND SIGHTING IS THE
+# INTERESTING PART.** `docs/PARITY-ROADMAP.md` §22, branch
+# `golden-probe-audit`, found the identical expression on the harness's own
+# constructed **player** and measured two runs at 0.522 and 5.360 degrees.
+# Two independent sightings, two `LivingEntity` subclasses, two instruments —
+# a golden-table dumper and a packet recorder — and one line of vanilla.
+#
+# The difference between the two sightings is exactly what decides this
+# family's projections. §22's consumer is `Direction.fromYRot`, whose southern
+# bucket is [-45, 45), and the draw's whole range fits inside it: the
+# randomness was invisible *because its range was narrower than its only
+# consumer's resolution*, and `ci/use-golden.sh` now pins `yRot` to 0 and
+# throws if a constructed player faces anything but SOUTH. `yHeadRot` has no
+# bucketing consumer. It is written to the wire as
+# `Mth.floor(deg * 256 / 360)`, which resolves the draw into five distinct
+# byte values, so here the same die roll is fully visible and nothing can pin
+# it away on the reference side. Hence 773-776 observe `add_entity` and
+# 777, 788 and 789 do not.
+# Measured, two cold vanilla runs, `ci/entity-spawn-probe.sh`: the armor stand
+# came back 3 then 2, the snow golem 3 then 2, the iron golem 1 then 2, while
+# every non-living entity in the same runs came back 0 both times.
+#
+# 773-776 are therefore the strong half of the family and 777/788/789 buy the same
+# mechanism minus that one field. See 777's header for what replaces it.
+#
+# The stone is placed in setup: this check is about the frame, and the block
+# under it is scaffolding.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [2, -1, -1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:item_frame"
+
+[[step]]
+do = "place"
+on = [2, 0, -1]
+face = "west"

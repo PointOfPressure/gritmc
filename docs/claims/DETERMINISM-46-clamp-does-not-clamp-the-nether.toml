@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 46
+slug   = "clamp-does-not-clamp-the-nether"
+title  = "`-Dmax.bg.threads=1` sets a ForkJoinPool's PARALLELISM, not its thread count, and does not make a nether harvest reproducible — 2026-08-18, branch `nether-biome-census`"
+branch = "nether-biome-census"

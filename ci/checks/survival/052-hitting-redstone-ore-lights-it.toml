@@ -1,0 +1,43 @@
+name = "hitting-redstone-ore-lights-it"
+about = """
+`RedStoneOreBlock.attack` -> `interact`: when the ore is not lit,
+`level.setBlock(pos, state.setValue(LIT, true), 3)` — a block_update of
+`lit=true` to everyone tracking the chunk, the digger included, before the
+dig's own ack. It is reached from `handleBlockBreakAction` offsets 318-329 on
+the survival path only. The substrate's `random_tick_speed 0` keeps the ore
+lit afterwards (it goes out on a random tick). What would make it fail: a
+server that does not call `attack` sends no update and leaves the ore dark.
+"""
+# The console gave this rig its items; `clear` takes them back so the
+# next scenario starts empty-handed, on both servers.
+console_restore = ["clear oracle"]
+observe_from = "both"
+observe = ["block_update", "block_changed_ack"]
+settle_ms = 1000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "console"
+text = "clear oracle"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:redstone_ore"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "wait"
+ms = 300
+
+[[step]]
+do = "dig"
+at = [1, 0, 0]
+face = "up"

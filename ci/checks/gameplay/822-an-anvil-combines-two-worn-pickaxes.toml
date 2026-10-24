@@ -1,0 +1,56 @@
+name = "an-anvil-combines-two-worn-pickaxes"
+about = "two iron pickaxes at damage 200 and 100 take `createResult`'s combine arm (offsets 349-433): 50 + 150 left plus `250 * 12 / 100` = 30 of bonus gives 230 of durability, damage 20, for 2 levels — integer division of the product, so it is not 0.12 x 250 rounded some other way"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:anvil"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_pickaxe"
+components = [{ type = "minecraft:damage", varint = 200 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_pickaxe"
+slot = 1
+components = [{ type = "minecraft:damage", varint = 100 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 31
+
+[[step]]
+do = "container_click"
+slot = 1

@@ -1,0 +1,26 @@
+name = "a-console-msg-reaches-only-its-target"
+about = """
+`msg oracle_eye psst` from the console reaches the observer as one
+`msg_command_incoming` chat line from `Server`, and the actor not at all
+
+`MsgCommand.sendMessage` sends the target `msg_command_incoming` bound to the
+source, and the outgoing echo to the SOURCE — which for the console is
+`CommandSourceStack.sendChatMessage`'s non-player arm,
+`source.sendSystemMessage`, the server log. So the observer's side carries one
+line and the actor's carries none; a server that echoed the outgoing line to
+a player, or broadcast the message, moves the actor's side.
+
+`msg` is level 0 and the console is level 4, so this is also the check that
+the console reaches a root no op list gates.
+
+The restore line sets `send_command_feedback` to the value it already has:
+a console step must declare one, and `/msg` leaves no state to put back.
+"""
+console_restore = ["gamerule send_command_feedback true"]
+observe_from = "both"
+observe = ["chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "msg oracle_eye psst"

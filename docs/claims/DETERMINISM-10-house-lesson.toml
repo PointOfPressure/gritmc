@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 10
+slug   = "house-lesson"
+title  = "One thing this run got wrong, kept because it is the house lesson"
+branch = "backfill"

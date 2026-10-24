@@ -1,0 +1,8 @@
+# Smoke checks for t2-wire: prove the scripted-check machinery round-trips.
+# /me is permission-level 0 (any player), so no ops.json needed.
+
+[[check]]
+name = "chat-roundtrip"
+send_command = "me rustmc-oracle-marker-7481"
+expect_system_chat_contains = "rustmc-oracle-marker-7481"
+timeout_ms = 5000

@@ -1,0 +1,44 @@
+name = "a-decorated-pot-sends-block-entity-data-and-a-lectern-does-not"
+about = "the pair that makes 760 and its nine siblings mean something: a lectern has a block entity, `hasBlockEntity()` is true for its state, `broadcastBlockEntityIfNeeded` calls straight through — and `LecternBlockEntity` inherits `BlockEntity.getUpdatePacket()`, whose whole body is `aconst_null; areturn`, so `broadcastBlockEntity` returns at its `ifnull` and vanilla says nothing. 29 of the 49 registered types are in that position. Without this check, a server that answered every block entity with a packet would pass all ten placement checks and be wrong about more types than it was right about"
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+# The lectern goes down first and is the **silent** half. It cannot be the
+# measured step: a scenario whose last action produces only the two resyncs
+# `handleUseItemOn` makes unconditionally is `inert` by the gate's own
+# definition, and would be refused rather than measured. So the assertion
+# about the lectern lives in the trace and the pot carries the step.
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:lectern"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:decorated_pot"
+slot = 1
+
+# Two blocks away from the lectern rather than one. A lectern and a pot in the
+# same section in the same tick would arrive as one `section_blocks_update`,
+# and these are separate ticks — but the rig is kept on one side of relative
+# z = 0 and clear of each other so that neither packet's shape depends on the
+# other's timing.
+[[step]]
+do = "place"
+on = [3, -1, 0]
+face = "up"

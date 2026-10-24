@@ -1,0 +1,5 @@
+[toolchain]
+# Pinned so 3 concurrent worker agents + CI + the Threadripper all build with
+# the same compiler. Bump deliberately, in its own commit, orchestrator-only.
+channel = "1.96.1"
+components = ["rustfmt", "clippy"]

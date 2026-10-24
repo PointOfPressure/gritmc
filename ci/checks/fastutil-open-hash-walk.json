@@ -1,0 +1,54 @@
+{
+  "fastutil_path": "oracle-work/vanilla-26.2/libraries/it/unimi/dsi/fastutil/8.5.18/fastutil-8.5.18.jar",
+  "fastutil_sha256": "9094ae67d01d0ad246f886f11ad557fc2e79c72cbf3feed83e1512a8ae90a74a",
+  "inputs": {
+    "10_iterator": {
+      "direction": "descending",
+      "start": "pos = n",
+      "zero_key": "returned first, from slot n"
+    },
+    "1_mix": {
+      "multiplier": -1640531527,
+      "op": "h ^ (h >>> shift)",
+      "shift": 16
+    },
+    "2_next_power_of_two": {
+      "expr": "1L << (64 - Long.numberOfLeadingZeros(x - 1))"
+    },
+    "3_array_size": {
+      "ceiling": 1073741824,
+      "expr": "max(2, nextPowerOfTwo(ceil(expected / f)))",
+      "floor": 2
+    },
+    "4_max_fill": {
+      "expr": "min(ceil(n * f), n - 1)"
+    },
+    "5_default_ctor": {
+      "expected": 16,
+      "load_factor": 0.75
+    },
+    "6_probe": {
+      "kind": "linear",
+      "slot": "mix(k) & mask",
+      "step": "+1 & mask"
+    },
+    "7_growth": {
+      "target": "arraySize(size_after + 1, f)",
+      "test": "size_before >= maxFill"
+    },
+    "8_shrink": {
+      "floor": 16,
+      "target": "n / 2",
+      "test": "n > minN and size < maxFill / 4 and n > 16"
+    },
+    "9_shift_keys": {
+      "kind": "knuth algorithm R shift-back",
+      "tombstones": false
+    }
+  },
+  "users": {
+    "ChunkMap.entityMap": "Int2ObjectOpenHashMap",
+    "ChunkMap.tick call sequence": "PlayerMap.getAllPlayers -> updateChunkTracking -> ServerLevel.players -> Int2ObjectMap.values -> TrackedEntity.updatePlayers -> ServerEntity.sendChanges -> Int2ObjectMap.values -> TrackedEntity.updatePlayers",
+    "PlayerMap.players": "Object2BooleanOpenHashMap"
+  }
+}

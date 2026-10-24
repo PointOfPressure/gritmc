@@ -1,0 +1,96 @@
+# Shell idioms this project has got wrong more than once.
+#
+# A RATCHET, in the shape of `ci/checks/comment-guards.toml` and
+# `ci/checks/t1-known-red.toml`, not a pass list. `ci/shell-footguns.py` reads
+# this. A branch may LOWER `total` by repairing an instance; raising it means
+# adding a line that says which instance is being left and why. A declared
+# instance that stops being found is as red as a new one, because a stale
+# declaration reads as authoritative and is worse than none.
+#
+# # WHY THESE TWO
+#
+# `pkill -f` matched its own caller and killed it **five separate times in one
+# run**, and it was already documented when three of those happened:
+# `ci/batch.sh:372` names the mechanism, `ci/batch-falsify.sh:67` says
+# "PID-resolved, never `pkill -f`". Being written down is what this class has
+# already had.
+#
+# `cmd | grep -c X || echo 0` emits `0\n0`, because `grep -c` prints 0 AND
+# exits 1 on no match. It was made twice. It broke four cases of
+# `ci/batch-falsify.sh` on their first run and read as a defect in
+# `ci/batch.sh`, because the numeric comparison fails as a syntax error rather
+# than as a tally of zero.
+#
+# # WHY THESE EIGHT ARE DECLARED AND NOT REPAIRED
+#
+# Every one is in a falsifier's cleanup path, killing processes it started
+# itself in a temp directory it owns. They work today. The safe form is not a
+# bracketing trick — `ci/batch.sh` says plainly that "the bracket form is not
+# enough when the same command line also carries the plain path" — it is pgrep,
+# skip `$$`, and compare `/proc/<pid>/environ`, which is a real rewrite of each
+# cleanup. Rewriting eight of them blind, in the scripts whose whole job is to
+# prove other checks can fail, is a worse risk than declaring them. What the
+# ratchet buys is that a NINTH cannot be written.
+#
+# MEASURED 2026-08-19 on `work-method` by `ci/shell-footguns.py --emit`, over
+# 8 shell instances with comments and heredoc bodies blanked. The raw grep
+# returns twelve; four of them are comments warning against the idiom,
+# including the two quoted above. A checker that counted those would report the
+# documentation of a defect as the defect, and its number would rise every time
+# somebody wrote a warning.
+#
+# GREP-C-OR-ECHO-ZERO stands at ZERO. The one live instance,
+# `ci/handoff-merge-tail-falsify.sh:586`, was repaired in the same commit as
+# this file rather than declared: it is one line and the replacement,
+# `awk 'END{print NR}'`, is already the form used elsewhere in that file.
+
+total = 13
+
+[allowed]
+
+# The corpus-lock falsifier's cleanup: an anchor process it spawned, and
+# anything left holding its own temp dir.
+"ci/corpus-lock-falsify.sh:97" = "PKILL-F-MATCHES-ITS-CALLER"
+"ci/corpus-lock-falsify.sh:101" = "PKILL-F-MATCHES-ITS-CALLER"
+
+# The gate-lock falsifier, same shape: two in the trap, one in a case body.
+"ci/gate-lock-falsify.sh:50" = "PKILL-F-MATCHES-ITS-CALLER"
+
+# main 3973's keep-going falsifier (gate-pipeline), declared on train-c: the
+# pattern is the prefetched job's own body, `sleep 30; touch LEAKED`, which
+# this script's command line does not contain; it runs only on the failure
+# arm, to reap a job the case just proved was leaked.
+"ci/t0-keepgoing-falsify.sh:227" = "PKILL-F-MATCHES-ITS-CALLER"
+"ci/gate-lock-falsify.sh:51" = "PKILL-F-MATCHES-ITS-CALLER"
+"ci/gate-lock-falsify.sh:348" = "PKILL-F-MATCHES-ITS-CALLER"
+
+# `ci/handoff-merge-tail-falsify.sh`'s `pkill -9 -f 'sleep 600'` is gone
+# (fix-flappers-2, 2026-10-04): its hung push writes its own pid to a marker
+# and the case kills that pid, so no other gate's sleep can match.
+
+# The lanes falsifier's cleanup.
+"ci/lanes-falsify.sh:51" = "PKILL-F-MATCHES-ITS-CALLER"
+"ci/lanes-falsify.sh:52" = "PKILL-F-MATCHES-ITS-CALLER"
+
+# --- five instances that came in with `excl2` (2026-08-19), before this check
+# existed, declared on landing 2026-09-04. The four `grep -c ... || echo 0`
+# sites that came in with the same branch were repaired instead (a single
+# `${n:-0}` read, so no-match and missing-file both print one 0). These five
+# are left because each is either the recommended idiom already or not a
+# process kill at all:
+#
+# * `corpus-holder-progress-falsify.sh:19` kills `progress-falsify-writer-$$`,
+#   a marker carrying this shell's own pid, which no caller's command line
+#   contains.
+# * `corpus-holder-rate-falsify.sh:31` and `corpus-overlap-sampler-falsify.sh:20`
+#   kill `$MARK`, an instance-unique stub marker (excl2's 8f1a4c1a3 made it
+#   so, for exactly the self-match this rule names).
+# * `corpus-load-band-falsify.sh:29` already uses the `[l]oad-worker` bracket
+#   idiom this rule recommends; the regex cannot see that.
+# * `corpus-lock-provenance.sh:198` is `grep -q 'pkill -f rustmc-movetick'` over
+#   a COMMIT MESSAGE — a string being looked for, not a kill being issued.
+"ci/corpus-holder-progress-falsify.sh:19" = "PKILL-F-MATCHES-ITS-CALLER"
+"ci/corpus-holder-rate-falsify.sh:31" = "PKILL-F-MATCHES-ITS-CALLER"
+"ci/corpus-load-band-falsify.sh:29" = "PKILL-F-MATCHES-ITS-CALLER"
+"ci/corpus-lock-provenance.sh:198" = "PKILL-F-MATCHES-ITS-CALLER"
+"ci/corpus-overlap-sampler-falsify.sh:20" = "PKILL-F-MATCHES-ITS-CALLER"

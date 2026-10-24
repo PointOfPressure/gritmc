@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 6
+slug   = "ranked-all-of-it"
+title  = "Ranked, all of it"
+branch = "backfill"

@@ -1,0 +1,41 @@
+name = "an-unsmokable-item-in-a-smoker-still-gets-a-cook-total-of-two-hundred"
+about = "raw iron into a smoker. There is no smoking recipe for it, and getTotalCookTime's orElse is a literal sipush 200 — not the smoker's 100 codec default — so setItem still writes cookingTotalTime 200 and the click sends container_set_data id 3 = 200. A server that derived the fallback from the block (100 for a smoker) or skipped the recompute on a recipe miss diverges on the value or on the packet"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:smoker"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:raw_iron"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+
+[[step]]
+do = "container_click"
+slot = 0

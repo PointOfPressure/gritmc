@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 41
+slug   = "potent-sulfur-block-entities"
+title  = "The first block entity written: potent_sulfur, 28 of 28 co-located payloads byte-identical against a payload floor of exactly zero, with block states unmoved"
+branch = "worldgen-block-entities"

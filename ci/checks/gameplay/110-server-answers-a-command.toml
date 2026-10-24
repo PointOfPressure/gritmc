@@ -1,0 +1,9 @@
+name = "server-answers-a-command"
+about = "a permission-level-zero command gets an answer — the command tree exists and dispatches"
+observe_from = "actor"
+observe = ["chat"]
+settle_ms = 1500
+
+[[step]]
+do = "command"
+text = "list"

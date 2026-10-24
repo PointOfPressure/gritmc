@@ -1,0 +1,2133 @@
+# ci/checks/test-targets.toml — every cargo target in this workspace, and which
+# gate runs it.
+#
+# # WHY THIS LEDGER EXISTS
+#
+# `ci/t0.sh` runs `cargo test --workspace --lib --bins`. That selector cannot
+# build anything in a `tests/` directory and runs no doctest, so when this audit
+# began **88 of this workspace's 106 targets were invisible to T0**. For one
+# bucket that was a deliberate budget decision with a comment behind it; for the
+# other six nobody ever wrote anything down, and until this file existed nothing
+# in the tree could tell those two states apart.
+#
+# It is 85 as of this commit: the audit promoted three (`t0-wiring`) and left
+# the rest where they were, with a measured reason each. **The remaining 85 are
+# not a backlog.** They are 9.3% of the workspace's assertions and most of them
+# belong exactly where they are; the number that matters is not how many targets
+# T0 skips but which of them nobody had ever decided to skip.
+#
+# The cost of not being able to tell them apart, twice:
+#
+#   * `--lib` alone matched no target in `tools/oracle-runner`, a **binary**
+#     crate. Nineteen tests had never run in any gate and one was failing.
+#     Fixed 2026-08-03 by adding `--bins`.
+#   * an agent added an integration test under `tests/`, T0 came back GREEN,
+#     and the green was the test binary never having been built. 2026-08-10.
+#
+# Both fixes were one target wide. This file is the general answer:
+# `ci/check-test-targets.py` enumerates the tree with `cargo metadata` and
+# reddens T0 on a target that is in the tree and in no bucket here. **Adding a
+# test target without saying where it runs is a red gate.**
+#
+# # WHAT `runs_in` MEANS, AND THE THING IT IS EASY TO MISREAD
+#
+# `runs_in` is which gate is the **first** to execute the target. Note what the
+# table below adds up to: **`t1` is not "excluded"**. `ci/t1.sh` is a bare
+# `cargo test --workspace --no-fail-fast`, which reaches every one of these 110
+# targets, so nothing in this workspace is outside every gate. The real
+# quantity is the *exposure window*: T0 runs on every agent push, T1 runs on
+# merge (`docs/CI.md` gate-tier table). A defect in any of the 88 is invisible
+# from the push that introduces it until the merge gate, and `docs/CI.md`'s own
+# "what the gate's commands can still be green over" section is the list of
+# things that has already cost.
+#
+# The permitted values are `t0`, `t1` and `retired`, and there is no `t2`.
+# **That is a measurement, not an omission.** `ci/t2-wire.sh`,
+# `ci/t2-gameplay.sh`, `ci/t2-gameplay-subset.sh`, `ci/t2-gameplay-selfcheck.sh`,
+# `ci/t2-memory.sh`, `ci/t2-regiondiff.sh`, `ci/t2-vanilla-loads-ours.sh` and
+# `ci/t3-determinism.sh` were grepped for `cargo test` on 2026-08-16 and run
+# none: T2 drives already-built binaries against recorded vanilla traces. So a
+# target cannot be "covered by T2", nobody may claim it is, and
+# `ci/check-test-targets.py` has no stage to check such a claim against.
+#
+# `retired` was spelled `never` until 2026-08-16 and nothing was ever in it. It
+# means: no stage runs this target, on purpose, and the `reason` says why. It is
+# the *only* way a target may be selected by nothing — anything else is
+# `RUNS NOWHERE` and a red gate — and it is a claim that can be wrong in both
+# directions, because a stage that still selects a retired target is
+# `RETIRED BUT RUN`.
+#
+# # THE CLAIM IN THIS COLUMN WAS UNCHECKED FOR SIX DAYS — 2026-08-16
+#
+# Everything above was written on 2026-08-10 and every word of it was true, and
+# **no line of code read `ci/t1.sh` until 2026-08-16**. `ci/check-test-targets.py`
+# recomputed T0's argv and refused on a disagreement with the `runs_in = "t0"`
+# buckets; the `runs_in = "t1"` buckets — 88 of the 110 targets, twelve buckets,
+# every golden vector and every integration test in the tree — rested on this
+# file's prose and on nothing else. Narrowing `ci/t1.sh` to `--lib --bins` would
+# have taken all 88 out of every gate in the project and left T0 printing
+# `110 targets declared, 22 run in T0, 88 do not`, which is what it printed
+# anyway.
+#
+# That is the project's central defect class — a green that cannot be turned red
+# — inside the ledger written to close it. It is fixed: `ci/t1.sh` now carries
+# the same selector sentinel `ci/t0.sh` does, both are re-evaluated, a target
+# selected by no stage is red unless it is `retired`, and
+# `ci/check-test-targets-falsify.py` injects sixteen faults and asserts each
+# refusal by name. The summary line changed too, and not cosmetically: `88 do
+# not` named a hole of 88 where the measured hole is 0, and a check that cries
+# wolf gets bypassed.
+#
+# # THE NEXT RING OUT, DELIBERATELY NOT CHECKED HERE — a null, so nobody re-runs it
+#
+# `runs_in = "t1"` now means two things and this file verifies one of them:
+# that `ci/t1.sh`'s argv selects the target. It does **not** verify that
+# anything invokes `ci/t1.sh`. The chain is `ci/handoff.sh` stage 5 →
+# `ci/t1-gate.sh` → `ci/t1.sh`, one line, and deleting it would take 88 targets
+# out of the merge gate with every check in the tree green — which is the same
+# sentence as the defect above, one level up.
+#
+# It is not checked, on purpose, for two measured reasons:
+#
+#   * **Deleting stage 5 does not fail silently.** `ci/handoff.sh:489` is
+#     `set -euo pipefail` and `T1_RC` is assigned only inside stage 5, so
+#     stage 6's `[ "$T1_RC" -eq 0 ]` is an unbound-variable fatal. Checked on
+#     2026-08-16, not assumed. The failure mode here is a dead gate, not a
+#     green one, which is the opposite of and much cheaper than the class this
+#     file exists for.
+#   * **The check available is worse than the gap.** Shell invocation cannot be
+#     established by substring — `ci/handoff.sh` names `ci/t1.sh` twice in
+#     comments and executes it never — so any such check would have to strip
+#     comments heuristically and would be biased toward *passing* on a false
+#     match. A guard whose failure mode is a false green, defending against a
+#     fault that has never occurred and would be loud if it did, is surface
+#     without assurance. `docs/AGENT-BRIEF.md`: hold anything you build to the
+#     bar of catching a real past instance.
+#
+# If a stage ever does get silently un-invoked, this paragraph is wrong and the
+# check becomes worth writing. Nothing else about it needs re-deriving.
+#
+# # HOW TO EDIT IT
+#
+# Add your target to the bucket that describes it, or add a bucket. Two fields
+# carry the justification and they are **not** the same claim:
+#
+#   * `reason` — what somebody actually WROTE DOWN, quoted with its file:line.
+#     Where nothing was ever recorded this says `unknown`, and that is a
+#     deliberate reading rather than a gap to be tidied away. An invented
+#     rationale is worse than an admitted absence: it reads as a decision
+#     somebody made and stops the question ever being asked again.
+#   * `measured` — what the 2026-08-10 audit measured, so that the next person
+#     arguing about T0's budget argues against numbers instead of adjectives.
+#     Wall times were taken on the Threadripper with two other trees' suites
+#     running concurrently, so every figure is an **upper bound**.
+#
+# # WHAT THIS FILE IS NOT
+#
+# It is not a claim that the excluded targets pass — two of them do not. It is
+# a claim about *where they run*. `ci/checks/t1-known-red.toml` is the ledger
+# for whether they pass, and it carries the two standing reds by signature.
+
+[meta]
+# A floor under the enumeration itself, for the reason `min_binaries` exists in
+# t1-known-red.toml and the reason `SHELL_N` has a floor in `ci/t0.sh`: an audit
+# over an empty target list passes byte-identically to a clean one. This is the
+# measured count on 2026-08-10 (106) less a margin for a branch that
+# legitimately deletes a crate.
+#
+# **It cannot catch the defect this file exists for, and that is why the file
+# exists.** An unaccounted target makes the count go UP, and every floor in the
+# tree passes trivially in that direction. A floor catches collapse; only a
+# manifest catches addition.
+min_targets = 96
+
+# MERGE-REGION BEGIN buckets to-eof check=toml-buckets
+#
+# Every branch that adds a cargo target adds a `[[bucket]]` here, and — measured
+# 2026-09-05 — it lands beside the bucket it is topically closest to rather than
+# at a shared tail, which is `ci/t0.sh`'s shape rather than `ci/figures.toml`'s.
+# So the region is the whole body and `check=toml-buckets` carries the weight:
+# a duplicated `id`, a target listed in two buckets, or a file that stops
+# parsing is a refusal, and a real edit both sides make still conflicts exactly
+# as it did. 193 of the 630 pairs of the 36 branches ahead of main that touch
+# this file conflicted on it before this marker, and 18 of 630 after. Do not
+# move or delete this
+# line — `ci/merge-docregions.py --check` runs in T0.
+
+[[bucket]]
+id = "t0-unit"
+runs_in = "t0"
+reason = """
+RECORDED, `ci/t0.sh`: "Unit tests, and only the unit tests." These 19 are the
+entire intersection of "exists" and "T0 runs it" — one unittest binary per lib
+and one per bin. (18 until 2026-09-05, when `tools/level-probe` was added: it
+writes and reads a world directory's `level.dat`, `data/minecraft/*.dat` and
+`players/data/<uuid>.dat` from outside the server, so that
+`ci/t2-vanilla-opens-our-world.sh` can hand vanilla a directory our writer
+produced without booting the server inside a gate about the file format. It
+carries no `#[test]` of its own — the format and its goldens live in
+`rustmc-world` — so it contributes a binary and zero assertions, which is why
+the measured block below is unchanged.)
+
+`--bins` is load-bearing and is named here as a reminder rather than a note:
+`tools/oracle-runner` is a binary crate, so under `--lib` alone this bucket was
+19 tests smaller and one of the missing ones was failing.
+"""
+measured = """
+1455 assertions passed, 0 failed, 1 ignored, in 36.4 s wall (Threadripper,
+2026-08-10, two other trees' suites running concurrently, so an upper bound).
+
+**Read that number against the 150 assertions in the 88 targets T0 could not
+reach when the audit began, because it is the correction to this whole file's
+premise.** T0 is blind to 83% of the
+workspace's targets and to 9.3% of its assertions (150 of 1,605). The blind spot
+is wide and shallow. That does not make it safe — `tools/oracle-runner`'s 19
+invisible tests were 1.2% of the assertions and one of them was failing — but it
+does mean "T0 misses 88 of 106 targets" is a much more alarming sentence than
+the coverage it describes, and anyone quoting it should quote 9.3% beside it.
+
+# NINE OF THESE EIGHTEEN EXECUTED NO ASSERTION AT ALL — found and closed 2026-08-16
+
+Re-measured by running the whole workspace suite in `~/rustmc-assertfloor` on
+the Threadripper against 186d6f17 (110 result blocks, 98 binaries + 12
+doctests, `skipping: no vanilla` count **0**, so nothing skipped for want of a
+fixture). Per target rather than in aggregate, which is the count nobody had
+taken:
+
+    anvil-probe::bin::anvil-probe          0 passed, 0 failed, 0 ignored
+    essentials-core::lib::essentials_core  0 passed, 0 failed, 0 ignored
+    goldengen::bin::goldengen              0 passed, 0 failed, 0 ignored
+    permissions::lib::permissions          0 passed, 0 failed, 0 ignored
+    region-differ::bin::region-differ      0 passed, 0 failed, 0 ignored
+    rustmc-api::lib::rustmc_api            0 passed, 0 failed, 0 ignored
+    rustmc-server::bin::rustmc-server      0 passed, 0 failed, 0 ignored
+    worldedit-core::lib::worldedit_core    0 passed, 0 failed, 0 ignored
+    worldgen-dump::bin::worldgen-dump      0 passed, 0 failed, 0 ignored
+
+**So T0 declared 22 targets and 13 of them could go red.** These nine
+compiled, linked, ran, reported `test result: ok` and could not fail — the
+limiting case of the class this whole ledger exists for, sitting inside the
+bucket the ledger holds up as the covered half, and the `1455 assertions`
+figure above is exactly what hid them: an aggregate over eighteen targets
+cannot show that nine of them contributed nothing to it.
+
+**The count was 14 in commit 186d6f17 and it was 13.** That commit's own
+bullet list named eight of these nine — `worldedit-core::lib::worldedit_core`
+was missing from it — while its total said 20, so the summary disagreed with
+itself and the disagreement was in the direction that flattered the gate. The
+list above is now derived mechanically by `ci/check-test-targets.py` from the
+module tree each target roots, and cross-checked against the measured log.
+
+**All nine now assert, and the fix was not the same in each.** Four bins had
+pure decoders or argv parsers worth a test outright (`region-differ`'s window
+parsers, `anvil-probe`'s block/chunk/region arithmetic, `worldgen-dump`'s
+`ChunkPos.asLong` inverse, `goldengen`'s version scrape against the compiled
+constant). `rustmc-server`'s bin had its flag reader extracted. The three
+plugin stubs and `rustmc-api` were the interesting ones: their honest content
+is type-level, so what they assert is the architectural rule the tree calls
+`ENFORCED` — a `plugins/` crate may name no dependency but `rustmc-api` —
+which was enforced by nothing and, until `rustmc-api` re-exported the types
+its own signatures use, could not be obeyed either.
+
+**It is a check now, and it is here rather than where 186d6f17 predicted.**
+That commit named `ci/t1-allowlist.py` as the instrument, on the ground that
+per-target counts only exist once a suite has run. They do — but a *static*
+derivation from the sources cargo would build gives the same answer, was
+calibrated against the measured log target for target in both directions, and
+lands in T0 where an agent meets it before the push rather than at merge. See
+`[assertions]` at the foot of this file and
+`ci/check-test-targets-falsify.py`'s 24 new cases.
+"""
+members = [
+    "anvil-probe::bin::anvil-probe",
+    "essentials-core::lib::essentials_core",
+    "goldengen::bin::goldengen",
+    "level-probe::bin::level-probe",
+    "oracle-runner::bin::oracle-runner",
+    "permissions::lib::permissions",
+    "region-differ::bin::region-differ",
+    "rustmc-api::lib::rustmc_api",
+    "rustmc-behavior::lib::rustmc_behavior",
+    "rustmc-data::lib::rustmc_data",
+    "rustmc-entity::lib::rustmc_entity",
+    "rustmc-loot::lib::rustmc_loot",
+    "rustmc-proto::lib::rustmc_proto",
+    "rustmc-server::bin::rustmc-server",
+    "rustmc-server::lib::rustmc_server",
+    "rustmc-world::lib::rustmc_world",
+    "rustmc-worldgen::lib::rustmc_worldgen",
+    "worldedit-core::lib::worldedit_core",
+    "worldgen-assembly::lib::worldgen_assembly",
+    "worldgen-dump::bin::worldgen-dump",
+]
+
+[[bucket]]
+id = "t0-wiring"
+runs_in = "t0"
+reason = """
+Promoted into T0 by the 2026-08-10 unrun-target audit, and this bucket is the
+audit's only change to what T0 executes.
+
+They had no recorded reason to be excluded (they were outside T0 because
+`--lib --bins` cannot reach `tests/`, which is a property of a flag), they need
+no vanilla extract, they cost 0.3 s together, and they gate production wirings:
+the plugin storage contract, the plugin tick lock, and the positions random
+ticks are drawn at. `ci/plugin-hook-falsify.sh:68` already drives
+`plugin_tick_lock` by name — somebody had decided it was load-bearing without a
+gate ever running it.
+
+They are named on their own selector line in `ci/t0.sh` rather than reached by
+widening to `--tests`, which would pull in the two standing reds and 830 s of
+suite. That is the rule `session_joint` established: not "integration tests are
+T1", but "tests that need minutes and the extract are T1".
+"""
+measured = """
+0.3 s for all three together; 3 assertions. Promoted into T0 by the 2026-08-10
+audit — they had no recorded reason to be out, need no vanilla extract, and gate
+production wirings rather than golden vectors.
+
+Named explicitly rather than by widening the selector to `--tests`, which would
+drag in the two standing reds and 830 s of suite.
+
+**`golden_chunk_send_order` joined them 2026-09-05, and it belongs here rather
+than in `golden-vectors` for the one reason that bucket names.** Its fixture —
+`crates/rustmc-server/golden/chunk_send_order.json`, 117 chunk positions a real
+vanilla superflat server sent a joining client — is **committed**, so it needs
+no `oracle-work/` extract, which is the binding half of `golden-vectors`'
+exclusion. It runs in 0.00 s, 2 tests. The fixture is positions only and holds
+no block data, which is what makes committing it different in kind from a
+region file.
+"""
+members = [
+    "rustmc-server::test::golden_chunk_send_order",
+    "rustmc-server::test::plugin_storage",
+    "rustmc-server::test::plugin_tick_lock",
+    "rustmc-server::test::random_tick_pos",
+]
+
+[[bucket]]
+id = "place-survive"
+runs_in = "t0"
+reason = """
+`BlockItem.canPlace`'s first half, and the whole claim of
+`crates/rustmc-behavior/src/place_survive.rs` lives in this one target. Under
+`--lib --bins` the crate's lib target passes while none of the 640,532
+comparisons is built, which is this ledger's founding defect — the same shape
+as `rustmc-loot` landing with its interpreter ungated.
+
+It needs `data/vanilla/item_survive.json` and `data/vanilla/block_props.json`,
+both generated by `ci/gen-gameplay-tables.sh` in every tree, and **not** the
+3.8 GB `oracle-work/` extract. That is what separates it from
+`golden_survival`, which is in the `golden-vectors` T1 bucket for exactly that
+reason, and puts it in the `session_joint` / `loot-interpreter` class instead.
+"""
+measured = """
+1.41 s, 3 tests, Threadripper 2026-09-05, `cargo test --release -p
+rustmc-behavior --test golden_item_survive`.
+
+Assertion counts, because two of the three are ratchets and a ratchet whose
+number nobody quotes is a number nobody notices moving: 640,532 cells compared
+against vanilla with 0 disagreements, 2,546 states in classes this port does
+not answer, 34 such classes named individually.
+"""
+members = [
+    "rustmc-behavior::test::golden_item_survive",
+]
+
+[[bucket]]
+id = "t0-joint"
+runs_in = "t0"
+reason = """
+Promoted into T0 by `joint-witness-607`, not by the unrun-target audit — it is a
+separate bucket so that neither reason is read as the other's.
+
+`session_joint` is an integration test because it drives `keep_alive_loop`
+through the crate's public API, which is the joint it exists to witness. It is
+the test that named the rule the bucket above then applied: "tests that need
+minutes and the extract are T1", not "integration tests are T1".
+
+It is also the reason this manifest exists. The test landed with six arms and
+six negative controls, and the first T0 run after it came back GREEN without the
+binary ever being built — `--lib --bins` cannot reach `tests/`. A test written
+to close "a check that cannot fail" was, for one run, exactly that.
+"""
+measured = """
+3.3 s; needs `data/vanilla` but not the 3.8 GB extract. Recorded by
+`joint-witness-607`, 2026-08-10, against a ~50-minute corpus run behind a
+contended lock — which was the only prior witness of any of the six arms.
+"""
+members = [
+    "rustmc-server::test::session_joint",
+]
+
+[[bucket]]
+id = "t0-section-light"
+runs_in = "t0"
+reason = """
+Promoted into T0 by `light-section-data`, 2026-08-18, on the rule
+`session_joint` established: "tests that need minutes and the extract are T1",
+not "integration tests are T1". Neither needs minutes.
+
+`light_golden` is the comparison that can go red. Until this branch every
+chunk packet carried `LightData::default()` — 0 of the 26 light sections
+vanilla puts in that payload — and no gate would have caught it. It compares
+our classification against vanilla's own, dumped from
+`ClientboundLightUpdatePacketData` by `ci/light-golden.sh`: 3,276 sections over
+seven worlds.
+
+`section_light_wired` grades something the comparison cannot: that the engine
+is connected to the packet at all. An engine exact against vanilla that never
+runs in the server is the `ACCEPT_TELEPORTATION` defect with a better test
+suite attached, so this one drives the server's own `World::chunk` and reads
+the light back off the encoded body.
+
+`section_light_wired` DOES need the 3.8 GB extract, which is why it is not in
+the `t0-wiring` bucket — that bucket's stated criterion is needing none. It
+skips itself with a printed reason when the extract is absent, exactly as
+`decorated_world` does, so its presence here cannot redden a tree without one.
+"""
+measured = """
+Threadripper, 2026-08-18, `cargo test --release`: `light_golden` 1.78 s,
+`section_light_wired` 7.75 s. 9.5 s together.
+
+`ci/light-falsify.sh` gates the first of the two and is wired into `ci/t0.sh`
+separately, in its `LIGHT_FALSIFY_DRYRUN=1` form — 8 injections, all verified
+to still apply, no cargo. The full suite rebuilds per case at about five
+minutes and is what an engine change earns.
+"""
+members = [
+    "rustmc-server::test::light_golden",
+    "rustmc-server::test::section_light_wired",
+]
+
+[[bucket]]
+id = "weather-console"
+runs_in = "t0"
+reason = """
+Promoted into T0 by the `weather` branch, on the `t0-wiring` bucket's rule and
+not on a new one: no vanilla extract, no `data/vanilla`, and it gates a
+production wiring rather than a golden vector.
+
+The wiring is the point. `crate::weather` carries thirty unit tests against a
+caller-supplied level and a scripted generator, and none of them can see
+whether `crate::console::dispatch_line` reaches
+`crate::weather::dispatch_console`, whether that writes the state
+`crate::weather::tick` reads, or whether the packets coming back describe the
+transition the console asked for. That is the class
+`ci/corpus-falsifiable.py`'s header enumerates — a mechanism derived
+correctly, tested thoroughly and wired to nothing — and this is the only
+instrument in the tree that asks it for weather, because the corpus scenario
+that would ask it needs a `Step::Console` that is not on main
+(`docs/cold-start/weather.md`).
+
+It is one test in its own binary and must stay that way.
+`crate::weather::shared()` and `crate::weather::level_random()` are
+process-wide singletons, as `MinecraftServer.getWeatherData()` and
+`Level.random` are one object each in vanilla; a second test in this file, or
+a unit test driving the same statics in the shared `--lib` process, restores
+exactly the contamination `plugin_tick_lock`'s header documents catching in
+this workspace.
+"""
+measured = """
+0.01 s green; 1 test, 14 assertions. Threadripper, `~/rustmc-weather`,
+2026-09-06.
+
+The 10 s constant in the file is a DEADLINE on the fifo round trip, not a
+sleep: the loop exits the instant the shared state moves, and reaching the
+deadline is the failure, carrying the `WeatherData` it observed. Shown red
+twice before green — removing the `Some("weather")` arm from
+`console::dispatch_line` fails at that deadline in 10.00 s, and inverting the
+rain ramp's sign fails at `no START_RAINING in 200 ticks` in 0.01 s.
+"""
+members = [
+    "rustmc-server::test::weather_console",
+]
+
+[[bucket]]
+id = "t0-incremental-light"
+runs_in = "t0"
+reason = """
+Added by `light-engine`, 2026-09-05, for the half of the light engine
+`t0-section-light` is structurally blind to.
+
+`light_golden` grades `light_engine::light`, a max-plus fixpoint over a world
+handed to it whole. Every case it reads reaches the engine through
+`propagateLightSources`, which enqueues nothing but increases — so
+`LightEngine.propagateDecreases` drains an empty queue and **a port with no
+decrease queue at all passes every case in it**. Three injections into the
+incremental engine were applied to the tree and none of them turned that check
+red: swapping the decrease and increase passes, replacing `repeatFirstLayer`
+with a dark layer, and deleting the skip-one-direction bit.
+
+The three targets here close that, and each grades something the other two
+cannot:
+
+* `light_incremental_golden` runs vanilla's own algorithm — two FIFO queues,
+  `QueueEntry` packing, the sky column shortcut — over the same vectors, so a
+  disagreement between it and `light_golden` is a finding about one of the two
+  rather than a flake. 6,084 of 6,084 sections.
+* `light_incremental_mutation` edits an already-lit world and drains again,
+  which is the only thing in the tree that reaches `propagateDecrease`,
+  `removeSourcesBelow`, `checkNode`'s decrease arm or the materialise-then
+  darken wire state. 2,340 of 2,340 sections over five edited worlds. It
+  refuses a golden with fewer than five edited cases and separately requires
+  every edit to move vanilla's own light, so it cannot go vacuous.
+`light_harvest` is NOT in this bucket — see `t1-light-harvest`.
+"""
+measured = """
+Threadripper, 2026-09-05, `cargo test --release`: `light_incremental_golden`
+1.05 s, `light_incremental_mutation` 0.64 s. 1.7 s together.
+
+`ci/light-incremental-falsify.sh` gates the first two and is wired into
+`ci/t0.sh` in its `LIGHT_INCREMENTAL_FALSIFY_DRYRUN=1` form. It asserts BOTH
+verdicts per injection — the mutation check red, the static check pass — so it
+is simultaneously the falsifier for the new checks and the standing evidence
+for the claim that the old one could not have caught them.
+
+"""
+members = [
+    "rustmc-server::test::light_incremental_golden",
+    "rustmc-server::test::light_incremental_mutation",
+]
+
+[[bucket]]
+id = "t0-live-light"
+runs_in = "t0"
+reason = """
+Added by `light-engine-2`, 2026-09-05, when `RUSTMC_SECTION_LIGHT` stopped
+defaulting off and `World::light` stopped being a `OnceLock`.
+
+`live_light_edit` is the only target in the workspace that drives the **server**
+light rather than the engine. It builds a real `World`, sends a chunk, and only
+then edits — which is the order that reddens on the defect it was written for,
+where the light was computed once and every later player edit was invisible on
+the wire. It grades three things nothing else can see:
+
+* the live path against `light_incremental::light_region_with_edits`, which is
+  the form measured at 2,340 of 2,340 post-edit sections against vanilla's own
+  `LevelLightEngine`. **0 of 1,916,928 nibbles** differ, over 9 chunks and 3
+  edits including a solid block put back where air was, so the decrease queue
+  runs. Two positive controls: a withheld edit moves the figure by 2,342
+  nibbles, and the nibble at a placed torch must be its emission of 14 rather
+  than merely different.
+* the `light_update` masks, against the sections whose arrays actually moved
+  between two reads of the **wire** form. 12 named, 12 moved.
+* that `ChunkHolder.broadcastChanges` clears both filters, so a second call
+  owes nothing.
+
+It is in T0 rather than T1 because it is fast and because the thing it guards
+is a default: the wire now carries light on every branch, and a regression in
+the live path is invisible to every other light target in the tree — all of
+which drive the engine directly and none of which construct a `World`.
+"""
+measured = """
+Threadripper, 2026-09-05, `cargo test --release`: 4 tests, 7.6 s, which is the
+`World::generate` calls and not the light. It needs the vanilla extract and
+skips loudly without it, on `section_light_wired`'s contract.
+"""
+members = [
+    "rustmc-server::test::live_light_edit",
+]
+
+[[bucket]]
+id = "t1-chunk-light-capture"
+runs_in = "t1"
+reason = """
+Beside `golden_chunk_packet`, which is in the `t1` golden-vector bucket above
+and which this follows exactly: both need a **capture that does not exist in a
+clean clone and cannot be committed** — 4.6 MB of `level_chunk_with_light`
+bodies from a real vanilla server, Mojang-derived like every other oracle world
+here — and both skip loudly without `RUSTMC_CHUNK_CAPTURE`.
+
+What `golden_chunk_light` grades is the one thing nothing else could: our light
+against **vanilla's own light bytes, in the packet that carries the blocks it
+was computed from**. Both sides read their blocks out of the same 117 packets,
+so our generator is not consulted and no worldgen residual can reach the
+number. 245 of 2,572,288 nibbles on a settled capture at seed 31415926.
+
+It needs a *settled* capture and says so, which is the reason it can never be a
+push gate on a freshly dumped one: vanilla's chunk packet carries light that
+lags its own blocks by the fluid ticks that follow generation, and the same
+instrument charges 5,261 block nibbles on a fresh capture against 55 on one
+taken 120 s later from the same server. `ci/dump-chunks.sh` takes a settle
+time for that.
+"""
+measured = """
+Threadripper, 2026-09-05: 2 tests, 3.3 s with a capture present, instant
+without. Capture taken by `ci/dump-chunks.sh <out> 25591 31415926 120`.
+"""
+members = [
+    "rustmc-server::test::golden_chunk_light",
+]
+
+[[bucket]]
+id = "t1-light-harvest"
+runs_in = "t1"
+reason = """
+RECORDED, and on `session_joint`'s own criterion: "tests that need minutes and
+the extract are T1".
+
+`light_harvest` compares our engine's output against **a real server's saved
+`BlockLight`/`SkyLight` nibbles**, in three dimensions, with both sides
+reading the blocks out of the same region file so no worldgen residual can
+leak into the figure:
+
+    overworld  0 of 6,787,072 nibbles differ   289 chunks   r=8
+    nether     0 of 7,409,664                  289 chunks   r=8
+    the End    5,609 of 1,863,680               81 chunks   r=4
+
+All 5,609 are sky and all are in section -1, the light-only padding section
+below the End's world bottom; the test prints the `(section, vanilla, ours)`
+census itself so the residual arrives attributed.
+
+The nether and the End are in the table because both have `minSectionY == 0`,
+which `docs/AGENT-BRIEF.md` names as the case that hides every off-by-one
+between a mask index and a section Y. The dimension geometry and the sky flag
+are read out of `generated-data/.../dimension_type/<name>.json` rather than
+written down — 26.2's `the_end` says `"has_skylight": true`, contradicting
+every older version, and a hand-written `false` scored 1,079,016 sky nibbles
+wrong while reading exactly like a port defect.
+
+It is here rather than in T0 for one reason and it is measured: reading and
+decoding the three harvests is ~5,500 chunks, and in the DEBUG build `ci/t0.sh`
+uses that costs **112 s** even with the harvests memoised for the life of the
+binary — against 1.7 s for the two T0 light targets together. The engine is
+still gated on every branch by those two; this one re-measures a published
+number, which is a T1 job.
+
+It does NOT skip when a harvest is absent: it panics naming the fix, because a
+light comparison that quietly measures nothing is the defect this repo exists
+to avoid. Its positive control picks the commonest non-air state in each
+harvest's OWN window rather than naming a constant — `minecraft:stone` moves
+0 of 7,409,664 nibbles in the nether, which is a green control measuring
+nothing.
+"""
+measured = """
+Threadripper, 2026-09-05: 38 s `--release` at radius 8/8/4, 112 s in a debug
+build at the default radius of 2. Two tests, 14 assertions.
+"""
+members = [
+    "rustmc-server::test::light_harvest",
+]
+
+[[bucket]]
+id = "t0-player-joint"
+runs_in = "t0"
+reason = """
+The three targets that witness the player wiring end to end, promoted for the
+same reason `session_joint` was and kept in their own bucket so that neither
+reason is read as the other's.
+
+`fall_damage_wire` drives `keep_alive_loop` in SURVIVAL and asserts the
+`set_health` a five-block fall produces. Five ported mechanisms have to meet
+for that packet to exist — `playermove`, `fall`, `hurt`, `health`,
+`playersync` — and each has module tests that pass without the others, so the
+joint is the only thing that can witness it. `fall_damage_agreement` compares
+this crate's two independent transcriptions of
+`LivingEntity.calculateFallDamage` over 20,505 cells; it is an integration
+test only because it reads `data/vanilla/attributes.json`.
+
+**`move_correction` was in the tree and in no bucket.** `origin/player-movement`
+added the target and not the manifest row, so `ci/check-test-targets.py` would
+have reddened T0 on it the moment that branch reached a gate — which is the
+manifest doing exactly its job, and is recorded here rather than fixed
+silently.
+"""
+measured = """
+2.4 s for all three, Threadripper, 2026-09-05, release: `fall_damage_wire`
+2.3 s (four full play-loop runs), `fall_damage_agreement` 0.03 s,
+`move_correction` 0.03 s. Needs `data/vanilla` and not the 3.8 GB extract,
+which is the `session_joint` shape.
+"""
+members = [
+    "rustmc-server::test::move_correction",
+    "rustmc-server::test::fall_damage_wire",
+    "rustmc-server::test::fall_damage_agreement",
+]
+
+[[bucket]]
+id = "standing-red"
+runs_in = "t1"
+reason = """
+RECORDED, in two places. `docs/AGENT-BRIEF.md` names `carved_chunks_match_vanilla`
+(`crates/rustmc-worldgen/tests/golden_carver_chunk.rs::carved_chunks_match_vanilla` (`:130`)) and
+`surface_chunks_match_vanilla` (`.../golden_surface_chunk.rs::surface_chunks_match_vanilla` (`:400`)) as the two
+standing reds and says "They are **not** in `ci/t0.sh`. Do not chase them."
+`ci/checks/t1-known-red.toml:102,122` carries both by signature — count,
+denominator, y bands, confusion table, seed/chunk — so a known red that gets
+worse, gets better, or changes its nature is as red as a third failure.
+
+They are one defect reported twice: 106 blocks of 7,077,888 in the surface
+rule, which the carver stage inherits whole.
+
+**Wiring these into T0 would make T0 permanently red**, and a permanently red
+gate is one nobody reads. They stay in T1, where an adjudicator that
+understands their signature is watching them.
+"""
+measured = """
+Both fail, exactly at their registered signature: `106 of 7077888 blocks differ
+(99.998502% exact)`, `golden_carver_chunk.rs:410` and
+`golden_surface_chunk.rs:862`. That is the signature
+`ci/checks/t1-known-red.toml` declares, so they are reds that are known rather
+than reds that are new.
+
+They are also **480.0 s of the 829.7 s** the 88 unrun targets cost — 58% of the
+whole excluded suite in two targets (235.6 s and 244.4 s). The budget argument
+and the known-red argument point the same way, which is why this bucket is the
+least contentious in the file.
+"""
+members = [
+    "rustmc-worldgen::test::golden_carver_chunk",
+    "rustmc-worldgen::test::golden_surface_chunk",
+]
+
+[[bucket]]
+id = "golden-vectors"
+runs_in = "t1"
+reason = """
+RECORDED, and this is the ONLY bucket that had a reason before the 2026-08-10
+audit. `ci/t0.sh`: "the golden-vector gates live in T1 because they need the
+vanilla extract and take minutes. These need neither and run in about nine
+seconds, which is inside T0's budget."
+
+Note the shape of that sentence: it is framed positively, as a statement about
+where the golden gates live. It was never an audit of what the selector thereby
+excluded, which is why six other buckets went unrecorded underneath it.
+"""
+measured = """
+42 targets, 169.0 s, 103 assertions, 0 failures.
+
+**The recorded reason is measurably wrong about half of what it covers, and the
+half it is wrong about is the larger half.** "Take minutes" is true of three
+targets — `golden_assembly_chunk` 53.7 s, `golden_ocean_floor_wg` 34.6 s,
+`golden_climate_ties` 24.1 s, together 66% of the bucket — and 31 of the 42 run
+in under 2 s.
+
+The extract half of the reason is the binding one and it still holds: these read
+fixtures from `oracle-work/`, which is 3.8 GB of twinned vanilla references that
+T0 exists in order not to need. Nothing here was changed. The measurement is
+recorded so that the next person to argue about it argues against a number
+instead of against the word "minutes".
+"""
+members = [
+    "rustmc-behavior::test::golden_survival",
+    "rustmc-server::test::golden_chunk_packet",
+    "rustmc-worldgen::test::golden_assembly_chunk",
+    "rustmc-worldgen::test::golden_bastion_start",
+    "rustmc-worldgen::test::golden_beard",
+    "rustmc-worldgen::test::golden_biome_zoom",
+    "rustmc-worldgen::test::golden_climate",
+    "rustmc-worldgen::test::golden_climate_ties",
+    "rustmc-worldgen::test::golden_cluster_ruin",
+    "rustmc-worldgen::test::golden_cross_collision_blocks",
+    "rustmc-worldgen::test::golden_decorate",
+    "rustmc-worldgen::test::golden_density",
+    "rustmc-worldgen::test::golden_end_city_walk",
+    "rustmc-worldgen::test::golden_fancy_math",
+    "rustmc-worldgen::test::golden_feature_order",
+    "rustmc-worldgen::test::golden_gaussian",
+    "rustmc-worldgen::test::golden_hash_order",
+    "rustmc-worldgen::test::golden_interpolated",
+    "rustmc-worldgen::test::golden_interpolator_corners",
+    "rustmc-worldgen::test::golden_jigsaw_template",
+    "rustmc-worldgen::test::golden_mth_sin",
+    "rustmc-worldgen::test::golden_named_noise",
+    "rustmc-worldgen::test::golden_end_podium",
+    "rustmc-worldgen::test::golden_fortress_start",
+    "rustmc-worldgen::test::golden_nether_fossil",
+    "rustmc-worldgen::test::golden_noise",
+    "rustmc-worldgen::test::golden_noise_chunk",
+    "rustmc-worldgen::test::golden_ocean_floor_wg",
+    "rustmc-worldgen::test::golden_ocean_ruin_placement",
+    "rustmc-worldgen::test::golden_ore",
+    "rustmc-worldgen::test::golden_pos_rule_test",
+    "rustmc-worldgen::test::golden_rng",
+    "rustmc-worldgen::test::golden_router",
+    "rustmc-worldgen::test::golden_ruin_full_blocks",
+    "rustmc-worldgen::test::golden_ruined_portal_setups",
+    "rustmc-worldgen::test::golden_structure_placement",
+    "rustmc-worldgen::test::golden_structure_starts",
+    "rustmc-worldgen::test::golden_structure_step_index",
+    "rustmc-worldgen::test::golden_structure_template",
+    "rustmc-worldgen::test::golden_surface",
+    "rustmc-worldgen::test::golden_temperature",
+    "rustmc-worldgen::test::golden_template_pool",
+    "rustmc-worldgen::test::golden_village_start",
+    "rustmc-worldgen::test::golden_worldgen_random_wrapper",
+    "rustmc-worldgen::test::nested_feature_rollback",
+    "worldgen-assembly::test::golden_biome_lookup",
+    "worldgen-assembly::test::golden_end_features",
+    "worldgen-assembly::test::golden_nether_features",
+    "worldgen-assembly::test::golden_nether_ruined_portal",
+    "worldgen-assembly::test::golden_biome_tags",
+    "rustmc-entity::test::golden_mob_math",
+    "rustmc-entity::test::golden_mob_path",
+    "rustmc-entity::test::mob_goal_tables",
+    "rustmc-entity::test::brain_tables",
+]
+
+[[bucket]]
+id = "mobs-ground"
+runs_in = "t0"
+reason = """
+The mob AI's ground pathfinding and navigation over a grid level
+(`crates/rustmc-entity/src/testing.rs`), landed by `mobs-goals`. Neither
+target reads the vanilla extract or `data/vanilla`; both are the kind of
+production-wiring witness `t0-joint` describes — the A* over
+`WalkNodeEvaluator` and `GroundPathNavigation.tick` handing waypoints to
+`MoveControl` — and the jar goldens for these classes are deferred by name
+inside them because taking one needs a `Mob` in a `Level`.
+"""
+measured = """
+15 tests, 0.03 s together (Threadripper, 2026-09-04, `cargo test -p rustmc-entity
+--test ground_path --test navigation`, debug profile).
+"""
+members = [
+    "rustmc-entity::test::ground_path",
+    "rustmc-entity::test::navigation",
+]
+
+[[bucket]]
+id = "spawn-tables"
+runs_in = "t0"
+reason = """
+Natural spawning's three generated tables and its decision log, landed by
+`natural-spawning`. They read `data/vanilla/{biome_spawners,spawn_placements,
+entity_spawn_facts}.json` — which `ci/gen-gameplay-tables.sh` writes into every
+gate directory, so they are T0-reachable — and **not** `oracle-work/`, which is
+what puts the goldens bucket in T1. There is no jar golden for either target
+and there cannot be one yet: a live capture of natural spawns needs a mob
+branch in the world and a corpus substrate that is not peaceful, and
+`docs/cold-start/natural-spawning.md` records what that would take. What these
+do check is the transcription's internal consistency, and one of them
+(`draws_match_the_decision_log_over_sixty_four_seeds`) compares the RNG draw
+counter against a count re-derived from the event log, so a draw taken on the
+wrong branch moves one and not the other.
+"""
+measured = """
+29 tests, 0.32 s together (Threadripper, 2026-09-05, `cargo test -p rustmc-entity
+--test spawn_tables --test spawn_decisions --test spawn_state`, debug profile).
+"""
+members = [
+    "rustmc-entity::test::spawn_tables",
+    "rustmc-entity::test::spawn_decisions",
+    "rustmc-entity::test::spawn_state",
+]
+
+[[bucket]]
+id = "enchantments"
+runs_in = "t0"
+reason = """
+The enchantment area's three targets, landed by `enchantments` on 2026-09-06.
+
+`enchantment_registry_order` is the one that had to be in a gate rather than
+in a worktree. It compares the order of `data/vanilla/enchantments.json`
+against the entry ids of `minecraft:enchantment` decoded out of
+`data/vanilla/registries.bin`, which is a capture of a real vanilla server's
+`registry_data` packet — a route sharing no code with the dumper that wrote
+the table. The dumper's first answer for that order was
+`VanillaRegistries.createLookup()`'s iteration, which is the bootstrap's
+registration order (`thorns, unbreaking, swift_sneak, ...`) rather than the
+live registry's sorted one (`aqua_affinity, bane_of_arthropods, ...`), and
+`EnchantmentMenu.slotsChanged` writes `asHolderIdMap().getId()` straight into
+a `DataSlot`. A wrong order there is a wrong id on the wire for all 43 at
+once, and nothing else in the tree looks at it.
+
+`enchanting_offers` and `anvil_cost` gate pure functions over that table:
+`EnchantmentMenu.slotsChanged`'s draw ORDER, asserted through a
+`RandomSource` that records every call with its bound rather than only its
+answer, and `AnvilMenu.createResult`'s six refusal branches, each by name so
+one cannot stand in for another. Both read `data/vanilla/enchantments.json`
+and neither needs the 3.8 GB extract, which is the `t0-joint` shape.
+"""
+measured = """
+40 assertions (2 + 20 + 18), 0.22 s warm together, 26.0 s from cold
+(Threadripper, 2026-09-06, `cargo test -q -p rustmc-server --test
+enchantment_registry_order --test enchanting_offers --test anvil_cost`, debug
+profile).
+"""
+members = [
+    "rustmc-server::test::anvil_cost",
+    "rustmc-server::test::enchanting_offers",
+    "rustmc-server::test::enchantment_registry_order",
+    "rustmc-server::test::workstation_menus",
+]
+
+[[bucket]]
+id = "probes"
+runs_in = "t1"
+reason = """
+unknown.
+
+Nothing in the tree records why these are outside T0. They are not golden-vector
+gates, so `ci/t0.sh`'s recorded reason does not cover them. Five of them
+self-describe as instruments rather than gates
+(`probe_sulfur_gradient.rs:248` "This is a probe, not a gate";
+`probe_find_badlands_mineshaft.rs:17`, `probe_find_village.rs:13`,
+`probe_sulfur_index.rs:31`, `probe_end_city_rows.rs:10`) — which is adjacent to
+a tier statement but is not one, and says nothing about the other fourteen.
+
+Written as `unknown` deliberately. The honest reading is that nobody chose this:
+they are outside T0 because `--lib --bins` cannot reach `tests/`, which is a
+property of a flag rather than a judgement about these tests. Inventing "they
+are exploratory" would turn an accident into a policy nobody is accountable
+for.
+"""
+measured = """
+19 targets, 11.7 s, 19 assertions, 0 failures, 1 ignored. 18 of the 19 finish in
+under 2 s; the slowest is `probe_find_village` at 2.4 s.
+
+So the bucket that has no recorded reason to be excluded is also the cheapest
+one that could be included. That is not an argument for including it — a probe
+that asserts one thing per target buys little — but it does mean the exclusion
+has never been paid for, only inherited.
+
+`probe_sulfur_gradient` executes **zero** assertions: its only test is
+`#[ignore]`d pending a `sulfur_mismatch.json` that no longer exists. It compiles
+and exits 0. That is a target that cannot fail, and it is passing — which since
+2026-08-16 is a **declared** state rather than an undetected one: it is named in
+`[[compile_only]]` at the foot of this file with the argument for keeping it,
+and `ci/check-test-targets.py` reddens on any other target in this bucket
+reaching the same condition.
+"""
+members = [
+    "rustmc-worldgen::test::probe_cluster_boxes",
+    "rustmc-worldgen::test::probe_disk_origin",
+    "rustmc-worldgen::test::probe_end_city_rows",
+    "rustmc-worldgen::test::probe_find_badlands_mineshaft",
+    "rustmc-worldgen::test::probe_find_end_city",
+    "rustmc-worldgen::test::probe_find_village",
+    "rustmc-worldgen::test::probe_main_piece_sand",
+    "rustmc-worldgen::test::probe_ore_overlap",
+    "rustmc-worldgen::test::probe_packed_ice",
+    "rustmc-worldgen::test::probe_placement_vs_servers",
+    "rustmc-worldgen::test::probe_population_seed",
+    "rustmc-worldgen::test::probe_prelim",
+    "rustmc-worldgen::test::probe_ruin_height",
+    "rustmc-worldgen::test::probe_sulfur_gradient",
+    "rustmc-worldgen::test::probe_sulfur_index",
+    "rustmc-worldgen::test::probe_template_properties",
+    "rustmc-worldgen::test::probe_warm7_markers",
+    "rustmc-worldgen::test::probe_warm_ruin_sizes",
+    "worldgen-assembly::test::probe_step6_order",
+]
+
+[[bucket]]
+id = "instruments"
+runs_in = "t1"
+reason = """
+RECORDED, per target, and these are the three that are deliberately not gates
+at all — they measure rather than assert, so running them in T0 would buy
+nothing and cost minutes.
+
+  * `dig_throughput` — `crates/rustmc-server/tests/dig_throughput.rs:3`:
+    "`#[ignore]`d, so it is not in any gate: it is an instrument, and its
+    number only means anything beside the same number taken from a control tree
+    on the same box in the same minute."
+  * `margin_probe` — `crates/rustmc-server/tests/margin_probe.rs:42`:
+    "Env-gated because it generates six worlds up to 13x13 chunks and takes
+    about 90 seconds — too slow for `ci/t0.sh`, and it asserts nothing, which
+    is what makes it an instrument rather than a gate."
+  * `probe_margin_context` — `tools/worldgen-assembly/tests/probe_margin_context.rs:58`:
+    "Env-gated: it generates ten worlds up to 15x15 chunks. An instrument, not
+    a gate."
+
+They are in this bucket rather than in `probes`/`server-integration` because
+their exclusion is the one kind that is genuinely settled: a target that
+asserts nothing cannot gate anything, whichever tier runs it.
+"""
+measured = """
+3 targets, 0.7 s, 2 assertions. `dig_throughput` executes zero assertions (its
+only test is `#[ignore]`d) and `margin_probe`/`probe_margin_context` are
+env-gated, so they exit 0 in 0.1 s without generating anything.
+
+This is the one bucket where a target that cannot fail is the intended design
+rather than a defect, which is why they are separated from `probes` and
+`server-integration`: an instrument that asserted something would be a gate, and
+the files say so themselves.
+
+**And "intended" is now a claim this file has to make out loud.** Since
+2026-08-16 `dig_throughput` is named in `[[compile_only]]` at the foot of this
+file with its argument written out, because a bucket whose `reason` says the
+targets in it are instruments is not the same statement as a per-target
+declaration a checker can adjudicate — this bucket's own membership is proof of
+that, since `margin_probe` and `probe_margin_context` are *not* in the
+compile-only set. They execute a test that returns early and reports `1 passed`,
+so they read as able to fail and are not. That residual is named in
+`[assertions] blind_to` rather than absorbed here: the instrument counts tests,
+not assertions, and the difference is exactly two targets.
+"""
+members = [
+    "rustmc-server::test::dig_throughput",
+    "rustmc-server::test::margin_probe",
+    "worldgen-assembly::test::probe_margin_context",
+]
+
+[[bucket]]
+id = "server-integration"
+runs_in = "t1"
+reason = """
+unknown for seven of the eight; RECORDED for `entity_move`.
+
+`crates/rustmc-server/tests/entity_move.rs:33` is the only file in the tree
+with an explicit which-gate-runs-this section: "**`ci/t1.sh`, not `ci/t0.sh`.**
+T0 is `cargo test --workspace --lib --bins` and that selector does not reach
+`tests/`; T1 is `cargo test --workspace` and does. This is written down because
+the last time a selector failed to reach a target in this tree, nineteen tests
+had never run in any gate and one of them was failing."
+
+For the other seven nothing records a decision. `docs/WORKLIST.md:4686` states
+the *consequence* for `block_entity_round_trip` under the heading "Not in T0,
+and say so rather than let a green imply coverage" — "The round trip must be
+run by hand" — but a consequence is not a reason.
+
+Two of these are invoked by name from falsification scripts
+(`ci/collide-falsify.sh:187` `--test entity_move`,
+`ci/plugin-hook-falsify.sh:68` `--test plugin_tick_lock`), which is evidence
+somebody considers them load-bearing. A falsification script is run on demand
+by an agent, not by a gate.
+"""
+measured = """
+5 targets, 145.2 s, 17 assertions, 0 failures — and the cost is concentrated:
+`tiled_world` 54.4 s, `save_round_trip` 36.7 s, `block_entity_round_trip`
+36.6 s, `decorated_world` 17.5 s are 99% of it. `entity_move` is 1.8 s.
+
+These four heavy ones are genuinely T1-shaped on cost alone, which is a reason
+nobody had written down and now somebody has measured. `entity_move` is the
+odd one out: it is cheap, and it is the single target in the tree whose header
+records a deliberate decision to keep it in T1
+(`crates/rustmc-server/tests/entity_move.rs:33`). That decision stands — this
+audit counted, it did not overturn.
+"""
+members = [
+    "rustmc-server::test::block_entity_round_trip",
+    "rustmc-server::test::decorated_world",
+    "rustmc-server::test::entity_move",
+    "rustmc-server::test::save_round_trip",
+    "rustmc-server::test::tiled_world",
+]
+
+[[bucket]]
+id = "other-integration"
+runs_in = "t1"
+reason = """
+unknown.
+
+Two targets that fit no other bucket. `surface_rule_parse` parses the surface
+rule tree; its header (`:9`) records only that it *skips* when the extract is
+absent, not which tier runs it. `refusal_ratchet` asserts that
+`tools/worldgen-assembly` still refuses what it is supposed to refuse, which
+makes it a gate on a gate; `refusal_ratchet.rs:13` mentions `ci/t0.sh` but as a
+precedent about known reds, not as an exclusion reason.
+
+`refusal_ratchet` is the one whose absence from T0 is most surprising: a ratchet
+that no agent-local gate turns is a ratchet that cannot click until merge.
+"""
+measured = """
+2 targets, 18.8 s, 3 assertions, 0 failures. `refusal_ratchet` is 18.3 s of it
+and `surface_rule_parse` 0.5 s.
+
+`refusal_ratchet` is the interesting one and the measurement is what makes it
+arguable rather than obvious: a ratchet that no agent-local gate turns cannot
+click until merge, but 18.3 s is a third of T0's entire budget for three
+assertions. Left in T1, now with a number attached to the trade rather than an
+intuition.
+"""
+members = [
+    "rustmc-worldgen::test::surface_rule_parse",
+    "worldgen-assembly::test::refusal_ratchet",
+]
+
+[[bucket]]
+id = "protocol-ids-reachability"
+runs_in = "t1"
+reason = """
+RECORDED, by this bucket's own addition. `crates/rustmc-server/tests/
+protocol_ids_reachable.rs`'s module doc names the fault it exists to witness:
+`crate::protocol_ids::shared()` resolved its table relative to the process's
+working directory, and every `cargo test` binary in this workspace runs with
+its own package's `CARGO_MANIFEST_DIR` as that directory rather than the repo
+root, so the lookup failed on every test run regardless of what was on disk.
+It is an integration test under `tests/`, so `ci/t0.sh`'s `--lib --bins`
+selector does not build it, for the same reason the `server-integration` and
+`other-integration` buckets above are in T1 and not T0.
+"""
+measured = """
+1 target, 2 assertions, 0 failures once `crate::protocol_ids::shared()` grew
+its `CARGO_MANIFEST_DIR` fallback; both fail with the fallback reverted —
+`protocol_ids_shared_resolves_under_the_cargo_test_working_directory` on the
+`.expect` naming the loader unreachable, `world_chunk_runs_end_to_end_beside_
+the_block_entity_store_and_its_ids` on the same `.expect` one call later.
+Needs the vanilla extract for the `World::chunk` half only; the id-resolution
+test needs just `data/vanilla/protocol_ids.json` and skips without it, same
+as every other golden-backed test in this crate.
+"""
+members = [
+    "rustmc-server::test::protocol_ids_reachable",
+]
+
+[[bucket]]
+id = "mob-in-world"
+runs_in = "t1"
+reason = """
+RECORDED, by this bucket's own addition. `crates/rustmc-server/tests/
+mob_in_world.rs` is the one instrument that puts a pig and a bat in a real
+flat tile, pairs them to a fake client and ticks them through `mob::tick_all`
+and the real tracker, then reads the bytes: the pairing bundle (add_entity,
+set_entity_data with health 10 at accessor 9, no update_attributes), the
+`update_attributes{movement_speed 0.25}` a tick later, the standing pig's
+y and resting velocity `(0 - 0.08) * 0.98f`, and `Mob.checkDespawn`
+discarding a bat 150 blocks from every player while the pig beside it stays.
+It needs six `data/vanilla` extracts and refuses (panics) without them, and it
+is an integration test under `tests/`, which `ci/t0.sh`'s `--lib --bins` does
+not build — T1, beside the other extract-backed integration tests.
+
+`mob_combat.rs` joined it on 2026-09-05 with the combat half, on the same rig
+and for the same reason: it is the only instrument that reads what a **hit**
+puts on the wire without booting vanilla. Three parts in one function, because
+the entity list and the mob store are process-wide — a hit (damage_event with
+both `+ 1` conventions, the health at accessor 9 on the very next
+`sendChanges`, the `hurtMarked` velocity packet from OUTSIDE the interval
+gate), the invulnerability cooldown (a second equal hit sends nothing; a
+larger one lands for the DIFFERENCE, which is the positive control that stops
+the pair passing for an implementation that refuses every second hit), and a
+kill (entity_event 3 as a four-byte int, the porkchop `add_entity` before the
+orb's, and the corpse leaving on the twentieth tick with the poof before the
+removal). It needs four more extracts than `mob_in_world` — the three loot
+fixtures and `recipes.json` — and panics without any of them.
+"""
+measured = """
+1 target, 1 test (three parts in one function, because the entity list and the
+mob store are process-wide), 3.7 s on ~/rustmc-mobs (Threadripper,
+2026-09-05). Positive control taken before registration: the expected
+attribute id changed from 26 to 25 fails it at the `update_attributes` byte
+compare (`left: [1, 26, 63, 208, ...] right: [1, 25, ...]`); restored, green.
+"""
+members = [
+    "rustmc-server::test::mob_in_world",
+    "rustmc-server::test::mob_combat",
+]
+
+[[bucket]]
+id = "loader-paths-reachability"
+runs_in = "t1"
+reason = """
+RECORDED, by this bucket's own addition. `crates/rustmc-server/tests/
+loader_paths_reachable.rs`'s module doc names the fault it exists to witness:
+`docs/PARITY-ROADMAP.md` §33's census of five more loaders sharing
+`crate::protocol_ids::shared()`'s exact zero-argument, bare-cwd-relative
+shape (`entities::shared_kind_ids`, `power::shared`,
+`attributes::Attributes::shared`, `movement_props::MovementProps::shared`,
+`ops::shared`), fixed in §34. It is an integration test under `tests/`, so
+`ci/t0.sh`'s `--lib --bins` selector does not build it, for the same reason
+`protocol-ids-reachability` above is in T1 and not T0.
+"""
+measured = """
+1 target, 5 assertions, 0 failures once all five loaders grew their
+`CARGO_MANIFEST_DIR` fallback; all five fail with the fallback reverted —
+`entities_shared_kind_ids_resolves_under_the_cargo_test_working_directory`,
+`power_shared_resolves_under_the_cargo_test_working_directory`,
+`attributes_shared_resolves_under_the_cargo_test_working_directory` and
+`movement_props_shared_resolves_under_the_cargo_test_working_directory` each
+on the `.expect` naming the loader unreachable, and
+`ops_level_for_resolves_a_real_file_beside_the_repo_root` on its `assert_eq`
+answering `Level::All` (the fixture never seen) instead of `Level::Admins`.
+The first four skip without their `data/vanilla/*.json` table, same as every
+other golden-backed test in this crate; the fifth manufactures its own
+`ops.json` fixture at the repo root and refuses rather than runs if a real one
+is already there.
+"""
+members = [
+    "rustmc-server::test::loader_paths_reachable",
+]
+
+[[bucket]]
+id = "player-registry-tables"
+runs_in = "t1"
+reason = """
+RECORDED, by this bucket's own addition. Three integration tests added by the
+player-systems branch, each checking a Rust port or reader against a
+`data/vanilla/` table produced by a Golden that reads the pinned jar:
+
+  * `mob_effects_table` — `crate::effects::TickRule` against a PROBE of
+    `MobEffect.shouldApplyEffectTickThisTick` over every effect in the
+    registry, durations 0..=120 and amplifiers 0..=6 plus 32. The point of the
+    probe is that a port checked only by unit tests written from the same
+    `javap` dump is checked against a second reading by the same pair of eyes.
+  * `potions_table` — `crate::potions::Potions` against the 46-row registry,
+    plus a cross-check that every effect a potion names exists in
+    `mob_effects.json` (the two dumpers are independent, so drift between them
+    reds).
+  * `damage_types_table` — `crate::damage_types::DamageTypeRegistry` against
+    the 51-row registry and its 34 tag files, and the finding that
+    `DamageTypeTags` declares 35 `TagKey`s so `minecraft:bypasses_cooldown`
+    is an empty tag.
+
+All three are integration tests under `tests/`, so `ci/t0.sh`'s `--lib --bins`
+selector does not build them, for the same reason `loader-paths-reachability`
+above is in T1 and not T0. Every unit-level claim each of them makes about the
+Rust side is ALSO covered by `#[cfg(test)]` tests in the corresponding module,
+which T0 does run; what only these three add is the comparison against the
+generated table, and that table is not present in a clean clone.
+"""
+measured = """
+3 targets, 10 assertions-bearing test functions, 0 failures on the
+Threadripper in `~/rustmc-player` on 2026-09-05 with all three tables
+generated. Wall time is under 0.01 s for all three combined — they read three
+JSON files and compare in memory — so the exposure-window argument, not cost,
+is why they are in T1.
+
+Shown able to fail rather than asserted to be: with
+`PoisonMobEffect`'s period changed 25 -> 24 in `crate::effects::
+rule_for_class`, `mob_effects_table` reds with
+`minecraft:poison (PoisonMobEffect, Periodic { base: 24 }):
+shouldApplyEffectTickThisTick(duration=24, amplifier=0) is false in the jar and
+true here`. Coverage figures the run prints: 38,720 cells compared over 40
+effects, 6,920 firing, 7 distinct rules exercised; 13 distinct `DamageTags`
+over 51 damage types with per-field counts [19, 1, 2, 1, 0, 8, 1, 3, 1, 30].
+
+All three skip without their table, same as every other golden-backed test in
+this crate, through `rustmc_data::fixture::available` — which PANICS rather
+than skipping under the default `RUSTMC_FIXTURES` mode, so a gate cannot go
+green over a missing table.
+"""
+members = [
+    "rustmc-server::test::damage_types_table",
+    "rustmc-server::test::mob_effects_table",
+    "rustmc-server::test::potions_table",
+]
+
+[[bucket]]
+id = "doctests"
+runs_in = "t1"
+reason = """
+RECORDED — and recorded as an OPEN HOLE rather than as a decision, which is a
+third state this ledger's `reason`/`unknown` split would otherwise flatten.
+
+`docs/CI.md:70`, under the heading "What the gate's own commands can still be
+green over", in a list its own text says was "measured and are **not** closed":
+"**`cargo check --all-targets` does not compile doctests, and T0's `--lib
+--bins` does not run them.** A doctest that does not compile takes T0 to `T0
+GREEN`, measured. T1 catches it ... So the hole is T0-only, and T0 is what an
+agent runs before a push."
+
+So nobody decided to exclude doctests from T0; somebody measured that they are
+excluded, wrote it down as a known hole, and left it open. This bucket exists to
+stop that entry going stale silently: the 12 members are now enumerated, so a
+thirteenth lib crate cannot join the hole without a red gate.
+"""
+measured = """
+12 targets, 2.2 s, and until 2026-08-16 **the whole bucket contained 3
+executable doc examples**: `rustmc-proto` 1, `rustmc-data` 1, `rustmc-api` 1.
+
+**Nine of the twelve targets executed nothing** — eight entirely vacuous
+(0 passed, 0 failed, 0 ignored: `rustmc-world`, `rustmc-behavior`,
+`worldgen-assembly`, `rustmc-entity`, `rustmc-server`, `essentials-core`,
+`permissions`, `worldedit-core`) and `rustmc-worldgen`, whose only fence was
+` ```ignore ` (`crates/rustmc-worldgen/src/trace_switch.rs:52`) and which
+therefore reported 0 passed and 1 ignored. `cargo test --doc` on any of them
+could not fail and reported ok.
+
+The 2026-08-10 note here said this was **not a defect to fix**, on the ground
+that a crate is under no obligation to carry doc examples. That is true of a
+crate and it was the wrong conclusion about a *ledger*: nine of the twelve
+entries in a bucket whose whole subject is an open coverage hole were checks
+that could not fail, and nothing in the tree could tell them from the three
+that could.
+
+All twelve now run an example, so all twelve can go red, and each was chosen to
+document a property that has actually been got wrong somewhere in this problem
+space rather than to satisfy a count — vanilla's `Direction` ordinal order, the
+32-bit `imul` in `Mth.getSeed`, `>> 4` against a truncating divide at a negative
+chunk border, an absolute data path against a `cargo test` binary's own cwd.
+A doc target with no runnable example is now `EXECUTES NO ASSERTION`, and a doc
+target may **not** be declared compile-only in its place: rustdoc does not
+compile an `ignore`d fence, so there would be nothing for that category to be
+true of.
+
+`docs/CI.md`'s hole is unchanged and is still open: T0 runs no doctest, so a
+doc example that stops compiling is still invisible until T1. What has changed
+is that there is now something in each of them for T1 to catch.
+"""
+members = [
+    "essentials-core::doc::essentials_core",
+    "permissions::doc::permissions",
+    "rustmc-api::doc::rustmc_api",
+    "rustmc-behavior::doc::rustmc_behavior",
+    "rustmc-data::doc::rustmc_data",
+    "rustmc-entity::doc::rustmc_entity",
+    "rustmc-proto::doc::rustmc_proto",
+    "rustmc-server::doc::rustmc_server",
+    "rustmc-loot::doc::rustmc_loot",
+    "rustmc-world::doc::rustmc_world",
+    "rustmc-worldgen::doc::rustmc_worldgen",
+    "worldedit-core::doc::worldedit_core",
+    "worldgen-assembly::doc::worldgen_assembly",
+]
+
+[[bucket]]
+id = "growing-world"
+runs_in = "t1"
+reason = """
+Cost, and it is measured rather than assumed.
+
+`crates/rustmc-server/tests/growing_world.rs` is the gate on
+`docs/DETERMINISM.md` §32.6 — a chunk, once delivered, is never written again.
+It generates two ladders over four seed/centre pairs: the growing arm holds one
+canvas and takes it from radius 0 to 1 to 2, and the regenerate arm generates
+each square from scratch, which is what the tree does today. That is the same
+shape and roughly twice the work of `tiled_world`, which this ledger already
+measured at 54.4 s and put in T1 on cost.
+
+It sits beside `tiled_world` deliberately. The two measure different
+properties over the same eight rungs — that file asks whether a delivered chunk
+is independent of the generated extent (§32.4 says it cannot be), this one asks
+whether a delivered chunk is ever written again (§32.6 says it must not be) —
+and its regenerate arm has to reproduce that file's eight numbers, so running
+them in the same tier keeps a divergence between them visible in one log.
+"""
+measured = """
+1 target, 2 tests, 48.1 s of test time (1 m 31 s wall including the build),
+585 MB peak RSS, 0 failures. Threadripper, 2026-08-12, `--test-threads=1`.
+
+That is 88% of `tiled_world`'s 54.4 s for two ladders instead of one, because
+the growing arm carves 81 chunks per ladder where the regenerate arm carves
+155 — `docs/DETERMINISM.md` §35.4. The RSS is the before-snapshot: a rung holds
+every block of `(2r + 3)^2` chunks across the growth, interned to `u32`, which
+is 19 MB at the widest rung and would be ~1 GB as `String`s.
+"""
+members = [
+    "rustmc-server::test::growing_world",
+]
+
+[[bucket]]
+id = "loot-interpreter"
+runs_in = "t0"
+reason = """
+`crates/rustmc-loot`'s `tests/` targets, promoted into T0 on 2026-09-05
+because the crate's entire claim is made there and nowhere else.
+`entity_dispatch` joined them on the same day with the entity parameter set:
+before it, every one of the 94 `minecraft:entities/*` tables refused on a
+missing `this_entity`, so the crate's coverage figure was a statement about
+blocks with an entity-shaped hole beside it that no target read.
+
+The lib target is 813 lines of interpreter with no assertion in it about
+vanilla. `golden_loot` replays the vectors `ci/loot-golden.sh` recorded from
+vanilla rolling its own 1,355 tables; `block_dispatch` asks whether every block
+in the game gets an answer or a **named** refusal; `falsify_loot` is the
+evidence the other two can go red under five plausible mistakes. Under
+`--lib --bins` none of the three is built, so a green T0 on this crate would
+have measured the lib compiling — this ledger's founding defect, landed again.
+
+They are named on their own selector line in `ci/t0.sh`, the rule
+`t0-wiring` established: not "integration tests are T1", but "tests that need
+minutes and the extract are T1". These need neither.
+
+**The other half of this repair is not in this file and is the larger half.**
+Two of the four fixtures they read — `data/vanilla/loot_tables.json` and
+`data/vanilla/item_tags.json` — were produced by no committed step. They existed
+in exactly one worktree on the box, so from a clean checkout `golden_loot` and
+`block_dispatch` panicked on a missing file and the crate's headline figure
+rested on documents nothing in the tree could reproduce. `ci/loot-golden.sh`
+writes all four now, `ci/gen-gameplay-tables.sh` knows the mapping, and the
+generator was verified against the two hand-made files: 1,355 tables and 224
+tags, key sets and values identical, so the vectors taken on them still stand.
+"""
+measured = """
+3 targets, 3 tests, 1.26 s of test time (golden_loot 0.25 s, block_dispatch
+0.13 s, falsify_loot 0.88 s), 519 MB peak RSS, 0 failures. Threadripper,
+2026-09-05, `cargo test --release -p rustmc-loot`, 41.6 s wall including the
+build.
+
+They need `data/vanilla` but not the 3.8 GB `oracle-work` extract, which is the
+`session_joint` shape exactly. The four fixtures cost ~13 s of JVM per
+`ci/loot-golden.sh` run and the generator loop calls it once per table, so a
+tree that has none of them pays ~52 s of one-time setup.
+"""
+members = [
+    "rustmc-loot::test::golden_loot",
+    "rustmc-loot::test::block_dispatch",
+    "rustmc-loot::test::falsify_loot",
+    "rustmc-loot::test::entity_dispatch",
+]
+
+[[bucket]]
+id = "villager-trades"
+runs_in = "t0"
+reason = """
+`crates/rustmc-entity/tests/villager_trade_tables.rs`, landed 2026-09-05 with
+the 26.2 trade tables it reads.
+
+In T0 rather than T1 for the reason `t0-joint` gives and `loot-interpreter`
+repeats: the rule is "tests that need minutes and the extract are T1", not
+"integration tests are T1". This one reads `data/vanilla/villager_trades.json`
+and `data/vanilla/wandering_trader_trades.json`, which
+`ci/gen-gameplay-tables.sh` produces in every tree, needs no `oracle-work`, and
+runs in 0.05 s.
+
+**Under `--lib --bins` a green T0 on this branch would have measured the crate
+compiling**, which is this ledger's founding defect. The trading module's unit
+tests gate the arithmetic — the price clamp, the draw loop, the restock state
+machine — and not one of them reads a row of vanilla's data; every number that
+comes from the registry rather than from our own reader is asserted here and
+nowhere else. It is an integration test rather than a `#[cfg(test)]` module for
+the same reason `command-tree-vanilla` is: the fixtures are 260 KB and the
+crate's 314 unit tests are the ones `--lib` runs on every push whether or not
+`data/vanilla` was ever generated.
+"""
+measured = """
+1 target, 12 tests, 0.05 s of test time, 531 MB peak RSS, 0 failures.
+Threadripper, 2026-09-05, `cargo test --release -p rustmc-entity --test
+villager_trade_tables`, 47.0 s wall including the build.
+
+What it costs is the fixture, not the run: `ci/villager-trade-golden.sh` is
+about 4 s of JVM for two runs plus the comparison, once per tree — the cheapest
+generated table in `ci/gen-gameplay-tables.sh` by a wide margin, because it
+reads packed data out of the jar instead of driving the game.
+
+The 12 assertions are counts from vanilla's own registry (388 listings, 68
+trade sets, 73 pools, 13 professions, 91 datapack entries excluded, 243 item
+stack sizes) and constants from bytecode (the level thresholds,
+`updateTrades`' null branch, the eight over-subscribed sets), so a corrupt or
+stale extract reddens rather than passing quietly.
+"""
+members = [
+    "rustmc-entity::test::villager_trade_tables",
+]
+
+[[bucket]]
+id = "recipe-vectors"
+runs_in = "t0"
+reason = """
+`crates/rustmc-server/tests/recipe_match_golden.rs` and `recipes_table.rs`,
+landed 2026-09-05 with the recipe engine they gate.
+
+In T0 rather than T1 on the `t0-wiring` rule — "tests that need minutes and the
+extract are T1", not "integration tests are T1". Neither needs `oracle-work`;
+both read generated tables (`recipes.json`, `tags_item.json`,
+`recipe_match.json`) that `ci/gen-gameplay-tables.sh` produces in every tree,
+and together they are 1.5 s.
+
+**They are here because the defect they catch has no local symptom.**
+`RecipeManager.getRecipeFor` is `findFirst` over an `ImmutableMultimap` bucket
+built from a `TreeMap` walk, so which of two matching recipes wins is a
+property of the whole table's sort order. 256 of the golden's 1,561 positive
+grids are won by a recipe other than the one they were built from: a table that
+loads every recipe correctly and orders them wrongly fails 256 vectors and
+passes every unit test written from the same reading of the data. Under
+`--lib --bins` neither target is built at all, which is this ledger's founding
+defect and the reason the file says "adding a test target without saying where
+it runs is a red gate".
+
+**Both, and not just the golden.** `ci/recipe-match-falsify.sh` measured why:
+`transmute: material_count defaults to an open range` SURVIVES
+`recipe_match_golden` alone, because the golden's grids come from
+`Recipe.placementInfo()` and a `material_count` of `exactly(1)` produces a
+two-slot grid — the golden structurally cannot present two materials. Only
+`recipes_table::a_transmute_refuses_a_no_op_and_any_foreign_item` sees it. A
+selector naming one of the two would be a gate with a hole its own falsifier
+had already found.
+"""
+measured = """
+2 targets, 11 tests, 1.47 s of test time (recipe_match_golden 0.99 s over 3,378
+vectors, recipes_table 0.48 s), 0 failures. sayer-desktop, 2026-09-05,
+`cargo test -p rustmc-server --test recipe_match_golden --test recipes_table`.
+
+Falsified rather than asserted: `ci/recipe-match-falsify.sh` applies six
+mutations to `crates/rustmc-server/src/recipes.rs`, four of them defects this
+repository shipped, and requires each to redden this pair — **caught 6,
+survived 0, unmatched 0**, then the restored source green. Stubbing
+`getRecipeFor`'s `lastRecipe` branch alone reds 254 of the 3,378 vectors.
+
+The fixture costs ~15 s of JVM per `ci/recipe-match-golden.sh` run, in the same
+loop as every other generated table.
+"""
+members = [
+    "rustmc-server::test::recipe_match_golden",
+    "rustmc-server::test::recipes_table",
+]
+
+[[bucket]]
+id = "explosion-goldens"
+runs_in = "t0"
+reason = """
+`crates/rustmc-server/tests/golden_explosion_ray.rs` and
+`golden_explosion_wire.rs`, landed 2026-09-06 with the explosion port.
+
+Both compare `crates/rustmc-server/src/explosion.rs` against **vanilla's own
+output**, not against a second reading of the same bytecode.
+`ci/explosion-ray-golden.sh` reflectively invokes the private
+`ServerExplosion.calculateExplodedPositions()` on a `ServerExplosion` and a
+`ServerLevel` subclass allocated without their constructors, and
+`ci/explosion-wire-golden.sh` runs `ClientboundExplodePacket.STREAM_CODEC.encode`
+on a real `RegistryFriendlyByteBuf`, and `ci/explosion-entity-golden.sh`
+overrides `Level.clip` on an allocated `ServerLevel` subclass so that
+`getSeenPercent`'s sample origins are recorded rather than reasoned about.
+
+T0 rather than T1 for the `t0-joint` reason: they read
+`data/vanilla/explosion_ray.json`, `explosion_wire.json` and
+`block_explosion.json`, which `ci/gen-gameplay-tables.sh` produces in every
+tree, and they need nothing from the 3.8 GB `oracle-work` extract. Measured on
+threadripper 2026-09-06: 5 tests, **0.02 s** of test time, 535 MB peak RSS,
+96.3 s wall including the release build.
+
+They are integration tests rather than `#[cfg(test)]` modules because the
+generator-arms check requires a reader that names `"data/vanilla/<table>.json"`
+as one quoted literal, and a test file is the honest reader for a table whose
+only consumer today is a comparison — nothing in this server can start an
+explosion yet (`docs/cold-start/explosions.md`).
+"""
+members = [
+    "rustmc-server::test::golden_explosion_ray",
+    "rustmc-server::test::golden_explosion_wire",
+    "rustmc-server::test::golden_explosion_entity",
+]
+
+[[bucket]]
+id = "command-tree-vanilla"
+runs_in = "t0"
+reason = """
+`crates/rustmc-server/tests/command_tree_vanilla.rs`, landed 2026-09-05 with
+the argument-node encoder it gates.
+
+It is in T0 rather than T1 for the reason `t0-joint` gives: the rule is "tests
+that need minutes and the extract are T1", not "integration tests are T1".
+This one reads `data/vanilla/command_tree_full.json`, which
+`ci/gen-gameplay-tables.sh` produces in every tree, and it runs in 0.09 s.
+
+It is an integration test rather than a unit test because it must build a
+`Graph` from a fixture and call the same `encode` production calls — a
+`#[cfg(test)]` module inside `commandtree.rs` could do that too, but the
+fixture is 419 KB and the crate's unit tests are the ones `--lib` runs on
+every push regardless of whether `data/vanilla` was generated.
+"""
+measured = """
+1 target, 7 tests, 0.09 s, 0 failures. Threadripper, 2026-09-05.
+
+What it costs is the fixture, not the run: `ci/command-tree-extract.sh` is
+~32 s of JVM for two runs plus the comparison, once per tree.
+"""
+members = [
+    "rustmc-server::test::command_tree_vanilla",
+]
+
+[[bucket]]
+id = "command-parse-vanilla"
+runs_in = "t0"
+reason = """
+`crates/rustmc-server/tests/command_parse_vanilla.rs`, landed 2026-09-05 with
+the Brigadier `StringReader` transcription it gates.
+
+It answers a question none of the three command-tree gates asks. Those are all
+about the tree a client is SHOWN — the nodes, the property bytes, the numbering,
+the permission filter. None of them constrains what happens when a player types
+a command INTO that tree, and the failure mode there is silent: a parser that
+consumes one character too many leaves the next node reading the wrong input, so
+a present, correctly-spelled command with a working executor answers "unknown
+command". So the recorded quantity is the cursor, not the verdict.
+
+T0 rather than T1 for the same reason `command-tree-vanilla` gives: the rule is
+"tests that need minutes and the extract are T1". This one reads
+`data/vanilla/command_parse.json`, which `ci/gen-gameplay-tables.sh` produces in
+every tree, and it runs in 0.01 s.
+
+An integration test rather than a unit test because it reads a generated
+fixture, which is the same line `command-tree-vanilla` sits on and the same
+reason: the fixture is 140 KB and `--lib` runs on every push regardless of
+whether `data/vanilla` was generated.
+"""
+measured = """
+1 target, 4 tests, 0.02 s, 0 failures. Threadripper, 2026-09-05.
+
+2,889 rows (27 parser configurations over 15 parser names x 107 inputs), 1,113
+accepted / 1,776 rejected by vanilla, 22 distinct accepted cursor positions.
+**2,645 agreed, 0 disagreed, 244 unread.**
+
+That third number is the point of the three-bucket shape: a row is not a claim
+that the port implements the parser. `unread` is `ArgError::Unsupported` — this
+server cannot read that parser — and it is ratcheted against a named constant in
+the test, with a companion test asserting WHICH parser names the residue
+belongs to, and which two of them are DECLARED partial and why, so a parser
+transcribed while another is quietly dropped nets to the same number and is
+still red.
+
+One of the four is the positive control and it is the reason the first is a
+gate: it replays every read row through a parser deliberately made to
+over-consume by one character and requires the comparison to catch **all** of
+them.
+
+What it costs is the fixture, not the run: `ci/command-parse-golden.sh` is ~12 s
+of JVM for two runs plus the comparison, once per tree.
+"""
+members = [
+    "rustmc-server::test::command_parse_vanilla",
+]
+
+[[bucket]]
+id = "command-failure-vanilla"
+runs_in = "t0"
+reason = """
+`crates/rustmc-server/tests/command_failure_vanilla.rs`, landed 2026-09-05 with
+the `Commands.finishParsing` port it gates.
+
+It gates one reply and that reply is the answer for every command that does not
+run: every typo, every root this server has not ported, and every command a
+player lacks permission for. Until it landed all of those were answered with
+silence, which on the wire is indistinguishable from a command that ran and
+printed nothing — and `tools/oracle-runner`'s `chat` projection digests the
+whole packet body, so there is no partial credit for a component that renders
+the same and encodes differently.
+
+T0 rather than T1 for the same reason the two command gates beside it give: it
+reads `data/vanilla/commands_tree.json`, which `ci/gen-gameplay-tables.sh`
+produces in every tree, and it runs in 0.01 s.
+"""
+measured = """
+1 target, 3 tests, 0.01 s, 0 failures. Threadripper, 2026-09-05.
+
+80 rows (16 failing inputs x 5 permission levels). **72 rendered byte-exact, 8
+silent where vanilla was silent, 0 unrendered, 0 disagreements.**
+
+Zero unrendered is a ratchet and not a claim of completeness: the corpus's
+inputs reach the three dispatcher keys and Brigadier's own argument-level table
+(`parsing.int.expected`, `parsing.int.invalid`, `parsing.bool.invalid`,
+`argument.integer.low`, `argument.integer.big`), which is the whole of what this
+server's tree can raise. A `net.minecraft.commands.arguments` type has keys of
+its own, and the first argument this server registers that can produce one takes
+the count to 1 and reds the test.
+
+One of the three is the positive control and it is why the first is a gate: it
+replays every rendered row with the cursor moved by one — the quantity the
+context window, the ellipsis threshold and the red-underlined remainder are all
+derived from — and requires the byte comparison to catch every one.
+"""
+members = [
+    "rustmc-server::test::command_failure_vanilla",
+]
+
+[[bucket]]
+id = "cmdexec-vanilla"
+runs_in = "t0"
+reason = """
+`crates/rustmc-server/tests/cmdexec_vanilla.rs`, landed 2026-10-01 with
+`crate::cmdexec`, the executors for the roots ported after the first ten.
+
+Every reply those executors send — success lines, executor exceptions, the red
+`sendFailure` line, the gray-italic admin broadcast — is compared byte for byte
+with the component vanilla's OWN code built: the command's private message
+lambda invoked by reflection, its static exception type raised, or
+`CommandSourceStack.sendFailure` run on a real stack
+(`CommandsGolden.appendExecutorReplies`). A component that renders the same and
+encodes differently is a red, for the `chat` projection's reason.
+
+T0 for `command-failure-vanilla`'s reason: it reads
+`data/vanilla/commands_tree.json`, which every tree generates, and runs in
+hundredths of a second.
+"""
+measured = """
+1 target, 14 tests, 0 failures. Threadripper, 2026-10-01, `~/rustmc-cmdexec`.
+"""
+members = [
+    "rustmc-server::test::cmdexec_vanilla",
+]
+
+[[bucket]]
+id = "t0-sky-golden"
+runs_in = "t0"
+reason = """
+`sky_golden` replays 513 vectors made by `ci/sky-golden.sh` from vanilla's own
+`AttributeTrackSampler`. It is an integration test rather than a unit one for
+the reason `golden_chunk_packet` is: the vectors are a committed file under
+`crates/rustmc-server/golden/` and the test that reads them belongs beside
+them, not inside the module it checks.
+
+It is in **T0** and not T1 because it is cheap and because of what it guards.
+The rule this manifest already carries is "tests that need minutes and the
+extract are T1"; this one needs milliseconds. It does read
+`data/vanilla/timelines.json`, and that is exactly why it must run in the gate
+every branch runs: **its first ever run skipped all three cases and reported
+three passes**, because the table was not in the derived required set. It is
+now, `ci/sky-falsify.sh` case 0 asserts the skip is announced, and this bucket
+is the third place that mistake is written down.
+
+`crate::sky`'s and `crate::light`'s own unit tests are not named here — they
+are `--lib` and are already covered by T0's selector.
+"""
+measured = """
+3 tests, 513 vectors, 0.00 s of test time. Threadripper, 2026-08-18, in
+`~/rustmc-sky`. The comparison is on raw float bits with no tolerance, so the
+run time is the file read and nothing else.
+
+Zero skips is asserted, not observed in passing: `ci/sky-falsify.sh`'s control
+case fails if any of the three announces `skipping: no vanilla`.
+"""
+members = [
+    "rustmc-server::test::sky_golden",
+]
+
+[[bucket]]
+id = "t1-world-systems-golden"
+runs_in = "t1"
+reason = """
+Added 2026-09-05 with the `world-systems` area: the world border, the
+scoreboard, portal frames, dimension travel, the villager trade table and the
+online-mode crypto and handshake.
+
+Every one of these compares against a **committed golden captured from the
+pinned jar** (`ci/border-golden.sh`, `ci/scoreboard-golden.sh`,
+`ci/portal-golden.sh`, `ci/crypt-golden.sh`) or, for the trades, against the
+datapack extract itself. So each needs a fixture that a clean clone does not
+have, and each gates itself on `rustmc_data::fixture::available` — in the
+default `required` mode a missing fixture is a panic, not a skip, so a tree
+without the extract fails loudly rather than passing empty.
+
+`t1` and not `t0` for the reason the `t1-vanilla-backed` bucket gives: T0 runs
+on every agent push in a tree that may have no `oracle-work`, and a bucket that
+panics there would make T0 unrunnable outside the box. `ci/t1.sh` is a bare
+`cargo test --workspace`, so all seven run at merge.
+
+**They are not slow and that is not why they are here.** The measured figure
+below is the whole bucket; the exposure window is the argument, not the cost.
+"""
+measured = """
+36 tests, 0 failed, in under 0.1 s of test time across the seven binaries
+(Threadripper, rustmc-dims, 2026-09-05, release profile). The comparisons
+behind them: 312 bit-exact border values and 78 captured packets; 18 captured
+scoreboard packets and 45 enum ids; 144 portal-frame fields over 18 frames and 60 spiral positions over 4 walks;
+3,104 trade fields over 388 trades, a 152-byte merchant_offers packet and
+the 65-entry join between the profession registry and the datapack's trade
+sets;
+7 crypto vectors against the JVM; 5 handshake assertions including the two
+refusals.
+
+`golden_float_precision` is the exception to this bucket's fixture rule and
+belongs here anyway: it reads only committed `golden/` files, so it runs in a
+clean clone, and its own second test proves it can go red. It walks 61 files
+and 843 decimal literals in 0.08 s.
+
+Compile time dominates: the eight binaries add ~15 s to a cold
+`cargo test --workspace` and nothing to a warm one.
+"""
+members = [
+    "rustmc-data::test::golden_float_precision",
+    "rustmc-proto::test::crypt",
+    "rustmc-server::test::dimension_travel",
+    "rustmc-server::test::online_login",
+    "rustmc-server::test::portal_shape",
+    "rustmc-server::test::scoreboard",
+    "rustmc-server::test::villager_trades",
+    "rustmc-server::test::world_border",
+]
+
+[[bucket]]
+id = "world-systems-wiring"
+runs_in = "t0"
+reason = """
+`crates/rustmc-server/tests/join_border.rs`, landed 2026-09-05 with the commit
+that made this server send a world border at all.
+
+It answers a question no other target in the tree asks. Every other
+world-systems target is about a **transcription** — does `worldborder.rs`
+encode what vanilla encodes — and all of them were green for a day while
+nothing in the server called any of them. This one is about the **wiring**: it
+drives `world_send::enter_world` and reads the frames a client would, so it
+fails if the packet is absent, if it is in the wrong place in the join
+sequence, or if the border it carries is not the one this process serves.
+
+T0 rather than T1, unlike its `t1-world-systems-golden` neighbours, because it
+reads only `crates/rustmc-server/golden/world_border.json`, which is
+**committed**. A clean clone with no `oracle-work` runs it. That is also why
+it is a separate bucket: `t1-world-systems-golden`'s whole argument is "each
+of these needs a fixture a clean clone does not have", and repeating that
+sentence over a target for which it is false would make the bucket's reason a
+lie rather than an explanation.
+
+An integration test rather than a unit one because `enter_world` is `pub` and
+the frames have to be read back through `rustmc_proto::frame`, which is the
+client's side of the boundary.
+"""
+measured = """
+1 target, 1 test, 0.00 s, 0 failures. Threadripper, rustmc-misc2, 2026-09-05.
+
+The comparison is 39 bytes against vanilla's own
+`ClientboundInitializeBorderPacket` stream codec on a `new WorldBorder()`
+(`golden/world_border.json`, state `fresh`).
+
+Its positive control is inside the same test rather than beside it, and that
+is forced rather than chosen: `worldborder::shared()` is one process-wide cell
+and cargo runs a binary's tests on parallel threads, so a second test that
+mutated it would race this one. The single test sends, mutates the border,
+sends again, and requires the second join to differ from the first AND to
+equal the mutated border's own encoding — without which the file would pass
+just as well against a hard-coded constant.
+"""
+members = [
+    "rustmc-server::test::join_border",
+]
+
+[[bucket]]
+id = "served-dimensions"
+runs_in = "t1"
+reason = """
+`crates/rustmc-server/tests/served_dimensions.rs`, landed 2026-09-05 with the
+commit that made this server able to generate and encode a chunk of the nether
+and of the End.
+
+T1 rather than T0 for the same two reasons `server-integration`'s heavy four
+are there, both measured rather than assumed: it runs the real pipeline
+(`worldgen_assembly::generate::generate_nether` and `_end`, plus the overworld
+control) over three 9-chunk squares, which is 58 s and by far the largest
+single target in `crates/rustmc-server/tests/`; and every one of its four
+tests needs the vanilla extract and the registry capture, so a clean clone
+without `oracle-work` cannot run it at all.
+
+What it asks that nothing else does: `docs/PARITY.md` states the nether and
+the End against vanilla, and every one of those figures was taken on
+`tools/worldgen-dump`'s output. They transfer to the running server only if a
+served chunk is the dump's chunk, and that is a claim about the code BETWEEN
+the generator and the wire — `World::generate_in`'s arm selection, the
+dimension type's section count, the `min_y` offset, the palettes — not about
+the generator, which both sides share. Every one of those steps can disagree
+with the dump while the generator agrees with itself.
+"""
+measured = """
+1 target, 5 tests, 62.3 s, 0 failures. Threadripper, rustmc-dims, 2026-09-05,
+debug profile.
+
+`a_served_chunk_is_the_dumps_chunk` compares **196,608 blocks**: the whole
+column of chunk (0,0) at seed 20260722 in each of the three dimensions
+(16 + 16 + 24 sections x 4,096), served through `World::chunk` -> `encode` ->
+`decode`, against the canvas the dump's own call produced. 0 differ.
+
+`the_tile_grid_serves_all_three_dimensions` closes the gap the other four
+leave: they go through `World::generate_in` directly, and `Tiles` — the
+per-dimension `OnceLock`, the tile grid, the overlay, the region directory —
+sits between that and what `status.rs`'s `chunk_at` closure actually calls. It
+is the first test in this workspace to reach the live chunk source, and it had
+to move cwd to the workspace root to do it: `Tiles::build` reads
+`data/vanilla/...` by relative path, which is correct for a server run from
+the world root and is why nothing had reached it before.
+
+Its positive controls are the arms it does not share with the subject. The
+reference generator is chosen by an explicit `match` in the TEST, so a
+`World::generate_in` that mapped `Nether` onto the overworld arm goes red;
+the section-count assertion takes its number from the dimension type rather
+than from either side; and the two content tests each assert the OTHER
+dimension's signature block is absent (`grass_block` not in the nether,
+`netherrack` not in the End), without which a server that served one world
+under three names would pass all three.
+"""
+members = [
+    "rustmc-server::test::served_dimensions",
+]
+
+[[bucket]]
+id = "dimension-travel-wiring"
+runs_in = "t0"
+reason = """
+`crates/rustmc-server/tests/dimension_travel_wire.rs`, landed 2026-09-05 with
+the commit that made this server able to send a client to another dimension.
+
+Same argument as `world-systems-wiring`, one system along, and the same shape
+of gap: `crates/rustmc-server/src/dimension.rs` carried the portal timer, the
+coordinate scale, the border clamp and the End's constants for a day before
+`crates/rustmc-proto/src/ids.rs` had a `respawn` id at all, so all of it was
+green and none of it could reach a client. A library that encodes correctly
+and is never called produces a client that stays in the overworld, which looks
+exactly like a portal that did not trigger.
+
+T0 rather than T1 for the same reason its neighbour is: it needs no fixture at
+all. `change_dimension` writes into a `Vec`, the frames are read back with
+`rustmc_proto::frame`, and every expectation is derived from
+`Dimension`'s own accessors — no `oracle-work`, no registry capture, no
+extract, so a clean clone runs it.
+"""
+measured = """
+1 target, 4 tests, 0.07 s, 0 failures. Threadripper, rustmc-dims, 2026-09-05.
+
+9 frame ids in `ServerPlayer.teleport`'s own order, taken for both the nether
+and the End; 3 respawn bodies compared whole and required to be pairwise
+distinct; 9 chunks decoded at their dimension's section count; the End's
+arrival position and yaw read back out of the teleport.
+
+Its controls are the pairs, not a separate test. Three dimensions must give
+three DIFFERENT respawn bodies, so an encoder ignoring its `JoinInfo` fails;
+and a 16-section chunk must FAIL to decode as 24, so a section count that was
+being ignored cannot pass as one that is read.
+"""
+members = [
+    "rustmc-server::test::dimension_travel_wire",
+]
+
+[[bucket]]
+id = "structures-live"
+runs_in = "t1"
+reason = """
+Cost for one, and the T0 selector for the other.
+
+`served_structures` generates six windows twice each — through
+`Through::Decoration` and through `Through::Carvers`, the control that makes
+its zeroes mean something — including the server's own 21x21 shipped square at
+`status::WORLD_RADIUS`. That is 121 + 9 + 121 + 625 chunks through every stage,
+twice. It is the same shape as `tiled_world` and it belongs in the same tier
+for the same measured reason.
+
+`structure_census` costs nothing at all: it reads four JSON tables and asserts
+counts. It is here only because `ci/t0.sh`'s `--lib --bins` selector cannot
+build anything in a `tests/` directory, which is this ledger's founding fact
+rather than a decision about this target. If a `t0` bucket for integration
+tests ever exists, this one moves into it first.
+
+`served_vs_vanilla` generates the r=16 parity window once — 33x33 offered,
+37x37 with the margin — and reads two whole vanilla harvests off disk to score
+twelve structure boxes against them, plus two more tests that give their own
+small window to each box vanilla places outside that square and to each
+structure this port DECLARES it refuses. 70 s, and it is the most expensive
+of the three by a wide margin.
+
+All three are named here rather than folded into `server-integration` so that
+the measured block below is about them and does not have to be re-taken when
+an unrelated target in that bucket moves.
+"""
+measured = """
+3 targets, 113.2 s, 12 assertions, 0 failures — Threadripper, release,
+2026-09-05, branch `structures-live`.
+
+`served_vs_vanilla` is 70.3 s over three tests, `served_structures` 42.9 s,
+`structure_census` 0.01 s. `structure_block_entities` (added 2026-10-02) is
+26.8 s: three End generations at r=3 and nine overworld ones at r=1.
+`deep_dark_sculk` (2026-10-02) is 11 s: one 15x15-chunk overworld generation. Every one was run red as well as green: with `Through::Decoration`
+swapped for `Through::Carvers` every `served_structures` test fails on its
+first marker, and `served_vs_vanilla` printed its whole twelve-row table as
+faults before the table was declared — including a coverage fault, which is
+the assertion that stops a comparison scoring zero positions and reading as a
+pass.
+"""
+members = [
+    "rustmc-server::test::deep_dark_sculk",
+    "rustmc-server::test::served_structures",
+    "rustmc-server::test::served_vs_vanilla",
+    "rustmc-server::test::structure_block_entities",
+    "rustmc-server::test::structure_census",
+]
+
+[[bucket]]
+id = "projectile-flight"
+runs_in = "t1"
+reason = """
+RECORDED, and the decision is `entity_move`'s applied to the same shape of
+target one crate over.
+
+`crates/rustmc-server/tests/projectile_flight.rs` drives
+`crates/rustmc-server/src/projectile/arrow.rs` over a hand-built world:
+`Arrow::tick` against a `CollisionShapes` fixture, a `CollisionBlocks` world
+and a `ProjectileTargets` list. It is a `tests/` target, so T0's
+`--lib --bins` selector cannot build it, and it is put in T1 rather than
+promoted to T0 for the reason the header of `tests/entity_move.rs:33` gives:
+T0's selector is the one that failed to reach a target twice in this tree, and
+the answer written down here is to say which gate runs a target rather than to
+widen the selector for one file.
+
+**The module's own unit tests — 35 of them across `math`, `shoot`, `hit`,
+`throwable` and `bow` — ARE in T0**, because they live in `#[cfg(test)]` blocks
+inside the crate. So the constants, the draw counts and the rotation seam are
+gated on every push; only the whole-tick assembly waits for the merge gate.
+
+The two targets are deliberately different instruments and the bucket keeps
+them together so nobody reads one as the other.
+
+`projectile_flight`'s own header states what it is: a **self-consistency**
+harness. Its expectations come from the same reading of `AbstractArrow`,
+`ProjectileUtil` and `BlockGetter.clip` the port was written from, so a green
+run says the port does what this lane believes vanilla does and not that the
+belief is right.
+
+`projectile_golden` is the fidelity half. It compares against vanilla actually
+running the arithmetic, bit for bit, and it covers everything in the
+projectile path that is reachable with no `Level`. What it does NOT reach is
+`ProjectileUtil.computeMargin` (needs a real `Entity`'s `tickCount`),
+`getManyEntityHitResult` (needs `Level.getEntities`) and `AbstractArrow.tick`
+itself (needs a `ServerLevel`); those want the `MoveLevel` treatment
+`ci/entity-move-golden.sh` gives `Entity.collide`, and until they have it the
+26.2 margin ramp is graded only by the self-consistency half.
+"""
+measured = """
+2 targets, 29 tests, 0.06 s, 0 failures. Threadripper, 2026-09-06.
+
+`projectile_golden` (11 tests) compares against
+`crates/rustmc-server/golden/projectile.json`, which
+`ci/projectile-golden.sh` takes by calling the real methods in the pinned jar:
+325 launch directions, 180 `triangle` draws, 225 `lerpRotation` pairs, 41 bow
+power values, 18 crossbow pitches, 55 `AABB.clip` probes, 88
+`VoxelShape.clip` probes and 9 `traverseBlocks` walks totalling 73 cells, all
+bit-exact. **It caught a real defect on its first run** — `clipPoint`'s `h`
+guard is strictly positive (`dconst_0; dload h; dcmpg; ifge`) and this lane
+had written `0.0 <= h`, so a segment starting flush on a face was a hit here
+and a miss in vanilla.
+
+`projectile_flight` (18 tests) is the self-consistency half:
+
+Every case carries a positive control — an input differing in exactly the thing
+under test whose outcome must differ — because a fixture world is the easiest
+place in this tree to write a green that no mutation of the subject can move.
+The six the buckets separate: the block ray (`an_entity_behind_a_wall_is_not_struck`),
+the entity search order (`the_nearer_of_two_entities_is_struck_first`), the
+26.2 margin ramp (`the_margin_ramp_decides_a_near_miss_and_a_flat_zero_point_three_would_not`,
+whose whole point is that a flat 0.3 passes BOTH arms), the `inGround` state
+machine (`an_arrow_whose_block_is_taken_away_falls_again_and_pays_three_draws`
+against `an_arrow_still_in_its_block_does_not_fall_and_takes_no_draws`), the
+despawn counter (`a_stuck_arrow_is_discarded_after_1200_ticks_of_life_and_not_before`),
+and the piercing loop (`a_piercing_arrow_strikes_both_and_survives`).
+"""
+members = [
+    "rustmc-server::test::projectile_flight",
+    "rustmc-server::test::projectile_golden",
+]
+# ---------------------------------------------------------------------------
+# CAN IT GO RED — the second question, added 2026-08-16
+#
+# Everything above answers "does a gate run this target". It cannot answer
+# "and could that run have failed", and when the question was first asked the
+# answer was **20 of the 110 targets could not**:
+#
+#     9 lib/bin unittest binaries with no `#[test]` in them
+#         anvil-probe (bin), essentials-core (lib), goldengen (bin),
+#         permissions (lib), region-differ (bin), rustmc-api (lib),
+#         rustmc-server (bin), worldedit-core (lib), worldgen-dump (bin)
+#     9 doctest targets with no example rustdoc would run
+#         essentials-core, permissions, rustmc-behavior, rustmc-entity,
+#         rustmc-server, rustmc-world, rustmc-worldgen, worldedit-core,
+#         worldgen-assembly
+#     2 `#[ignore]`d instruments
+#         dig_throughput, probe_sulfur_gradient
+#
+# All nine of the first group sit in `t0-unit`, the bucket this file holds up
+# as the covered half, so **T0 declared 22 checks and 13 of them could go
+# red.** They compiled, linked, ran and printed `test result: ok` on every
+# gate this project has run.
+#
+# **The bullet list in commit 186d6f17 said eight, and its own total said 20.**
+# The ninth is `worldedit-core::lib::worldedit_core`, and the discrepancy is
+# the reason the derivation below is mechanical rather than a list somebody
+# typed: a hand-counted decomposition of a hand-counted total is two chances
+# to be wrong about the same thing.
+#
+# All 18 of the first two groups now assert. The two instruments are declared
+# below, by name and with the argument for each.
+#
+# # THE RESIDUAL THIS INSTRUMENT CANNOT SEE, STATED RATHER THAN ROUNDED OFF
+#
+# `ci/check-test-targets.py` counts **tests**, not assertions. A test that
+# executes and asserts nothing therefore reads as red-capable here.
+# `margin_probe` and `probe_margin_context` are exactly that: both are
+# env-gated and return early, so both report `1 passed` and neither can fail.
+# They are named in `blind_to` below. Closing that would need either a
+# coverage instrument or a per-test mutation sweep, and neither is a thing
+# this file can do from source; naming it is the honest alternative to a
+# figure that quietly excludes it.
+
+[assertions]
+# The ratchet. Floors, not exact counts, because adding a check must never be
+# a red gate — what must not happen silently is the number going DOWN.
+#
+# `min_red_capable_*` is at target granularity and `min_runnable_tests_t0` is
+# at test granularity, and both are needed: a target with 588 tests and a
+# target with 1 both count as one target, so the first floor cannot see an
+# `#[ignore]` added to one test of many, and the second cannot see a whole
+# target being switched off if another gained tests the same day.
+min_red_capable_t0 = 22
+min_red_capable_t1 = 108
+min_runnable_tests_t0 = 1622
+
+# What the static derivation was checked against, because a model of what
+# cargo and rustdoc do is not a measurement of it. Re-take with
+# `./ci/check-test-targets.py --calibrate <a cargo test log>`; it refuses on
+# any target where the model and the log disagree, in either direction.
+calibrated_on = "2026-08-16, Threadripper, cargo test --workspace --no-fail-fast over the whole workspace: 110 result blocks, every one agreeing with the static model"
+
+# Targets that execute a test which cannot fail, so are counted as red-capable
+# above and are not. Named because an excluded case nobody wrote down is
+# `unknown`, not an exclusion.
+blind_to = [
+    "rustmc-server::test::margin_probe",
+    "worldgen-assembly::test::probe_margin_context",
+]
+
+[[compile_only]]
+target = "rustmc-server::test::dig_throughput"
+reason = """
+An instrument, `#[ignore]`d, and the file says so itself
+(`crates/rustmc-server/tests/dig_throughput.rs:3`): "it is an instrument, and
+its number only means anything beside the same number taken from a control
+tree on the same box in the same minute."
+
+What a gate gets from it is real and is the whole of what this category
+claims: it drives the **production** dig path through the crate's public API —
+frame decode, tick lock, `player_will_destroy`, `Level.setBlock`, the
+neighbour pass, the change record and the acknowledgement — plus
+`install_global(first_party())` exactly as `status::listen` runs it. A change
+to any of those signatures stops this file compiling, and the gate says so.
+It is not made to assert because a throughput number without its control is
+not a verdict, and `ci/plugin-hook-cost.sh` is the thing that pairs it with
+one.
+"""
+
+[[compile_only]]
+target = "rustmc-worldgen::test::probe_cluster_boxes"
+reason = """
+`#[ignore = "diagnostic; needs oracle-work/van-ruin--58_28, which no tree on
+this box has"]`, and that is the whole of its single `#[test]`. Its two
+references — `van-ruin--58_28` and `van-ruin--57_42` — exist in no tree on this
+box, which is the same reading `ci/checks/t1-positive-controls.toml` records
+for it under `[unforceable]`: the comparison has never been made once, so
+there is nothing for a control to force and nothing for an assertion to grade.
+
+**Not retired, and the distinction is the same one `probe_sulfur_gradient`
+makes.** What is missing is its INPUT, not its property. Its own
+`crates/rustmc-worldgen/tests/probe_cluster_boxes.rs::the_servers_piece_boxes_against_ours` (`:38`)
+carries an `assert!(visited > 0)` written precisely so it "cannot go back to
+being a silent no-op the day somebody removes the `#[ignore]`" — so the assertion
+exists and is waiting on two vanilla references, and the day either is
+regenerated the `#[ignore]` comes off and this entry goes with it.
+
+Declared here rather than left to the bucket's `reason`, for the argument
+`dig_throughput`'s entry makes: a bucket saying its members are instruments is
+not a per-target claim a checker can adjudicate.
+"""
+
+[[compile_only]]
+target = "rustmc-worldgen::test::probe_ruin_height"
+reason = """
+`#[ignore = "diagnostic; its world is /tmp/ruin-w/region, a scratch path no
+gate directory has"]`, its only `#[test]`. `/tmp` does not survive a reboot and
+no gate directory has ever held that path, so — again as
+`ci/checks/t1-positive-controls.toml`'s `[unforceable]` records — the
+comparison has never run here.
+
+Its own header names the repair rather than leaving it implicit: dump a world
+with `ci/dump-chunks.sh` into that path and lift the `#[ignore]`. The tenth
+entry under `max_ignored` in `ci/checks/t1-known-red.toml` names it too, so
+this is the third ledger holding the same fact about it and the first that
+`ci/check-test-targets.py` can read.
+"""
+
+[[compile_only]]
+target = "rustmc-worldgen::test::probe_sulfur_gradient"
+reason = """
+`#[ignore = "needs a sulfur_mismatch.json from a whole-world diff"]`, and that
+file is a whole-world diff's output rather than a fixture anything commits.
+
+**Not retired, and the distinction is the point.** Retiring it would mean the
+property is gone; the sulfur residual is very much alive — `docs/DETERMINISM.md`
+§11 has sulfur/sulfur_spike/cinnabar as 38.0% of the r=16 overworld
+disagreement and §12's decomposition puts it at 63.5% of what remains. What is
+gone is only its *input*. Its own header carries the answer it was written to
+find (2026-07-27: the surface rule is doing what the noise tells it and the
+sulfur feature is placed in the wrong positions), so deleting the file would
+delete a recorded finding to make a count go green.
+
+What the gate gets is that the probe still compiles against the surface-rule
+and noise APIs it reads, so it is still runnable by hand the day somebody
+re-takes a whole-world diff — which is the only thing an `#[ignore]`d target
+can honestly offer.
+"""

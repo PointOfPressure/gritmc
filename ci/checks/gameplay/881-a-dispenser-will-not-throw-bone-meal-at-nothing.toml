@@ -1,0 +1,58 @@
+name = "a-dispenser-will-not-throw-bone-meal-at-nothing"
+about = "bone meal in a dispenser facing open air: the registry's entry for `BONE_MEAL` is an `OptionalDispenseItemBehavior` that calls `BoneMealItem.growCrop` and then `growWaterPlant` on the block in front, and air is neither, so `setSuccess(false)` and the sound is the dry **1001**, followed by the smoke 2000 — the bone meal stays in the dispenser. A server that runs the default behaviour here throws the bone meal out: an `add_entity` and a 1000 instead"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "level_event"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:dispenser"
+
+[[setup]]
+do = "place"
+on = [3, -1, 2]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [4, -1, 2]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:bone_meal"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[setup]]
+do = "place"
+on = [3, 0, 2]
+face = "up"
+
+[[setup]]
+do = "container_click"
+slot = 36
+
+[[setup]]
+do = "container_click"
+slot = 0
+
+[[setup]]
+do = "close_container"
+
+[[step]]
+do = "place"
+on = [4, 0, 2]
+face = "up"

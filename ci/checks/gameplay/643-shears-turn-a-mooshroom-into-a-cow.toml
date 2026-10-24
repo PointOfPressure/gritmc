@@ -1,0 +1,97 @@
+name = "shears-turn-a-mooshroom-into-a-cow"
+about = "shears used on an adult mooshroom convert it: the shear sound on the entity, five red mushrooms, a cow added where it stood and the mooshroom removed at once"
+observe_from = "actor"
+observe = ["sound"]
+within = 576
+settle_ms = 1500
+
+# THE MECHANISM:
+#
+#   MushroomCow.mobInteract  128-191  SHEARS && readyForShearing() (!isBaby)
+#                                     -> shear(level, PLAYERS, stack); SUCCESS
+#   MushroomCow.shear           0-9   level.playSound(null, this,
+#                                     MOOSHROOM_SHEAR, PLAYERS, 1F, 1F) — a
+#                                     sound_entity, to everyone, NOT gated on
+#                                     isSilent (that is Entity.playSound's)
+#                              12-30  convertTo(COW, single(this, false, false),
+#                                     cow -> { particles; five mushrooms })
+#   Mob.convertTo               9-95  COW.create; SINGLE.convert (copyPosition,
+#                                     Silent among convertCommon's copies);
+#                                     the callback; addFreshEntity(cow);
+#                                     discard() — remove_entities at once
+#
+# Observed: the sound (event, PLAYERS, volume 1, pitch 1, on the mooshroom).
+# NOT observed, each for a reason vanilla gives:
+#   add_entity      the cow's carries the mooshroom's yaw (`copyPosition`),
+#                   which `EntityType.create` drew from the unseeded level
+#                   random when the egg hatched it; the five mushroom items
+#                   share the kind and cannot be observed without it
+#   remove_entities the mooshroom's goes out at once, but vanilla's five
+#                   mushrooms TICK — `ItemEntity.tick` merges stacks lying
+#                   within half a block (`mergeWithNeighbours`, every 2 ticks
+#                   while they cross a block line, 40 otherwise), removing
+#                   the absorbed ones inside this window; this server
+#                   ticks them too since train-f (`crate::itementity`), but
+#                   the count of removals is that port's question, not
+#                   this one's
+# `mob_in_world` asserts the items, their positions, the cow and the
+# immediate removal; `654` grades that what stands there is a cow.
+#
+# THE RIG. `083`'s pit: digging [1,-1] and [1,-2] leaves a 1x1 shaft two deep
+# whose floor has no walkable neighbour, so the mob hatched at its bottom never
+# moves — its unseeded stroll and look goals reach nothing observed here. The
+# rig sits -560 blocks out on z, perpendicular to the line the workspaces are
+# laid along (`-(n+1) * 32` on x), alternating sign with its neighbours in this
+# block and 80 further out every pair (640/641 at +-480 ... 652/653 at +-960),
+# so the nearest same-side rig is 64 blocks away on x and 80 on z: nothing it
+# leaves is tracked from another scenario and nothing another leaves is
+# tracked from it — the actor tracks to 64 blocks at view-distance 4. The mob is SILENT
+# (`minecraft:entity_data` `Silent` on the egg, applied by
+# `EntityType.updateCustomEntityTag` through `Entity.load`), because
+# `Mob.baseTick`'s ambient roll (`nextInt(1000) < ambientSoundTime++`, unseeded)
+# can land in any window; `Entity.playSound` refuses every sound of a silent
+# entity and the roll still happens, so its random stream is unchanged.
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, -560.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, -561]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, -561]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:mooshroom_spawn_egg"
+components = [{ type = "minecraft:entity_data", entity = "minecraft:mooshroom", silent = true }]
+
+[[setup]]
+do = "place"
+on = [1, -3, -561]
+face = "up"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, -560.95]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "hold"
+item = "minecraft:shears"
+
+[[step]]
+do = "interact"
+target = "minecraft:mooshroom"

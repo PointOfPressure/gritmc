@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 32
+slug   = "generate-once-costs-more-than-it-buys"
+title  = "Generate-once over one canvas: the extent half is the jar's, the read half zeroes the gate and is measurably further from vanilla — 2026-08-12, branch `worldgen-generate-once`"
+branch = "worldgen-generate-once"

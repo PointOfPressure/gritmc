@@ -1,0 +1,102 @@
+name = "a-carved-pumpkin-on-copper-makes-a-copper-golem"
+about = "the cheapest mob in vanilla — one copper block and one pumpkin — and the copper block becomes a copper chest as it goes"
+observe = ["block_update", "section_blocks_update", "level_event", "set_entity_data", "update_attributes", "sound"]
+settle_ms = 1500
+
+# ============================================================================
+# WHY A GOLEM AND NOT A SPAWN EGG — THIS IS THE FINDING THE BRANCH EXISTS FOR
+# ============================================================================
+#
+# The standing reading is that a mob cannot be put in a measured window
+# reproducibly. `080-spawn-egg-makes-a-mob` is in
+# `ci/checks/gameplay-unstable.toml` at 25 flaps in 25 comparisons over N = 26
+# cold vanilla servers, and `docs/PARITY-ROADMAP.md` §26.4 killed natural
+# spawning at 15/15 pairs over six distinct projections. Both name one cause:
+#
+#   EntityType.create(ServerLevel, PostSpawnProcessor, BlockPos, reason, Z, Z)
+#     offsets  99-115  snapTo(x, y, z,
+#                             Mth.wrapDegrees(level.getRandom().nextFloat()*360), 0)
+#     offsets 118-152  if Mob: yHeadRot = yBodyRot = getYRot()
+#     offset      168  Mob.finalizeSpawn(...)
+#
+# **That is a property of the mechanism, not of the mob.** The same jar has a
+# second way to put a `Mob` in the world:
+#
+#   CarvedPumpkinBlock.spawnGolemInWorld(Level, match, entity, pos)
+#     offsets  0-2   clearPatternBlocks(level, match)
+#     offsets  5-35  snapTo(pos.getX()+0.5, pos.getY()+0.05, pos.getZ()+0.5,
+#                            0.0F, 0.0F)          <- a literal zero
+#     offsets 38-43  Level.addFreshEntity
+#   and no `finalizeSpawn` call anywhere in the method.
+#
+# Measured, `ci/entity-spawn-probe.sh`, N = 6 cold vanilla servers, seed
+# 20260803, Threadripper, 2026-08-12: the spawn-egg control's `y_rot` and
+# `y_head_rot` take six distinct values in six runs and its `set_entity_data`
+# residue takes four; this check's `set_entity_data` and `update_attributes`
+# residues are byte-identical across all six. `docs/PARITY-ROADMAP.md` §30.2
+# has the table.
+#
+# **Do not repeat the claim this header used to carry**, that `finalizeSpawn`'s
+# `random.triangle(0.0, 0.11485)` FOLLOW_RANGE draw "rides `update_attributes`"
+# and is a second reason to prefer this route. The draw is in the bytecode and
+# it does not reach the wire — that attribute is not client-syncable, and the
+# spawn-egg control's `update_attributes` residue is constant across all six
+# runs. §30.3. The literal-zero yaw is the reason; it is sufficient on its own.
+#
+# TWO REASONS THIS IS NOT A DUPLICATE OF 789.
+#
+# **It is a different pattern, and that is what stops either from being
+# passable by a constant.** `BlockPatternBuilder.aisle("^", "#")` with
+# `'#' = Blocks.COPPER_BLOCK` — height two, and one block, against 789's
+# asymmetric T of iron. A server that hard-coded one golem's shape fails the
+# other, which is the same argument `235` and `330` are built on.
+#
+# **It writes a block entity.** `CarvedPumpkinBlock.trySpawnGolem` calls
+# `replaceCopperBlockWithChest` after the spawn, which reads the pumpkin's
+# FACING off the cached `BlockInWorld` and calls
+# `CopperChestBlock.getFromCopperBlock`. The probe recorded
+# `minecraft:copper_chest[facing=north,type=single,waterlogged=false]` at the
+# copper block's position in both runs. `docs/PARITY-ROADMAP.md` §21.5 row 4
+# is "48 block entity types, only `sign` has ever been observed"; this is the
+# second.
+#
+# `CopperGolem` is also the only mob reachable from this substrate that is on
+# §21.2's list of 33 per-mob tick sections proved never to have run. What that
+# moves is a **negative**: `copperGolemBrain` stops being *provably*
+# unpopulated and becomes `unclassified`, which means unknown and must never
+# be read as covered.
+#
+# `CopperGolem.spawn(WeatherState)` is `setWeatherState` then `playSpawnSound`
+# and nothing else — no draw. See 777 for why `add_entity` is not observed.
+#
+# THIS SCENARIO LEAVES A LIVE, WANDERING MOB IN THE WORLD. That is why the two
+# golems are the last checks before `790`, and it is not a theoretical hazard:
+# a third golem check existed on this branch — a snow golem — and it was
+# removed because a snow golem *lays blocks* as it strolls, and its trail
+# landed inside THIS check's projection at x 14..17 in one run of six, flapping
+# it 5 pairs in 15 for no reason of its own. A copper golem and an iron golem
+# write nothing, which is the whole of why these two survived and it did not.
+# `docs/PARITY-ROADMAP.md` §30.4; `ci/checks/gameplay/README.md`.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:copper_block"
+
+[[setup]]
+do = "place"
+on = [1, -1, -1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:carved_pumpkin"
+
+[[step]]
+do = "place"
+on = [1, 0, -1]
+face = "up"

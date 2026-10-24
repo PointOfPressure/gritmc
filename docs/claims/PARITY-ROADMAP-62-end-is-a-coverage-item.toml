@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 62
+slug   = "end-is-a-coverage-item"
+title  = "What is unmeasured in the End: the residual is zero and the coverage is 0.57 of one gateway — 2026-08-18, branch `end-biome-census`"
+branch = "end-biome-census"

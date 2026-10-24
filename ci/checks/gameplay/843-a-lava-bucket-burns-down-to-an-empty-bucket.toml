@@ -1,0 +1,54 @@
+name = "a-lava-bucket-burns-down-to-an-empty-bucket"
+about = "a lava bucket into the fuel slot and raw iron into the ingredient slot of an open furnace. The tick it lights, consumeFuel (offsets 0-42) shrinks the lava bucket to nothing and — only because that emptied it — replaces slot 1 with the item's crafting remainder, Items.LAVA_BUCKET's craftRemainder(BUCKET). broadcastChanges then corrects slot 1 to an empty bucket, not to empty, after the lit=true block update. A server with no remainder deletes the bucket"
+observe_from = "actor"
+observe = ["container_set_slot", "block_update"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:furnace"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:lava_bucket"
+
+[[setup]]
+do = "hold"
+item = "minecraft:raw_iron"
+slot = 2
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+
+[[step]]
+do = "container_click"
+slot = 1
+
+[[step]]
+do = "container_click"
+slot = 32
+
+[[step]]
+do = "container_click"
+slot = 0

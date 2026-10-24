@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 27
+slug   = "checks-that-cannot-fail"
+title  = "The check that cannot go red, mechanised — 2026-08-13, branch `ci-unfalsifiable-root`"
+branch = "ci-unfalsifiable-root"

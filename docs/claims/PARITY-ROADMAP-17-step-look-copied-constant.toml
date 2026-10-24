@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 17
+slug   = "step-look-copied-constant"
+title  = "`Step::Look` was a copied constant, and the instrument that would have caught it did not exist — 2026-08-09, branch `step-look-timing`"
+branch = "step-look-timing"

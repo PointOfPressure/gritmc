@@ -1,0 +1,23 @@
+{
+  "provenance": "recorded",
+  "vanilla": [
+    "me",
+    "help",
+    "list",
+    "msg",
+    "tell",
+    "w",
+    "random",
+    "teammsg",
+    "tm",
+    "trigger"
+  ],
+  "rustmc": [
+    "list",
+    "me",
+    "msg",
+    "tell",
+    "w",
+    "help"
+  ]
+}

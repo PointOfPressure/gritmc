@@ -1,0 +1,513 @@
+# ci/checks/order-blind.toml — what each gameplay check can see
+# about ENTITY ORDER. Written by `ci/order-blind.py --ledger`.
+#
+# `--check` refuses the moment a check becomes CAN-GRADE-ORDER
+# while ci/checks/entity-broadcast-order.json still records our
+# order as differing from vanilla's. That is the whole point: a
+# divergence nobody can see is one nobody has to fix, and it
+# stays unfixed until a scenario lands that happens to see it,
+# at which point it reads as a regression from that scenario.
+#
+# AND SINCE ROADMAP §103 CLOSED IT, `--check` also refuses if
+# that pin ever records the order as differing again. The pin
+# has a `--measure` that rewrites it, and with 0 of 108 checks
+# able to grade this order, a re-measure is the only way a
+# closed divergence could quietly reopen. `broadcast_order_closed`
+# below is that floor. Removing the line disarms the refusal,
+# which is deliberate — it must be a visible edit and not a
+# side effect of running a tool.
+#
+# BLIND-BY-PROJECTION   observes no kind ServerEntity emits.
+#                       Cannot start seeing order by accident.
+# BLIND-BY-POPULATION   observes such a kind, but only ever one
+#                       entity emits it. May stop being blind
+#                       when the scenario's world changes.
+# CAN-GRADE-ORDER       two or more entities, one order-bearing
+#                       kind. Nothing is here yet.
+#
+# `entities_in_one_tick` is an OBSERVATION and not a gate
+# floor, which is why it is not named `max_*`: the gate
+# reads `status`, and a `max_` name here would register as
+# a merge-blocking floor that nothing enforces.
+#
+broadcast_order_closed = true
+N_distinct_recordings = 41
+files = 41
+serverentity_packets = ["ClientboundBundlePacket", "ClientboundMoveEntityPacket", "ClientboundMoveMinecartPacket", "ClientboundProjectilePowerPacket", "ClientboundRemoveEntitiesPacket", "ClientboundRotateHeadPacket", "ClientboundSetEntityDataPacket", "ClientboundSetEntityLinkPacket", "ClientboundSetEntityMotionPacket", "ClientboundSetEquipmentPacket", "ClientboundSetPassengersPacket", "ClientboundUpdateAttributesPacket"]
+order_bearing_kinds = ["move_entity", "move_entity_heartbeat", "move_entity_rot", "remove_entities", "rotate_head", "set_entity_data", "set_entity_link", "set_entity_motion", "set_equipment", "set_passengers", "update_attributes"]
+
+[[check]]
+name = "a-bat-hatched-under-glass-takes-off-at-once"
+file = "086-a-bat-hatched-under-glass-takes-off-at-once.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-bat-left-far-away-despawns-and-a-pig-does-not"
+file = "082-a-bat-left-far-away-despawns-and-a-pig-does-not.toml"
+status = "CAN-GRADE-ORDER"
+watched = ["update_attributes"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 2
+
+[[check]]
+name = "a-boat-is-placed-by-right-clicking-the-world"
+file = "776-a-boat-is-placed-by-right-clicking-the-world.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data", "set_entity_motion"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[[check]]
+name = "a-carrot-on-a-stick-tempts-a-pig-through-its-own-goal"
+file = "085-a-carrot-on-a-stick-tempts-a-pig-through-its-own-goal.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["move_entity", "rotate_head"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-carved-pumpkin-on-copper-makes-a-copper-golem"
+file = "788-a-carved-pumpkin-on-copper-makes-a-copper-golem.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data", "update_attributes"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-carved-pumpkin-on-iron-makes-an-iron-golem"
+file = "789-a-carved-pumpkin-on-iron-makes-an-iron-golem.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data", "update_attributes"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-dropped-item-goes-into-your-inventory"
+file = "350-a-dropped-item-goes-into-your-inventory.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["remove_entities"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[[check]]
+name = "a-dye-colours-a-sheep"
+file = "644-a-dye-colours-a-sheep.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-full-creative-inventory-takes-an-item-and-it-vanishes"
+file = "997-a-full-creative-inventory-takes-an-item-and-it-vanishes.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["remove_entities"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[[check]]
+name = "a-golden-dandelion-locks-a-baby-pigs-age"
+file = "094-a-golden-dandelion-locks-a-baby-pigs-age.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-hopper-catches-what-a-dropper-drops"
+file = "877-a-hopper-catches-what-a-dropper-drops.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["remove_entities"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[[check]]
+name = "a-lead-used-again-on-its-pig-unties-it"
+file = "098-a-lead-used-again-on-its-pig-unties-it.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_link"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-lead-used-on-a-pig-ties-it-to-the-player"
+file = "097-a-lead-used-on-a-pig-ties-it-to-the-player.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_link"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-minecart-sits-on-a-rail"
+file = "775-a-minecart-sits-on-a-rail.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[[check]]
+name = "a-pig-nine-blocks-away-is-still-tempted"
+file = "089-a-pig-nine-blocks-away-is-still-tempted.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["move_entity", "rotate_head"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-pig-spawn-egg-used-on-a-pig-hatches-a-baby"
+file = "093-a-pig-spawn-egg-used-on-a-pig-hatches-a-baby.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put"
+file = "084-a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["move_entity", "rotate_head"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-player-that-leaves-the-ground-is-resynced"
+file = "540-a-player-that-leaves-the-ground-is-resynced.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["move_entity"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-powered-crafter-makes-planks"
+file = "878-a-powered-crafter-makes-planks.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-powered-dropper-drops-its-item"
+file = "873-a-powered-dropper-drops-its-item.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-roosting-bat-sleeps-through-a-player-four-and-a-half-blocks-away"
+file = "087-a-roosting-bat-sleeps-through-a-player-four-and-a-half-blocks-away.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-second-golden-dandelion-after-the-cooldown-unlocks-the-age"
+file = "095-a-second-golden-dandelion-after-the-cooldown-unlocks-the-age.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-spawned-chicken-syncs-its-movement-speed-a-tick-later"
+file = "653-a-spawned-chicken-syncs-its-movement-speed-a-tick-later.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["update_attributes"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-spawned-cow-syncs-its-movement-speed-a-tick-later"
+file = "650-a-spawned-cow-syncs-its-movement-speed-a-tick-later.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["update_attributes"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-spawned-mooshroom-syncs-its-movement-speed-a-tick-later"
+file = "651-a-spawned-mooshroom-syncs-its-movement-speed-a-tick-later.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["update_attributes"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-spawned-pig-syncs-its-movement-speed-a-tick-later"
+file = "081-a-spawned-pig-syncs-its-movement-speed-a-tick-later.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["update_attributes"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-spawned-sheep-syncs-its-movement-speed-a-tick-later"
+file = "652-a-spawned-sheep-syncs-its-movement-speed-a-tick-later.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["update_attributes"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-standing-player-is-rebroadcast-on-a-timer"
+file = "520-a-standing-player-is-rebroadcast-on-a-timer.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["move_entity_heartbeat"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-tempted-pig-in-a-pit-turns-its-head-after-the-player"
+file = "083-a-tempted-pig-in-a-pit-turns-its-head-after-the-player.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["move_entity", "rotate_head"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "a-thrown-item-is-picked-up-when-its-delay-runs-out"
+file = "993-a-thrown-item-is-picked-up-when-its-delay-runs-out.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["remove_entities"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[[check]]
+name = "a-torch-knocked-off-its-block-drops-itself"
+file = "982-a-torch-knocked-off-its-block-drops-itself.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "an-armor-stand-is-placed-as-a-living-entity"
+file = "777-an-armor-stand-is-placed-as-a-living-entity.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data", "update_attributes"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "an-egg-thrown-at-the-ground-breaks"
+file = "659-an-egg-thrown-at-the-ground-breaks.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["remove_entities"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[[check]]
+name = "an-end-crystal-sits-on-obsidian"
+file = "774-an-end-crystal-sits-on-obsidian.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "an-item-frame-hangs-on-a-blocks-side"
+file = "773-an-item-frame-hangs-on-a-blocks-side.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "an-orb-beside-a-player-is-picked-up"
+file = "682-an-orb-beside-a-player-is-picked-up.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["remove_entities"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[[check]]
+name = "an-orb-four-blocks-away-creeps-to-the-player"
+file = "683-an-orb-four-blocks-away-creeps-to-the-player.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["move_entity", "remove_entities", "set_entity_motion"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "an-orb-of-count-two-is-taken-twice"
+file = "684-an-orb-of-count-two-is-taken-twice.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["remove_entities"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[[check]]
+name = "console-rotate-turns-each-target-to-the-angles-given"
+file = "136-console-rotate-turns-each-target-to-the-angles-given.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["move_entity_rot", "rotate_head"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "dropping-an-item-throws-it-on-the-floor"
+file = "500-dropping-an-item-throws-it-on-the-floor.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["remove_entities", "set_entity_motion"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "other-player-is-an-entity"
+file = "080-other-player-is-an-entity.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["move_entity"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "spawn-egg-makes-a-mob"
+file = "080-spawn-egg-makes-a-mob.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "swapping-to-the-offhand-shows-on-both-channels"
+file = "510-swapping-to-the-offhand-shows-on-both-channels.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_equipment"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[[check]]
+name = "two-pigs-in-love-four-blocks-apart-never-breed"
+file = "101-two-pigs-in-love-four-blocks-apart-never-breed.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[[check]]
+name = "two-pigs-in-love-two-blocks-apart-make-a-baby"
+file = "099-two-pigs-in-love-two-blocks-apart-make-a-baby.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["set_entity_data"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 1
+
+[[check]]
+name = "two-thrown-stones-merge-and-are-picked-up-as-one"
+file = "996-two-thrown-stones-merge-and-are-picked-up-as-one.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["remove_entities"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[[check]]
+name = "walking-away-drops-a-standing-player-from-view"
+file = "530-walking-away-drops-a-standing-player-from-view.toml"
+status = "BLIND-BY-POPULATION"
+watched = ["remove_entities"]
+# NOT a floor: the count of distinct entities this check
+# has been seen to observe on one order-bearing kind in
+# ONE TICK. The gate reads `status`, never this.
+entities_in_one_tick = 0
+
+[summary]
+checks = 360
+blind_by_projection = 313
+blind_by_population = 46
+can_grade_order = 1

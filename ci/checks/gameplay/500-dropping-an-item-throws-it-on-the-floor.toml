@@ -1,0 +1,27 @@
+name = "dropping-an-item-throws-it-on-the-floor"
+about = "pressing Q turns a held item into an item entity in front of the player and empties the slot it came from — the first check whose measured step is an inventory action rather than a block, so it fails for a server that can put items into a player and not take them out"
+observe_from = "actor"
+observe = [
+    "add_entity",
+    "set_entity_motion",
+    "container_set_slot",
+    "container_set_content",
+    "take_item_entity",
+    "remove_entities",
+]
+settle_ms = 3000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+# `DROP_ITEM` is action 4 in `ServerboundPlayerActionPacket$Action`. It names
+# no block, carries `BlockPos.ZERO` and is never acknowledged — see
+# `scenario::player_action` for why the ordinals are written out.
+[[step]]
+do = "drop"

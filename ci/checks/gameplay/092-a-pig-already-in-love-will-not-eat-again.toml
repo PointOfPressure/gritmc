@@ -1,0 +1,82 @@
+name = "a-pig-already-in-love-will-not-eat-again"
+about = "a second carrot used on a pig that is already in love does nothing at all: canFallInLove is false while inLove > 0, an adult cannot age up, AgeableMob.mobInteract only knows the golden dandelion, so Mob.interact answers PASS, nothing eats, no hearts, no server swing"
+observe_from = "actor"
+observe = ["entity_event", "animate"]
+within = 256
+settle_ms = 1500
+measured_step = "silent"
+
+# THE MECHANISM, read from the pinned jar:
+#
+#   Animal.canFallInLove         0-12  inLove <= 0
+#   Animal.mobInteract          33-42  age == 0 && canFallInLove()  -> false
+#                               66-70  canAgeUp() = isBaby() && !isAgeLocked()
+#                                      -> false for an adult
+#                              113-119 AgeableMob.mobInteract
+#   AgeableMob.mobInteract       6-19  canUseGoldenDandelion -> false (a carrot)
+#                               44-50  PathfinderMob/Mob.mobInteract -> PASS
+#   Player.interactOn          107-204 stack.interactLivingEntity -> PASS
+#
+# The first interact is `091` again and speaks (hearts, swing); the measured
+# second one, 250 ms later and well inside the 600-tick love, must say
+# nothing. A server that re-fed the pig — or that counted the love down on
+# the wrong clock — sends a second `entity_event 18` and a second `animate`.
+
+# THE RIG, AND WHY IT IS OUT HERE. The pit is `083`'s: digging [1,-1] and
+# [1,-2] leaves a 1x1 shaft two deep whose floor has no walkable neighbour, so
+# every path a pig in it is ever given is its own node and it never moves —
+# its unseeded `RandomStrollGoal` and look goals cannot reach anything this
+# check observes. The rig sits -240 blocks out on z, past `083`-`089`'s
+# rigs at +-80 and +-160 and alternating sign with its neighbours here (same
+# sign 64 apart on x and 80 on z), so no other scenario's mob is tracked from
+# it and nothing it leaves is tracked from theirs: the actor tracks to 64
+# blocks at view-distance 4. `within` is opened to reach the rig; the observer
+# stays at the workspace and tracks none of it, hence `observe_from = "actor"`.
+# Coordinates in the steps carry the offset.
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, -240.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, -241]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, -241]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [1, -3, -241]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:carrot"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, -239.95]
+
+[[setup]]
+do = "wait"
+ms = 1500
+
+[[step]]
+do = "interact"
+target = "minecraft:pig"
+
+[[step]]
+do = "interact"
+target = "minecraft:pig"

@@ -1,0 +1,30 @@
+name = "a-named-furnace-opens-under-its-name"
+about = "945's rule on the other branch of BaseContainerBlockEntity: a furnace placed from a stack carrying minecraft:custom_name (\"Kiln\") opens titled \"Kiln\", not container.furnace. AbstractFurnaceBlock.openContainer opens the block entity as its own MenuProvider, so the title is the same getDisplayName as a chest's. What would make this fail: a name taken only by chests (the one kind 945 reaches) — a furnace then opens under its default title."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_entity_data"]
+settle_ms = 1000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:furnace"
+components = [{ type = "minecraft:custom_name", text = "Kiln" }]
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

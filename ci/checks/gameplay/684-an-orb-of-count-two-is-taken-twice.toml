@@ -1,0 +1,21 @@
+name = "an-orb-of-count-two-is-taken-twice"
+about = """
+an orb whose `Count` is 2 — what two merged orbs become — is taken twice, two
+ticks apart, and removed only after the second take; the player gains its
+value each time
+
+`playerTouch` decrements `count` and discards only at zero, and sets
+`takeXpDelay = 2`, which `Player.tick` counts down before the next touch: so
+the actor's stream carries `take_item_entity`, `set_experience` (3), then two
+ticks later `take_item_entity`, `remove_entities`, `set_experience` (6). A
+server that discarded on the first take, ignored the count, or ignored the
+delay and took both in one tick produces a different sequence.
+"""
+console_restore = ["xp add oracle -1000000 levels"]
+observe_from = "actor"
+observe = ["add_entity", "take_item_entity", "remove_entities", "set_experience"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "execute at oracle run summon minecraft:experience_orb ~1 ~ ~ {Value:3,Count:2}"

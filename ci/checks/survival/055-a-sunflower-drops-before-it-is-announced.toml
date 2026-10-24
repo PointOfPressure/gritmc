@@ -1,0 +1,46 @@
+name = "a-sunflower-drops-before-it-is-announced"
+about = """
+A survival dig of a sunflower's lower half. `DoublePlantBlock.playerWillDestroy`
+offsets 26-37 roll the drop there — `dropResources(state, level, pos, null,
+player, mainHand)` — BEFORE `super.playerWillDestroy` sends the dug block's
+2001 to everyone but the digger, and before `removeBlock`.
+`DoublePlantBlock.playerDestroy` then rolls `Blocks.AIR`'s table, so there is
+one sunflower, not two. Destroy time 0: it breaks on START. The removal's
+shape cascade turns the upper half to air through `destroyBlock`, a
+three-argument 2001 that reaches the digger too; the upper half's own table
+drops nothing (`half=lower` condition). So the observer sees the drop's
+`set_entity_data` before the lower half's level_event. What would make it
+fail: a drop rolled in `playerDestroy` lands after the 2001; a server rolling
+both lands two sunflowers.
+"""
+console_restore = ["clear oracle"]
+observe_from = "both"
+observe = ["set_entity_data", "level_event", "block_update", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "console"
+text = "clear oracle"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:sunflower"
+
+[[setup]]
+do = "place"
+on = [3, -1, 0]
+face = "up"
+
+[[setup]]
+do = "wait"
+ms = 300
+
+[[step]]
+do = "dig"
+at = [3, 0, 0]
+face = "up"

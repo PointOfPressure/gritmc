@@ -1,0 +1,26 @@
+name = "console-teleport-with-a-rotation-turns-the-target"
+about = """
+`execute at oracle run tp oracle ~ ~ ~ 90 ~` from the console sends the actor
+one `player_position` with every position bit relative and a zero delta,
+the yaw ABSOLUTE at 90, and the pitch relative at zero
+
+With a rotation argument `TeleportCommand.getRelatives` uses
+`Relative.rotation(yRelative, xRelative)` instead of `Relative.ROTATION`, so
+only the `~` angle keeps its bit, and the angles come from
+`rotation.getRotation(source)` — after `execute at oracle` the source's
+rotation is the actor's, so `~` is the actor's own pitch, which
+`performTeleport` turns into a zero delta. A server that dropped the rotation
+sends both rotation bits and a zero yaw; one that resolved `~` against the
+console sends a non-zero pitch. The rest of the body after the position is
+digested, so the angles and the mask are compared byte for byte.
+
+Level 2, through the console. The restore teleports the actor onto itself.
+"""
+console_restore = ["tp oracle oracle"]
+observe_from = "actor"
+observe = ["player_position", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "execute at oracle run tp oracle ~ ~ ~ 90 ~"

@@ -1,0 +1,56 @@
+name = "lava-poured-onto-water-beside-a-water-source-becomes-obsidian"
+about = "a lava bucket emptied into a cell of flowing water that touches a water source turns into obsidian on the spot, with the lava fizz — LiquidBlock.onPlace -> shouldSpreadLiquid, the source-or-flowing test on the LAVA (a lava source makes obsidian), levelEvent 1501, and Level.setBlock skipping the outer write's updates once onPlace has rewritten it"
+observe = ["block_update", "section_blocks_update", "block_changed_ack", "level_event", "sound"]
+settle_ms = 2000
+# # The rig
+#
+# Two cells dug at (1, -1, 0) and (1, -1, 1). Water is poured into the first
+# in setup and, 5 ticks later, flows into the second at level 1. The step
+# pours LAVA aimed at the second (yaw -45, pitch 46 crosses y = 0 at
+# (1.106, 1.106) and meets the floor at (1.789, -1, 1.789)); the full
+# bucket's `Fluid.NONE` ray passes through the flowing water to the floor, so
+# the target is that cell. Flowing water is replaceable, so `emptyContents`
+# writes a lava SOURCE there with flags 11, and `LiquidBlock.onPlace` finds
+# the water source to its north (`POSSIBLE_FLOW_DIRECTIONS` SOUTH ->
+# `pos.relative(NORTH)`) and writes obsidian before the outer write returns.
+#
+# What the client sees is the obsidian, the fizz at that cell, and the
+# empty-lava sound for the observer. No lava block is ever broadcast.
+
+[[setup]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "look"
+yaw = -74.5
+pitch = 54.5
+
+[[setup]]
+do = "hold"
+item = "minecraft:water_bucket"
+
+[[setup]]
+do = "use_item"
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "look"
+yaw = -45.0
+pitch = 46.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:lava_bucket"
+
+[[step]]
+do = "use_item"

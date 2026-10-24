@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 22
+slug   = "use-table-probe-dependence"
+title  = "`use_without_item.json` is 122/184 a reading of the probe and 17/184 wrong — 2026-08-11, branch `golden-probe-audit`"
+branch = "golden-probe-audit"

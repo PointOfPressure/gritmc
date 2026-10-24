@@ -1,0 +1,15 @@
+[package]
+name = "rustmc-loot"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde_json.workspace = true
+# For `LegacyRandomSource` — vanilla's `java.util.Random`, which is what
+# `RandomSource.create(long)` returns and therefore what every loot roll draws
+# from. Taken from the worldgen crate on purpose: it is already golden-tested
+# there, and a second copy of a random source is exactly the duplicated-pipeline
+# fault ORACLE.md 5b keeps catching.
+rustmc-worldgen = { path = "../rustmc-worldgen" }

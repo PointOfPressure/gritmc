@@ -1,0 +1,49 @@
+name = "a-shift-clicked-book-goes-onto-the-enchanting-table"
+about = "a shift-clicked book from the hotbar takes `EnchantmentMenu.quickMoveStack`'s last arm (offsets 113-185): not lapis, slot 0 empty and accepting, so ONE item is `copyWithCount(1)` into slot 0 by `setByPlayer` and the source shrinks — which runs `slotsChanged`, so the offers of 840 arrive from the same click"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1000
+
+# EnchantmentMenu: item 0, lapis 1, then the 36 — hotbar 0 is 2 + 27 = 29.
+# Ten data slots: costs 0..2, the seed at 3, enchantClue 4..6, levelClue
+# 7..9. The seed is `Player.enchantmentSeed`, 0 for a player with no save
+# file — which every corpus actor is — so the offers are a function of the
+# item and the bookshelf count (none here) and nothing else.
+# That holds only until the connection's player first enchants: one enchant
+# redraws the seed from the unseeded `Player.random`, and every later offer on
+# that connection is unreproducible. So this file sorts BEFORE the one
+# scenario that enchants (849); recorded after it (as 843) it diverged on the
+# seed slot alone, r6, 2026-10-01.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:enchanting_table"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:book"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 29
+input = "quick_move"

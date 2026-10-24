@@ -1,0 +1,28 @@
+name = "a-fire-being-lit-is-heard-by-everyone-else"
+about = "`FlintAndSteelItem.useOn` offsets 159-185 play `item.flintandsteel.use` with the *player* in `Level.playSound`'s entity slot, so `PlayerList.broadcast` skips the striker and everybody else hears it — and it plays at `relPos`, the fire's own block, not at the block that was clicked. This is `320` from the other side: the same step, the observer's stream, and the one kind `320` structurally cannot see. It exists because a comment in `crates/rustmc-server/src/itemuse.rs` said this event was unhearable in this corpus and the recordings say it is heard 30 times."
+observe_from = "observer"
+observe = ["sound"]
+settle_ms = 2000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:flint_and_steel"
+
+[[step]]
+do = "place"
+on = [2, 0, 0]
+face = "up"

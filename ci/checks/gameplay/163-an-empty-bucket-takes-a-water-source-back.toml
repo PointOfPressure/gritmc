@@ -1,0 +1,44 @@
+name = "an-empty-bucket-takes-a-water-source-back"
+about = "an empty bucket aimed at a still water source picks it up: the source becomes air and the bucket-fill sound is played for everyone but the player — BucketItem.use's SOURCE_ONLY ray, LiquidBlock.pickupBlock (level 0 only, setBlock flags 11) and getPickupSound through player.playSound"
+observe = ["block_update", "section_blocks_update", "block_changed_ack", "sound"]
+settle_ms = 1500
+# Both clients: the fill sound goes through `Player.playSound`, which is
+# `level.playSound(this, ...)` — the user is EXCLUDED and only the observer
+# hears it. A server that sent it to the actor, or to nobody, differs here.
+#
+# # The rig
+#
+# One cell dug at (1, -1, 0) and filled in setup, so the source is enclosed by
+# grass and dirt and never spreads. The same aim as 161 (yaw -74.5,
+# pitch 54.5): an EMPTY bucket's ray is `ClipContext.Fluid.SOURCE_ONLY`, and
+# meets the source's own surface — `FlowingFluid.getShape`, a box 8/9 high —
+# at (1.190, -0.111, 0.330), inside the same column. A full bucket's ray would
+# have passed through it.
+
+[[setup]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "look"
+yaw = -74.5
+pitch = 54.5
+
+[[setup]]
+do = "hold"
+item = "minecraft:water_bucket"
+
+[[setup]]
+do = "use_item"
+
+[[setup]]
+do = "wait"
+ms = 750
+
+[[setup]]
+do = "hold"
+item = "minecraft:bucket"
+
+[[step]]
+do = "use_item"

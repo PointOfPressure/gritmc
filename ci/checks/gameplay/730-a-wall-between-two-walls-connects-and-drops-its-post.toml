@@ -1,0 +1,108 @@
+name = "a-wall-between-two-walls-connects-and-drops-its-post"
+about = "closing the gap between two lone walls connects all three and takes the post off the middle one — the corpus's first look at the `WallBlock` schema, which is 32 blocks and 10,368 of the registry's 32,366 block states"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 1500
+
+# WHY THIS BLOCK AND NOT ANOTHER.
+#
+# `docs/PARITY-ROADMAP.md` §41 measures the block-state denominator and finds
+# it is a Cartesian product: for all 1,196 blocks in the pinned jar's
+# `generated/reports/blocks.json`, `len(states) == prod(len(domain))` with
+# **zero exceptions**, so 32,366 carries no information beyond 116 distinct
+# property-set schemas and how many blocks share each. The schema this check
+# reaches is the largest of the 116 by a factor of two:
+#
+#   32 blocks x 324 states = 10,368 states = 32.0% of the whole denominator
+#   props: east, north, south, up, waterlogged, west
+#
+# and before this file the corpus had never observed one of its states. That
+# is the reason to write it. Placing 32 wall blocks and asserting nothing
+# would move the same number further and prove less.
+#
+# FROM THE JAR. `javap -p -c -constants` on
+# `net/minecraft/world/level/block/WallBlock.class`, pinned server-26.2.jar.
+#
+#   makeWallState(boolean connected, VoxelShape above, VoxelShape side)
+#      0: iload_1 / 1: ifeq 20
+#     20: WallSide.NONE     areturn        <- not connected
+#      6: isCovered(above, side) : ifeq 16
+#     12: WallSide.TALL     areturn        <- connected, covered from above
+#     16: WallSide.LOW      areturn        <- connected, open above
+#
+# So a side is a **tri-state**, not a boolean, and this check pins the
+# NONE -> LOW arm only. `731` pins LOW -> TALL, and it exists because a
+# server that writes LOW down as a constant passes this file for ever —
+# see the "some checks exist because another one could not fail" paragraph
+# in this directory's README.
+#
+#   shouldRaisePost(BlockState above, BlockState self, VoxelShape aboveShape)
+#      7: above is a WallBlock && above.getValue(UP) : iconst_1 ireturn
+#     41..145  otherwise: read NORTH, SOUTH, EAST, WEST and compare each
+#              against WallSide.NONE
+#
+# The post is therefore a function of the four sides, and the *straight run*
+# is the case that turns it off. That is what makes the middle position the
+# interesting one and the two ends the control: after the measured step the
+# middle wall has east and west connected and north and south NONE, and the
+# two outer walls have exactly one connection each.
+#
+# WHAT VANILLA ACTUALLY SAYS. Measured, not predicted — `ci/place-subset-probe.sh`,
+# 2026-08-12, cold vanilla 26.2 on the Threadripper:
+#
+#   block_update           [2,-1,1]  minecraft:grass_block[snowy=false]
+#   block_update           [2, 0, 1] cobblestone_wall[east=low,west=low,up=false,...]
+#   section_blocks_update  [2,0,1] east=low  west=low  up=FALSE
+#                          [1,0,1] east=low            up=true
+#                          [3,0,1]           west=low  up=true
+#
+# **Both packet kinds appear, and the `block_update` pair is not the mechanism.**
+# It is the placing client's own correction — the position clicked and the
+# position written — while the three-entry `section_blocks_update` is the
+# broadcast that carries the connection. Observing only `block_update` would
+# therefore see the placement and miss the entire point of the check; eight
+# checks were reported `inert` on 2026-08-03 for exactly that, and a wall
+# connecting is the multi-block shape that rule is about.
+#
+# The middle wall at `up=false` against both ends at `up=true` is
+# `shouldRaisePost`'s straight-run test firing, and it is the asymmetry that
+# makes this check unfakeable by a server that connects sides without
+# recomputing the post.
+#
+# WHAT WOULD MAKE THIS COME BACK RED. A server that places the wall and does
+# not run `updateShape` on its neighbours emits **one** block change where
+# vanilla emits three. A server that connects the sides but leaves `up` at
+# its placement default emits three changes with the middle state wrong. The
+# check cannot be passed by a server that treats a wall as an inert cube.
+#
+# THE RIG IS ENTIRELY AT RELATIVE z = +1, one block clear of the chunk
+# boundary at z = 0, per this directory's README.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:cobblestone_wall"
+
+# Two lone walls with a one-block gap between them. Each is placed on the top
+# face of the superflat ground at y = -1, so each wall lands at y = 0. They
+# are two apart and cannot see each other, so both are all-NONE with the post
+# up.
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [3, -1, 1]
+face = "up"
+
+# The measured step closes the gap. The wall that lands at [2,0,1] connects
+# east and west; both neighbours gain one connection each.
+[[step]]
+do = "place"
+on = [2, -1, 1]
+face = "up"

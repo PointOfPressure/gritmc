@@ -1,0 +1,582 @@
+# What has ever been shown to make each T1 test binary fail.
+#
+# A RATCHET, in the shape of `t1-known-red.toml`, not a pass list.
+# `ci/check-t1-controls.py` reads this. `demonstrated` may be RAISED freely;
+# lowering it means a control stopped working and has to be explained in the
+# same commit, and a binary moving from a demonstrated grade to `instrument` is
+# as red as a declared red that stopped failing.
+#
+# # THE QUESTION THIS ANSWERS
+#
+# `docs/PARITY-ROADMAP.md` §73.7 counted, over T1's 80 test binaries, how many
+# have a positive control — anything ever shown to make them fail. Five are
+# named by a falsifier in `ci/`, one carries a real control in its own file,
+# and **74 have neither**. §73.7 is careful about what that does and does not
+# mean: not that the 74 are worthless, but that "for 74 binaries nobody has
+# ever demonstrated a red, so nobody knows which of them are in the same state
+# `can_survive_matches_vanilla_where_both_sides_answer` was in an hour ago".
+#
+# Every figure below is a measurement, not an argument. §84 has the method.
+#
+# # THE GRADES ARE ORDERED, AND THE WEAKEST IS NOT ENOUGH ALONE
+#
+#   absent            the fixture is moved aside and the binary goes red
+#   perturbed         ONE number inside the fixture is changed and it goes red
+#   perturbed+rebuild same, for a fixture `include_str!` bakes into the binary
+#   sabotage          a named wrong implementation makes it go red
+#
+# 59 of the 78 were forced by fixture (40 `absent`, 19 `perturbed`), 4 by
+# sabotage (`golden_rng`, `plugin_storage`, `ground_path`, `navigation`) and 1
+# by perturb-and-rebuild (`random_tick_pos`). 64 demonstrated; the other 14 are
+# the three classes below, each named individually.
+#
+# §73.4 graded 70 tests by removal alone, and §73.7 says of that method that it
+# "is by fixture removal, which is one axis and not the only one". The reason
+# to care is exact: **a binary that goes red when its golden file is deleted
+# has proved that it opens the file, and nothing more.** A test that loads a
+# vector and never compares it fails in precisely the same way. `perturbed` is
+# the grade that tells those apart and it costs one integer.
+#
+# # AND THE NON-GRADES, WHICH ARE FINDINGS RATHER THAN GAPS
+#
+#   instrument     `println!` with no assertion that can fail. Not a gate, so
+#                  there is nothing to control. Named individually below.
+#   unforceable    the fixture exists in no tree on this box, so the comparison
+#                  has never run. §73.10's class. Named individually.
+#   declared-red   already failing at its declared signature in
+#                  `t1-known-red.toml`; forcing it measures nothing.
+#
+# MEASURED 2026-08-18 in ~/grit/work-t1pc on `t1-positive-controls`, base
+# `t1-audit` restacked onto main cb358498c. Three rounds:
+# `ci/logs/t1-controls.tsv`. Fixture axis 57 of 74; the rest below.
+#
+# # THE FOUR `rustmc-entity` BINARIES main f4fa28ff8 ADDED — 2026-09-05
+#
+# `mobs-goals` took the tree from 80 test binaries to 84 and this ledger read
+# 80, which is the refusal working: `cargo builds 84 test binaries, the ledger
+# declares 80` (gate-stack-ci-20260905-015059.log:441). Measured in
+# `~/rustmc-stackci`, `ci/t1-positive-control.py --only <name>`:
+#
+#   golden_mob_math   perturbed   golden/mob_math_vectors.json, leaf asin_tab/0
+#                                 0 -> 1000 of 4096 numeric leaves, red at
+#                                 mob_math_matches_the_jvm_bit_for_bit
+#   golden_mob_path   perturbed   golden/mob_path_vectors.json, leaf
+#                                 grids/0/start/0 0 -> 1000 of 1599, red at
+#                                 path_finder_matches_the_jvm_over_grids
+#   ground_path       unforced    green clean; 0 candidate fixtures
+#   navigation        unforced    green clean; 0 candidate fixtures
+#
+# The two goldens reach `perturbed`, which is the grade that separates a binary
+# that opens a file from one that compares it, and both do compare.
+#
+# The other two read no fixture — 25 and 33 assertions over
+# `rustmc_entity::pathfinder`, `rustmc_entity::ai` and a grid level built in
+# memory — so they are `ci/t1-sabotage.sh`'s case and they took two arms to
+# settle. **The first arm fired and moved neither, and that is recorded here
+# so nobody re-runs it:** `path-tiebreak`, relaxing `BinaryHeap.upHeap`'s
+# strict `<` to `<=`, gave `fired=1` with both binaries green, 8 and 7 tests
+# passing. Every grid in those two files is a straight line or one detour whose
+# optimal path is unique in shape, so no equal-`f` choice reaches an assertion.
+# `path-accuracy` — `PathFinder.findPath`'s `accuracy` forced to 0, the shape
+# of that loop before the argument was ported — does reach them:
+# `ground_path::accuracy_stops_short` asserts the path ends at `(4, 64, 0)` for
+# a target at `(5, 64, 0)`, and every `move_to` in `navigation` paths at
+# accuracy 1 and counts 5 nodes. Both pairs are in `ci/t1-sabotage.sh`'s
+# `PAIRS_DEFAULT`, which is where a `sabotage` grade is recorded — this file
+# carries the count and the four non-grade classes by name, and the sweep
+# carries the pairs.
+
+# 84 -> 86 ON LANDING, 2026-09-05, and by the same route as the 80 -> 84 above:
+# `mobs-brains` and `mobs-goals-2` merged into main (f4fa28ff8 -> bd5be4a36)
+# between this stack's gate and its rebase, each adding one `rustmc-entity`
+# test binary. `git diff --name-status f4fa28ff8 bd5be4a36 -- 'crates/*/tests/
+# *.rs'` names exactly two additions and no removals.
+#
+# Both were forced rather than argued, `ci/t1-positive-control.py --only`,
+# sayer-desktop:
+#
+#   brain_tables     absent   crates/rustmc-entity/golden/mob_brain_tables.json
+#                             red at every_priority_pair_carries_an_integer_
+#                             priority_and_the_core_packages_are_as_read,
+#                             every_villager_and_piglin_behaviour_is_
+#                             transcribed_or_named_pending, and twenty_
+#                             providers_and_the_villager_and_piglin_lists_in_
+#                             push_order. 0.6 s. Fixture restored, binary green.
+#   mob_goal_tables  absent   crates/rustmc-entity/golden/mob_goal_tables.json
+#                             red at attribute_builders_name_a_base_and_valued_
+#                             adds, every_directly_registered_goal_class_is_
+#                             transcribed and operand_tokens_match_each_
+#                             constructor. 1.0 s. Restored, green.
+#
+# **`absent` and not `perturbed`, for both, and that is a finding rather than a
+# gap in this measurement.** `--emit` tries `perturbed` first and falls back;
+# reaching only `absent` says each binary has proved it OPENS its golden and
+# nothing more — a test that loads a table and never compares a value fails in
+# exactly the same way. Two of the four binaries the previous bump added
+# (`golden_mob_math`, `golden_mob_path`) do reach `perturbed`. The lane that
+# owns the brain and goal tables is the one to say whether these two should,
+# and lifting either grade lowers nothing here: it only makes this line
+# stronger.
+# 86 -> 90 ON LANDING, 2026-09-05, third time and same route: `stack-extract`
+# merged into main (bd5be4a36 -> 58f1fa5c6) between this stack's gate and its
+# rebase. `git diff --name-status bd5be4a36 58f1fa5c6 -- 'crates/*/tests/*.rs'`
+# names four additions and no removals — the whole `rustmc-loot` crate plus the
+# command-tree vector.
+#
+# All four forced, `ci/t1-positive-control.py --only`, sayer-desktop, each
+# restored and re-run green:
+#
+#   golden_loot          absent     data/vanilla/loot_tables.json, red at
+#                                   the_interpreter_reproduces_vanillas_own_
+#                                   loot_vectors. 31.5 s.
+#   block_dispatch       absent     data/vanilla/loot_tables.json, red at
+#                                   every_block_in_the_game_gets_an_answer_
+#                                   or_a_named_reason. 8.7 s.
+#   falsify_loot         perturbed  data/vanilla/loot.json, leaf seeds/0
+#                                   0 -> 1000 of 4096 numeric leaves, red at
+#                                   every_plausible_mistake_turns_the_loot_
+#                                   gate_red. 9.3 s.
+#   command_tree_vanilla perturbed  data/vanilla/command_tree_full.json, leaf
+#                                   parsers/brigadier:bool 0 -> 1000, red at
+#                                   the_parser_registry_is_the_one_vanilla_
+#                                   declares. 0.5 s.
+#
+# Two reach `perturbed` and two only `absent`, and that is recorded rather
+# than smoothed: `absent` says a binary has proved it OPENS its golden and
+# nothing more. Both of those read `data/vanilla/loot_tables.json`, a 675 KB
+# document whose perturbation the sweep did not find a leaf for; the lane that
+# owns the loot interpreter is the one to say which number should move it.
+#
+# **A WARNING THAT COST TWENTY MINUTES HERE.** `ci/logs/t1-testbins.tsv` and
+# `ci/logs/t1-controls.tsv` are both caches, and both are read before anything
+# is measured. A stale `t1-testbins.tsv` made `--only golden_loot` answer
+# `no test binary named 'golden_loot'` for a binary that exists, and a stale
+# `t1-controls.tsv` row made a later run print nothing at all and exit 0 —
+# the row is skipped if the name is already in the file. A `red-before-forcing`
+# row from a tree whose tables were not yet generated therefore STICKS, and
+# reads exactly like a finding about the binary. Delete both before
+# re-measuring after a merge.
+# 90 -> 92 ON LANDING, 2026-09-05, fourth time in one day and the same route
+# every time: `commands` merged into main (58f1fa5c6 -> 1a31e0a56) between
+# this stack's gate and its rebase. `git diff --name-status 58f1fa5c6
+# 1a31e0a56 -- 'crates/*/tests/*.rs'` names two additions and no removals.
+#
+# Both forced, `ci/t1-positive-control.py --only`, sayer-desktop, each
+# restored and re-run green:
+#
+#   command_parse_vanilla    perturbed  data/vanilla/command_parse.json, leaf
+#                                       specs 27 -> 1027 of 4096 numeric
+#                                       leaves, red at every_golden_row_
+#                                       parses_the_way_vanilla_parsed_it. 0.7 s.
+#   command_failure_vanilla  absent     data/vanilla/commands_tree.json, red at
+#                                       a_cursor_wrong_by_one_is_caught,
+#                                       every_failure_row_answers_the_way_
+#                                       vanilla_answered, and nothing_
+#                                       unrendered_is_a_refusal_this_server_
+#                                       claims_to_render.
+# 92 -> 98 ON LANDING, 2026-09-23: stack-ci rebased onto main f1e6babbb
+# (stack-worldgen, +392). `cargo metadata --no-deps` names 98 test targets
+# against 92 on the pre-rebase tip e3dccb835; six additions, no removals,
+# all from main. Each forced with `ci/t1-positive-control.py --only` in
+# ~/rustmc-ciland-sc (threadripper), restored, `t1-force.py verify` OK:
+#
+#   light_golden             perturbed  golden/light_vectors.json, leaf #0
+#                                       min_section_y -4 -> 996, red at
+#                                       section_light_matches_vanilla. 11.4 s.
+#   sky_golden               perturbed  golden/sky_vectors.json, leaf #3
+#                                       samples/0/ticks 0 -> 1000, red at
+#                                       sun_angle_and_sky_light_level_match_
+#                                       the_jvm. 0.4 s.
+#   golden_bastion_start     absent     oracle-work/gen-wide-20260722-r16-
+#                                       nether-a, red at the_bastions_match_
+#                                       vanillas_own_children and the_starts_
+#                                       beyond_the_searched_square_cannot_
+#                                       reach_the_measured_one. 7.6 s.
+#   golden_pos_rule_test     absent     vanilla-26.2 generated-data
+#                                       data/minecraft, red at every_processor_
+#                                       list_a_bastion_names_parses and the_
+#                                       high_rampart_list_parses_and_keeps_its_
+#                                       draw_sequence. 0.1 s.
+#   nested_feature_rollback  absent     generated-data minecraft/tags/block,
+#                                       red at a_tree_whose_nested_feature_
+#                                       refuses_leaves_the_chunk_untouched. 6.0 s.
+#   section_light_wired      absent     data/vanilla/block_props.json, red at
+#                                       the_flag_is_what_stands_between_us_and_
+#                                       zero_of_twenty_six. 725.6 s.
+#
+# Two reached `perturbed`, four only `absent`. The four `absent` ones prove that
+# the binary opens its fixture and nothing more (see the header). All six are
+# `demonstrated`.
+# 98 -> 102 ON LANDING, 2026-09-24: stack-ci rebased onto main 1049a12d3
+# (3316). `cargo metadata --no-deps` names 102 test targets against 98; the
+# four additions are main's, no removals: spawn_decisions, spawn_state and
+# spawn_tables (798ffd125, f97ed9640) and weather_console (1c96afd5d). Forced
+# with `ci/t1-positive-control.py --only` in ~/rustmc-landx-ci (threadripper),
+# restored, `t1-force.py verify` OK:
+#
+#   spawn_decisions   absent     data/vanilla/biome_spawners.json, red at all
+#                                eight tests incl. draws_match_the_decision_
+#                                log_over_sixty_four_seeds. 1.6 s.
+#   spawn_state       absent     data/vanilla/entity_spawn_facts.json, red at
+#                                all seven tests. 1.2 s.
+#   spawn_tables      absent     data/vanilla/biome_spawners.json, red at all
+#                                nine tests. 1.3 s.
+#   weather_console   sabotage   reads no fixture (`unforced`, 0 candidates),
+#                                so a sixth arm, `weather-step`, doubles the
+#                                0.01f level step: `ci/t1-sabotage.sh
+#                                weather-step:rustmc-server:weather_console`
+#                                -> RED armed (panics at the
+#                                20th-tick assertion), GREEN unarmed, fired.
+#
+# Three `absent`, one `sabotage`. All four `demonstrated`.
+# 102 -> 113 ON train-c, 2026-09-30: stack-ci + grepq-pipefail + portability
+# + vacuous-green-audit + light-engine-2 + chunk-streaming + entity-tracker
+# over main 3745 (c52d52e7b). `cargo metadata --no-deps` names 113 test
+# targets; eleven additions, no removals. Forced with
+# `ci/t1-positive-control.py --only` in ~/rustmc-train-c (threadripper),
+# AFTER ci/gen-gameplay-tables.sh — a first pass before the tables existed
+# read nine of them as `red-before-forcing` on a missing
+# data/vanilla/enchantments.json, which is an environment and not a grade.
+# Restored, `t1-force.py verify` OK after each:
+#
+#   golden_item_survive         perturbed  data/vanilla/item_survive.json,
+#                                          red at ported_families_match_vanilla_exactly
+#   villager_trade_tables       absent     data/vanilla/villager_trades.json
+#   anvil_cost                  perturbed  data/vanilla/enchantments.json (an
+#                                          anvil_cost 4 -> 1004), red at
+#                                          a_book_of_wholly_inapplicable_...
+#   enchanting_offers           absent     data/vanilla/enchantments.json
+#   enchantment_registry_order  absent     data/vanilla/enchantments.json
+#   light_harvest               absent     oracle-work/vanilla-r7
+#   light_incremental_golden    perturbed  golden/light_vectors.json
+#   light_incremental_mutation  perturbed  golden/light_vectors.json
+#   live_light_edit             absent     data/vanilla/block_props.json
+#   golden_chunk_send_order     perturbed+rebuild  `unforced` by the script
+#                                          (the fixture is include_str!'d);
+#                                          by hand, the first `order` entry
+#                                          [-1,-1] -> [3,-1] in
+#                                          golden/chunk_send_order.json, touch,
+#                                          rebuild: 0 passed 2 failed; restored,
+#                                          2 passed, cmp identical.
+#   golden_chunk_light          UNFORCEABLE, see [unforceable]: both tests
+#                                          return early without
+#                                          RUSTMC_CHUNK_CAPTURE, as
+#                                          golden_chunk_packet does.
+#
+# Ten demonstrated (4 perturbed, 5 absent, 1 perturbed+rebuild), one
+# unforceable.
+# 113 -> 115 ON train-c's rebase onto main 3768, 2026-09-30: main's recipe
+# lane (fced0e3c7..000e24b4d) added recipe_match_golden and recipes_table.
+# Forced with `ci/t1-positive-control.py --only` in ~/rustmc-train-c after
+# ci/gen-gameplay-tables.sh, restored, `t1-force.py verify` OK:
+#
+#   recipe_match_golden  perturbed  data/vanilla/recipe_match.json
+#                                   (stonecutter/0/count 2 -> 1002), red at
+#                                   the_stonecutter_set_matches_vanillas_in_order
+#   recipes_table        absent     data/vanilla/recipes.json, red at every test
+#
+# Both demonstrated.
+# 115 -> 127 ON train-c's rebase onto main 3953 (train-a), 2026-09-30: twelve
+# binaries train-a landed. Forced in ~/rustmc-train-c after
+# ci/gen-gameplay-tables.sh, restored, `t1-force.py verify` OK after each:
+#
+#   crypt                   absent     rustmc-proto/golden/crypt.json
+#   dimension_travel        perturbed  golden/world_border.json (clampSize)
+#   join_border             absent     golden/world_border.json
+#   mob_in_world            perturbed  data/vanilla/path_facts.json, red at
+#                                      mobs_in_a_flat_world — AFTER train-c's
+#                                      repair of that test (it was red on an
+#                                      unmutated tree: its chunk view was never
+#                                      marked sent, and entity-tracker's
+#                                      isChunkTracked limb withheld add_entity)
+#   portal_shape            perturbed  golden/portal_shape.json
+#   scoreboard              perturbed  golden/scoreboard.json
+#   served_dimensions       absent     data/vanilla/registries.bin
+#   villager_trades         perturbed  golden/merchant_offers.json
+#   world_border            perturbed  golden/world_border.json (probeXBits)
+#   online_login            absent, BY HAND: the script found 0 candidates
+#                           (the path is built from CARGO_MANIFEST_DIR);
+#                           crypt.json held aside -> 4 tests FAILED; restored,
+#                           5 passed.
+#   golden_float_precision  perturbed, BY HAND: one numeric decimal in
+#                           golden/world_border.json (32.0) replaced by the
+#                           known misread literal 14.600000000000001 ->
+#                           no_committed_golden_grows_an_unreadable_double
+#                           FAILED; restored, cmp identical, 2 passed.
+#   dimension_travel_wire   sabotage, BY HAND: change_dimension's border frame
+#                           (`world_send.rs::change_dimension`, its INITIALIZE_BORDER write) written as GAME_EVENT ->
+#                           the_travel_packets_go_out_in_vanillas_order
+#                           FAILED; restored, 4 passed.
+#
+# All twelve demonstrated.
+#
+# 127 -> 130 ON land-batch-1's rebase onto main 4032 (3a74284a5), 2026-10-01:
+# main's structure lane added three `rustmc-server` binaries (`git diff
+# --name-status --diff-filter=AD d48904cb5 3a74284a5 -- 'crates/*/tests/*.rs'`
+# names exactly these, no removals). Forced in ~/rustmc-lb1r after
+# ci/gen-gameplay-tables.sh twice, `ci/t1-positive-control.py --only`,
+# `t1-force.py verify` OK after each:
+#
+#   structure_census    absent  data/vanilla/structure_sets.json, red at
+#                               the_jar_has_twenty_sets_naming_thirty_four_
+#                               structures and the_served_census_names_real_
+#                               sets_and_says_what_it_measured. 1.8 s.
+#   served_structures   absent  data/vanilla/block_props.json, red at every
+#                               `a_..._reaches_the_wire` test.
+#   served_vs_vanilla   absent  data/vanilla/block_props.json, red at
+#                               the_boxes_outside_the_parity_window,
+#                               the_declared_refusals_carry_a_price_or_say_
+#                               they_cannot and the_served_chunks_match_
+#                               vanilla_inside_every_structure_box. 4081.6 s.
+#
+# All three demonstrated, at `absent` only: each has proved it opens its
+# table; whether a perturbed value reaches an assertion is the structure
+# lane's to raise.
+#
+# 130 -> 145 ON train-g (main 16529d006 + item-components, train-e,
+# land-batch-1, menus-workstations, fluids, mining, commands-exec,
+# random-ticks, train-f), 2026-10-02: fifteen binaries the train's lanes
+# added (`cargo metadata` over this tree against land-batch-1's: no
+# removals). Forced in ~/rustmc-train-g after ci/gen-gameplay-tables.sh,
+# `ci/t1-positive-control.py --only`, `t1-force.py verify` OK after each:
+#
+#   entity_dispatch         absent    data/vanilla/loot_tables.json, red at
+#                                     all nine tests.
+#   cmdexec_vanilla         absent    data/vanilla/commands_tree.json, red at
+#                                     all nineteen `..._are_vanillas`.
+#   damage_types_table      perturbed data/vanilla/damage_types.json.
+#   fall_damage_agreement   absent    data/vanilla/attributes.json.
+#   fall_damage_wire        absent    data/vanilla/block_props.json, red at
+#                                     all four.
+#   golden_explosion_entity perturbed data/vanilla/explosion_entity.json.
+#   golden_explosion_ray    perturbed data/vanilla/explosion_ray.json.
+#   golden_explosion_wire   perturbed data/vanilla/explosion_wire.json.
+#   mob_combat              perturbed data/vanilla/path_facts.json.
+#   move_correction         absent    data/vanilla/block_props.json.
+#   potions_table           absent    data/vanilla/potions.json.
+#   projectile_golden       perturbed crates/rustmc-server/golden/
+#                                     projectile.json.
+#   workstation_menus       absent    data/vanilla/item_props.json.
+#   mob_effects_table       perturbed, BY HAND: the tool found no candidate
+#                           (the path is `effects::TABLE_PATH`, not a
+#                           literal). data/vanilla/mob_effects.json's first
+#                           `firesAt` 1 -> 2 ->
+#                           every_probed_cell_agrees_with_the_transcribed_rule
+#                           FAILED; restored, cmp identical, 3 passed.
+#   projectile_flight       sabotage, BY HAND: `arrow.rs`'s applyGravity
+#                           (`self.movement.y - ARROW_GRAVITY`) written as
+#                           `self.movement.y` -> an_arrow_in_open_air_drags_
+#                           then_falls..., the_second_tick_compounds... and
+#                           an_arrow_in_water... FAILED; restored, 20 passed.
+#
+# All fifteen demonstrated.
+#
+# 145 -> 146 ON structures-2 (train-g 0ad3cdfde + structures-mansion +
+# structures-monument-city), 2026-10-02: one `rustmc-server` binary.
+#
+#   structure_block_entities  sabotage, BY HAND: `place_piece`'s stream put
+#                             back to `None` in both `place_end_city_in_chunk`
+#                             and `place_mansions_in_chunk` -> all three tests
+#                             FAILED (the end city's three LootTableSeeds and
+#                             the mansion's (590,88,-747) seed move);
+#                             restored, 3 passed. Its fourth test, the ship,
+#                             FAILED with the skull class mapped to nothing
+#                             in block_entity::entity_id; restored, 4 passed.
+#                             The fifth, coded_structure_loot_is_vanillas,
+#                             FAILED on four rows with create_chest's record
+#                             removed; restored, 5 passed.
+#
+# 146 -> 147 ON structures-2, 2026-10-02: one `rustmc-server` binary.
+#
+#   deep_dark_sculk           sabotage: run against the pre-port sculk code
+#                             (the tree at 1ecefe17b with only this test
+#                             added) -> FAILED, 999 positions and another hash
+#                             against vanilla's 1,056 / 0xb8c062890f40f006;
+#                             on the port, 1 passed.
+#   structure_block_entities  (re-forced on its new test) the vindicator's
+#                             enchantSpawnedEquipment draw removed from
+#                             structure::spawned::finalize_spawn ->
+#                             structure_mobs_draw_vanillas_spawn_bonus_and_
+#                             handedness FAILED; restored, passed.
+# # `golden_nether_features` — 2026-10-02, branch `nether-parity`
+#   golden_nether_features  sabotage, BY HAND: the four forest feature types
+#                           (`nether_forest_vegetation`, `huge_fungus`,
+#                           `weeping_vines`, `twisting_vines`) unwired in
+#                           `configured.rs`'s parse, so each falls to
+#                           `Unimplemented` -> the_forest_features_sit_inside_
+#                           vanillas_own_spread FAILED on all eight families
+#                           (stem 3197 against a vanilla worst pair of 1006;
+#                           ours 0 against a sparsest vanilla 2983); restored,
+#                           1 passed. Its fixtures are three references, so
+#                           `absent` would hold too, and proves less.
+#                           Its second test, the_fortress_sits_inside_
+#                           vanillas_own_spread, by hand twice: fortress
+#                           placement disabled -> all six families fail
+#                           (bricks 31108 against a vanilla worst pair of 0);
+#                           the nether post-process pass disabled -> fence
+#                           1088 against 0. Restored, 2 passed. Its block-entity
+#                           half by hand: the two `record_block_entity` calls
+#                           for the corridor-turn chests removed -> "block
+#                           entities against ...-c12_3-open-{a,b,c}" on all
+#                           three. Restored, 2 passed, 9 equal. Its third
+#                           test, the_fossils_and_their_dried_ghasts_..., by
+#                           hand: the `place_dried_ghast` call removed ->
+#                           dried_ghast ours 0 against a sparsest vanilla 5.
+#                           Restored, 3 passed. Its fourth, the_nether_ruined_portal_..., by
+#                           hand: the cracked_stone_bricks entry removed from
+#                           `blackstone_replacement` -> cracked_bricks ours 0
+#                           against 6. Restored, 4 passed.
+#   golden_fortress_start   sabotage, BY HAND, twice: (1) the dropped
+#                           out-of-range filler's `nextInt()` removed from
+#                           `fortress.rs`'s generate_and_add -> the start at
+#                           (-189,198) saved 56 pieces and ours 58, first
+#                           difference at piece 32; (2) a refused createPiece
+#                           ending the roll instead of carrying on down the
+#                           table -> 56 against 130 from piece 0. Restored,
+#                           1 passed, 198 pieces and 23 filler seeds equal.
+#   golden_nether_ruined_portal  sabotage, BY HAND: `find_suitable_y`'s
+#                           in_nether air-pocket range 32..=100 written as
+#                           33..=100 -> the portal at (43,88) lands at y 46
+#                           against vanilla's 31. Restored, 1 passed, three
+#                           portals equal.
+# `golden_end_podium` — 2026-10-04, branch `end-parity`
+#
+#   golden_end_podium       sabotage, BY HAND: `podium_writes`' outer test
+#                           `closerThan(origin, 3.5)` written as 3.0 ->
+#                           the inactive podium at (0,64,0) writes 88 blocks
+#                           against vanilla's 153. Restored, 1 passed.
+#   golden_end_features     sabotage, BY HAND, one run: the crystal's yaw
+#                           `nextFloat() * 360` written as `* 180` -> the
+#                           crystals test FAILED at seed 12345 against -a;
+#                           and the gateway's old wrong shape (cross AIR,
+#                           corners BEDROCK) -> the gateways test FAILED at
+#                           (-1580,64,-67), air against bedrock. Restored,
+#                           2 passed. Its third, the_ship_cities_match_
+#                           vanillas_consensus, by hand: the end city's
+#                           `with_shape_update()` removed -> 1 of 5,308,413
+#                           consensus positions differ at (1713,72,-581).
+#                           Restored, 3 passed. Its seed-12345 city, by hand: the
+#                           wall-banner rule disabled -> 4 of 5,308,379
+#                           consensus positions differ at (-257,130,1337).
+#                           Restored, passed. Its exit-portal test, by hand:
+#                           `exit_portal_origin` starting at the heightmap
+#                           instead of one below -> origin (0,65,0), 82 of
+#                           1,048,576 consensus positions differ at seed
+#                           20260722. Restored, passed. Its end-city-starts
+#                           test, by hand: `set_large_feature_seed(seed, cz,
+#                           cx)` (axes swapped) -> seed 12345 city (141,-58)
+#                           pieces differ. Restored, passed.
+#                           golden_end_podium's ring test, by hand:
+#                           `gateway_spawn_order` without its `reverse()` ->
+#                           seed 20260722 order differs. Restored, passed.
+#                           Its dragon-kill test, by hand, the same
+#                           sabotage -> killed-a's saved gateway order
+#                           differs at seed 20260722. Restored, passed.
+#                           Its first-gateway-exit test was red BEFORE the
+#                           fix: `findValidSpawnInChunk` returning the
+#                           winning block instead of the MutableBlockPos
+#                           cursor's last value -> seed 12345 exit
+#                           (-943,68,-319) vs vanilla (-929,48,-305) in all
+#                           3 worlds. Fixed, passed. Its ship-cities test's
+#                           far window (12345, chunk (-3127,6247)), by hand:
+#                           end city corner heights read off the canvas
+#                           again -> 950 of 5,308,416 consensus positions
+#                           differ at (-50088,133,99895). Restored, passed.
+demonstrated = 131
+instrument = 9
+unforceable = 4
+declared_red = 2
+
+# 131 + 9 + 4 + 2 = 146, and 146 + the 6 that already had one = 152.
+# 130 + 9 + 4 + 2 = 145, and 145 + the 6 that already had one = 151.
+# 129 + 9 + 4 + 2 = 144, and 144 + the 6 that already had one = 150.
+# 128 + 9 + 4 + 2 = 143, and 143 + the 6 that already had one = 149.
+# 127 + 9 + 4 + 2 = 142, and 142 + the 6 that already had one = 148.
+# 126 + 9 + 4 + 2 = 141, and 141 + the 6 that already had one = 147.
+# 125 + 9 + 4 + 2 = 140, and 140 + the 6 that already had one = 146.
+# 124 + 9 + 4 + 2 = 139, and 139 + the 6 that already had one = 145.
+# 109 + 9 + 4 + 2 = 124, and 124 + the 6 that already had one = 130.
+# 106 + 9 + 4 + 2 = 121, and 121 + the 6 that already had one = 127.
+# 82 + 9 + 3 + 2 = 96, and 96 + the 6 that already had one = 102 (it was 78 + 9 + 3 + 2 = 92 and 98 before the 2026-09-24 landing,
+# 72 + 9 + 3 + 2 = 86 and 92 before the 2026-09-23 landing), which is the
+# binary count `ci/t1.sh` reports and `min_binaries` floors. It was 60 / 74 /
+# 80 / 84 / 86 / 90; f4fa28ff8 added four `rustmc-entity` binaries, bd5be4a36
+# two more, 58f1fa5c6 four, and 1a31e0a56 two. All twelve are accounted for in
+# the blocks above and every one of them is `demonstrated`.
+#
+# **This number has moved four times in one day and every move was a merge,
+# not a branch.** A total that is re-based by hand on every landing is a
+# maintenance cost this ledger should eventually shed: what it is really
+# asserting is `total_binaries == cargo's count`, which `ci/check-t1-controls.py`
+# already computes. The scalar earns its place only as the arithmetic's left
+# side, and the classes are what carry the claim.
+total_binaries = 152
+already_had_one = 6
+
+# ---------------------------------------------------------------------------
+# The nine instruments, each named with what it prints instead of asserting
+# ---------------------------------------------------------------------------
+# §73.4 counted 7 VACUOUS *tests* plus a compile-time trait check. This is the
+# same class counted over *binaries*, and it is larger: six of these nine are
+# not in §73.4's list, because that list wanted a `println!` and no assertion at
+# all, and these carry one weak assertion apiece — a `.expect()` on a registry
+# load, or an `assert!(visited > 0)` guarding a loop.
+#
+# **None of them is wrong and none of them is a gate.** Recorded here so the
+# arithmetic is honest: a positive control for a binary that asserts nothing
+# would be a control for nothing.
+
+[instrument]
+"margin_probe" = "0 hard assertions, 5 println!. Its own module docs open 'Instrument, not a gate: how wide does the context have to be before a chunk stops changing?'"
+"probe_population_seed" = "0 hard assertions, 6 println!. Its golden vector is named in a COMMENT — 'verified against golden/xoroshiro128pp_seed_20260708.json' — and never opened, which is why the fixture axis reported it unforced"
+"probe_disk_origin" = "1 weak assertion, 6 println!. Asks which feature index would put disk_gravel's origin where the server put it"
+"probe_margin_context" = "1 weak assertion, 8 println!. Asks why DECORATION_MARGIN does not converge at seed 0"
+"probe_step6_order" = "1 weak assertion, 2 println!. Asks what order this port runs step 6 in"
+"probe_prelim" = "0 assertions of any kind. Already §73.4's VACUOUS list, as corner_values_for_the_failing_column"
+"probe_sulfur_index" = "1 weak assertion. Already §73.4's VACUOUS list, as which_feature_index_gives_the_server_its_column"
+"probe_sulfur_gradient" = "#[ignore]d, so it does not run at all; declared in t1-known-red.toml's max_ignored. Needs a whole-world diff"
+"dig_throughput" = "#[ignore]d throughput instrument, declared in t1-known-red.toml's max_ignored. Its own docs say 'it is an instrument, and its number'"
+
+# ---------------------------------------------------------------------------
+# The two that cannot be forced, BY NAME
+# ---------------------------------------------------------------------------
+# §73.10's class: the fixture exists in no tree on this box, so the comparison
+# has never been made once and no forcing is possible. Named individually and
+# never as a ceiling.
+
+[unforceable]
+"probe_cluster_boxes" = "oracle-work/van-ruin--58_28 and van-ruin--57_42 exist in no tree on this box. #[ignore]d on t1-audit; §73.10"
+"probe_ruin_height" = "its world is /tmp/ruin-w/region, a scratch path from a one-off run. /tmp does not survive a reboot and no gate directory has ever held it. #[ignore]d on t1-audit; §73.10"
+"golden_chunk_packet" = "all three tests return early without RUSTMC_CHUNK_CAPTURE — 117 packet bodies from a live vanilla server, Mojang-derived and never committed, absent from this box. The `palette` sabotage arm reports fired=0 against it, which is the UNVISITED verdict and the proof: 12 assertions that have never run here"
+"golden_chunk_light" = "both tests call load(), which returns None without RUSTMC_CHUNK_CAPTURE — the same never-committed vanilla packet capture golden_chunk_packet needs — and return early with a SKIP line. ci/t1-positive-control.py reads it as unforced with 1 candidate fixture (data/vanilla/block_props.json) that did not force it, which is that early return"
+
+# A THIRD NAME §73.10 DOES NOT HAVE, and it is not in the count above because
+# the binary IS forced — one of its two tests is not.
+#
+# `golden_village_start` reached `perturbed` through
+# `the_reference_village_is_the_one_the_assembler_is_built_against`, which reads
+# the committed vector. Its other test,
+# `the_vector_still_matches_the_world_it_came_from`, needs
+# `oracle-work/van-village-31415926` and that world exists nowhere on this box,
+# so THAT test has still never compared anything. Only a vanilla boot can
+# produce it. Declared in `ci/checks/fixture-skips.toml` as the one raw skip
+# deliberately left.
+#
+# `golden_chunk_packet` IS the fourth name §73.10 does not have, and it is in
+# the count above. It looked forceable — `container_bit_packing_is_lossless` is
+# a pure round-trip and needs no vanilla bytes — until the `palette` arm was
+# pointed at it and reported `fired=0`. That test calls `capture()` too and
+# returns early with the rest.
+#
+# **Its skip is invisible to the ratchet built to count skips.**
+# `ci/check-fixture-skips.py` reports `total = 1` for this tree, naming only
+# `golden_village_start`. It greps for `eprintln!("skipping...` and this file
+# writes `eprintln!("SKIP golden_chunk_packet: set RUSTMC_CHUNK_CAPTURE")` —
+# three sites, one wording, and the pattern was taken from the wording of the
+# sites already known. That is §73.2's defect inside the ratchet written to
+# close it. Measured over the whole tree: exactly one file and three sites use
+# a wording the ratchet misses, and they hide 12 assertions.
+
+[declared_red]
+"golden_carver_chunk" = "carved_chunks_match_vanilla, 106 blocks at its declared signature. Forcing an already-failing test measures nothing"
+"golden_surface_chunk" = "surface_chunks_match_vanilla, the same 106 reported twice. Same reason"

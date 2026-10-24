@@ -1,0 +1,183 @@
+probe-reads: /tmp/claude-1000/-/4accf9d4-d95c-437c-b125-c5f251a4f2f9/scratchpad/use_item_on.json  (BlockState.useItemOn)
+  140 of 163 rows sit on a useItemOn that reads the player (24 of 28 block classes)
+
+  BeehiveBlock                 rows=2   via BeehiveBlock
+      Player.drop                                                 (self)
+      Player.getInventory                                         (self)
+      Player.getX                                                 (self)
+      Player.getY                                                 (self)
+      Player.getZ                                                 (self)
+      LivingEntity.level                                          ItemStack.hurtAndBreak
+      Entity.position                                             BeehiveBlock.releaseBeesAndResetHoneyLevel -> BeehiveBlockEntity.emptyAllLivingFromHive
+      Player.position                                             BeehiveBlock.releaseBeesAndResetHoneyLevel -> BeehiveBlockEntity.emptyAllLivingFromHive
+      LivingEntity.addEffect                                      BeehiveBlock.releaseBeesAndResetHoneyLevel -> BeehiveBlockEntity.emptyAllLivingFromHive -> PotentSulfurBlockEntity.applyNauseaEffect
+      LivingEntity.getPlainTextName                               BeehiveBlock.releaseBeesAndResetHoneyLevel -> BeehiveBlockEntity.emptyAllLivingFromHive -> StructureBlockEntity.createdBy
+      ServerPlayer.hasInfiniteMaterials                           ItemStack.hurtAndBreak -> ItemStack.hurtAndBreak -> ItemStack.processDurabilityChange
+      LivingEntity.getItemBySlot                                  BeehiveBlock.releaseBeesAndResetHoneyLevel -> BeehiveBlockEntity.emptyAllLivingFromHive -> EnchantmentHelper.stopLocationBasedEffects -> EnchantmentHelper.runIterationOnEquipment
+      Player.isSecondaryUseActive                                 ItemStack.hurtAndBreak -> ItemStack.hurtAndBreak -> ItemStack.processDurabilityChange -> UseOnContext.isSecondaryUseActive
+      LivingEntity.activeLocationDependentEnchantments            BeehiveBlock.releaseBeesAndResetHoneyLevel -> BeehiveBlockEntity.emptyAllLivingFromHive -> EnchantmentHelper.stopLocationBasedEffects -> EnchantmentHelper.lambda$stopLocationBasedEffects$0 -> Enchantment.stopLocationBasedEffects
+      LivingEntity.position                                       BeehiveBlock.releaseBeesAndResetHoneyLevel -> BeehiveBlockEntity.emptyAllLivingFromHive -> EnchantmentHelper.stopLocationBasedEffects -> EnchantmentHelper.lambda$stopLocationBasedEffects$0 -> Enchantment.stopLocationBasedEffects
+      LivingEntity.getAttributes                                  BeehiveBlock.releaseBeesAndResetHoneyLevel -> BeehiveBlockEntity.emptyAllLivingFromHive -> EnchantmentHelper.stopLocationBasedEffects -> EnchantmentHelper.lambda$stopLocationBasedEffects$0 -> Enchantment.stopLocationBasedEffects -> EnchantmentAttributeEffect.onDeactivated
+  CakeBlock                    rows=1   via CakeBlock
+      LivingEntity.hasInfiniteMaterials                           ItemStack.consume
+      Player.isSecondaryUseActive                                 ItemStack.consume -> UseOnContext.isSecondaryUseActive
+  CampfireBlock                rows=2   via CampfireBlock
+      Player.getItemInHand                                        (self)
+      LivingEntity.hasInfiniteMaterials                           CampfireBlockEntity.placeFood -> ItemStack.consumeAndReturn -> ItemStack.consume
+      Player.isSecondaryUseActive                                 CampfireBlockEntity.placeFood -> ItemStack.consumeAndReturn -> ItemStack.consume -> UseOnContext.isSecondaryUseActive
+  CandleBlock                  rows=17  via CandleBlock
+      Player.getAbilities                                         (self)
+  CauldronBlock                rows=1   via AbstractCauldronBlock
+      Player.drop                                                 CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult
+      Player.getInventory                                         CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult
+      Player.hasInfiniteMaterials                                 CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult
+      Player.isSecondaryUseActive                                 CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult -> UseOnContext.isSecondaryUseActive
+      LivingEntity.hasInfiniteMaterials                           CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult -> ItemStack.consume
+  CeilingHangingSignBlock      rows=12  via CeilingHangingSignBlock
+      Player.mayBuild                                             SignBlock.useItemOn
+      Player.isTextFilteringEnabled                               SignBlock.useItemOn -> SignBlockEntity.executeClickCommandsIfPresent
+      Player.getX                                                 SignBlock.useItemOn -> SignBlockEntity.isFacingFrontText
+      Player.getZ                                                 SignBlock.useItemOn -> SignBlockEntity.isFacingFrontText
+      Player.isSecondaryUseActive                                 SignBlock.useItemOn -> UseOnContext.isSecondaryUseActive
+      Player.getUUID                                              SignBlock.useItemOn -> SignBlock.otherPlayerIsEditingSign
+      LivingEntity.hasInfiniteMaterials                           SignBlock.useItemOn -> ItemStack.consume
+      Player.getDisplayName                                       SignBlock.useItemOn -> SignBlockEntity.executeClickCommandsIfPresent -> SignBlockEntity.createCommandSourceStack
+      Player.getPlainTextName                                     SignBlock.useItemOn -> SignBlockEntity.executeClickCommandsIfPresent -> SignBlockEntity.createCommandSourceStack
+  ChiseledBookShelfBlock       rows=1   via ChiseledBookShelfBlock
+      LivingEntity.hasInfiniteMaterials                           ChiseledBookShelfBlock.addBook -> ItemStack.consumeAndReturn -> ItemStack.consume
+      Player.isSecondaryUseActive                                 ChiseledBookShelfBlock.addBook -> ItemStack.consumeAndReturn -> ItemStack.consume -> UseOnContext.isSecondaryUseActive
+  ComposterBlock               rows=1   via ComposterBlock
+      LivingEntity.hasInfiniteMaterials                           ItemStack.consume
+      Player.isSecondaryUseActive                                 ItemStack.consume -> UseOnContext.isSecondaryUseActive
+  DecoratedPotBlock            rows=1   via DecoratedPotBlock
+      LivingEntity.hasInfiniteMaterials                           ItemStack.consumeAndReturn -> ItemStack.consume
+      Player.isSecondaryUseActive                                 ItemStack.consumeAndReturn -> ItemStack.consume -> UseOnContext.isSecondaryUseActive
+  FlowerPotBlock               rows=39  via FlowerPotBlock
+      LivingEntity.hasInfiniteMaterials                           ItemStack.consume
+      Player.isSecondaryUseActive                                 ItemStack.consume -> UseOnContext.isSecondaryUseActive
+  JukeboxBlock                 rows=1   via JukeboxBlock
+      Player.getItemInHand                                        (self)
+      LivingEntity.hasInfiniteMaterials                           JukeboxPlayable.tryInsertIntoJukebox -> ItemStack.consumeAndReturn -> ItemStack.consume
+      Player.isSecondaryUseActive                                 JukeboxPlayable.tryInsertIntoJukebox -> ItemStack.consumeAndReturn -> ItemStack.consume -> UseOnContext.isSecondaryUseActive
+  LavaCauldronBlock            rows=1   via AbstractCauldronBlock
+      Player.drop                                                 CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult
+      Player.getInventory                                         CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult
+      Player.hasInfiniteMaterials                                 CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult
+      Player.isSecondaryUseActive                                 CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult -> UseOnContext.isSecondaryUseActive
+      LivingEntity.hasInfiniteMaterials                           CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult -> ItemStack.consume
+  LayeredCauldronBlock         rows=2   via AbstractCauldronBlock
+      Player.drop                                                 CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult
+      Player.getInventory                                         CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult
+      Player.hasInfiniteMaterials                                 CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult
+      Player.isSecondaryUseActive                                 CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult -> UseOnContext.isSecondaryUseActive
+      LivingEntity.hasInfiniteMaterials                           CauldronInteractions.bannerInteraction -> ItemUtils.createFilledResult -> ItemStack.consume
+  LecternBlock                 rows=1   via LecternBlock
+      LivingEntity.hasInfiniteMaterials                           LecternBlock.tryPlaceBook -> LecternBlock.placeBook -> ItemStack.consumeAndReturn -> ItemStack.consume
+      Player.isSecondaryUseActive                                 LecternBlock.tryPlaceBook -> LecternBlock.placeBook -> ItemStack.consumeAndReturn -> ItemStack.consume -> UseOnContext.isSecondaryUseActive
+  PumpkinBlock                 rows=1   via PumpkinBlock
+      Player.getDirection                                         (self)
+      LivingEntity.level                                          ItemStack.hurtAndBreak
+      ServerPlayer.hasInfiniteMaterials                           ItemStack.hurtAndBreak -> ItemStack.hurtAndBreak -> ItemStack.processDurabilityChange
+      Player.isSecondaryUseActive                                 ItemStack.hurtAndBreak -> ItemStack.hurtAndBreak -> ItemStack.processDurabilityChange -> UseOnContext.isSecondaryUseActive
+  RedStoneOreBlock             rows=2   via RedStoneOreBlock
+      Player.level                                                BlockPlaceContext.<init>
+  RespawnAnchorBlock           rows=1   via RespawnAnchorBlock
+      Player.getItemInHand                                        (self)
+      LivingEntity.hasInfiniteMaterials                           ItemStack.consume
+      Player.isSecondaryUseActive                                 ItemStack.consume -> UseOnContext.isSecondaryUseActive
+  ShelfBlock                   rows=12  via ShelfBlock
+      Player.getInventory                                         (self)
+      Player.hasInfiniteMaterials                                 ShelfBlock.swapSingleItem
+      Player.isSecondaryUseActive                                 ShelfBlock.swapSingleItem -> UseOnContext.isSecondaryUseActive
+  StandingSignBlock            rows=12  via SignBlock
+      Player.mayBuild                                             (self)
+      Player.isTextFilteringEnabled                               SignBlockEntity.executeClickCommandsIfPresent
+      Player.getX                                                 SignBlockEntity.isFacingFrontText
+      Player.getZ                                                 SignBlockEntity.isFacingFrontText
+      Player.isSecondaryUseActive                                 UseOnContext.isSecondaryUseActive
+      Player.getUUID                                              SignBlock.otherPlayerIsEditingSign
+      LivingEntity.hasInfiniteMaterials                           ItemStack.consume
+      Player.getDisplayName                                       SignBlockEntity.executeClickCommandsIfPresent -> SignBlockEntity.createCommandSourceStack
+      Player.getPlainTextName                                     SignBlockEntity.executeClickCommandsIfPresent -> SignBlockEntity.createCommandSourceStack
+  TntBlock                     rows=1   via TntBlock
+      LivingEntity.level                                          ItemStack.hurtAndBreak
+      LivingEntity.hasInfiniteMaterials                           ItemStack.consume
+      PrimedTnt.getX                                              TntBlock.prime
+      PrimedTnt.getY                                              TntBlock.prime
+      PrimedTnt.getZ                                              TntBlock.prime
+      Player.isSecondaryUseActive                                 ItemStack.consume -> UseOnContext.isSecondaryUseActive
+      ServerPlayer.hasInfiniteMaterials                           ItemStack.hurtAndBreak -> ItemStack.hurtAndBreak -> ItemStack.processDurabilityChange
+  VaultBlock                   rows=1   via VaultBlock
+      Player.getUUID                                              VaultBlockEntity$Server.tryInsertKey -> VaultServerData.hasRewardedPlayer
+      LivingEntity.hasInfiniteMaterials                           VaultBlockEntity$Server.tryInsertKey -> ItemStack.consume
+      Player.getLuck                                              VaultBlockEntity$Server.tryInsertKey -> VaultBlockEntity$Server.resolveItemsToEject
+      Player.isSecondaryUseActive                                 VaultBlockEntity$Server.tryInsertKey -> ItemStack.consume -> UseOnContext.isSecondaryUseActive
+  WallHangingSignBlock         rows=12  via WallHangingSignBlock
+      Player.mayBuild                                             SignBlock.useItemOn
+      Player.isTextFilteringEnabled                               SignBlock.useItemOn -> SignBlockEntity.executeClickCommandsIfPresent
+      Player.getX                                                 SignBlock.useItemOn -> SignBlockEntity.isFacingFrontText
+      Player.getZ                                                 SignBlock.useItemOn -> SignBlockEntity.isFacingFrontText
+      Player.isSecondaryUseActive                                 SignBlock.useItemOn -> UseOnContext.isSecondaryUseActive
+      Player.getUUID                                              SignBlock.useItemOn -> SignBlock.otherPlayerIsEditingSign
+      LivingEntity.hasInfiniteMaterials                           SignBlock.useItemOn -> ItemStack.consume
+      Player.getDisplayName                                       SignBlock.useItemOn -> SignBlockEntity.executeClickCommandsIfPresent -> SignBlockEntity.createCommandSourceStack
+      Player.getPlainTextName                                     SignBlock.useItemOn -> SignBlockEntity.executeClickCommandsIfPresent -> SignBlockEntity.createCommandSourceStack
+  WallSignBlock                rows=12  via SignBlock
+      Player.mayBuild                                             (self)
+      Player.isTextFilteringEnabled                               SignBlockEntity.executeClickCommandsIfPresent
+      Player.getX                                                 SignBlockEntity.isFacingFrontText
+      Player.getZ                                                 SignBlockEntity.isFacingFrontText
+      Player.isSecondaryUseActive                                 UseOnContext.isSecondaryUseActive
+      Player.getUUID                                              SignBlock.otherPlayerIsEditingSign
+      LivingEntity.hasInfiniteMaterials                           ItemStack.consume
+      Player.getDisplayName                                       SignBlockEntity.executeClickCommandsIfPresent -> SignBlockEntity.createCommandSourceStack
+      Player.getPlainTextName                                     SignBlockEntity.executeClickCommandsIfPresent -> SignBlockEntity.createCommandSourceStack
+  WeatheringCopperGolemStatueBlock rows=4   via WeatheringCopperGolemStatueBlock
+      LivingEntity.level                                          ItemStack.hurtAndBreak
+      ServerPlayer.hasInfiniteMaterials                           ItemStack.hurtAndBreak -> ItemStack.hurtAndBreak -> ItemStack.processDurabilityChange
+      Player.isSecondaryUseActive                                 ItemStack.hurtAndBreak -> ItemStack.hurtAndBreak -> ItemStack.processDurabilityChange -> UseOnContext.isSecondaryUseActive
+
+  no player read at all (4 classes): CandleCakeBlock, CopperGolemStatueBlock, NoteBlock, SweetBerryBushBlock
+
+  SPLIT (denominator: 163 rows in the table)
+    reads the probe                      140
+      of which the row MOVES              25   CakeBlock, CandleBlock, CauldronBlock, ComposterBlock, FlowerPotBlock, LavaCauldronBlock, LayeredCauldronBlock, RespawnAnchorBlock
+      of which constant across stances   115
+        - every cell a refusal            68   (constant because unmeasured)
+        - some cells refusals              4
+        - fully measured and constant     43
+    never reads the probe                 23
+    a stance refused where base did not    0
+
+  THE 25, BY NAME — every row whose recorded answer is a reading of one
+  player. These are not rows to bulk-convert on suspicion; they are the
+  list whoever ports them works from.
+    minecraft:black_candle             CandleBlock              no_build
+    minecraft:blue_candle              CandleBlock              no_build
+    minecraft:brown_candle             CandleBlock              no_build
+    minecraft:cake                     CakeBlock                game_master
+    minecraft:candle                   CandleBlock              no_build
+    minecraft:cauldron                 CauldronBlock            game_master
+    minecraft:composter                ComposterBlock           game_master
+    minecraft:cyan_candle              CandleBlock              no_build
+    minecraft:flower_pot               FlowerPotBlock           game_master
+    minecraft:gray_candle              CandleBlock              no_build
+    minecraft:green_candle             CandleBlock              no_build
+    minecraft:lava_cauldron            LavaCauldronBlock        game_master
+    minecraft:light_blue_candle        CandleBlock              no_build
+    minecraft:light_gray_candle        CandleBlock              no_build
+    minecraft:lime_candle              CandleBlock              no_build
+    minecraft:magenta_candle           CandleBlock              no_build
+    minecraft:orange_candle            CandleBlock              no_build
+    minecraft:pink_candle              CandleBlock              no_build
+    minecraft:powder_snow_cauldron     LayeredCauldronBlock     game_master
+    minecraft:purple_candle            CandleBlock              no_build
+    minecraft:red_candle               CandleBlock              no_build
+    minecraft:respawn_anchor           RespawnAnchorBlock       game_master
+    minecraft:water_cauldron           LayeredCauldronBlock     game_master
+    minecraft:white_candle             CandleBlock              no_build
+    minecraft:yellow_candle            CandleBlock              no_build
+
+    stances swept: 12 of 12  (unavailable: none)
+
+STAMP        jar=183c0499c5f8 table=8065b576485b dumper=cf7dc297dc19+818033c91a95 audit=42e5cb236d9a rows=163 reads=140 moves=25

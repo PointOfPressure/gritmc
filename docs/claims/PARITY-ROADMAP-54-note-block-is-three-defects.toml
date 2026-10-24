@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 54
+slug   = "note-block-is-three-defects"
+title  = "430 is three defects, not two, and one of them could never have been a placement bug — 2026-08-18, branch `gameplay-corpus-gaps`"
+branch = "gameplay-corpus-gaps"

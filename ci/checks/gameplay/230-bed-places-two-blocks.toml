@@ -1,0 +1,18 @@
+name = "bed-places-two-blocks"
+about = "placing a bed puts down a foot and a head — BedBlock.setPlacedBy writes the second half itself with a setBlock that getStateForPlacement does not describe, the same shape of gap as a door but along a horizontal axis chosen by the player's facing rather than upwards"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:red_bed"
+
+[[step]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

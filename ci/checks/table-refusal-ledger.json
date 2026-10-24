@@ -1,0 +1,93 @@
+{
+  "tables": {
+    "set_placed_by.json": {
+      "answered": 2046,
+      "causes": {
+        "getChunkSource": 52
+      },
+      "other": {
+        "randomBlocks": 0,
+        "tickBlocks": [
+          "minecraft:crafter"
+        ],
+        "tickRows": 24,
+        "worldSensitiveBlocks": 4
+      },
+      "population": 32366,
+      "refused": 52,
+      "unit": "states",
+      "universe": 32366
+    },
+    "signal.json": {
+      "answered": 1372,
+      "causes": {
+        "0,1,0": 1215,
+        "a block entity, which holds the value it is being asked for": 35
+      },
+      "other": {
+        "quiet": 29744
+      },
+      "population": 32366,
+      "refused": 1250,
+      "unit": "states",
+      "universe": 32366
+    },
+    "update_shape.json": {
+      "answered": 12748,
+      "causes": {
+        "-1,0,0": 5381,
+        "0,-1,-1": 16,
+        "0,-1,0": 6629,
+        "0,-2,0": 2,
+        "0,0,-1": 6976,
+        "0,0,1": 5386,
+        "0,1,0": 48995,
+        "1,0,0": 5412,
+        "BlockAndLightGetter.getLightEngine": 212,
+        "LevelReader.environmentAttributes": 96,
+        "LevelReader.registryAccess": 8
+      },
+      "other": {
+        "connective": 11621
+      },
+      "population": 103482,
+      "refused": 79113,
+      "unit": "(state, direction) pairs",
+      "universe": 194196
+    },
+    "use_item_on.json": {
+      "answered": 4319,
+      "causes": {
+        "getChunkSource": 25,
+        "recipeAccess": 64
+      },
+      "other": {
+        "blocksWithBehaviour": 163,
+        "partlyRefusedStates": 25
+      },
+      "population": 4537,
+      "refused": 64,
+      "unit": "states (over a state x item grid)",
+      "universe": 4537
+    },
+    "use_without_item.json": {
+      "answered": 7718,
+      "causes": {
+        "VanillaPaused": 1344,
+        "a block entity for minecraft:moving_piston: the block decl": 12,
+        "environmentAttributes": 128,
+        "getChunkSource": 32
+      },
+      "other": {
+        "probeDependentBlocks": 42,
+        "randomBlocks": 1,
+        "soundBlocks": 71
+      },
+      "population": 32366,
+      "refused": 1516,
+      "unit": "states",
+      "universe": 32366
+    }
+  },
+  "what": "the golden generators' refusal populations, derived by ci/refusal-ledger.py; --check refuses on drift"
+}

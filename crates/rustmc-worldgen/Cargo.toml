@@ -1,0 +1,35 @@
+[package]
+name = "rustmc-worldgen"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+rustmc-data.workspace = true
+rustmc-world.workspace = true
+# Surface rules are datapack content, not an algorithm: vanilla builds the
+# overworld's tree in code but a server has to parse the JSON form anyway to
+# support datapacks, so reading it is the normal path rather than a shortcut.
+# Everything else in this crate stays dependency-free apart from its two
+# sibling crates.
+serde_json.workspace = true
+
+[dev-dependencies]
+flate2.workspace = true
+# The gates only. Worldgen asks block-behaviour questions — `matching_fluids`
+# wants a fluid state, `solid` wants `isSolidRender` — through traits it
+# defines itself, so the library depends on nothing; it is the *test* worlds
+# that need a real answer table to stand in for a live server.
+rustmc-behavior.workspace = true
+# The datapack loaders every whole-chunk gate needs, shared with
+# `worldgen-dump` so there is one reader rather than two.
+worldgen-assembly.workspace = true
+
+[features]
+# Forwarded so `cargo test -p rustmc-worldgen --features t1-sabotage` arms the module in
+# `rustmc-data`. Off by default; see `rustmc_data::sabotage`.
+t1-sabotage = ["rustmc-data/t1-sabotage"]
+
+[lints]
+workspace = true

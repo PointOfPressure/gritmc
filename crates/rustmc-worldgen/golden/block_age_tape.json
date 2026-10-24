@@ -1,0 +1,6338 @@
+{
+ "source": "vanilla 26.2 BlockAgeProcessor.processBlock, run in the JVM with a recording RandomSource injected via StructurePlaceSettings.setRandom",
+ "generator": "ci/block-age-golden.sh + tools/goldengen/vanilla/BlockAgeGolden.java",
+ "seed_note": "seed is Mth.getSeed(pos) \u2014 BlockAgeProcessor's stream is per position, so every entry here is independent of every other",
+ "world": "seed 20260722 overworld, vanilla's own saved ruined_portal/portal_3 at chunk (48,64), piece box [768 42 1032 .. 776 50 1039]",
+ "mossiness": 0.2,
+ "count": 554,
+ "positions": [
+  {
+   "pos": [
+    768,
+    42,
+    1032
+   ],
+   "seed": 64049241778239,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    42,
+    1033
+   ],
+   "seed": -91253066728730,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    42,
+    1034
+   ],
+   "seed": 31061356113360,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    42,
+    1035
+   ],
+   "seed": 27103873416739,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    42,
+    1036
+   ],
+   "seed": 107032529342244,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    42,
+    1037
+   ],
+   "seed": 109032331543118,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    42,
+    1038
+   ],
+   "seed": -70536204869160,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    42,
+    1039
+   ],
+   "seed": -114854616293050,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    43,
+    1033
+   ],
+   "seed": 61951301503763,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    43,
+    1034
+   ],
+   "seed": -121592879923550,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    43,
+    1035
+   ],
+   "seed": -101564184399022,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    43,
+    1036
+   ],
+   "seed": -50781777520123,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    43,
+    1037
+   ],
+   "seed": -14508155585096,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    43,
+    1038
+   ],
+   "seed": 53543581061559,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    44,
+    1033
+   ],
+   "seed": -16451787446368,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    44,
+    1035
+   ],
+   "seed": 51242734497165,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    44,
+    1036
+   ],
+   "seed": -71981536299057,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.02923775"
+   ],
+   "out": "minecraft:mossy_stone_brick_slab[type=bottom,waterlogged=false]"
+  },
+  {
+   "pos": [
+    768,
+    44,
+    1037
+   ],
+   "seed": 74638329092766,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.89101958"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    45,
+    1033
+   ],
+   "seed": 136752580793873,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    45,
+    1034
+   ],
+   "seed": 88381610724733,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    45,
+    1035
+   ],
+   "seed": -77425323316013,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    45,
+    1036
+   ],
+   "seed": 51679133541483,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    45,
+    1039
+   ],
+   "seed": -58169054021379,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    46,
+    1032
+   ],
+   "seed": 14792453378660,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    46,
+    1033
+   ],
+   "seed": -41385547212321,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    46,
+    1034
+   ],
+   "seed": -16605634605220,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    46,
+    1035
+   ],
+   "seed": 75381595582757,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    46,
+    1036
+   ],
+   "seed": -106135173327341,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    46,
+    1038
+   ],
+   "seed": -3905395157807,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    47,
+    1032
+   ],
+   "seed": -138259232073334,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    47,
+    1033
+   ],
+   "seed": 111818821025337,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    47,
+    1034
+   ],
+   "seed": 112215106073692,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    47,
+    1035
+   ],
+   "seed": -53286462227838,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    47,
+    1036
+   ],
+   "seed": 17525496515782,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    47,
+    1037
+   ],
+   "seed": -83296160485801,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    47,
+    1038
+   ],
+   "seed": 120174390767745,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    48,
+    1033
+   ],
+   "seed": 33415732101035,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    48,
+    1034
+   ],
+   "seed": 11754828724245,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    48,
+    1035
+   ],
+   "seed": -93590431907906,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    48,
+    1036
+   ],
+   "seed": -3674262226992,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    48,
+    1037
+   ],
+   "seed": -6795589553528,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    48,
+    1038
+   ],
+   "seed": 44361747653516,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    49,
+    1034
+   ],
+   "seed": 140575569369580,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    49,
+    1035
+   ],
+   "seed": 59216486974075,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    49,
+    1036
+   ],
+   "seed": 119986407608383,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    49,
+    1037
+   ],
+   "seed": -130336076648165,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    768,
+    50,
+    1035
+   ],
+   "seed": -69451570853309,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    42,
+    1032
+   ],
+   "seed": -139209147500693,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    42,
+    1033
+   ],
+   "seed": -47430718785932,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    42,
+    1034
+   ],
+   "seed": 53280390343496,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    42,
+    1035
+   ],
+   "seed": 19116557019143,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    42,
+    1036
+   ],
+   "seed": 104417252442610,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    42,
+    1037
+   ],
+   "seed": -130282727178064,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    42,
+    1038
+   ],
+   "seed": -84398445724856,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    42,
+    1039
+   ],
+   "seed": 122340590804533,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    43,
+    1032
+   ],
+   "seed": 13841163274287,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    43,
+    1033
+   ],
+   "seed": 80843972707184,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    43,
+    1034
+   ],
+   "seed": -75536308310725,
+   "src": "minecraft:lava[level=0]",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    43,
+    1035
+   ],
+   "seed": -133691695562504,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    43,
+    1036
+   ],
+   "seed": -19247500420631,
+   "src": "minecraft:magma_block",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    43,
+    1037
+   ],
+   "seed": -6746282074540,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    43,
+    1038
+   ],
+   "seed": 72998078741834,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    43,
+    1039
+   ],
+   "seed": -35205908084054,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    44,
+    1033
+   ],
+   "seed": -122207499939833,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    44,
+    1034
+   ],
+   "seed": 124805128569510,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    44,
+    1035
+   ],
+   "seed": -5024971432205,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.77514559"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    44,
+    1036
+   ],
+   "seed": 1980839517213,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.16601229",
+    "nextInt(4)=2",
+    "nextInt(2)=1",
+    "nextInt(4)=3",
+    "nextInt(2)=0",
+    "nextFloat=0.32652497",
+    "nextInt(2)=0"
+   ],
+   "out": "minecraft:cracked_stone_bricks"
+  },
+  {
+   "pos": [
+    769,
+    44,
+    1037
+   ],
+   "seed": -95880640670581,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.82959259"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    44,
+    1038
+   ],
+   "seed": -117716517943706,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    45,
+    1032
+   ],
+   "seed": 38466808117464,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    45,
+    1033
+   ],
+   "seed": 6067191561031,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    45,
+    1034
+   ],
+   "seed": -4011570076962,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    45,
+    1035
+   ],
+   "seed": 123641752699386,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    45,
+    1036
+   ],
+   "seed": -121683913353778,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.81807470"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    45,
+    1037
+   ],
+   "seed": 27655804430360,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    45,
+    1038
+   ],
+   "seed": 39680006520402,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    46,
+    1032
+   ],
+   "seed": -89957857814338,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    46,
+    1033
+   ],
+   "seed": -97281906227032,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    46,
+    1034
+   ],
+   "seed": 100963549155673,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    46,
+    1035
+   ],
+   "seed": -29166499878387,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    46,
+    1036
+   ],
+   "seed": 36126310487179,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    46,
+    1037
+   ],
+   "seed": -61478554157933,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    46,
+    1038
+   ],
+   "seed": 130440386553267,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    47,
+    1032
+   ],
+   "seed": 63092452965807,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    47,
+    1033
+   ],
+   "seed": 30992785271250,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    47,
+    1034
+   ],
+   "seed": -27853149493382,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    47,
+    1035
+   ],
+   "seed": 99500224255786,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    47,
+    1036
+   ],
+   "seed": -87538442381228,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    47,
+    1037
+   ],
+   "seed": 62057890940425,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    47,
+    1038
+   ],
+   "seed": 6361934304135,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    48,
+    1032
+   ],
+   "seed": 19137605084477,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    48,
+    1033
+   ],
+   "seed": -54724164201185,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    48,
+    1034
+   ],
+   "seed": -108986689297974,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    48,
+    1035
+   ],
+   "seed": 35034721049084,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    48,
+    1036
+   ],
+   "seed": -82932519854480,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    48,
+    1037
+   ],
+   "seed": -27076467640119,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    48,
+    1038
+   ],
+   "seed": 112052713573226,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    49,
+    1033
+   ],
+   "seed": 73550527263520,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    49,
+    1034
+   ],
+   "seed": 43671588771375,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    49,
+    1035
+   ],
+   "seed": -117773531504152,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    49,
+    1036
+   ],
+   "seed": 74877704021346,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    49,
+    1037
+   ],
+   "seed": 96459977455656,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    49,
+    1038
+   ],
+   "seed": -12025738699151,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    50,
+    1034
+   ],
+   "seed": -132828268722143,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    50,
+    1035
+   ],
+   "seed": 10893192654559,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    50,
+    1036
+   ],
+   "seed": -48787048812192,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    769,
+    50,
+    1037
+   ],
+   "seed": 7325618882861,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    42,
+    1032
+   ],
+   "seed": -56083085393478,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    42,
+    1033
+   ],
+   "seed": 25400988478759,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    42,
+    1034
+   ],
+   "seed": -84869891714218,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    42,
+    1035
+   ],
+   "seed": 57129112440081,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    42,
+    1036
+   ],
+   "seed": 2386555046990,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    42,
+    1037
+   ],
+   "seed": -92391366289954,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    42,
+    1038
+   ],
+   "seed": 32424252261729,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    42,
+    1039
+   ],
+   "seed": -59030598959494,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    43,
+    1032
+   ],
+   "seed": 72359197356153,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    43,
+    1033
+   ],
+   "seed": -102888611443881,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    43,
+    1034
+   ],
+   "seed": 43953590340215,
+   "src": "minecraft:magma_block",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    43,
+    1035
+   ],
+   "seed": -71541686787361,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    43,
+    1036
+   ],
+   "seed": 126055382967340,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    43,
+    1037
+   ],
+   "seed": 65551215289382,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    43,
+    1038
+   ],
+   "seed": -124979030478943,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    43,
+    1039
+   ],
+   "seed": 98519949901298,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    44,
+    1032
+   ],
+   "seed": -31492674178208,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    44,
+    1033
+   ],
+   "seed": -49286342090251,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    44,
+    1034
+   ],
+   "seed": -13385853881727,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.88253391"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    44,
+    1035
+   ],
+   "seed": 32995734188184,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.21813804",
+    "nextInt(4)=3",
+    "nextInt(2)=0",
+    "nextInt(4)=1",
+    "nextInt(2)=1",
+    "nextFloat=0.89232713",
+    "nextInt(2)=1"
+   ],
+   "out": "minecraft:stone_brick_stairs[facing=west,half=top,shape=straight,waterlogged=false]"
+  },
+  {
+   "pos": [
+    770,
+    44,
+    1036
+   ],
+   "seed": -100025407543508,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.54225379"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    44,
+    1037
+   ],
+   "seed": -57981179840646,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.15027136",
+    "nextInt(4)=1",
+    "nextInt(2)=0",
+    "nextInt(4)=1",
+    "nextInt(2)=0",
+    "nextFloat=0.15279531",
+    "nextInt(2)=1"
+   ],
+   "out": "minecraft:mossy_stone_brick_stairs[facing=east,half=top,shape=straight,waterlogged=false]"
+  },
+  {
+   "pos": [
+    770,
+    44,
+    1038
+   ],
+   "seed": -907336507667,
+   "src": "minecraft:obsidian",
+   "draws": [
+    "nextFloat=0.25513756"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    45,
+    1032
+   ],
+   "seed": 96949608568839,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    45,
+    1033
+   ],
+   "seed": 103899034690017,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    45,
+    1034
+   ],
+   "seed": 115437628164957,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    45,
+    1035
+   ],
+   "seed": -95675065041841,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.41243577"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    45,
+    1036
+   ],
+   "seed": 23643420384590,
+   "src": "minecraft:obsidian",
+   "draws": [
+    "nextFloat=0.57422709"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    45,
+    1037
+   ],
+   "seed": 99961401741273,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.95094758"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    45,
+    1038
+   ],
+   "seed": 123164357464900,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    45,
+    1039
+   ],
+   "seed": -82076663749456,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    46,
+    1032
+   ],
+   "seed": -6902262957773,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    46,
+    1033
+   ],
+   "seed": -24390565239080,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    46,
+    1034
+   ],
+   "seed": -37213866497723,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    46,
+    1035
+   ],
+   "seed": 8862355941452,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    46,
+    1036
+   ],
+   "seed": -65888086685175,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    46,
+    1037
+   ],
+   "seed": -23570993386173,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    46,
+    1038
+   ],
+   "seed": -34238925271898,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    46,
+    1039
+   ],
+   "seed": 8221643070109,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    47,
+    1032
+   ],
+   "seed": 121540019786691,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    47,
+    1033
+   ],
+   "seed": 128794811543770,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    47,
+    1034
+   ],
+   "seed": 91609615551544,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    47,
+    1035
+   ],
+   "seed": -119808443291156,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    47,
+    1036
+   ],
+   "seed": 57780741240341,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    47,
+    1037
+   ],
+   "seed": 134371588198329,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    47,
+    1038
+   ],
+   "seed": 89832768703252,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    47,
+    1039
+   ],
+   "seed": -115702784774589,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    48,
+    1032
+   ],
+   "seed": -67063538452054,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    48,
+    1033
+   ],
+   "seed": -99077895777095,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    48,
+    1034
+   ],
+   "seed": -65503053324933,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    48,
+    1035
+   ],
+   "seed": -103678972933601,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    48,
+    1036
+   ],
+   "seed": 113174927465977,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    48,
+    1037
+   ],
+   "seed": 23226163760442,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    48,
+    1038
+   ],
+   "seed": -82392780524458,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    48,
+    1039
+   ],
+   "seed": 121566014745500,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    49,
+    1032
+   ],
+   "seed": 61378744269165,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    49,
+    1033
+   ],
+   "seed": 54107480998007,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    49,
+    1034
+   ],
+   "seed": 63320428757911,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    49,
+    1035
+   ],
+   "seed": 49125204562527,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    49,
+    1036
+   ],
+   "seed": -44631221311415,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    49,
+    1037
+   ],
+   "seed": -100306231404456,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    49,
+    1038
+   ],
+   "seed": 41678913432612,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    50,
+    1033
+   ],
+   "seed": -74182118936256,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    50,
+    1034
+   ],
+   "seed": -89331065868609,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    50,
+    1035
+   ],
+   "seed": -127812351211328,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    50,
+    1036
+   ],
+   "seed": -134162728396676,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    50,
+    1037
+   ],
+   "seed": 57636350142595,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    770,
+    50,
+    1038
+   ],
+   "seed": -115724369319683,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    42,
+    1032
+   ],
+   "seed": -86759030776032,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    42,
+    1033
+   ],
+   "seed": 403443255026,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    42,
+    1034
+   ],
+   "seed": -32906313782006,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    42,
+    1035
+   ],
+   "seed": 43134627873474,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    42,
+    1036
+   ],
+   "seed": -78016262211319,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    42,
+    1037
+   ],
+   "seed": 106050659617646,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    42,
+    1038
+   ],
+   "seed": 93924636133212,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    42,
+    1039
+   ],
+   "seed": 39056027220368,
+   "src": "minecraft:magma_block",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    43,
+    1032
+   ],
+   "seed": 66283121864898,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    43,
+    1033
+   ],
+   "seed": 128686292799540,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    43,
+    1034
+   ],
+   "seed": 119738389541989,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    43,
+    1035
+   ],
+   "seed": -109660049975734,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    43,
+    1036
+   ],
+   "seed": 79785803502045,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    43,
+    1037
+   ],
+   "seed": -51895963914061,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    43,
+    1038
+   ],
+   "seed": -30145724181014,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    43,
+    1039
+   ],
+   "seed": -118503980366820,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    44,
+    1032
+   ],
+   "seed": -12931045043050,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    44,
+    1033
+   ],
+   "seed": -24505834365311,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.64277321"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    44,
+    1034
+   ],
+   "seed": -9091883843380,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.12022096",
+    "nextInt(4)=1",
+    "nextInt(2)=1",
+    "nextInt(4)=0",
+    "nextInt(2)=1",
+    "nextFloat=0.38168025",
+    "nextInt(2)=1"
+   ],
+   "out": "minecraft:stone_brick_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]"
+  },
+  {
+   "pos": [
+    771,
+    44,
+    1035
+   ],
+   "seed": -29208509070434,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.39379871",
+    "nextInt(4)=3",
+    "nextInt(2)=0",
+    "nextInt(4)=1",
+    "nextInt(2)=1",
+    "nextFloat=0.80837739",
+    "nextInt(2)=0"
+   ],
+   "out": "minecraft:cracked_stone_bricks"
+  },
+  {
+   "pos": [
+    771,
+    44,
+    1036
+   ],
+   "seed": -112145416923518,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.33835995",
+    "nextInt(4)=2",
+    "nextInt(2)=1",
+    "nextInt(4)=0",
+    "nextInt(2)=0",
+    "nextFloat=0.45670670",
+    "nextInt(2)=1"
+   ],
+   "out": "minecraft:stone_brick_stairs[facing=south,half=bottom,shape=straight,waterlogged=false]"
+  },
+  {
+   "pos": [
+    771,
+    44,
+    1037
+   ],
+   "seed": -72169506007621,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.36084473",
+    "nextInt(4)=0",
+    "nextInt(2)=0",
+    "nextInt(4)=1",
+    "nextInt(2)=0",
+    "nextFloat=0.16721970",
+    "nextInt(2)=0"
+   ],
+   "out": "minecraft:mossy_stone_bricks"
+  },
+  {
+   "pos": [
+    771,
+    44,
+    1038
+   ],
+   "seed": -6078132086280,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.38956350",
+    "nextInt(4)=2",
+    "nextInt(2)=0",
+    "nextInt(4)=1",
+    "nextInt(2)=0",
+    "nextFloat=0.12650913",
+    "nextInt(2)=0"
+   ],
+   "out": "minecraft:mossy_stone_bricks"
+  },
+  {
+   "pos": [
+    771,
+    44,
+    1039
+   ],
+   "seed": 72701065687961,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    45,
+    1032
+   ],
+   "seed": 140111107605628,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    45,
+    1033
+   ],
+   "seed": 103777015181785,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    45,
+    1034
+   ],
+   "seed": -137922157227458,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    45,
+    1035
+   ],
+   "seed": 99471789798763,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.45666653"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    45,
+    1036
+   ],
+   "seed": 45656648787264,
+   "src": "minecraft:obsidian",
+   "draws": [
+    "nextFloat=0.45479923"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    45,
+    1037
+   ],
+   "seed": 51358847163581,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.56164205"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    45,
+    1038
+   ],
+   "seed": -130148492408254,
+   "src": "minecraft:obsidian",
+   "draws": [
+    "nextFloat=0.21296233"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    45,
+    1039
+   ],
+   "seed": -84858941901809,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    46,
+    1032
+   ],
+   "seed": -37540373625876,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    46,
+    1033
+   ],
+   "seed": -49415111980483,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    46,
+    1034
+   ],
+   "seed": 14722546100411,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    46,
+    1035
+   ],
+   "seed": -5094130094297,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    46,
+    1036
+   ],
+   "seed": 135200405080105,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    46,
+    1037
+   ],
+   "seed": -106587776374583,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    46,
+    1038
+   ],
+   "seed": 27256123981718,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    46,
+    1039
+   ],
+   "seed": 106346104160721,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    47,
+    1032
+   ],
+   "seed": 115501779020219,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    47,
+    1033
+   ],
+   "seed": 78867737569196,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    47,
+    1034
+   ],
+   "seed": -114107727281084,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    47,
+    1035
+   ],
+   "seed": 123586168772317,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    47,
+    1036
+   ],
+   "seed": 11527494077648,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    47,
+    1037
+   ],
+   "seed": 16940576799201,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    47,
+    1038
+   ],
+   "seed": -96814236337673,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    47,
+    1039
+   ],
+   "seed": -51213903431633,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    48,
+    1032
+   ],
+   "seed": 120887960248134,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    48,
+    1033
+   ],
+   "seed": 42749076078842,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    48,
+    1034
+   ],
+   "seed": 38536976049368,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    48,
+    1035
+   ],
+   "seed": 11122678162970,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    48,
+    1036
+   ],
+   "seed": 84187772806692,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    48,
+    1037
+   ],
+   "seed": -3332965258199,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    48,
+    1038
+   ],
+   "seed": -57945715771487,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    48,
+    1039
+   ],
+   "seed": 127676473937359,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    49,
+    1032
+   ],
+   "seed": -7544863829341,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    49,
+    1033
+   ],
+   "seed": -110443051120878,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    49,
+    1034
+   ],
+   "seed": -90293297329544,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    49,
+    1035
+   ],
+   "seed": 139802977057996,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    49,
+    1036
+   ],
+   "seed": -39485138157022,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    49,
+    1037
+   ],
+   "seed": 120195387907837,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    49,
+    1038
+   ],
+   "seed": 99458900591365,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    49,
+    1039
+   ],
+   "seed": -29883533678241,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    50,
+    1032
+   ],
+   "seed": 96278631696302,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    50,
+    1033
+   ],
+   "seed": 17839798391349,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    50,
+    1034
+   ],
+   "seed": 62351406003491,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    50,
+    1035
+   ],
+   "seed": 35237057087449,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    50,
+    1036
+   ],
+   "seed": 50058618027338,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    50,
+    1037
+   ],
+   "seed": -37751235635492,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    771,
+    50,
+    1038
+   ],
+   "seed": -24611459755147,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    42,
+    1032
+   ],
+   "seed": 48645887034927,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    42,
+    1033
+   ],
+   "seed": -138781259460548,
+   "src": "minecraft:magma_block",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    42,
+    1034
+   ],
+   "seed": -124748056410943,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    42,
+    1035
+   ],
+   "seed": 135964753373852,
+   "src": "minecraft:jigsaw[orientation=north_up]",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    42,
+    1036
+   ],
+   "seed": -30165711383455,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    42,
+    1037
+   ],
+   "seed": 87428491260095,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    42,
+    1038
+   ],
+   "seed": -137768071270519,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    42,
+    1039
+   ],
+   "seed": 61910625714737,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    43,
+    1032
+   ],
+   "seed": -104075303784936,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    43,
+    1033
+   ],
+   "seed": 13789279841309,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    43,
+    1034
+   ],
+   "seed": 3612342569091,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    43,
+    1035
+   ],
+   "seed": 7453702793161,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    43,
+    1036
+   ],
+   "seed": 93641285719402,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    43,
+    1037
+   ],
+   "seed": -36529157422755,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    43,
+    1038
+   ],
+   "seed": -14354460995770,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    43,
+    1039
+   ],
+   "seed": -61653636098681,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    44,
+    1032
+   ],
+   "seed": 120548101849254,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    44,
+    1033
+   ],
+   "seed": 119027615360923,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.59082973"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    44,
+    1034
+   ],
+   "seed": -99993877656481,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.07486761",
+    "nextInt(4)=3",
+    "nextInt(2)=1",
+    "nextInt(4)=0",
+    "nextInt(2)=0",
+    "nextFloat=0.66523153",
+    "nextInt(2)=0"
+   ],
+   "out": "minecraft:cracked_stone_bricks"
+  },
+  {
+   "pos": [
+    772,
+    44,
+    1035
+   ],
+   "seed": 62606126753153,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.13595027",
+    "nextInt(4)=3",
+    "nextInt(2)=0",
+    "nextInt(4)=1",
+    "nextInt(2)=1",
+    "nextFloat=0.81436801",
+    "nextInt(2)=1"
+   ],
+   "out": "minecraft:stone_brick_stairs[facing=west,half=top,shape=straight,waterlogged=false]"
+  },
+  {
+   "pos": [
+    772,
+    44,
+    1036
+   ],
+   "seed": -64026693887106,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.92723697"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    44,
+    1037
+   ],
+   "seed": -93367447396327,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.85402930"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    44,
+    1038
+   ],
+   "seed": 39763636976036,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.89218587"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    44,
+    1039
+   ],
+   "seed": 96257078799849,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    45,
+    1032
+   ],
+   "seed": -32173088978357,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    45,
+    1033
+   ],
+   "seed": -9876822050458,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    45,
+    1034
+   ],
+   "seed": 28366521320970,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    45,
+    1035
+   ],
+   "seed": -65904923835287,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.37633049"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    45,
+    1036
+   ],
+   "seed": 59780303218333,
+   "src": "minecraft:obsidian",
+   "draws": [
+    "nextFloat=0.15622121"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    45,
+    1037
+   ],
+   "seed": 64149880639227,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.37238431"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    45,
+    1038
+   ],
+   "seed": -118297729452122,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    45,
+    1039
+   ],
+   "seed": -27307183010986,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    46,
+    1032
+   ],
+   "seed": 96580696905979,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    46,
+    1033
+   ],
+   "seed": 95361513476905,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    46,
+    1034
+   ],
+   "seed": -75239698896853,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    46,
+    1035
+   ],
+   "seed": 87059002288220,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    46,
+    1036
+   ],
+   "seed": -97887676385592,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    46,
+    1037
+   ],
+   "seed": -126927126752904,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    46,
+    1038
+   ],
+   "seed": 74411393125571,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    46,
+    1039
+   ],
+   "seed": 130603531890127,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    47,
+    1032
+   ],
+   "seed": -56140493919049,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    47,
+    1033
+   ],
+   "seed": -33542923937060,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    47,
+    1034
+   ],
+   "seed": 53120700078015,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    47,
+    1035
+   ],
+   "seed": -41452048297637,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    47,
+    1036
+   ],
+   "seed": 25919320722431,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    47,
+    1037
+   ],
+   "seed": 30590201280067,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    47,
+    1038
+   ],
+   "seed": -83649973305170,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    47,
+    1039
+   ],
+   "seed": 7039270081875,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    48,
+    1032
+   ],
+   "seed": 78747174855462,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    48,
+    1033
+   ],
+   "seed": 71695411598052,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    48,
+    1034
+   ],
+   "seed": 116397573672445,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    48,
+    1035
+   ],
+   "seed": -72151596669612,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    48,
+    1036
+   ],
+   "seed": -131748658878911,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    48,
+    1037
+   ],
+   "seed": -253004497010,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    48,
+    1038
+   ],
+   "seed": -33824802759927,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    48,
+    1039
+   ],
+   "seed": -109821639633339,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    49,
+    1032
+   ],
+   "seed": -73974015997978,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    49,
+    1033
+   ],
+   "seed": -57209025818495,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    49,
+    1034
+   ],
+   "seed": -36717004024600,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    49,
+    1035
+   ],
+   "seed": 80812329468101,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    49,
+    1036
+   ],
+   "seed": -7941661768306,
+   "src": "minecraft:obsidian",
+   "draws": [
+    "nextFloat=0.62354612"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    49,
+    1037
+   ],
+   "seed": -124210653208272,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    49,
+    1038
+   ],
+   "seed": 89588807507074,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    49,
+    1039
+   ],
+   "seed": 48089075250985,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    50,
+    1032
+   ],
+   "seed": 54779769860529,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    50,
+    1033
+   ],
+   "seed": 48029309724365,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    50,
+    1034
+   ],
+   "seed": -140323224350904,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    50,
+    1035
+   ],
+   "seed": -47698721103550,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    50,
+    1036
+   ],
+   "seed": 115865335343591,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    50,
+    1037
+   ],
+   "seed": -33812683781266,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    772,
+    50,
+    1038
+   ],
+   "seed": 822953420602,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    42,
+    1032
+   ],
+   "seed": 81132709078734,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    42,
+    1033
+   ],
+   "seed": 81393295524844,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    42,
+    1034
+   ],
+   "seed": 132900803752453,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    42,
+    1035
+   ],
+   "seed": 94151468585251,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    42,
+    1036
+   ],
+   "seed": 79257079069352,
+   "src": "minecraft:magma_block",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    42,
+    1037
+   ],
+   "seed": -112648829038859,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    42,
+    1038
+   ],
+   "seed": -133842714815115,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    42,
+    1039
+   ],
+   "seed": -42587507623907,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    43,
+    1032
+   ],
+   "seed": -47622451494240,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    43,
+    1033
+   ],
+   "seed": -71173160617420,
+   "src": "minecraft:magma_block",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    43,
+    1034
+   ],
+   "seed": 4544446647302,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    43,
+    1035
+   ],
+   "seed": -58813791107488,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    43,
+    1036
+   ],
+   "seed": -44554000945143,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    43,
+    1037
+   ],
+   "seed": 11304777515986,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    43,
+    1038
+   ],
+   "seed": 24219985431522,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    43,
+    1039
+   ],
+   "seed": 80978128835531,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    44,
+    1032
+   ],
+   "seed": 9238742411729,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.62143409"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    44,
+    1033
+   ],
+   "seed": 105051231102589,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.65203393"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    44,
+    1034
+   ],
+   "seed": 108138541255971,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.90688801"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    44,
+    1035
+   ],
+   "seed": -113956880073819,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.17904788",
+    "nextInt(4)=0",
+    "nextInt(2)=0",
+    "nextInt(4)=0",
+    "nextInt(2)=0",
+    "nextFloat=0.46356159",
+    "nextInt(2)=0"
+   ],
+   "out": "minecraft:cracked_stone_bricks"
+  },
+  {
+   "pos": [
+    773,
+    44,
+    1036
+   ],
+   "seed": 113109895752310,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.10225481",
+    "nextInt(4)=2",
+    "nextInt(2)=1",
+    "nextInt(4)=0",
+    "nextInt(2)=0",
+    "nextFloat=0.31281799",
+    "nextInt(2)=1"
+   ],
+   "out": "minecraft:stone_brick_stairs[facing=south,half=bottom,shape=straight,waterlogged=false]"
+  },
+  {
+   "pos": [
+    773,
+    44,
+    1037
+   ],
+   "seed": 68122856888271,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.02470553",
+    "nextInt(4)=3",
+    "nextInt(2)=0",
+    "nextInt(4)=1",
+    "nextInt(2)=0",
+    "nextFloat=0.10515493",
+    "nextInt(2)=1"
+   ],
+   "out": "minecraft:mossy_stone_brick_stairs[facing=east,half=top,shape=straight,waterlogged=false]"
+  },
+  {
+   "pos": [
+    773,
+    44,
+    1038
+   ],
+   "seed": -29891443447888,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.90148538"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    44,
+    1039
+   ],
+   "seed": -76931211414396,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    45,
+    1032
+   ],
+   "seed": -119516418168993,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    45,
+    1033
+   ],
+   "seed": -47515225042257,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    45,
+    1034
+   ],
+   "seed": -20217815851762,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    45,
+    1035
+   ],
+   "seed": 14552836936350,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.06281984"
+   ],
+   "out": "minecraft:mossy_stone_brick_slab[type=bottom,waterlogged=false]"
+  },
+  {
+   "pos": [
+    773,
+    45,
+    1036
+   ],
+   "seed": -10701184259601,
+   "src": "minecraft:obsidian",
+   "draws": [
+    "nextFloat=0.23848999"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    45,
+    1037
+   ],
+   "seed": -89398513259791,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.46859103"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    45,
+    1038
+   ],
+   "seed": 128171256806498,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    45,
+    1039
+   ],
+   "seed": 46634425047624,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    46,
+    1032
+   ],
+   "seed": 33203397962232,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    46,
+    1033
+   ],
+   "seed": 128709166685500,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    46,
+    1034
+   ],
+   "seed": 83376278764656,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    46,
+    1035
+   ],
+   "seed": -138412422762846,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    46,
+    1036
+   ],
+   "seed": -134512264270221,
+   "src": "minecraft:obsidian",
+   "draws": [
+    "nextFloat=0.92067116"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    46,
+    1037
+   ],
+   "seed": 101690620477614,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    46,
+    1038
+   ],
+   "seed": -64541867242129,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    46,
+    1039
+   ],
+   "seed": -111274915199720,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    47,
+    1032
+   ],
+   "seed": -95551762615908,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    47,
+    1033
+   ],
+   "seed": -23857289461930,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    47,
+    1034
+   ],
+   "seed": -44980078345660,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    47,
+    1035
+   ],
+   "seed": -9902705750095,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    47,
+    1036
+   ],
+   "seed": 23151632431106,
+   "src": "minecraft:obsidian",
+   "draws": [
+    "nextFloat=0.28985357"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    47,
+    1037
+   ],
+   "seed": -55830749673031,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    47,
+    1038
+   ],
+   "seed": 93520833009674,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    47,
+    1039
+   ],
+   "seed": 12290721264884,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    48,
+    1032
+   ],
+   "seed": -38690568673779,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    48,
+    1033
+   ],
+   "seed": 60155610453499,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    48,
+    1034
+   ],
+   "seed": -24762860398311,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    48,
+    1035
+   ],
+   "seed": 106615476171188,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    48,
+    1036
+   ],
+   "seed": -111311890555299,
+   "src": "minecraft:obsidian",
+   "draws": [
+    "nextFloat=0.37180668"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    48,
+    1037
+   ],
+   "seed": -11945538208842,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    48,
+    1038
+   ],
+   "seed": 47952577324128,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    48,
+    1039
+   ],
+   "seed": 122405665411884,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    49,
+    1032
+   ],
+   "seed": 114029247450989,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    49,
+    1033
+   ],
+   "seed": -92410845717176,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    49,
+    1034
+   ],
+   "seed": 128355759220109,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    49,
+    1035
+   ],
+   "seed": -46349783493140,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    49,
+    1036
+   ],
+   "seed": 46352006169274,
+   "src": "minecraft:obsidian",
+   "draws": [
+    "nextFloat=0.82610518"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    49,
+    1037
+   ],
+   "seed": 112008068338255,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    49,
+    1038
+   ],
+   "seed": -75459699168303,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    49,
+    1039
+   ],
+   "seed": -35503674872912,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    50,
+    1032
+   ],
+   "seed": -14725913133608,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    50,
+    1033
+   ],
+   "seed": 83813546088068,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    50,
+    1034
+   ],
+   "seed": -49525122920621,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    50,
+    1035
+   ],
+   "seed": 82159933554481,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    50,
+    1036
+   ],
+   "seed": -77459073815517,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    50,
+    1037
+   ],
+   "seed": 21622225411495,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    773,
+    50,
+    1038
+   ],
+   "seed": 13302153602207,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    42,
+    1032
+   ],
+   "seed": -87114401262460,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    42,
+    1033
+   ],
+   "seed": -96840789684615,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    42,
+    1034
+   ],
+   "seed": 120775225661354,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    42,
+    1035
+   ],
+   "seed": -116436339876863,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    42,
+    1036
+   ],
+   "seed": -57357992430112,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    42,
+    1037
+   ],
+   "seed": 110935386252487,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    42,
+    1038
+   ],
+   "seed": -15552036158881,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    42,
+    1039
+   ],
+   "seed": -37315140665716,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    43,
+    1032
+   ],
+   "seed": 41636719959101,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.22763824",
+    "nextInt(4)=1",
+    "nextInt(2)=0",
+    "nextInt(4)=1",
+    "nextInt(2)=0",
+    "nextFloat=0.44241101",
+    "nextInt(2)=1"
+   ],
+   "out": "minecraft:stone_brick_stairs[facing=east,half=top,shape=straight,waterlogged=false]"
+  },
+  {
+   "pos": [
+    774,
+    43,
+    1033
+   ],
+   "seed": 55732414193491,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    43,
+    1034
+   ],
+   "seed": -32336599964475,
+   "src": "minecraft:magma_block",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    43,
+    1035
+   ],
+   "seed": 36524834137977,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    43,
+    1036
+   ],
+   "seed": 66457173220956,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    43,
+    1037
+   ],
+   "seed": -13014180909619,
+   "src": "minecraft:magma_block",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    43,
+    1038
+   ],
+   "seed": 107853492610621,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    43,
+    1039
+   ],
+   "seed": 120598238978241,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    44,
+    1032
+   ],
+   "seed": 122442372664966,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.80589569"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    44,
+    1033
+   ],
+   "seed": -73169358637767,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.01706862",
+    "nextInt(4)=2",
+    "nextInt(2)=0",
+    "nextInt(4)=3",
+    "nextInt(2)=0",
+    "nextFloat=0.29455483",
+    "nextInt(2)=1"
+   ],
+   "out": "minecraft:stone_brick_stairs[facing=south,half=top,shape=straight,waterlogged=false]"
+  },
+  {
+   "pos": [
+    774,
+    44,
+    1034
+   ],
+   "seed": 96026551121644,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.67341524"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    44,
+    1035
+   ],
+   "seed": -43094225900421,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.38901246",
+    "nextInt(4)=3",
+    "nextInt(2)=1",
+    "nextInt(4)=2",
+    "nextInt(2)=1",
+    "nextFloat=0.15579748",
+    "nextInt(2)=1"
+   ],
+   "out": "minecraft:mossy_stone_brick_stairs[facing=south,half=bottom,shape=straight,waterlogged=false]"
+  },
+  {
+   "pos": [
+    774,
+    44,
+    1036
+   ],
+   "seed": -23513347017717,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.91236180"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    44,
+    1037
+   ],
+   "seed": 10207859120278,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.97376913"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    44,
+    1038
+   ],
+   "seed": 88439721383195,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    45,
+    1032
+   ],
+   "seed": -30281482816380,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    45,
+    1033
+   ],
+   "seed": 79403845242922,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    45,
+    1034
+   ],
+   "seed": -57085274501602,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    45,
+    1035
+   ],
+   "seed": 109866948122167,
+   "src": "minecraft:chest[facing=west,type=single,waterlogged=false]",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    45,
+    1036
+   ],
+   "seed": 100301818630768,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.36911118",
+    "nextInt(4)=0",
+    "nextInt(2)=1",
+    "nextInt(4)=3",
+    "nextInt(2)=0",
+    "nextFloat=0.63935971",
+    "nextInt(2)=0"
+   ],
+   "out": "minecraft:cracked_stone_bricks"
+  },
+  {
+   "pos": [
+    774,
+    45,
+    1037
+   ],
+   "seed": -113741708049577,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    45,
+    1038
+   ],
+   "seed": -69629726565707,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    46,
+    1032
+   ],
+   "seed": -135059869789779,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    46,
+    1033
+   ],
+   "seed": -49497927585754,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    46,
+    1034
+   ],
+   "seed": 71277876587100,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    46,
+    1035
+   ],
+   "seed": -67541597231067,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    46,
+    1036
+   ],
+   "seed": 10331298399844,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    46,
+    1037
+   ],
+   "seed": 43783701492515,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    46,
+    1038
+   ],
+   "seed": 53775802197338,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    47,
+    1032
+   ],
+   "seed": -6308748563052,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    47,
+    1033
+   ],
+   "seed": 103075276297518,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    47,
+    1034
+   ],
+   "seed": -81833949033563,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    47,
+    1035
+   ],
+   "seed": 85419576788938,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    47,
+    1036
+   ],
+   "seed": 134146464045746,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    47,
+    1037
+   ],
+   "seed": -80165865674757,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    47,
+    1038
+   ],
+   "seed": -104293645748982,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    47,
+    1039
+   ],
+   "seed": 51894673831473,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    48,
+    1032
+   ],
+   "seed": -104889300703511,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    48,
+    1033
+   ],
+   "seed": 66277031869289,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    48,
+    1034
+   ],
+   "seed": 130014782719321,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    48,
+    1035
+   ],
+   "seed": 5800516776369,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    48,
+    1036
+   ],
+   "seed": 54893757296055,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    48,
+    1037
+   ],
+   "seed": -44075587607324,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    48,
+    1038
+   ],
+   "seed": -123707416940248,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    49,
+    1032
+   ],
+   "seed": 23861820489639,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    49,
+    1033
+   ],
+   "seed": -62624740976175,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    49,
+    1034
+   ],
+   "seed": -23097042878096,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    49,
+    1035
+   ],
+   "seed": -122713285906533,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    49,
+    1036
+   ],
+   "seed": -102766053750619,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    49,
+    1037
+   ],
+   "seed": 113449821907648,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    49,
+    1038
+   ],
+   "seed": -301888183660,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    50,
+    1033
+   ],
+   "seed": 89948462890308,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    50,
+    1034
+   ],
+   "seed": 105266108236434,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    50,
+    1035
+   ],
+   "seed": -18646854564609,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    50,
+    1036
+   ],
+   "seed": 88738402682622,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    774,
+    50,
+    1037
+   ],
+   "seed": -10499745286744,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    42,
+    1032
+   ],
+   "seed": 58986362954263,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    42,
+    1033
+   ],
+   "seed": 53793791692635,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    42,
+    1034
+   ],
+   "seed": 98957067541069,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    42,
+    1035
+   ],
+   "seed": -82009530304341,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    42,
+    1036
+   ],
+   "seed": 67685116982593,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    42,
+    1037
+   ],
+   "seed": 122377236424110,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    42,
+    1038
+   ],
+   "seed": 62579987430856,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    42,
+    1039
+   ],
+   "seed": 93118974624080,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    43,
+    1032
+   ],
+   "seed": -69776966332226,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    43,
+    1033
+   ],
+   "seed": -98764495818765,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    43,
+    1034
+   ],
+   "seed": -29412874875987,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    43,
+    1035
+   ],
+   "seed": 46513772025481,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    43,
+    1036
+   ],
+   "seed": -56134131745416,
+   "src": "minecraft:lava[level=0]",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    43,
+    1037
+   ],
+   "seed": -35152215076810,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    43,
+    1038
+   ],
+   "seed": -60824207682888,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    44,
+    1032
+   ],
+   "seed": 35038044820459,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.37599128"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    44,
+    1033
+   ],
+   "seed": 124718586656190,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.99089938"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    44,
+    1034
+   ],
+   "seed": 24751791938554,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.61865574"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    44,
+    1035
+   ],
+   "seed": -57581158249455,
+   "src": "minecraft:stone_bricks",
+   "draws": [
+    "nextFloat=0.30180722",
+    "nextInt(4)=3",
+    "nextInt(2)=1",
+    "nextInt(4)=2",
+    "nextInt(2)=0",
+    "nextFloat=0.77215004",
+    "nextInt(2)=0"
+   ],
+   "out": "minecraft:cracked_stone_bricks"
+  },
+  {
+   "pos": [
+    775,
+    44,
+    1036
+   ],
+   "seed": -112280421944780,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    44,
+    1037
+   ],
+   "seed": 88793310134218,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.08975536"
+   ],
+   "out": "minecraft:mossy_stone_brick_slab[type=bottom,waterlogged=false]"
+  },
+  {
+   "pos": [
+    775,
+    44,
+    1038
+   ],
+   "seed": 97246573915316,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    44,
+    1039
+   ],
+   "seed": -9993125446700,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    45,
+    1032
+   ],
+   "seed": -93725284468613,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    45,
+    1033
+   ],
+   "seed": -27839700862959,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    45,
+    1034
+   ],
+   "seed": -103618150486250,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    45,
+    1035
+   ],
+   "seed": 70942144077784,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    45,
+    1036
+   ],
+   "seed": 45375306045615,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    45,
+    1037
+   ],
+   "seed": -68736141364119,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    45,
+    1038
+   ],
+   "seed": -26157621195846,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    46,
+    1032
+   ],
+   "seed": 11089726691821,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    46,
+    1033
+   ],
+   "seed": 101076988329839,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    46,
+    1034
+   ],
+   "seed": 49486883800893,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    46,
+    1035
+   ],
+   "seed": -33152786189403,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    46,
+    1036
+   ],
+   "seed": 135358075499616,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    46,
+    1037
+   ],
+   "seed": 55209383849492,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    46,
+    1038
+   ],
+   "seed": 131913160404941,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    47,
+    1032
+   ],
+   "seed": -117673602599834,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    47,
+    1033
+   ],
+   "seed": -51481299186727,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    47,
+    1034
+   ],
+   "seed": -78883058621328,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    47,
+    1035
+   ],
+   "seed": 95370516135253,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    47,
+    1036
+   ],
+   "seed": 11538826776772,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    47,
+    1037
+   ],
+   "seed": -102320067646262,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    47,
+    1038
+   ],
+   "seed": 8508965296362,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    48,
+    1032
+   ],
+   "seed": -12858591431651,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    48,
+    1033
+   ],
+   "seed": 79659593493155,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    48,
+    1034
+   ],
+   "seed": -108312633520581,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    48,
+    1035
+   ],
+   "seed": -118103389837117,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    48,
+    1036
+   ],
+   "seed": -55390605708720,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    48,
+    1037
+   ],
+   "seed": 8821891240401,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    48,
+    1038
+   ],
+   "seed": -106610659686375,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    49,
+    1032
+   ],
+   "seed": 139853055984767,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    49,
+    1033
+   ],
+   "seed": -72898694051823,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    49,
+    1034
+   ],
+   "seed": 44792400780768,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    49,
+    1035
+   ],
+   "seed": 10419912526283,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    49,
+    1036
+   ],
+   "seed": 102265122307504,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    49,
+    1037
+   ],
+   "seed": 132767416437223,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    49,
+    1038
+   ],
+   "seed": 51460121876960,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    50,
+    1034
+   ],
+   "seed": -83577541627247,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    50,
+    1035
+   ],
+   "seed": -93675017849386,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    50,
+    1036
+   ],
+   "seed": -89227085026637,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    775,
+    50,
+    1037
+   ],
+   "seed": -24762035075320,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    42,
+    1032
+   ],
+   "seed": -45082818157453,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    42,
+    1033
+   ],
+   "seed": -21135876886823,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    42,
+    1034
+   ],
+   "seed": 61565325742589,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    42,
+    1035
+   ],
+   "seed": -97418010086018,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    42,
+    1036
+   ],
+   "seed": -121832505503939,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    42,
+    1037
+   ],
+   "seed": 8755673695643,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    42,
+    1038
+   ],
+   "seed": -97240106258599,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    42,
+    1039
+   ],
+   "seed": 96872321417355,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    43,
+    1033
+   ],
+   "seed": 131429158360420,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    43,
+    1034
+   ],
+   "seed": -91532914571335,
+   "src": "minecraft:magma_block",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    43,
+    1035
+   ],
+   "seed": 55529578616917,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    43,
+    1036
+   ],
+   "seed": 1990828860644,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    43,
+    1037
+   ],
+   "seed": -115185812121355,
+   "src": "minecraft:netherrack",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    44,
+    1033
+   ],
+   "seed": 49829404484039,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.97837871"
+   ],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    44,
+    1034
+   ],
+   "seed": -12599185989611,
+   "src": "minecraft:stone_brick_slab[type=bottom,waterlogged=false]",
+   "draws": [
+    "nextFloat=0.10609770"
+   ],
+   "out": "minecraft:mossy_stone_brick_slab[type=bottom,waterlogged=false]"
+  },
+  {
+   "pos": [
+    776,
+    45,
+    1033
+   ],
+   "seed": -79080536971625,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    45,
+    1034
+   ],
+   "seed": 115777550414870,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    45,
+    1035
+   ],
+   "seed": 79949779316004,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    46,
+    1032
+   ],
+   "seed": -92995611830712,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    46,
+    1033
+   ],
+   "seed": 26174310688586,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    46,
+    1034
+   ],
+   "seed": 12122317915956,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    46,
+    1035
+   ],
+   "seed": -48577608687843,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    47,
+    1032
+   ],
+   "seed": 35763678109530,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    47,
+    1033
+   ],
+   "seed": -102735630769661,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    47,
+    1034
+   ],
+   "seed": 140499054317855,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    47,
+    1035
+   ],
+   "seed": 104369980020257,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    47,
+    1036
+   ],
+   "seed": 69647444831374,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    47,
+    1037
+   ],
+   "seed": 99105154443728,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    48,
+    1032
+   ],
+   "seed": -15124635488266,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    48,
+    1033
+   ],
+   "seed": -92101158211194,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    48,
+    1034
+   ],
+   "seed": 21660751949485,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    48,
+    1035
+   ],
+   "seed": -24157407981007,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    48,
+    1036
+   ],
+   "seed": 58157547281617,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    48,
+    1037
+   ],
+   "seed": -79281405110240,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    48,
+    1038
+   ],
+   "seed": 6800139385125,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    49,
+    1034
+   ],
+   "seed": -131437488330861,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    49,
+    1035
+   ],
+   "seed": 128790180729676,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    49,
+    1036
+   ],
+   "seed": -99494095056707,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    49,
+    1037
+   ],
+   "seed": 78252085755007,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  },
+  {
+   "pos": [
+    776,
+    50,
+    1035
+   ],
+   "seed": 262792730994,
+   "src": "minecraft:air",
+   "draws": [],
+   "out": null
+  }
+ ]
+}

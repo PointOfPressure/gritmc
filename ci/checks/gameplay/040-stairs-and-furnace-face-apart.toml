@@ -1,0 +1,32 @@
+name = "stairs-and-furnace-face-apart"
+about = "a stair and a furnace placed from ONE yaw come back facing opposite ways — StairBlock takes getHorizontalDirection() and AbstractFurnaceBlock takes its opposite, so no single generic rule for `facing` can produce this pair"
+observe_from = "actor"
+# `packet:0x4A` is `minecraft:recipe_book_add` — unnamed in
+# `tools/oracle-runner` (see `compare::near`'s R2 audit), so it is compared
+# as an exact digest of its whole body under this literal kind string. Step 0
+# holds `oak_stairs`, which unlocks nothing, and step 2 holds `furnace`,
+# which unlocks exactly `minecraft:smoker` — PARITY-ROADMAP.md §3 S2.
+observe = ["block_update", "section_blocks_update", "block_changed_ack", "packet:0x4A"]
+
+[[setup]]
+do = "look"
+yaw = -90.0
+pitch = 0.0
+
+[[step]]
+do = "hold"
+item = "minecraft:oak_stairs"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "hold"
+item = "minecraft:furnace"
+
+[[step]]
+do = "place"
+on = [2, -1, 0]
+face = "up"

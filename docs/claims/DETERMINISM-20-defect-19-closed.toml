@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 20
+slug   = "defect-19-closed"
+title  = "The defect §19 named, closed — 2,436 -> 1,786 and the item to zero (2026-08-10)"
+branch = "backfill"

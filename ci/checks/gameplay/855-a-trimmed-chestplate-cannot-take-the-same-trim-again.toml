@@ -1,0 +1,105 @@
+name = "a-trimmed-chestplate-cannot-take-the-same-trim-again"
+about = "trim a chestplate with coast and redstone, take it — which spends one template, the chestplate and one redstone — and put the trimmed chestplate back over the second template and redstone: `applyTrim` builds `ArmorTrim(redstone, coast)`, finds `Objects.equals` with the chestplate's own `TRIM` and returns EMPTY, so the last click is answered with no result and `hasRecipeError` 1 although a recipe matched. A server that compares only the item, or never reads the base's trim, offers the same trim a second time"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1000
+
+# SmithingMenu: template 0, base 1, addition 2, result 3; hotbar k is 31 + k.
+# Two templates and two redstone, merged into their slots one click each, so
+# that the take leaves one of each behind.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:smithing_table"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:coast_armor_trim_smithing_template"
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_chestplate"
+slot = 1
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+slot = 2
+
+[[setup]]
+do = "hold"
+item = "minecraft:coast_armor_trim_smithing_template"
+slot = 3
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+slot = 4
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 31
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 34
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 32
+
+[[step]]
+do = "container_click"
+slot = 1
+
+[[step]]
+do = "container_click"
+slot = 33
+
+[[step]]
+do = "container_click"
+slot = 2
+
+[[step]]
+do = "container_click"
+slot = 35
+
+[[step]]
+do = "container_click"
+slot = 2
+
+[[step]]
+do = "container_click"
+slot = 3
+
+[[step]]
+do = "container_click"
+slot = 1

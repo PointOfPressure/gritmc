@@ -1,0 +1,96 @@
+# Scheduling invariants that live OUTSIDE the repository.
+#
+# gate-chain.sh, chain-keeper.sh and preflight.sh are orchestrator tools under
+# /home/sayer/grit and are not committed here. Nothing in a gate can enforce
+# them, and every one of them has silently lost a guard at least once. This
+# file is the list, and ci/check-queue-scheduling.py checks it WHEN THE FILE IS
+# PRESENT -- true in the canonical checkout where the chain actually runs, and
+# false in the `.git`-less rsync copy the gate ships to the box, which is the
+# right way round. Same shape as ci/checks/handoff-terminals.toml.
+#
+# `must_match` is a Python regex searched over the whole file. `must_not_match`
+# is how a repaired guard is kept repaired: naming the DEFECT, not only the
+# fix, is what stops a later edit reintroducing it under a new spelling.
+# `why` is printed on failure and is the only thing a reader gets, so it says
+# what breaks rather than what is missing.
+
+[[file]]
+path = "/home/sayer/grit/gate-chain.sh"
+
+  [[file.invariant]]
+  name = "chain-yields-between-branches"
+  must_match = '''(?m)^\s*yield_to_starved_run$'''
+  why = """ci/corpus-lock.sh gives a gate absolute priority over a role=run
+waiter, deliberately. A chain walking a 67-branch queue therefore overtakes a
+starving run 67 times. chain-keeper.sh's yield governs RELAUNCHING and cannot
+reach a chain that is already running: 123 of 129 of its yields on 2026-08-18
+fired while a chain ran, deferring nothing, while three runs waited 182, 176
+and 154 minutes. The branch boundary is the only point where the chain is
+provably between gates."""
+
+  [[file.invariant]]
+  name = "chain-yield-has-a-per-boundary-cap"
+  must_match = "CHAIN_YIELD_MAX"
+  why = """without a per-boundary cap one starved run stands the chain down
+indefinitely, which moves the starvation onto the gates instead of arbitrating
+between them."""
+
+  [[file.invariant]]
+  name = "chain-yield-has-a-chain-wide-budget"
+  must_match = '''yield_spent" -ge "\$CHAIN_YIELD_BUDGET'''
+  why = """a per-boundary cap alone is not a bound: a steady stream of queued
+runs yields at every one of 67 boundaries. The budget is what makes the worst
+case a number rather than a discovery."""
+
+  [[file.invariant]]
+  name = "chain-yield-budget-is-actually-spent"
+  must_match = '''yield_spent=\$\(\(yield_spent \+ 1\)\)'''
+  why = """a budget that never decrements permits unlimited yielding while
+appearing to be bounded."""
+
+[[file]]
+path = "/home/sayer/grit/preflight.sh"
+
+  [[file.invariant]]
+  name = "one-sweep-at-a-time"
+  must_match = '''flock -x -n 201'''
+  why = """every branch is evaluated in ONE shared worktree path, so two sweeps
+fight over one directory and the loser silently adjudicates nothing. On
+2026-08-18 an 84-row preflight.tsv was replaced by a 3-row one with no GREEN in
+it, and chain-keeper.sh's `[ -s preflight.tsv ]` was still satisfied, so the
+GREEN-first ordering silently became no ordering. supervisor.sh's pgrep guard
+cannot prevent it: it races the launch it guards and cannot see a hand-run
+sweep at all."""
+
+  [[file.invariant]]
+  name = "publish-only-a-complete-sweep"
+  must_match = '''rows" -ne "\$expected'''
+  why = """the guard said `[ -s ]`, meaning non-empty, while the comment above
+it said complete. A sweep that judged 3 of 84 branches is non-empty. Non-empty
+is the weakest possible reading of `the sweep worked`."""
+
+  [[file.invariant]]
+  name = "no-bare-non-empty-publish-guard"
+  must_not_match = '''if \[ -s "\$OUT_TMP" \]; then'''
+  why = """this is the exact defect above. Named as a must_not_match so a later
+edit cannot reintroduce it while leaving the completeness check dead below."""
+
+  [[file.invariant]]
+  name = "no-silent-branch-drop"
+  must_not_match = '''worktree add --detach "\$W" "origin/\$b" >/dev/null 2>&1 \|\| continue'''
+  why = """a skipped branch that writes no row is read by chain-keeper.sh as a
+branch preflight has never seen, and given a middle-of-queue slot. That is a
+guess presented as a verdict; an ERROR row is a fact."""
+
+[[file]]
+path = "/home/sayer/grit/chain-keeper.sh"
+
+  [[file.invariant]]
+  name = "queue-rebuild-sees-through-a-rebase"
+  must_match = '''log --cherry-pick --right-only'''
+  why = """this repo merges by rebase, so a landed commit reappears on its
+branch under a new sha. An ancestor check alone reads such a branch as unmerged
+forever and hands it a full gate slot to discover it is empty -- 12 of 63 were
+in that state on 2026-08-16. Measured 2026-08-18 with this guard in place: 68
+queue entries, 1 already landed. It is working, and that is why it looks like
+it is doing nothing."""

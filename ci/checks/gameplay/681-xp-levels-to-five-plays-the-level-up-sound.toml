@@ -1,0 +1,30 @@
+name = "xp-levels-to-five-plays-the-level-up-sound"
+about = """
+five levels given at once land the player on a multiple of five, and
+`Player.giveExperienceLevels` plays `entity.player.levelup` at the player's
+feet with volume `5 / 30 * 0.75` and pitch 1 — then `set_experience` follows
+on the next `doTick`
+
+The sound is gated on `lastLevelUpTime < tickCount - 100`: a player younger
+than a hundred ticks hears nothing. The setup waits five seconds so a subset
+run, whose actor has only just joined, is past that gate as a full run's is.
+The sound is played from the console phase (it is immediate,
+`PlayerList.broadcast`), the experience packet from the next connection tick,
+so the order on the actor's stream is the sound first.
+
+A server that played the sound on every level, or never, or at another volume,
+fails here; one that sent `set_experience` with the level and the total
+swapped fails the field compare.
+"""
+console_restore = ["xp add oracle -1000000 levels"]
+observe_from = "actor"
+observe = ["set_experience", "sound"]
+settle_ms = 1500
+
+[[setup]]
+do = "wait"
+ms = 5000
+
+[[step]]
+do = "console"
+text = "xp add oracle 5 levels"

@@ -1,0 +1,39 @@
+name = "grass-dug-to-the-end-breaks-on-stop"
+about = """
+The ordinary survival dig, finished: START, a second of digging bare-handed,
+STOP. `ServerPlayerGameMode.handleBlockBreakAction` offsets 505-599: at STOP
+the server's own progress is `getDestroyProgress * (ticks + 1)` =
+`1 / 0.6 / 30 * ~21` = ~1.17, past the 0.7 at offset 561, so it clears the
+overlay and `destroyAndAck`s there and then — the block_update lands in the
+STOP's own window, before its ack. The observer is told by
+`spawnDestroyParticles`' `levelEvent(player, 2001, ...)`, the four-argument
+overload, which `PlayerList.broadcast` keeps off the digger. What would make
+it fail: a server that destroys on START (instant survival mining) puts the
+block_update in step 0; one that ignores STOP never sends it; one that
+announces 2001 to everybody puts a level_event on the actor's stream.
+The crack overlay is deliberately NOT observed: how many stages land before
+a STOP sent a second in is a property of the harness's clock, not of either
+server — `044` and `002` grade the overlay where it is deterministic.
+"""
+observe_from = "both"
+observe = ["level_event", "block_update", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[step]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 1000
+
+[[step]]
+do = "finish_dig"
+at = [1, -1, 0]
+face = "up"

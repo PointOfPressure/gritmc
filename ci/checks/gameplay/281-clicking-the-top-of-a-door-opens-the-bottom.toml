@@ -1,0 +1,75 @@
+name = "clicking-the-top-of-a-door-opens-the-bottom"
+about = "right-clicking the UPPER half of a door opens the lower half too, and the lower half can only learn about it through the shape update — DoorBlock.setOpen writes the clicked position and nothing else, so this is the one branch of DoorBlock.updateShape that answers with the neighbour's whole state rather than with air"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+# 280 WITH THE CLICK ONE BLOCK HIGHER, AND THAT IS THE ENTIRE POINT.
+#
+# `DoorBlock.updateShape` fires only when
+# `(half == LOWER) == (direction == UP)`, so it has two live cases:
+#
+#     half=upper, dir=DOWN    the upper half hears about the lower one
+#     half=lower, dir=UP      the lower half hears about the upper one
+#
+# and one of them had never been executed by anything in this corpus.
+#
+#     260  dig the lower half        -> removeBlock, flag 3   -> upper, DOWN
+#     132  dig the upper half        -> preventDropFromBottomPart writes
+#                                       pos.below() at flag 35 -> upper, DOWN
+#     280  right-click the lower half -> setOpen, flag 10      -> upper, DOWN
+#
+# All three arrive at `half=upper, dir=DOWN`. Clicking the *upper* half is
+# what produces the other one, and it is reachable with no new step kind, no
+# survival mode and no operator: `DoorBlock.setOpen` is
+# `Level.setBlock(pos, state.setValue(OPEN, ...), 10)` — verified in bytecode,
+# `bipush 10`, one position, and the `playSound`/`gameEvent` after it touch no
+# block. Flag 10 has bit 16 clear, so `updateNeighbourShapes` runs and hands
+# the lower half `UP`.
+#
+# WHY THIS BRANCH IS WORTH A CHECK OF ITS OWN
+#
+# It is the only one whose answer is not air. Every other double-block rule in
+# the corpus destroys something; this one returns
+# `neighbourState.setValue(HALF, half)` — **the neighbour's whole state**, with
+# `open` already toggled, relabelled to this half. That is precisely the shape
+# a lookup table cannot hold, which is why `data/vanilla/update_shape.json`
+# carries 32 rows for `oak_door` and every one of them is `half=lower,
+# dir=DOWN, to=air`: not one row anywhere in the table names a door in its
+# `to`. The rule exists only in `crates/rustmc-server/src/shapes.rs`'s
+# `typed_update_shape`, and until this file nothing ran that arm.
+#
+# The refuted premise is recorded because it cost a turn: it was believed that
+# a dig could not reach the typed rule at all, because `playerWillDestroy`
+# routes into `preventDropFromBottomPart`. That routing is real but it is
+# **creative-only** — it is gated on `preventsBlockDrops() ||
+# !hasCorrectToolForDrops(state)`, and an oak door does not
+# `requiresCorrectToolForDrops`, so in survival the branch is skipped
+# entirely. And `preventDropFromBottomPart` does not bypass the shape update
+# either: it writes `pos.below()` at flag 35, bit 16 clear, which is exactly
+# how 132 reaches the rule. The gap was never "no dig reaches the typed rule";
+# it was "nothing reaches the UP direction".
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_door"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# A stick is not a BlockItem, so the click falls through to the block's own
+# `useWithoutItem` instead of trying to place anything.
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 1, 0]
+face = "north"

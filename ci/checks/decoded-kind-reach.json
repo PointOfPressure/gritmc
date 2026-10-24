@@ -1,0 +1,17 @@
+{
+  "note": "kinds in DECODED_KINDS that appear in no scenario of the reference recording. Shrinking is progress; growing is a decoder arm nothing reaches.",
+  "dead": [
+    "block_destruction",
+    "commands",
+    "damage_event",
+    "game_event",
+    "player_position",
+    "set_default_spawn_position",
+    "set_experience",
+    "set_health"
+  ],
+  "declared_but_dead": [
+    "damage_event",
+    "set_health"
+  ]
+}

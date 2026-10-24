@@ -1,0 +1,72 @@
+name = "a-block-in-hand-does-not-stop-a-lever-flipping"
+about = "the same click as 552 without the sneak — `isSecondaryUseActive` is false, so the lever's own `useWithoutItem` runs and the block in hand is not placed; a server that decided a placeable block in hand always means placement would pass 552 and fail this"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 1500
+
+# THE DEGENERATE HALF OF THE PAIR, AND IT IS HERE BECAUSE 552 ALONE IS A TRAP.
+#
+# The ladder port's lesson: its single-wall case passed while the two-wall case
+# caught the defect. 552 says "sneaking + block in hand -> place the block". A
+# server could reach `match` on that by never consulting the sneak flag at all
+# and simply placing whatever is in hand whenever it is placeable — which is
+# the *opposite* defect from the one this server has today, and just as wrong.
+#
+# This file is the one that refuses it. Identical rig, identical held item,
+# identical click; the only difference in the whole file is that no `sneak`
+# step precedes the click. Vanilla flips the lever and places nothing.
+#
+#   552 sneaking     -> vanilla places the block, lever unchanged
+#   553 not sneaking -> vanilla flips the lever, block not placed
+#
+# Together they pin the branch rather than one side of it. Neither is
+# meaningful without the other, and the pair is cheap precisely because they
+# share a rig — which is also why the rig is copied verbatim from 290 rather
+# than rewritten: three files differing in one line each are readable as a
+# family, and the family is the check.
+#
+# It is not here to find a bug today. It is here so that the fix for 552
+# cannot be "place whatever is in hand".
+#
+# AND IT WAS BRIEFLY UNABLE TO FAIL, KILLED BY THE CHECK BESIDE IT.
+#
+# The first run of this pair produced *identical vanilla traces* for both
+# files — vanilla placed the block in each, and this file's whole premise
+# vanished without a word. Run on its own, the same file's vanilla trace flips
+# the lever, which is what it asserts.
+#
+# The cause is that `record` logs in once and reuses one connection for every
+# scenario in a run, and sneak is a **state**: `handlePlayerInput` stores what
+# it is sent and holds it until another packet says otherwise. 552 sneaks and
+# never releases, so 553 inherited it and stopped being the other half of
+# anything. Position already had this problem and `goto` was its answer; the
+# fix is in `record.rs` beside it, resetting the input state before every
+# scenario rather than asking each scenario to tidy up after itself.
+#
+# Worth stating plainly because the failure mode is the project's recurring
+# one wearing a new hat: nothing errored, nothing flapped, and the corpus
+# reported two honest-looking `diverge`s. What had actually happened is that a
+# check stopped being able to fail because of the file next to it in the
+# directory listing.
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

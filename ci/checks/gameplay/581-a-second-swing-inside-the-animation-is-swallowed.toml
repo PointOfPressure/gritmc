@@ -1,0 +1,94 @@
+name = "a-second-swing-inside-the-animation-is-swallowed"
+about = "a swing arriving in the first half of the animation already running produces no packet at all — `swing` returns before the broadcast — so two `swing` packets 50 ms apart make **one** `animate`, and a server that echoes every swing sends two"
+observe_from = "observer"
+observe = ["animate"]
+settle_ms = 1000
+
+# THE MEASURED STEP ASSERTS A SILENCE, AND SAYS SO.
+#
+# This check's point is that the last `[[step]]` provokes nothing. Its
+# measured step — step 2 — therefore contributes zero declared
+# observations on both sides, and `compare` would otherwise report
+# `mute`: exactly the shape of `607` passing by comparing two silences.
+#
+# Measured, not assumed, and on two independent recordings so that a
+# single run's phase cannot be what is being read: the corpus traces in
+# `work-blueice` (2026-08-08 21:26, 86 scenarios) and `rustmc-cov2`
+# (2026-08-10 13:16, 93 scenarios) both put zero declared observations at
+# this step on both sides. What raw traffic lands there is *not* stable
+# between those two runs — the lid timer's repeat count, an idle-player
+# rebroadcast, a stray `entity_position` — and all of it is either
+# outside this check's `observe` list or deleted by the projection, which
+# is why the declared reading is the one worth writing down.
+#
+# The silence is still compared. A subject that spoke at this step would
+# `Diverge`, which is what this check is for; the declaration suppresses
+# `mute` and nothing else.
+#
+# The distinction is not in the actions — `608`'s measured click and
+# `607`'s are the same `container_click` on the same rig — it is in what
+# the check claims, and only this file knows that. Absent, the field
+# means "must speak", so a check that forgets it goes red rather than
+# quietly green.
+measured_step = "silent"
+
+# **`within = -1` — unbounded, and this is not a convenience.**
+#
+# `animate` carries an entity id and **no coordinates at all**, so the only
+# spatial information the comparator has for it is where that entity was last
+# *seen*. For an item or a mob that memory is true. For one of the two clients
+# it is false by construction: `record::run_one` walks them to the next
+# workspace between scenarios, outside every measured window, so no packet
+# ever says they moved.
+#
+# `530-walking-away-drops-a-standing-player-from-view` makes a player leave a
+# tracking range and come back, which emits an `add_entity` for a **player**
+# inside a measured window — the one case `compare::place`'s own doc assumed
+# could never happen. Measured on the corpus run of 2026-08-06 it placed the
+# actor at absolute (-1984, -60, 73) and left it there; twelve scenarios later
+# this file's anchor is (-2368, -60, 0), so the `animate` was bounded against a
+# position **384 blocks** away, vanilla's projection came out empty, and this
+# check went `vacuous` — gate-red, and unable to pass however right the server
+# was. It read `match` in `ci/t2-gameplay-subset.sh` because a subset that does
+# not include 530 never makes the placement.
+#
+# **A subset run is not a gate, and this is what that sentence costs.**
+within = -1
+
+# **This is 580's discriminating half, and it is 571's shape.**
+#
+# 580 says a swing shows up. On its own it is satisfied by four lines that
+# forward every `swing` packet to the trackers, which is what a first
+# implementation writes and what cannot be wrong.
+#
+# `LivingEntity.swing(hand, boolean)` opens with three guards:
+#
+#     0: swinging          ifeq 27       not swinging -> swing
+#     7: swingTime
+#    11: getCurrentSwingDuration() / 2
+#    17: if_icmpge 27                    past halfway -> swing again
+#    20: swingTime         ifge 106      otherwise -> return, no packet
+#    27: swingTime = -1; swinging = true
+#
+# `getCurrentSwingDuration()` is `SwingAnimation.DEFAULT.duration()` — `bipush
+# 6` — with haste and mining fatigue adjustments neither server can reach
+# here, so the half is **3 ticks**. `updateSwingTime` increments `swingTime`
+# once per tick from the -1 that `swing` set, so one tick after a swing it is
+# 0: `>= 0` and `< 3`, and the second swing is swallowed.
+#
+# 50 ms is one tick, which is inside that window with two ticks to spare. The
+# `ms` on the first step is what puts it there; the default is 200, which is
+# past the swallow on purpose so that a scenario cannot land in this branch by
+# accident.
+#
+# What this refuses is the obvious implementation — forward every packet —
+# which passes 580 and sends an `animate` vanilla does not.
+
+[[step]]
+do = "swing"
+hand = "main"
+ms = 50
+
+[[step]]
+do = "swing"
+hand = "main"

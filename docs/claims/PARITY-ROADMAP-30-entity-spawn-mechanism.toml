@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 30
+slug   = "entity-spawn-mechanism"
+title  = "The randomness is in the spawn mechanism, not in the entity — 2026-08-12, branch `gameplay-entity-coverage`"
+branch = "gameplay-entity-coverage"

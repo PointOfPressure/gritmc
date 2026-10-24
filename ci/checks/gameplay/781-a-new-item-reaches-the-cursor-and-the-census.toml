@@ -1,0 +1,85 @@
+name = "a-new-item-reaches-the-cursor-and-the-census"
+about = "the CONTROL half of the pair 781/783 — a stack of an item no other scenario in this corpus names, moved into the cursor with no data component on it. Its only job is to be identical to 783 in every respect except the component, so that whatever 783 does to the item census's opaque count cannot be attributed to the item having been new"
+
+# WHAT THIS PAIR IS FOR, AND WHY IT IS TWO FILES AND NOT ONE
+#
+# `ci/vanilla-reach-census.py` counts an item as observed when a decoded
+# `ItemStack` — a `{count, item_id, item, ...}` node at any depth — appears in
+# a recording of VANILLA, under one of five packet kinds. It counts nothing
+# from our own emission, and naming an item in a scenario is not enough:
+# the existing corpus names 41 distinct items across its `hold` steps and the
+# census reaches 12, because the other 29 are held and then never echoed back
+# inside a stack-bearing packet.
+#
+# So the numerator is bounded above by the corpus's item VOCABULARY and below
+# by which of that vocabulary vanilla answers about. `0.78%` of 1,537 is
+# therefore not a work queue that is 0.78% done; it is a vocabulary of 41
+# measured against a registry of 1,537, and the only thing that moves it is
+# somebody writing a scenario that names a new item. This file is the proof of
+# that claim rather than the argument for it: it names one item nothing else
+# names and the item row is expected to move by exactly one.
+#
+# 783 is this file with `components` added, and 782 is this file with a
+# different new item and no component. Between them:
+#
+#   * 781 vs 782 — two new items, two separate +1s, so the rule is per-item
+#     and not per-scenario;
+#   * 781 vs 783 — the SAME new item, so the item row moves once for the pair
+#     and any change in the opaque count belongs to the component alone.
+#
+# THE SHAPE IS 720'S, DELIBERATELY. `set_cursor_item` is the cheapest packet
+# in this corpus that carries a whole `ItemStack` on purpose rather than as a
+# side effect, and 720 already established that a `place` against a chest
+# while holding something unplaceable opens it. Nothing here is new
+# machinery; the only new thing is which item is in slot 0.
+
+observe_from = "actor"
+observe = [
+    "open_screen",
+    "container_set_content",
+    "container_set_slot",
+    "set_cursor_item",
+]
+settle_ms = 1000
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Slot 0 holds the item under test. **`minecraft:diamond_sword` is named by no
+# other file in `ci/checks/gameplay/`** — checked with a grep over the whole
+# directory, which is the only thing that makes this a control.
+[[setup]]
+do = "hold"
+item = "minecraft:diamond_sword"
+slot = 0
+
+# Hotbar slot 1, selected last, so the `place` below is a right-click with
+# something that will not place on a chest — which opens the chest — and so
+# the slot that moves is not the slot that is selected.
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# 54 is hotbar slot 0 in a single-chest menu: 27 container slots, then 27 of
+# the player's inventory, then the nine of the hotbar.
+[[step]]
+do = "container_click"
+slot = 54

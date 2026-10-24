@@ -1,0 +1,46 @@
+name = "raw-iron-in-a-cold-furnace-sets-a-cook-total-of-two-hundred"
+about = "raw iron into the ingredient slot of a furnace with no fuel: AbstractFurnaceBlockEntity.setItem (offsets 0-102) sees slot 0 receive a stack that is not the same item as what was there and sets cookingTotalTime to getTotalCookTime — the smelting recipe's 200 — and the click's broadcastChanges sends that as container_set_data id 3 = 200, after the container_set_slot correcting slot 0. Nothing lights: serverTick's light branch is isLit || (hasFuel && hasInput) and there is no fuel, so no later tick sends anything. A server that wrote the slot through the plain Container.setItem leaves the total at 0 and sends no data at all; one that sent its data slots as constant zeros sends nothing here either"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1500
+
+# Hotbar 0 is menu slot 30 in an `AbstractFurnaceMenu`: three container
+# slots, then `addStandardInventorySlots`. The opening click sends the four
+# data slots as zeros from `sendInitialData`; the measured click sends the
+# one that moved.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:furnace"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:raw_iron"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+
+[[step]]
+do = "container_click"
+slot = 0

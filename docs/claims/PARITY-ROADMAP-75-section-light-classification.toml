@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 75
+slug   = "section-light-classification"
+title  = "The section light data every chunk packet carries: 0 of 26 classified"
+branch = "light-section-data"
+status = "written"

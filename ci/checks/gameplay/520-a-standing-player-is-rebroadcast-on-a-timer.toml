@@ -1,0 +1,158 @@
+name = "a-standing-player-is-rebroadcast-on-a-timer"
+about = "a tracked entity that has not moved is re-broadcast anyway every 60 ticks — ServerEntity.sendChanges sends a position packet on tickCount % 60 == 0 whether or not the entity cleared its movement test — and over a window two periods long exactly two of them land, so a server that never sends them says nothing here and vanilla says two things"
+observe = ["move_entity_heartbeat"]
+observe_from = "observer"
+settle_ms = 6000
+
+# The heartbeat is a free-running 3.0 s broadcast — `ServerEntity.sendChanges`
+# sends on `tickCount % 60 == 0` (offsets 531-538) — and this window is 6.0 s,
+# so it spans **1.98 periods**. Two independently phased servers land on the
+# same integer count only by luck, and the paragraph above already records the
+# general form: a fixed window contains floor(L/P) or ceil(L/P) events, and
+# only frac(L/P) = 0 exactly removes the flap, which tick jitter forbids.
+#
+# Measured on the two pairs on disk: 2 against 2 at 2026-08-07 07:10, and
+# **3 against 4** at 2026-08-07 02:19 — with one of vanilla's three arriving
+# at `at_ms == 0`, leaked in from the previous scenario.
+#
+# So the count is dropped and the presence is kept. **This check still fails
+# for a server that never sends the heartbeat**: the collapsed projection is
+# one against zero, which is `absent`, which is what it read for weeks. The
+# 60-tick period itself is claimed by two tests that measure the **gap** rather
+# than the count, and neither goes through the wire window this check samples:
+# `rustmc_server::tracker::tests::a_standing_player_is_rebroadcast_every_sixty_ticks`
+# pins the beats at ticks 0, 60, 120, 180, and
+# `..::any_120_tick_window_holds_exactly_two_heartbeats` pins it over all sixty
+# phases. Both predate this line; neither may be deleted while it stands.
+collapse_repeats = ["move_entity_heartbeat"]
+
+# THIS CHECK IS THE CONDITION ON THE EXEMPTION, NOT AN ADDITION TO IT.
+#
+# `compare::project` drops a `move_entity` that failed vanilla's own movement
+# test — `dx² + dy² + dz² < 128` in wire units, which is
+# `delta.lengthSqr() < 2⁻¹⁷` in blocks, which is exactly the test
+# `ServerEntity.sendChanges` applies before deciding whether the entity moved.
+# Such a packet is on the wire only because the 3 s tick counter wrapped, and
+# because no window in this corpus is 3 s long it lands inside one on a phase
+# coin flip, under every check at once.
+#
+# Dropping it removes that coin flip. It also removes the last trace of the
+# heartbeat from the corpus — and a mechanism nothing observes is a mechanism
+# a server can omit entirely while every check still passes. That is a check
+# that cannot fail, manufactured by the fix. This file is what stops the
+# exemption from being that.
+#
+# WHY THE WINDOW IS TWO PERIODS AND NOT ONE, OR THREE
+#
+# The count of multiples of a period P inside a half-open window of length
+# exactly 2P is **two, for every phase**. That is the only property that makes
+# this check stable, and it is why `settle_ms` is 6000 against a 60-tick
+# period at 20 tps: not "long enough to see one" — long enough that *how many*
+# stops depending on when the window opened. A 3 s window would be the coin
+# flip this exemption exists to delete, and a 9 s window would cost three
+# times the running time to assert a number that is no more phase-independent
+# than this one.
+#
+# What is left is a boundary straddle: a heartbeat within a few tens of ms of
+# either edge can fall the other side of it. That is a much smaller target
+# than a coin flip, and if the selfcheck says otherwise this check is wrong
+# and it is this file that gets fixed, not the threshold.
+#
+# **THE SELFCHECK SAID OTHERWISE. MEASURED 10 of 11, 2026-08-04.**
+#
+# The paragraph above is left standing rather than rewritten, because the
+# argument in it is exactly the one that failed and a reader should see it
+# beside its refutation. What it got wrong: "two periods contains two for every
+# phase" holds for an EXACTLY periodic source, and this one is not. Measured
+# inter-arrivals in the first recording taken were 2930 and 3006 ms, and the
+# actor's and observer's streams disagreed about the count (3 against 2) within
+# that single recording.
+#
+# The general statement, which is why no retuning was attempted: for a
+# uniformly random phase a fixed window contains floor(L/P) or ceil(L/P)
+# events, with P(ceil) = frac(L/P), and only frac(L/P) = 0 EXACTLY removes the
+# flap. Tick jitter forbids that. A count-based assertion over a fixed window
+# is therefore structurally unstable, not mistuned.
+#
+# THE CHECK STILL DOES ITS JOB, AND THE JOB IS NARROWER THAN GREEN
+#
+# It exists so that a server which never sends the heartbeat stays
+# distinguishable from vanilla. It does: vanilla says two or three things, a
+# server with no entity tracking says nothing, and nothing scores `absent` —
+# not `match`, not `diverge`. Telling two from three is what flaps; telling two
+# from zero never does. So this check discriminates PRESENCE reliably and
+# CORRECTNESS not at all, it is declared in `ci/checks/gameplay-unstable.toml`
+# at its measured rate, and its verdict against this server is stable at
+# `absent` until entity tracking lands.
+#
+# WHY `observe_from = "observer"` AND WHY THE ACTOR STANDS STILL
+#
+# Both clients are tracked entities and both heartbeat, so reading both
+# streams doubles the number of window edges a straddle can happen at for no
+# extra coverage. Reading only the observer's stream measures one entity, the
+# actor, whose `ServerEntity` this scenario keeps in the state the check is
+# about: it does not move, so `moved` is false on every tick and every packet
+# it produces here got onto the wire through the counter.
+#
+# The single step is a `wait` rather than nothing because a scenario must have
+# a measured step; it deliberately does no world-changing work, so anything
+# observed is unprompted by construction.
+
+[[step]]
+do = "wait"
+ms = 1
+
+# WHAT THIS CHECK CAN AND CANNOT DISTINGUISH — MEASURED 2026-08-04, BRANCH
+# `vacuous-and-motion`. READ THIS BEFORE TRUSTING THE PARAGRAPHS ABOVE.
+#
+# This check exists to keep the heartbeat exemption honest, so "can it still
+# fail" is the only question about it that matters, and it now has a measured
+# answer on both axes:
+#
+#     declared  absent    vanilla says 2, this server says nothing
+#     strict    vacuous   BOTH projections empty — legitimately
+#
+# DECLARED — `absent`, and it can fail, because it is failing right now.
+#
+# That is the verdict the exemption's condition was written against and it is
+# unchanged: a server that never sends the heartbeat projects to nothing and
+# scores `absent`, which is neither `match` nor `diverge`. Three concrete
+# server behaviours move it, which is what makes it a live check:
+#
+#   * implement `ServerEntity.sendChanges`' 60-tick re-broadcast and send the
+#     same number of them inside the window -> `match`;
+#   * send them with the wrong payload, the wrong entity, or the wrong count
+#     -> `diverge`;
+#   * keep sending nothing -> `absent`, where it sits today.
+#
+# **THE "PRESENCE ONLY, NEVER CORRECTNESS" CLAIM ABOVE IS NOW TOO WEAK, AND
+# THE 10-OF-11 INSTABILITY IT RESTS ON WAS NOT THE PLAYERS' CADENCE.** It was
+# a dropped item from `500-dropping-an-item-throws-it-on-the-floor`, still
+# alive twenty checks later and still inside this window because
+# `compare::near` could not bound an observation carrying no position. Twelve
+# of this check's twelve non-heartbeat observations in one corpus run were
+# that item. With `compare::place` bounding it, this check measured
+# **0 of 11 declared, from 10 of 11** — so vanilla reproduced its own
+# heartbeat count exactly in every comparison, and the check discriminates the
+# COUNT and not merely presence.
+#
+# Held at arm's length, deliberately: that is one N = 12 sample, and this
+# corpus has twice written down that a 0-of-11 reading is a statement about N
+# rather than about stability. If it flaps again it comes back to
+# `gameplay-unstable.toml` with a measurement.
+#
+# STRICT — `vacuous`, and that is the correct verdict, not a broken one.
+#
+# This check's entire content is heartbeats, and `compare::project` drops
+# heartbeats whenever `kinds` is `None`, which is exactly what strict passes.
+# So strict has nothing to compare on either side. **Confirmed as the
+# both-sides-empty case**, from the code and from the traces: `verdict_for`
+# reaches `Vacuous` only through its `reference.is_empty() && subject.is_empty()`
+# arm since 2026-08-04, and the recordings show vanilla 0 and this server 0
+# after projection.
+#
+# The consequence, stated so nobody reads it as a defect twice: **strict can
+# never score this check**, and `ci/selfcheck-aggregate.py` counts any
+# non-`match` as unstable, so it costs quantity A a fixed 1 for as long as
+# this is true. The guard on the exemption does not depend on strict — it
+# lives entirely on the declared axis, which is the gated one.

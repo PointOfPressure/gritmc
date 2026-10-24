@@ -1,0 +1,73 @@
+name = "a-dropper-fills-the-chest-in-front"
+about = "a dropper facing a chest does not drop: `DropperBlock.dispenseFrom` asks `HopperBlockEntity.getContainerAt` for the block in front and, finding the chest, calls `HopperBlockEntity.addItem` through the chest's SOUTH face with one item and no sound and no smoke. The chest is open when the lever goes, so the chest menu's per-tick `broadcastChanges` corrects slot 0 to one coal four ticks after the trigger. A server that runs the default behaviour here spawns an item and sends 1000/2000 instead"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "level_event", "container_set_slot"]
+settle_ms = 1500
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [3, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:dropper"
+
+[[setup]]
+do = "place"
+on = [3, -1, 2]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [4, -1, 2]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:coal"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[setup]]
+do = "place"
+on = [3, 0, 2]
+face = "up"
+
+[[setup]]
+do = "container_click"
+slot = 36
+
+[[setup]]
+do = "container_click"
+slot = 0
+
+[[setup]]
+do = "close_container"
+
+[[setup]]
+do = "place"
+on = [3, 0, 1]
+face = "up"
+
+[[step]]
+do = "place"
+on = [4, 0, 2]
+face = "up"

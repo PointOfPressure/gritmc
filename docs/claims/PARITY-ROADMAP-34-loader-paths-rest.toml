@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 34
+slug   = "loader-paths-rest"
+title  = "The rest of §33's census: five more loaders fixed the same way, one deleted — 2026-08-12, branch `server-loader-paths-rest`"
+branch = "server-loader-paths-rest"

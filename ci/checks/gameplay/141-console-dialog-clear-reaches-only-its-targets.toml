@@ -1,0 +1,28 @@
+name = "console-dialog-clear-reaches-only-its-targets"
+about = """
+`dialog clear oracle` then `dialog clear @a` from the console send the actor
+one `clear_dialog` and then one more, and the observer only the second
+
+`DialogCommand.clearDialog` sends `ClientboundClearDialogPacket.INSTANCE` —
+an empty body — to each target, whether or not that player has a dialog
+open, since the server keeps no record of one. A server that broadcast the
+first command, resolved `@a` to the console's nobody, or skipped a player
+with no dialog open, moves the observation. The success lines are the
+console's log, so `chat` is silent.
+
+Level 2, through the console. Closing a dialog that is not open leaves
+nothing behind, so the restore only needs to be declared: it sets
+`send_command_feedback` to the value it already has.
+"""
+console_restore = ["gamerule send_command_feedback true"]
+observe_from = "both"
+observe = ["clear_dialog", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "dialog clear oracle"
+
+[[step]]
+do = "console"
+text = "dialog clear @a"

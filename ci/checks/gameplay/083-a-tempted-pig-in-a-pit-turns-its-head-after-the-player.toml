@@ -1,0 +1,144 @@
+name = "a-tempted-pig-in-a-pit-turns-its-head-after-the-player"
+about = "a pig at the bottom of a two-deep pit, tempted by the carrot the player holds from inside its stop distance, turns its head to follow the player round the rim — one rotate_head, to the new bearing, because TemptGoal re-aims LookControl every goal tick and a 44-degree turn fits in one tick at maxHeadYRot + 20"
+observe_from = "actor"
+observe = ["rotate_head", "move_entity"]
+within = 176
+settle_ms = 1500
+
+# WHAT THIS GRADES: the goal phase. `TemptGoal` is priority 4 of `Pig.registerGoals`
+# and it is the only goal here whose output is not drawn from the mob's own
+# `RandomSource`, which is unseeded (`Entity.<init>` takes `RandomSource.create()`),
+# so a pig left alone strolls and looks about differently on every run. This rig is
+# built so that nothing of the pig's own randomness reaches the measured window.
+#
+# THE MECHANISM, read from the pinned jar (`javap -p -c -constants`):
+#
+#   TemptGoal.canUse            0-18   calmDown > 0 -> calmDown--, false
+#                               19-66  player = getNearestPlayer(TEMPT_TARGETING
+#                                      .range(getAttributeValue(TEMPT_RANGE)), mob)
+#                                      -- the selector is shouldFollow: main hand OR
+#                                      off hand tests the item predicate
+#   TemptGoal.tick              0-30   lookControl.setLookAt(player,
+#                                      getMaxHeadYRot() + 20, getMaxHeadXRot())
+#                               33-61  distanceToSqr(player) < stopDistance^2
+#                                      (2.5^2) -> stopNavigation()     <-- THIS CHECK
+#                               64-69  else navigateTowards(player)
+#   Mob.getMaxHeadYRot          bipush 75   -> yMaxRotSpeed 95 deg/tick
+#   Mob.getMaxHeadXRot          bipush 40
+#   LookControl.tick            1-12   resetXRotOnTick -> setXRot(0)
+#                               15-58  lookAtCooldown > 0: yHeadRot = rotateTowards(
+#                                      yHeadRot, yRotD, yMaxRotSpeed); xRot likewise
+#                                      toward xRotD, clamped at 40
+#                               88     clampHeadRotationToBody — a no-op while the
+#                                      navigation is done, which stopNavigation makes it
+#   ServerEntity.sendChanges    249-281 the update-interval gate (pig: 3 ticks)
+#                               1130-1181 packDegrees(getYHeadRot()) differs from the
+#                                      last sent -> ClientboundRotateHeadPacket
+#
+# WHY IT IS THE SAME ON EVERY VANILLA RUN, which is the whole design:
+#
+# * THE PIT. Digging [1,-1,1] and [1,-2,1] leaves a 1x1 shaft two blocks deep.
+#   From its floor the walk evaluator finds no neighbour (a two-block wall, and
+#   the step-up is one), so every path the pig is ever given is its own node and
+#   it never moves. That is what makes the pig's random goals harmless in the
+#   ticks between the egg and the carrot: a `RandomStrollGoal` that fires there
+#   has nowhere to go, and a look goal is overwritten the moment the tempt starts
+#   (priority 4 against 7 and 8, flags MOVE|LOOK). `move_entity` is observed for
+#   exactly this reason: vanilla sends NONE, and a server whose pathfinder lets
+#   the pig climb out, or whose tempt walks it into a wall, sends some.
+# * THE PITCH IS PINNED. The pig's eye is at -2 + 0.765 and the player's at 1.62,
+#   so at both stands the target pitch is steeper than 67 degrees and LookControl
+#   clamps xRot at 40: no `move_entity_rot` (which would carry the pig's random
+#   spawn yaw — `EntityType.create` draws it from `level.random`) is ever sent in
+#   the window. Only the HEAD moves, and its start and end are both set by
+#   where the player stands, not by where the pig started.
+# * ONE TICK OF TURN. Start stand (0.45, 0.95) puts the head at 117.65 degrees,
+#   byte 83.66; end stand (1.25, 0.45) at 166.61, byte 118.48 — a 48.96-degree
+#   turn, inside 95, so the head is there after one LookControl tick and
+#   ServerEntity's 3-tick gate can only ever see the end value. Both bytes sit
+#   0.34 or more from a boundary, so the check is about the goal and not about
+#   the last bit of an atan2.
+# * INSIDE THE STOP DISTANCE. Horizontal 1.19 and 1.08 against a 2-block drop:
+#   3D distance 2.33 and 2.28, both under 2.5, so this is the `stopNavigation`
+#   arm of TemptGoal.tick. `084` is the same rig on the `navigateTowards` arm.
+#
+# The carrot goes in the MAIN hand after the egg, not the off hand before it:
+# the inventory a check leaves behind is inherited by every later check
+# (README, "790"), and nothing later expects a carrot in the off hand.
+#
+# THE FAR FIELD — why every rig in 083-089 sits 80 or 160 blocks out on z.
+#
+# The first two-run vanilla subset (`~/rustmc-mobgoal/oracle-work/gameplay/mg1`,
+# 2026-09-24) had these rigs at the workspace, and vanilla disagreed with
+# itself on 084, 085 and 089. Every disagreement was ANOTHER scenario's mob:
+# 083's pig turning its head inside 084's and 085's windows, 088's bat inside
+# 089's. The pig's own observations were identical in both runs. Two facts
+# make that leak, and neither is this check's to fix:
+#
+#   * A mob hatched in `[[setup]]` has its `add_entity` in the discarded
+#     scratch recording (`record::run_one`), so the comparator's placement
+#     table never learns where it is, and `compare::near` admits every
+#     observation of an unplaced entity whatever `within` says.
+#   * A pig whose tempter has left runs `RandomLookAroundGoal` on its own
+#     unseeded random for the rest of the run.
+#
+# So the rigs are put where no other scenario's player is tracking them: the
+# actor tracks an entity to 64 blocks (view-distance 4), consecutive checks
+# here alternate +z/-z and same-sign ones are 64 apart on x and 80 on z, so
+# the nearest foreign mob is at least 77 blocks away (082's z = 150 pig from
+# 083), and the next workspaces' players, at z = 0, are 80 or more. `within`
+# is opened to 176 so the bound reaches the rig; it admits nothing else,
+# because nothing else is tracked out here. The observer stays at the
+# workspace and tracks none of it, which is why every one of these checks is
+# `observe_from = "actor"`.
+#
+# Coordinates in the headers of 083-089 are relative to the rig's base,
+# (0, 0, z-offset). The steps carry the offset. Each rig is inside one chunk
+# on z (README). The player's stands keep its box clear of the shaft's
+# x 1..2, z 1..2.
+
+
+# THE RIG IS OUT AT z = +80, AND `within` IS OPENED TO REACH IT. See the
+# FAR FIELD note in `083`'s header.
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 80.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, 81]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, 81]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [1, -3, 81]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:carrot"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, 80.95]
+
+[[setup]]
+do = "wait"
+ms = 1500
+
+[[step]]
+do = "walk"
+to = [1.25, 0.0, 80.45]

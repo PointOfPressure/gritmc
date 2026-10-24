@@ -1,0 +1,31 @@
+name = "a-console-teleport-moves-the-target-to-the-destination"
+about = """
+`tp oracle oracle_eye` from the console sends the target ONE
+`player_position`: the next teleport id, the destination's position, and
+the destination's rotation, all absolute
+
+`TeleportCommand.teleportToEntity` passes `EnumSet.noneOf(Relative.class)`
+and the destination's own x, y, z, yRot and xRot to `performTeleport`, which
+reaches `ServerGamePacketListenerImpl.teleport`: `++awaitingTeleport`, then
+`ClientboundPlayerPositionPacket.of(id, pos, relatives)`. The id is compared
+— a server that reused the join's id, or counted from zero, moves this
+check — and the position is compared relative to the rig, so a server that
+sent the target's own position, or the console's, moves it too.
+
+`tp` is a redirect into `teleport`, so this is also the check that the
+redirect resolves at the console's permission.
+
+Level 2, so it goes through the console. The restore is a teleport of the
+target onto itself, which leaves it where this step put it: the next
+scenario walks both players to its own rig, so position is not state that
+outlives a scenario, and the line exists because a console step must declare
+one.
+"""
+console_restore = ["tp oracle oracle"]
+observe_from = "actor"
+observe = ["player_position", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "tp oracle oracle_eye"

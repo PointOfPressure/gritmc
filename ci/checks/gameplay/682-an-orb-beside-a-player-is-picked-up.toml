@@ -1,0 +1,32 @@
+name = "an-orb-beside-a-player-is-picked-up"
+about = """
+an experience orb summoned one block from the actor is announced, is touched
+on the actor's next tick, is taken (`take_item_entity` from the orb to the
+player, count 1), is removed, and its three points reach the player as
+`set_experience`
+
+The orb comes from `SummonCommand`, so it is built by `EntityType.create` — the
+two-argument constructor, which draws no yaw and no velocity — and snapped to
+the exact position: its `add_entity` is deterministic in every field the
+oracle keeps, unlike an orb from `ExperienceOrb.award`. The value rides in the
+pairing bundle's `set_entity_data` (accessor 8), which this check does not
+observe because a player's own score is also `set_entity_data` and is a
+statement about every point the session has gained.
+
+`Player.aiStep` touches what intersects the player's box inflated by
+(1, 0.5, 1); the orb's box is 0.5 wide at x+1, so it is inside on the first
+`doTick`. `playerTouch` sends the take through the orb's trackers, then
+`giveExperiencePoints(3)`, then `discard` — `remove_entities` immediately —
+and `doTick`'s tail sends `set_experience` (progress 3/7, level 0, total 3).
+
+`execute at oracle` puts `~` at the actor's feet; the observer stands five
+blocks off in z, further than the actor, so the orb is the actor's.
+"""
+console_restore = ["xp add oracle -1000000 levels"]
+observe_from = "actor"
+observe = ["add_entity", "take_item_entity", "remove_entities", "set_experience"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "execute at oracle run summon minecraft:experience_orb ~1 ~ ~ {Value:3}"

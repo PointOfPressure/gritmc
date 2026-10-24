@@ -1,0 +1,1973 @@
+# The accepted state of the gameplay corpus.
+#
+# A **ratchet**, not a pass list. Most of this is `diverge` or `absent`, and
+# that is the honest description of a server whose gameplay half is young.
+# A gate demanding `match` everywhere would mean nothing could ever land.
+#
+# What the gate refuses:
+#   * a scenario going backwards — `match` becoming `diverge`, `diverge`
+#     becoming `absent`;
+#   * a scenario that is not listed here at all, so a new check has to state
+#     where it starts, which is the moment somebody reads it;
+#   * `vacuous`, `inert` or `error`, which are never listed because none of
+#     the three says anything about the server. Those fail regardless of this
+#     file.
+#
+# Measured 2026-08-03 against vanilla 26.2, protocol 776, on superflat, on
+# the Threadripper. Seed 20260803, `spawn-radius=0`, workspaces at absolute
+# `(-(n+1) * 32, spawn_y, 0)`.
+#
+# **Corpus 37 -> 51.** The fourteen added on 2026-08-03 went into the three
+# areas with almost no coverage — redstone had three checks for the whole
+# subsystem, block entities had one, and inventory could only watch itself
+# change as a side effect of a block. Nine of the fourteen came back
+# `diverge` and five `absent`, and **all fourteen are live**: the corpus is
+# still 0 vacuous, 0 inert, 0 error, which matters more than the match count
+# and is the property that must not regress.
+#
+# Every new line below names a mechanism somebody can go and build, and the
+# missing observation kinds say which:
+#
+#   block_event            4 checks — pistons, the note block, the chest lid
+#   open_screen            2 — a furnace menu and a crafting table menu
+#   add_entity             1 — an item entity for a dropped stack
+#   container_set_slot     1 — the offhand swap
+#   open_sign_editor       1 — placing a sign opens its editor
+#   section_blocks_update  2 — one packet where we send two
+#
+# Three of the new checks are missing **no kinds at all** and diverge only on
+# content, which puts them closest to green: the redstone-torch inverter
+# (5 observations against our 3), the observer pulse (6 against 4) and the
+# repeater delay, which is **8 against 7** — one observation short.
+#
+# **Two checks in this file can never reach `match`.** `spawn-egg-makes-a-mob`
+# and `a-dropped-item-goes-into-your-inventory` are declared in
+# `ci/checks/gameplay-unstable.toml`: vanilla disagrees with *itself* about
+# them, because a mob's spawn yaw and a dropped item's position are fresh
+# draws from `level.getRandom()`. They are baselined at their honest verdict
+# and the ratchet still works, but do not read them as two defects.
+#
+# It said **three** until 2026-08-10, the third being `water-spreads`, which is
+# now parked in `ci/checks/gameplay/open/` and is not loaded at all. Its
+# instability is a different mechanism from these two — not a random draw but
+# which tick's broadcast each spread landed in — and it is still recorded in
+# `gameplay-unstable.toml`, which is measurement and not a gate input.
+#
+# Three things no check here can exercise, so a green result must not be read
+# as covering them: section `z` is never negative (workspaces sit at `z = 0`),
+# no scenario changes blocks in two chunks at once, and none fires two
+# actions inside one tick.
+#
+# **`lever-flips-when-right-clicked` is `match` as of the 2026-08-03 evening
+# run** — the first check moved by the `useWithoutItem` path. It went
+# `diverge -> match` on `crate::useblock` porting `LeverBlock`, exactly as
+# predicted from its shape: it was missing no observation kinds and was one
+# observation short, vanilla sending `lever[powered=true]` where this server
+# sent `powered=false`.
+#
+# **`a-repeater-delays-the-signal-it-passes-on` went `match` on the
+# `use_without_item.json` extraction, and that `match` was not earned.**
+#
+# It was recorded here as having "falsified the prediction written beside it"
+# — the check was expected to need redstone signal propagation for the wire in
+# front of the repeater and appeared not to, cycling DELAY being the whole
+# gap. Measured 2026-08-03 against vanilla on both selfcheck runs: the
+# repeater stayed `powered=false` for the whole scenario and **no
+# `block_update` was ever recorded at the wire, in vanilla either**. The rig
+# was inverted, so no propagation happened for anybody and the check was
+# resting on its resyncs.
+#
+# `DiodeBlock.getStateForPlacement` sets `FACING` to
+# `getHorizontalDirection().getOpposite()`, pointing it back at the placer, and
+# `getInputSignal` reads `level.getSignal(pos.relative(FACING), FACING)` — the
+# block FACING names is the repeater's **input**. The rig fed the redstone
+# block into the output side. The check now feeds the input side and the entry
+# below records what it measures with a working rig, which is a lower verdict
+# than the broken one earned. A prediction is not falsified by an experiment
+# that did not run.
+#
+# Five more moved closer without closing, and each names what is left:
+#
+# ```text
+#   button-unpresses-itself       5 vs 4, no missing kinds. We press; the
+#                                 un-press is a scheduled tick's EFFECT, and
+#                                 Block.tick takes a ServerLevel.
+#   door-opens-when-right-clicked 4 vs 4, missing section_blocks_update --
+#                                 blocked on `setPlacedBy`, not on this: we
+#                                 place ONE door half, so there is no upper
+#                                 half for the open to propagate to.
+#   a-comparator-...              6 vs 5, missing `sound` and nothing else.
+#   a-note-block-...              6 vs 4, missing block_event and sound.
+#   a-redstone-torch-...          5 vs 4, no missing kinds. The lever flips
+#                                 now; the torch needs redstone.
+# ```
+#
+# **Do not ratchet `strict`.** It moved 5/51 -> 3/51 across two runs whose
+# only server change was the lever, which cannot account for two checks, and
+# on 2026-08-04 it moved 5/55 -> 7/55 across two runs of a tree that had not
+# changed at all. Strict carries vanilla's own run-to-run nondeterminism
+# inside each scenario's box. Only the declared verdict is ratcheted, and only
+# declared should be read as progress.
+#
+# This used to cite "the selfcheck's measured ceiling (16/37 on vanilla
+# against itself)" as the reason. **Corrected 2026-08-04: there is no
+# ceiling** — see the block at the foot of this file. 16/37 was one comparison
+# at N = 2; at N = 12 vanilla reproduced itself under strict on 0 of 55 — and
+# after the heartbeat exemption of 2026-08-04, on 35 of 60. Quantity A, vanilla
+# against itself, never a parity claim.
+
+[expect]
+# MERGE-REGION BEGIN rows to-eof key=toml-key check=unique-toml-key
+break-block = "match"
+place-block = "match"
+place-log-axis = "match"
+stairs-and-furnace-face-apart = "match"
+torch-falls-with-its-support = "match"
+coral-dries-out-unprompted = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+sand-falls-when-unsupported = "match"
+# **Locked in 2026-08-04, and locking it in is not bookkeeping.** It has been
+# `match` since the tracker landed and the baseline still said `absent`, so
+# when `Session::hop_to`'s pacing repair split its four-block walk into four
+# packets and it fell `match -> diverge`, the full gate reported GREEN: a
+# regression that lands above a stale floor is invisible to a ratchet. The
+# gate had been printing `BETTER ... update gameplay-baseline.toml to lock
+# these in` for two runs. That instruction is the guard, and this is it being
+# taken.
+other-player-is-an-entity = "match"
+# **`absent` -> `diverge`, 2026-09-05, and the gate asked for it**: the first
+# corpus run over `mob-in-world` printed `BETTER spawn-egg-makes-a-mob: was
+# absent, is now diverge` and `update ci/checks/gameplay-baseline.toml to lock
+# these in`. It was `absent` because no mob existed to add; a pig does now, so
+# the check has stopped measuring a missing feature and started measuring a
+# wrong value. `diverge` is also as far as it can ever go — it is declared in
+# `ci/checks/gameplay-unstable.toml` and its whole difference against vanilla
+# is the spawn yaw (`y_rot`/`y_head_rot` -17 against our -78, every other
+# field of all 6 observations equal), a fresh `level.getRandom()` draw vanilla
+# does not reproduce against itself.
+spawn-egg-makes-a-mob = "diverge"
+# `mob-in-world`, 2026-09-05: the two checks that grade a mob against
+# vanilla's bytes. Both start where the branch claims they stand — the first
+# corpus run over `mob-in-world` is what confirms or corrects the row, and
+# the branch's cold start says which it was.
+a-spawned-pig-syncs-its-movement-speed-a-tick-later = "match"
+# 2026-09-30, `train-a`: `diverge`, set from what this server does on the
+# train's corpus run (bf8912086's tree, 179 scenarios, ~/rustmc-train-a).
+# 1eb6a9899 re-rigged 082 onto `update_attributes`, and our first one differs
+# from vanilla's at step 0 (`rest` 594df060bec3e117 against 8c43623da909a601).
+# The "match" row predates the re-rig and was never measured against it.
+# 2026-09-30 `diverge-burndown`: matched on the full corpus (171/179) with the bat now surviving, but
+# kept `diverge`: vanilla's pig arrives 3405 ms (train-a), 5327 ms (this run) or not inside the
+# settle at all (the subset of the same day) — vanilla against itself 2 of 3. Not a row to lock.
+a-bat-left-far-away-despawns-and-a-pig-does-not = "diverge"
+# **083-089, the goal phase (`mob-goal-corpus`), all `match`, measured
+# before they were locked.** Vanilla against itself over two subset pairs in
+# `~/rustmc-mobgoal` (mg1 at the workspace, mg3 in the far field) and one
+# full corpus: every one of the seven agrees with itself wherever it was
+# recorded, and this server matched vanilla on all seven declared
+# projections in the mg3 pair (7/7 against vanilla-b; 6/6 against vanilla-a,
+# whose 087 was lost to the observer keep-alive timeout the recorder now
+# walks around). The strict projections diverge on the bats' random flight
+# and the pigs' random spawn yaw, which none of them observes.
+a-tempted-pig-in-a-pit-turns-its-head-after-the-player = "match"
+a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put = "match"
+a-carrot-on-a-stick-tempts-a-pig-through-its-own-goal = "match"
+a-bat-hatched-under-glass-takes-off-at-once = "match"
+# 2026-09-30, `train-a`: `diverge`, and it is VANILLA that moved. Our step-0
+# `set_entity_data` is byte-identical across the two recordings that hold this
+# check (`rest` 0015ab265976fe41 in ~/rustmc-mobgoal and ~/rustmc-train-a);
+# vanilla sent 0015ab265976fe41 in the first and 1d9712d93be2c49c in the
+# second. One flap in one comparison (N = 2), so the row records the
+# train's verdict rather than a match the reference itself did not repeat.
+# 2026-09-30 `diverge-burndown`: matched on the full corpus, kept `diverge` for the vanilla flap above.
+# 2026-10-03 `fix-flappers`: back to `match`. 1d9712d93be2c49c is the same
+# data with `DATA_MOB_FLAGS_ID` bit 2 (left-handed) set — `Mob.finalizeSpawn`
+# 63-83 rolls it on the unseeded level random, one bat in twenty — and the
+# egg now carries `LeftHanded:1b`, which `EntityType.create` applies after
+# the roll (javap 168 then 179) and which leaves the flag set and dirty on
+# every run (the 086 header has why 0b does not). The flap is removed, not
+# tolerated.
+a-roosting-bat-sleeps-through-a-player-four-and-a-half-blocks-away = "match"
+a-roosting-bat-wakes-when-a-player-comes-within-four-blocks = "match"
+a-pig-nine-blocks-away-is-still-tempted = "match"
+# **`diverge`, and it was `match` for exactly one gate. The correction is the
+# point of this comment.**
+#
+# It was locked at `match` on 2026-08-04 with the 1-in-25 flap written out
+# beside it, on the argument that a softer floor would hide a real fall. The
+# very next gate run went red on it. **Disclosing a risk is not mitigating
+# one**, and the argument was wrong on its own terms — see below.
+#
+# THE MEASUREMENT, from the two recordings the red gate compared:
+#
+#     vanilla  6 events   59 254 519 737 987 1237 ms   gaps 195 265 218 250 250
+#     ours     5 events   64 264 514 764 1014     ms   gaps 200 250 250 250
+#
+# Same `b0`/`b1` (1, 1), same position, same block id, same start (~60 ms),
+# same mean gap — 235.6 ms against 237.5 ms. **Nothing about the mechanism
+# differs.** Our sixth repeat would have landed at 1264 ms and vanilla's sixth
+# landed at 1237, so the window edge sits somewhere in a **27 ms band** and
+# decided the verdict. Our cadence is in fact the *more* regular of the two:
+# exactly 250 ms every time, against vanilla's 195-265 jitter.
+#
+# WHY `match` WAS AN UNSUPPORTABLE FLOOR, WHICH IS THE PRINCIPLE
+#
+# A ratchet floor is an assertion about what the **reference** can reproduce.
+# `verdict_for` is exact sequence equality, and here the reference is not
+# deterministic in the number of repeats it emits inside the window. So
+# `match` was never a property of this server — it was a property of this
+# server *and* a coin toss, and locking a coin toss into a gate asserts
+# something no single run can support. That is the same error as publishing a
+# figure from one run, which this project already forbids everywhere else.
+#
+# The old argument — "a floor of `diverge` would hide a real fall to
+# `diverge`" — assumed a fall to `diverge` is a distinguishable event. For
+# this check it is not: `diverge` is a legitimate outcome of a *healthy*
+# server about one run in ten. You cannot protect against a transition you
+# cannot observe.
+#
+# WHAT THIS FLOOR DOES AND DOES NOT CATCH, STATED SO NOBODY ASSUMES
+#
+# Caught: the lid mechanism dying entirely (`absent`), which is below this
+# floor. NOT caught: a wrong `b1`, a wrong position, or a wrong block id,
+# because all three keep the verdict at `diverge`. **That hole is real and it
+# is the price of this floor.** It is closed properly by the projection change
+# proposed in `docs/WORKLIST.md`, not here.
+#
+# ⚠ **THE WARNING BELOW IS SPENT, AND ONLY BECAUSE THE CAUSE WAS REMOVED.**
+# It read: do not re-lock this at `match` when the gate prints `BETTER`, it
+# will print `BETTER` nine runs in ten, and locking it is what produced the red
+# gate of 2026-08-04. That was correct for as long as the projection sampled
+# the repeat count. **It is not a warning against locking a floor; it is a
+# warning against locking a floor the reference cannot reproduce.** If the
+# cadence ever re-enters this check's projection, it applies again unchanged.
+#
+# `collapse_repeats = ["block_event"]` landed 2026-08-05. A run of identical
+# consecutive observations compares as one, so the reference is no longer
+# sampling how many of a 5-tick repeat fall inside `settle_ms`, and `match`
+# becomes a floor a single run can support. Measured, not argued:
+# `ci/selfcheck-recompare.sh` over the **same 26 saved vanilla recordings** the
+# old rate came from gives 1/25 with the line stripped and **0/25** with it,
+# and every one of those flaps was the last `block_event` alone — byte
+# identical in `at`, `b0`, `b1` and `block`. See `gameplay-unstable.toml`.
+#
+# The hole the old floor left open — a wrong `b1`, a wrong position or a wrong
+# block id all reading as `diverge` and so being invisible above a `diverge`
+# floor — is closed by this lock, which was the point of making the change
+# rather than widening the verdict set.
+#
+# What this check no longer tests is the cadence itself. That coverage is
+# `rustmc_server::containers::tests::
+# the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`, which measures
+# the gap rather than the count and shipped in the same branch.
+chest-opens-a-screen = "match"
+redstone-torch-powers-wire = "match"
+# `absent -> match` on 2026-08-05, and **strict too**, which is unusual enough
+# to say: `chat`'s projection consumes zero bytes, so `rest` digests the whole
+# packet body and there is no partial credit. The reply is byte-identical to
+# real vanilla's 539 bytes, held verbatim as `crate::commands`'s test vector
+# after being recorded off the wire with `RUSTMC_DUMP_CHAT=1`. The red was
+# written first: a subset run before the commit reported `absent`.
+server-answers-a-command = "match"
+# New 2026-08-06, both `match` on their first full run.
+#
+# **RED-BEFORE, observed 2026-08-07 at the rebase onto `add7297a`.** Both were
+# baselined off a first run that was green, and this branch's stated control
+# for them — `ci/chat-commands-falsify.sh` — is a control for the *unit tests*:
+# it mutates source and runs `cargo test`. Whether a corpus check can go red
+# depends on its projection, its `observe` list, its settle window and the
+# runner's step, and the sweep exercises none of those. So the red was taken
+# afterwards, with `ci/t2-gameplay-subset.sh` over exactly these two checks,
+# against a server built to not implement either behaviour: the command
+# registry with its `uuids` subnode deleted, and the serverbound CHAT packet
+# still recognised and consumed (so the frame reader cannot desync and poison
+# the session) but not handled.
+#
+#     unmutated   match   server-answers-list-uuids   match   a-player-says-something
+#     mutated     absent  server-answers-list-uuids   absent  a-player-says-something
+#
+# `absent` requires a NON-empty reference and an empty subject, so the same
+# observation also rules out the vacuous reading: vanilla did speak in both
+# windows, and it was our silence that was scored.
+#
+# `server-answers-list-uuids` is the check that the command registry is a
+# **tree** rather than a string compare: `list uuids` is a distinct node with a
+# distinct reply, and until this branch the server matched the whole command
+# text against `list` and would have answered it with nothing. Its component is
+# gated byte-for-byte against vanilla's own codec in `ci/commands-golden.sh`,
+# so a divergence here would mean the dispatch picked the wrong node rather
+# than that the bytes are wrong.
+#
+# `a-player-says-something` is the first chat check this corpus has ever had,
+# because until this branch there was no serverbound chat packet id at all —
+# the packet was unnameable, not merely unhandled. It observes `player_chat`
+# from the **observer**, so it measures the broadcast rather than an echo to
+# the speaker.
+#
+# **`player_chat` is the one packet in this corpus that cannot be digested
+# whole.** `SignedMessageBody.unsigned` substitutes `Instant.now()` for the
+# client's timestamp, so the body carries the sending server's wall clock and
+# vanilla-against-vanilla would diverge under a zero-consuming projection.
+# `trace`'s `player_chat` arm consumes exactly as far as that field and stops;
+# everything after it — salt, the empty last-seen list, the absent unsigned
+# content, the filter mask, the chat-type holder and the sender's display-name
+# component — is still compared byte for byte in `rest`.
+server-answers-list-uuids = "match"
+a-player-says-something = "match"
+
+# **The three console-driven checks, landed 2026-09-05 with `Step::Console`.**
+#
+# They are the first checks in this corpus that a client does not drive: all
+# three send a permission-level-2 command down the server's own console fifo,
+# which `ci/t2-gameplay.sh` already opens on BOTH servers. `Step::Command`
+# cannot reach one — the harness's players are level 0 and op-ing them was
+# rejected because it changes join traffic for every check here.
+#
+# `match` is what a correct port produces and is recorded as the expectation
+# rather than as an observation: if any of the three comes back otherwise, the
+# gate names it and the verdict it actually reached, which is the report worth
+# having. Nothing is blessed here that a later run may not improve on.
+#
+# `113` is the border's size packet, and it is `set` WITHOUT a time on purpose:
+# that is the branch that must not send `set_border_lerp_size`.
+# `114` is the pair whose names cross over — `set_border_warning_delay` carries
+# `warningTime` and `set_border_warning_distance` carries `warningBlocks` —
+# with two values that are neither packet's default, so a swap moves both.
+# `115` is two steps because the FIRST one's silence is the finding:
+# `ServerScoreboard.onObjectiveAdded` broadcasts nothing, and the
+# `set_objective` a client sees arrives with the `setdisplay` that tracks it.
+console-worldborder-set-reaches-a-client = "match"
+console-worldborder-warning-is-two-different-packets = "match"
+scoreboard-objective-reaches-a-client-when-displayed = "match"
+slab-half-follows-the-cursor = "match"
+door-places-both-halves = "match"
+# New 2026-08-04, `match` on its first run. Not a second copy of 130: the four
+# unwaxed copper doors are `WeatheringCopperDoorBlock`, a subclass, and
+# `crate::shapes` resolves the door family through the superclass map. A
+# simple-name compare would give those four no rule and nothing else in the
+# corpus would notice.
+a-copper-door-places-both-halves = "match"
+# New 2026-08-04, `match` on its first run — and green from birth is a claim
+# that has to be earned here, so it was mutation-checked: forcing `is_door` to
+# answer false takes this and 260 to `diverge` together while 238 is
+# untouched. It is the only check that reaches `DoorBlock.playerWillDestroy`.
+digging-the-top-of-a-door-takes-the-bottom = "match"
+fences-connect-to-each-other = "match"
+torch-on-a-wall-faces-out = "match"
+# `water-spreads` was `absent` here until 2026-08-10 and is now parked in
+# `ci/checks/gameplay/open/`, so it is no longer loaded and has no verdict to
+# baseline. Its entry is removed rather than left behind: a name in this file
+# that no scenario answers to is a line nobody can ever act on. The reason it
+# was parked, and the measurements behind it, are in that directory's README.
+slab-stacks-into-a-double-slab = "match"
+# **`match` as of 2026-08-05.** Port 2 of the neighbour-aware shape family.
+#
+# `StairBlock.getStairsShape(state, level, pos)` is called from BOTH
+# `getStateForPlacement` (offsets 111-132) and `updateShape` (34-62), and it
+# ignores the neighbour state `updateShape` is handed -- `aload 7` is never
+# read -- going back to the world for two DIFFERENT neighbours instead. That
+# is why `update_shape.json` carries zero `oak_stairs` rows: no function of
+# one neighbour can express it.
+#
+# The check watches the stair NOBODY CLICKED. Two stairs at right angles, and
+# the first must stop being straight when the second arrives.
+#
+# **Locked on measurement, not on one green.** Vanilla reproduces itself here
+# 25 times out of 25 across the 26 corpus-63 recordings
+# (`ci/selfcheck-recompare.sh`, declared axis). It flaps 1/25 on the strict
+# axis, which is reported and not gated.
+#
+# The pair is the load-bearing part: `OUTER_LEFT` vs `OUTER_RIGHT` is
+# `getCounterClockWise` against `getClockWise`, and one corner cannot tell a
+# rule that picks a side from a constant. `crate::placement`'s tests assert
+# each corner WITH its mirror, and a third stair on the far side pins the
+# `canTakeShape` asymmetry that no single-corner case can see.
+stairs-make-a-corner-when-two-meet = "match"
+lever-attaches-to-a-floor-or-a-wall = "match"
+# **`match` as of 2026-08-05**, the first check moved by a ported
+# `getStateForPlacement` rule that reads the world.
+#
+# `LadderBlock.getStateForPlacement` walks `getNearestLookingDirections`, sets
+# `FACING` to the first horizontal direction's **opposite** whose state can
+# survive, and supports it at `pos.relative(FACING.getOpposite())`. Until this
+# branch `placement.json` answered a refusal for every one of a ladder's 144
+# cells -- the grid was sampled by clicking into open air, and vanilla will not
+# hang a ladder on nothing -- so this server placed no ladder at all.
+#
+# **Locked on measurement, not on one green.** Vanilla reproduces itself here
+# 25 times out of 25 on the 26 corpus-63 recordings, so unlike `530` this is
+# not a check whose `match` is a coin toss; and the rule behind it is
+# deterministic with a paired unit test gating it. The pair matters: with one
+# wall, `facing = d` and `facing = d.getOpposite()` both find the wall on some
+# iteration and agree, so only the two-wall case can tell the mechanism from a
+# constant. See `placement::ladder_tests`.
+ladder-hangs-off-the-wall-behind-it = "match"
+trapdoor-half-follows-the-cursor = "match"
+repeater-faces-away-from-the-player = "match"
+bed-places-two-blocks = "match"
+# New 2026-08-03, and both measured `match` on their first run. Each exists
+# because the check it shadows could not fail on the thing being claimed —
+# 230 pins one bed facing and 330 one button delay. See the README.
+a-bed-facing-north-puts-its-head-the-other-way = "match"
+# New 2026-08-03; both measured `match` on their first run.
+digging-a-bed-takes-both-halves = "match"
+digging-a-tall-flower-takes-both-halves = "match"
+# New 2026-08-04. The mirror of 237 — the same rig, the upper half dug instead
+# of the lower — and it was `diverge` on the run that introduced it, which is
+# what `docs/SERVER.md` had predicted in prose since 2026-08-03 without ever
+# measuring. `crate::shapes::player_will_destroy` took it to `match` in the
+# commit after the one that added it.
+digging-the-top-of-a-tall-flower-takes-the-bottom = "match"
+# New 2026-08-04, `match` on its first run. Places `DoublePlantBlock` itself
+# rather than the `TallFlowerBlock` subclass 237 and 238 use, so a rule keyed
+# on the leaf class is caught.
+tall-grass-places-both-halves = "match"
+# **`match` as of 2026-08-05.** Port 3 of the family, and it splits across
+# both hooks in a way the check list hides.
+#
+# `getChestType` -> `candidatePartnerFacing` reads the level, one step
+# clockwise of the placement's facing and one counter-clockwise, and asks each
+# whether it holds a still-`SINGLE` chest of the SAME BLOCK whose `FACING`
+# matches. `ChestBlock.updateShape` reads `aload 7` and only `aload 7`, so it
+# belongs with the door and the bed in `typed_update_shape` and NOT with the
+# stair.
+#
+# The un-pairing half was already in `update_shape.json` -- all 32 rows of it,
+# `dir=5` for a north-facing LEFT and `dir=4` for a RIGHT, which is exactly
+# `getConnectedDirection`. Only the PAIRING half was missing, because a
+# `SINGLE` chest has two possible answers and a row holds one.
+#
+# **Locked on measurement**: vanilla reproduces itself 25/25 on the declared
+# axis across the 26 corpus-63 recordings. Strict flaps 4/25, reported and not
+# gated.
+chest-pairs-with-its-neighbour = "match"
+snow-layers-stack = "match"
+digging-a-door-takes-both-halves = "match"
+sign-takes-a-sixteenth-of-a-turn = "match"
+door-opens-when-right-clicked = "match"
+lever-flips-when-right-clicked = "match"
+# **`match` as of 2026-08-05.** Port 4 of the family, and the only one that
+# needed a hook to exist first.
+#
+# `BaseRailBlock.getStateForPlacement` consults NO neighbour at all, and
+# `updateShape` only schedules the waterlog tick -- so a placement table and a
+# shape table are both blind to the entire connective rule. It lives in
+# `onPlace`, which `LevelChunk.setBlockState` calls at offsets 514-542, INSIDE
+# the write and before the broadcast. `RailState.place` then writes its own
+# position and every neighbouring rail it bends.
+#
+# **Locked on measurement**: vanilla reproduces itself 25/25 on the declared
+# axis, and does not flap on either axis.
+#
+# The tests behind it are the second story. Eight of them passed under four
+# separate injected bugs, because every L-shaped scenario -- INCLUDING THIS
+# CHECK'S OWN -- bends its middle rail inside `connectTo`, which runs only the
+# first corner pass. Five more were added to reach `place`'s second pass and
+# `canConnectTo`'s `||`, and the same four bugs now go red. A test built from
+# a corpus scenario exercises that scenario's path and no other.
+rail-curves-towards-its-neighbour = "match"
+hoe-turns-grass-into-farmland = "match"
+flint-and-steel-lights-a-fire = "match"
+# `320` from the other side, and it starts at `match` — the first row this
+# corpus has ever opened at match. `FlintAndSteelItem.useOn` puts the *player*
+# in `Level.playSound`'s entity slot, so `320`, which observes from the actor,
+# structurally cannot see this event however many kinds it names. Measured
+# 2026-09-06, corpus 109.
+a-fire-being-lit-is-heard-by-everyone-else = "match"
+button-unpresses-itself = "match"
+a-wooden-button-stays-pressed-longer = "match"
+a-dropped-item-goes-into-your-inventory = "absent"
+a-lever-lights-a-lamp = "match"
+wire-power-falls-off-with-distance = "match"
+a-piston-extends-when-powered = "match"
+a-piston-pushes-the-block-in-front = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-redstone-torch-turns-off-when-its-block-is-powered = "match"
+# Was `match` on a rig that fed the repeater's output side, so nothing
+# propagated for anybody and the check rested on its resyncs. With the input
+# side powered, vanilla emits the wire lighting two repeater ticks later at a
+# position no step touched, and this server has no redstone propagation to
+# emit it with. A lower verdict earned honestly beats a higher one that could
+# not fail.
+a-repeater-delays-the-signal-it-passes-on = "match"
+a-comparator-switches-to-subtract-mode = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-note-block-retunes-when-right-clicked = "match"
+an-observer-pulses-at-the-block-it-faces = "match"
+# **450 MOVED `diverge` -> `match` 2026-08-05**, and it is the only check that
+# moved on the branch that did it. It needed THREE ports, not the one the brief
+# described: the connection rule (landed earlier), `RedStoneWireBlock.updateShape`
+# — which was NOT ported and without which a notification arriving at a dust is
+# discarded — and `updateIndirectNeighbourShapes`, called twice by `Level.setBlock`.
+#
+# `100` and `370` were `diverge` before and are `diverge` after, which is the
+# other half of the closing condition: all three read the same connection rule,
+# so a change that moved them too would have been the rule shifting under the
+# cascade rather than the cascade arriving.
+redstone-wire-climbs-the-block-beside-it = "match"
+placing-a-sign-opens-its-editor = "match"
+# **These three and `chest-opens-a-screen` moved together, and could not have
+# moved separately.** `ServerPlayer.containerCounter` is a per-player counter
+# with no reset, and the corpus plays every scenario down one connection, so
+# the four see window ids 1, 2, 3, 4 in corpus order — a server implementing
+# only the crafting table sends window 1 where vanilla sends 3 and diverges on
+# a field that has nothing to do with crafting tables. Measured 2026-08-04,
+# branch `menus-and-jump`: declared 30/62 -> 34/62, absent 9 -> 5, diverge 23
+# unchanged, 0 vacuous / 0 inert / 0 error on both runs, nothing fell.
+#
+# The two without a lid are the stable pair: a furnace has no
+# `ContainerOpenersCounter` (`AbstractFurnaceBlockEntity` declares neither
+# `startOpen` nor `stopOpen`) and a crafting table has no block entity at all,
+# so neither emits the 5-tick `block_event` that makes the chest pair flap.
+a-furnace-opens-a-screen-a-chest-does-not = "match"
+a-crafting-table-opens-a-menu-with-no-block-entity = "match"
+# Same 5-tick cadence as `chest-opens-a-screen` sampled through a 2,000 ms
+# window instead of 1,000, so it was **3 flaps in 25** rather than 1 — the ratio
+# the window lengths predict, and roughly eight cadences of accumulated jitter
+# against five. It was the *more* unstable of the pair and was floored at
+# `diverge` for exactly that reason.
+#
+# Locked at `match` 2026-08-05 with `collapse_repeats = ["block_event"]`, and
+# **this is the better-evidenced half of the pair**: at N = 26 the aggregator's
+# own power test resolves a 3/25 rate (25 comparisons miss it with probability
+# 0.041) where it cannot resolve a 1/25 one. Measured 0/25 under the new
+# projection. Read the block on `chest-opens-a-screen` for the rest; it is not
+# repeated here.
+a-bystander-sees-a-chest-open = "match"
+# `diverge` is this check's ceiling — four `nextFloat()` draws in the throw
+# velocity, 25 flaps in 25 at N = 26 in `gameplay-unstable.toml` — so this is
+# locking in the whole of what it can ever reach.
+dropping-an-item-throws-it-on-the-floor = "diverge"
+swapping-to-the-offhand-shows-on-both-channels = "match"
+
+# **`match` on its first run, exactly as predicted — so it was mutation-tested
+# before being believed.** A check nobody has seen fail is the category this
+# corpus has found fourteen of. Disabling ONLY the `half=lower, dir=UP` arm of
+# `typed_update_shape` (an extra `if half == "lower" { return None }`, which
+# leaves `half=upper, dir=DOWN` reachable) gave, on the Threadripper
+# 2026-08-04, `ci/t2-gameplay-subset.sh` over the four door checks:
+#
+#     diverge  clicking-the-top-of-a-door-opens-the-bottom
+#     match    digging-the-top-of-a-door-takes-the-bottom
+#     match    digging-a-door-takes-both-halves
+#     match    door-opens-when-right-clicked
+#
+# One check moved and three did not, which is the whole claim: 281 covers the
+# `dir=UP` arm and the other three do not reach it. The arm was already
+# correctly implemented — this buys coverage of code that was right and
+# untested, not a fix.
+clicking-the-top-of-a-door-opens-the-bottom = "match"
+
+# **Written down as a prediction, before the run that measures it.**
+#
+# `crates/rustmc-server` broadcasts no entity movement of any kind — there is
+# no `MOVE_ENTITY_POS` sender in the tree — so vanilla should produce two
+# heartbeats over this window and we should produce nothing, which is
+# `absent`. If the run says otherwise the prediction was wrong and this line
+# gets corrected with the measurement beside it, not quietly.
+# Locked in 2026-08-04 with the other two. Measured `match` on both full
+# gates of this branch. Held with one caveat written down rather than
+# assumed away: this check counts heartbeats in a fixed window, its own
+# file records why that is structurally flappable, and its 0-of-11
+# selfcheck is one sample at N = 12. If it flaps, it comes back to
+# `gameplay-unstable.toml` with the measurement — it does not get quietly
+# lowered here.
+a-standing-player-is-rebroadcast-on-a-timer = "match"
+
+# **Written down as a prediction, before the run that measures it**, in the
+# same shape as the line above and for the same reason.
+#
+# The first check in this corpus whose subject is a visibility change caused
+# by the *walker's* own movement rather than by the entity's, so it is the
+# only one that reaches the `movedPlayers` sweep at the foot of
+# `ChunkMap.tick`. It walks two round trips, one inside vanilla's 64-block
+# tracking limit and one past it, so it pins the limit and not only the
+# sweep.
+#
+# Vanilla should be silent on the first trip and emit one removal and one
+# re-add on the second. This server has no server view distance: the number
+# that reaches `updatePlayer` is the spawn tile's radius, which
+# `ci/t2-gameplay.sh` sets to 2, so its limit is 32 blocks and it should
+# remove the observer on **both** trips — four observations against two,
+# which is `diverge`. The check's own file carries the derivation, including
+# the first version of this prediction, which believed a false doc comment in
+# our own source and guessed 160 blocks.
+#
+# **MEASURED, AND THE PREDICTION HELD — then the rig turned out to be the
+# thing being measured.** First run: `diverge`, our extra `remove_entities` at
+# step 0, exactly as written. But vanilla emitted *nothing at all*, on either
+# run, because `Session::hop_to` walked 8 blocks a packet and vanilla refused
+# it — `oracle moved too quickly! 0.0,0.0,16.0`, three teleports, the actor
+# never further than 24 blocks from the observer. A verdict that agrees with
+# the prediction is not the same as a verdict that measured it.
+#
+# With a legal `hop_to` (75e821c, corrected to four blocks a packet in
+# b202955) vanilla emits exactly two observations, `remove_entities` at step 2
+# and `add_entity` at step 3, and no rubber-band. The red/green pair on that
+# rig is the one that means something:
+#
+#   server unfixed  diverge  vanilla removes at step 2, we remove at step 0
+#   server fixed    match
+#
+# — which is the 64-blocks-against-32 difference and nothing else, so this
+# line is `match` and it is a line that can still fail.
+#
+# ⚠ **LOWERED TO `diverge` ON 2026-08-05, AND THIS IS A FLOOR WEAKENING —
+# READ BEFORE ACCEPTING IT.** The paragraph above is still correct about the
+# *visibility* mechanism. It is wrong that `match` is a verdict this check can
+# hold, and it is wrong for the second time in this file for the same reason:
+# **two greens on a check written the same day are not evidence of
+# reproducibility.** That is precisely what `chest-opens-a-screen` cost, and
+# this line was locked at `match` under the same mistake three days later.
+#
+# THE MEASUREMENT, from three independent corpus runs whose traces all still
+# existed on the Threadripper (`ci/verdict-diff.py` on each run's report,
+# digests read out of the saved traces):
+#
+#   gate  2026-08-04   ours 449516d9252be94f   vanilla 449516d9252be94f  match
+#   menus 2026-08-04   ours 449516d9252be94f   vanilla 449516d9252be94f  match
+#   chain 2026-08-05   ours 449516d9252be94f   vanilla ec94da22c1882da2  diverge
+#
+# **Our bytes are identical in all three, on three different trees**, so the
+# branch that exposed this did not cause it — it could not have, because the
+# packet it is accused of changing is byte-for-byte what the two earlier trees
+# sent. Vanilla's moved, and moved again *within* the third run: the observer's
+# stream carried a third value, `2737654eceda12b3`.
+#
+# The field is `add_entity`'s **movement**, established by exhaustion rather
+# than by eye — the decoder consumes id, uuid, type and the three position
+# doubles, so `rest` is `movement | xRot | yRot | yHeadRot | data`; ours is five
+# zero bytes and reproduces `449516d9252be94f` exactly; and no assignment of the
+# 256³ rotation triples against `data` in {0,1,2} with the movement pinned at
+# zero reproduces either vanilla value. It is
+# `ServerEntity.getLastSentMovement()` for a player who is standing still, which
+# depends on which tick vanilla's last motion packet went out on. A coin toss
+# vanilla makes.
+#
+# **RE-LOCKED AT `match` 2026-08-05, AND THIS IS NOT THE TRAP.** The warning
+# that stood here said: do not re-lock when the gate prints `BETTER`, because
+# `match` is the modal outcome and that is how it got locked the first time.
+# That warning was right and is deliberately preserved above in the history of
+# this file. What makes this different is that the *cause was removed and then
+# measured*, rather than the verdict being observed to be green again:
+#
+#   * ORACLE rule 26 was applied. `add_entity`'s movement —
+#     `ServerEntity.getLastSentMovement()`, the only field that ever moved, and
+#     established by exhaustion plus digest arithmetic — is now consumed and
+#     discarded by `trace::decode`. The check is about visibility, not
+#     velocity, and no check in this corpus claims to test a velocity.
+#   * **Vanilla now reproduces itself on this check 25 times out of 25.**
+#     `SELFCHECK_RUNS=26 ./ci/t2-gameplay-selfcheck.sh`, 26 cold-booted vanilla
+#     servers, run 1 against runs 2..26, corpus 63, this branch, Threadripper,
+#     2026-08-05: **0/25 flaps, all 25 `match`.** Under the old projection the
+#     same recordings reproduce every previously published rate.
+#   * Two full corpus runs against this server, either side of an unrelated
+#     fix, both `match` with `reference_obs 2, subject_obs 2` and no missing or
+#     extra kinds.
+#
+# Our own bytes were never in question: identical across three corpus runs on
+# three trees before the exemption, and the tail digest is now
+# `dc545a7f9dce13f5`, which is `trace::digest` of four zero bytes and was
+# computed by hand before the run that confirmed it.
+#
+# So `match` is a floor this check can hold, and a fall to `diverge` is now a
+# real signal rather than a coin toss. That is the whole point of the exercise.
+walking-away-drops-a-standing-player-from-view = "match"
+#
+# ---------------------------------------------------------------------------
+# `update_attributes` CAN BE HEARD HERE, AND THE ENTRY IS WRITTEN AND
+# COMMENTED OUT — 2026-09-05, corpus-instruments.
+#
+#     walking-away-drops-a-standing-player-from-view = "diverge"
+#
+# The packets lane reports that adding `update_attributes` to this check's
+# `observe` list makes vanilla's copy of it audible for the first time, at a
+# cost of **98/108 -> 97/108 declared**: vanilla sends the packet when the
+# standing player re-enters tracking range and this server does not, so the
+# check falls `match` -> `diverge` on `missing_kinds`.
+#
+# `ci/checks/gameplay-falsifiable.toml` corroborates the mechanism from the
+# other side. `update_attributes.entity` and `update_attributes.rest` are two
+# of the twelve `[[unaskable_field]]` pairs — "the reference records this and
+# this server never sends it, so axis B has nothing to perturb" — which is
+# exactly the population a coverage change like this exists to shrink.
+#
+# **It is commented out, and the reason is this file's own rule twelve
+# hundred lines up: "A baseline entry may only ever be written from the full
+# gate."** Two things stop that here and neither is a matter of taste:
+#
+#   1. **The row cannot be written without the scenario edit, and the
+#      scenario is not this area's file.** `530-…​.toml`'s `observe` list
+#      belongs to the packets lane. Writing `diverge` here against an
+#      unmodified scenario would ratchet the check DOWN for a reason that
+#      does not exist in this tree yet: `ci/t2-gameplay.sh` would read the
+#      unchanged check as `match`, and a baseline row below the measured
+#      verdict is not a refusal, it is silent slack — the ratchet would stop
+#      catching a real fall to `diverge` from any other cause.
+#   2. **The 98 is not a figure taken on `main`.** It comes from the packets
+#      lane's tree. A full gate on `~/rustmc-corpus` at main tip bd5be4a3 on
+#      2026-09-05 is the denominator this file would have to quote, and it
+#      measures the UNMODIFIED check.
+#
+# So the entry above lands in the same commit as the `observe` edit, from the
+# gate run that measures them together, and not before. Whoever does that:
+# uncomment the line, and the ledger needs `--sweep` in the same commit too,
+# because changing an `observe` list changes the semantic digest and
+# `--check` will say STALE.
+# ---------------------------------------------------------------------------
+# New 2026-08-04, measured `diverge` on its first run and **deliberately left
+# there**. It reaches `ServerEntity.sendChanges`' `wasOnGround !=
+# entity.onGround()` arm, which no scenario could touch until `Step::Walk`
+# gained an `on_ground` field, and the arm turns out to be reachable and the
+# behaviour behind it wrong: vanilla syncs twice inside step 0 because its own
+# tick restores `onGround` with no packet saying so, then sends the walk back
+# as a `move_entity` delta; this server syncs once and sends the walk back as
+# a sync, because it takes the client's ground flag as authoritative. Root
+# cause is no server-side player physics — see the check's own file for both
+# projections and the falsification.
+#
+# `diverge` is the honest floor: above `absent`, reproducible, and it fails
+# loudly if the defect is fixed *or* if the arm is removed — deleting the
+# disjunct moves this to `absent`, which the ratchet refuses.
+a-player-that-leaves-the-ground-is-resynced = "diverge"
+
+# COMBAT — the first two checks in this corpus that hit something.
+#
+# A read-only sweep on 2026-08-05 enumerated 92 mechanics and found 33 with
+# zero checks, and the top of that list was not an unwritten check: it was an
+# unwritten **verb**. `scenario.rs`'s `Step` enum had no way to express hitting
+# anything, so `damage_event`, `set_health`, `entity_event` and `animate` were
+# not untested, they were untestable — no `.toml` could have observed them
+# whatever either server did. All four have had decode arms in `trace.rs` the
+# whole time, and one of them (`damage_event`) had already been repaired for a
+# trap nothing had ever sprung.
+#
+# Both are `absent` and both are honest: this server sends neither the swing
+# broadcast nor anything at all in response to an attack.
+#
+#   attacking-another-player      vanilla plays sound 1304,
+#                                 `minecraft:entity.player.attack.nodamage` —
+#                                 the target is a creative player, so
+#                                 `hurtServer` refuses the damage and the
+#                                 no-damage sound is what survives
+#   attacking-from-out-of-range   attacks twice in one scenario, far then
+#                                 near, and vanilla answers with exactly ONE
+#                                 sound — `handleAttack` returns at its reach
+#                                 test on the far one before touching the
+#                                 target
+#
+# The second is the discriminating one. A server that answers the attack packet
+# the moment it arrives — no reach test — reaches `match` on the first and
+# produces two sounds here, which is the defect a single combat check would
+# have locked in.
+#
+# `absent` is the honest floor for both. It fails loudly if either is fixed,
+# and it cannot be reached by deleting anything.
+#
+# THE SECOND ONE FAILED ITS FIRST GATE, AND THE REPAIR IS WHY IT IS ONE FILE.
+#
+# It was originally two files: one attack from far away, asserting silence.
+# That measured `absent` in a chain dir and **`vacuous` in `~/rustmc-gate`** —
+# same commit, different directory, different verdict — because its entire
+# vanilla trace was a single `animate` broadcast to the observer, and
+# `ChunkMap$TrackedEntity.updatePlayer` gates entity broadcasts on
+# `isChunkTracked(player, entityChunkX, entityChunkZ)`. The actor stood in
+# chunk z 1 and the observer had no other reason to have streamed it; deep in a
+# 67-scenario run it had not.
+#
+# A check asserting an absence, whose only positive content is one incidental
+# packet, is one perturbation from proving nothing. Both attacks now live in
+# one scenario so the near one's sound keeps the trace non-empty by
+# construction, and both files observe `from = "actor"` only — the actor's own
+# attack sound sits in the chunk the actor is standing in, which it necessarily
+# tracks. `animate` is out of both `observe` lists: it is precisely the fragile
+# packet, and `Step::Swing` is where swing coverage belongs.
+attacking-another-player = "match"
+attacking-from-out-of-range = "match"
+
+# SNEAKING — and the first check against a divergence `docs/SERVER.md` has
+# been describing in prose with nothing able to observe it.
+#
+# "a sneaking player holding a block flips a lever here and places the block on
+# vanilla". `Player.isSecondaryUseActive()` reads `isShiftKeyDown()`, and that
+# is the branch deciding whether a right-click reaches the block's own `use` at
+# all. There was no verb for sneaking, so there was no check.
+#
+# Measured with `ci/t2-gameplay-subset.sh`, one rig, one line different:
+#
+#   552 sneaking      vanilla places `minecraft:stone`, lever stays
+#                     `powered=false`; ours flips it to `powered=true`
+#   553 not sneaking  vanilla flips the lever to `powered=true` and places
+#                     nothing; ours does the same
+#
+# Ours produces the **identical** trace for both, which is the divergence
+# stated as a measurement rather than as prose: this server does not consult
+# the flag.
+#
+# `match` is the right floor for 553 and it is not decoration. It is the
+# degenerate half — it passes under the bug, by construction — and what it
+# forbids is the wrong fix. A server that "fixed" 552 by placing whatever is
+# in hand whenever it is placeable would reach `match` there and break this,
+# and the ratchet refuses that.
+#
+# 553 was briefly unable to fail, killed by 552 sitting next to it: sneak is a
+# state, `record` reuses one connection for every scenario, and 552 never
+# released. Run together, vanilla produced identical traces for both and the
+# pair distinguished nothing while reporting two plausible `diverge`s. Fixed in
+# `record.rs`, which now resets the input state before every scenario the way
+# `goto` already resets position.
+sneaking-with-a-block-in-hand-places-it-on-a-lever = "match"
+a-block-in-hand-does-not-stop-a-lever-flipping = "match"
+
+# THE CONTAINER-CLICK FAMILY. Storing, retrieving and crafting were ranked
+# item 4 of the coverage sweep and had zero checks, because the language had no
+# verb for a click inside a menu — four checks could open a container and none
+# could put anything in one. `ServerboundContainerClickPacket` is the verb;
+# these are its checks.
+#
+# 560 and 562 are `diverge` because this server has no block entities, so a
+# chest has nowhere to keep an item and a crafting table has no grid to run a
+# recipe over. Both diverge at the *first click*, not at the open: vanilla
+# corrects the slot that moved and this server answers nothing.
+#
+# 561 IS THE DEGENERATE HALF AND IT WAS WATCHED FAILING BEFORE IT WAS LOCKED.
+#
+# It is 560 with one number changed — `slot = 54` becomes `slot = 0` — so both
+# clicks land on an empty slot with an empty cursor and vanilla, having run the
+# whole click path, correctly sends nothing. The wrong fix it forbids is the
+# cheap one: answer every container click with a correction for the slot that
+# was clicked. That server would reach `match` on 560 without a container.
+#
+# Measured, not argued. A throwaway arm was put in `world_send.rs` doing
+# exactly that and the subset re-run against real vanilla
+# (`~/rustmc-logs/chain-container-FALSIFY.log`):
+#
+#   560  diverge -> diverge    the wrong fix buys nothing
+#   561  match   -> DIVERGE    "we also sent: container_set_slot"
+#   562  diverge -> diverge    vanilla fills slot 0 with the recipe result
+#                              where the fake echoed slot 1
+#
+# So 561 can fail, it fails for its own reason, and the fix it refuses gains
+# nothing on the other two. The arm was reverted; it is not in this branch.
+#
+# All three depend on the window counter, like the four menu checks above:
+# `nextContainerCounter` runs for the life of the player and one actor plays
+# the whole corpus, so these open menus 5, 6 and 7 and say so. See
+# `ci/checks/gameplay/README.md` — the menu checks are one indivisible item in
+# corpus order and these three join the end of it.
+# LOCKED AT MATCH, 2026-08-05, branch `blockentities`.
+#
+# The two `diverge`s above were both "this server has no block entities". It
+# has now: a position-keyed store with vanilla's lifecycle, item stacks with
+# counts, `handleContainerClick` and `doClick`'s PICKUP branch transcribed, and
+# a recipe engine over the extracted table.
+#
+#   ci/t2-gameplay.sh, Threadripper, ports 25936/25937, log
+#   ~/rustmc-logs/blockentities-gate.log:
+#
+#     CORPUS  declared  43/70 match  (21 diverge, 6 absent, 0 vacuous,
+#                                     0 inert, 0 error)
+#     GAMEPLAY GREEN
+#
+#   Against this file: **2 better, 0 worse.** 41/70 -> 43/70, and the two
+#   that moved are exactly these two.
+#
+# 561 is unchanged and stays the guard. It is the check that forbids the
+# cheap fix, it was watched failing before it was locked, and the
+# implementation it now passes against is one that answers a click ONLY where
+# the server's truth differs from the client's prediction — which is the
+# thing 561 exists to distinguish from "answer every click".
+#
+# 562 is a **strict** match as well as a declared one, so its packets agree
+# byte for byte including the item payloads inside the `rest` digest. 560 and
+# 561 remain strict-diverge, and that is not this branch: the same
+# `ci/selfcheck-recompare.sh` run shows `chest-opens-a-screen` and
+# `a-bystander-sees-a-chest-open` strict-unstable at 25/25 — vanilla cannot
+# reproduce a chest's `block_event` lid cadence against ITSELF. Both of those
+# scenarios open a chest; 562 opens a crafting table, which has no lid.
+storing-an-item-in-a-chest = "match"
+clicking-an-empty-chest-slot-changes-nothing = "match"
+a-crafting-table-turns-a-log-into-planks = "match"
+
+# THE SIGN FAMILY. `ServerboundSignUpdatePacket` (61) is the verb; these are
+# its checks. All three are `absent`: vanilla answers a valid sign edit with
+# two packets and this server answers with none.
+#
+# **They measure the VERB and not the placement, which is not obvious and is
+# the reason the rig is shaped the way it is.** The sign is placed in
+# `[[setup]]`, and `record.rs` pumps setup into a scratch recording it throws
+# away, then settles, before the measured window opens. So the placement gap —
+# which is real, and is what `270` and `460` are diverging on — contributes
+# nothing here. What vanilla emits inside the window is
+# `SignBlockEntity.updateSignText`'s own tail: `sendBlockUpdated(pos, state,
+# state, 3)`, which re-broadcasts the *same* state and so shows up as a
+# `block_update` carrying `oak_sign[rotation=8,waterlogged=false]`, plus the
+# `block_entity_data` holding the text. Measured 2026-08-05.
+#
+# THE GREEN THAT WOULD HAVE BEEN THE BUG. `handleSignUpdate` has TWO silent
+# refusals — no `SignBlockEntity` at the position, and a sender who is not
+# `getPlayerWhoMayEdit()` — and each returns with no packet and no error, the
+# whole effect being one LOGGER.warn. This server has no sign block entities
+# anywhere, so at any position that is not a sign it is byte-identical to
+# vanilla. A check that simply sent `sign_update` somewhere would have recorded
+# silence against silence and reported `match`. All three therefore PLACE the
+# sign themselves as the same player: `SignBlock.setPlacedBy` -> `openTextEdit`
+# is the only thing that ever sets the permitted editor, and it is what makes
+# vanilla's answer unconditional.
+#
+# 571 is the discriminating one and it is 561's shape. `updateSignText` calls
+# `setAllowedPlayerEditor(null)` at offsets 57-61 BEFORE it broadcasts, so the
+# token is spent and a second `sign_update` at the same position is refused:
+# vanilla emits ONE `block_entity_data` from two identical edits, not two. The
+# obvious wrong implementation — "write the text and broadcast" — passes 570
+# and fails here. That cannot be watched failing until signs exist at all,
+# which is stated rather than implied: today all three are `absent` for the
+# same reason, and 571 only starts discriminating once 570 can pass.
+typing-on-a-sign-you-placed-sets-its-text = "match"
+a-second-edit-of-the-same-sign-is-ignored = "match"
+a-sign-update-for-the-back-face-is-carried = "match"
+
+# MEASURED 2026-08-05 in ~/rustmc-chain-cascade, branch `chain-cascade-signs`
+# at b8c69f7, `./ci/t2-gameplay.sh`, whole corpus, fresh vanilla world:
+#
+#   CORPUS  declared  42/73 match   (22 diverge, 9 absent, 0 vacuous, 0 inert, 0 error)
+#   CORPUS  strict    24/73 match   (42 diverge, 6 absent, 1 vacuous, 0 inert, 0 error)
+#   GAMEPLAY GREEN     no BETTER, no REGRESSED
+#
+# **No BETTER and no REGRESSED is the point of this run**, not a quiet result:
+# it is the whole file agreeing with the measurement, which is what says the
+# three `absent` entries and `450`'s `match` were written from what vanilla
+# and this server actually did rather than from what the branch expected.
+#
+# The run that moved `450` was the earlier one over the 70 checks that existed
+# before the sign family — declared 42/70 (22 diverge, 6 absent), strict 20/70,
+# one BETTER: `redstone-wire-climbs-the-block-beside-it` diverge -> match. The
+# nine `absent` here are those six plus the three sign checks.
+#
+# The two lines below are the previous record and are kept because the strict
+# commentary underneath them is written against those numbers. Their `total` of
+# 51 is the corpus size at the time, not an error.
+# declared: {"absent": 11, "diverged": 26, "errored": 0, "inert": 0, "matched": 14, "total": 51, "vacuous": 0}
+# strict:   {"absent": 4, "diverged": 42, "errored": 0, "inert": 0, "matched": 5, "total": 51, "vacuous": 0}
+#
+# **The strict number is not comparable with the one this file used to
+# carry.** `strict` used to drop the scenario's `within` radius and
+# `observe_from` as well as its kind filter, so every check compared the
+# whole session everywhere in the world. `ci/t2-gameplay-selfcheck.sh`
+# measured what that cost the first time it ran: **vanilla scored 3/37 on
+# strict against itself**, an 8% ceiling. Keeping the scenario's bounds and
+# dropping only the kind filter moved the reference's own score to
+# **16/37, 43%**.
+#
+# **CORRECTED 2026-08-04, and the instruction that used to be here is
+# withdrawn.** It said "quote the gap against that ceiling, never against
+# 100%". There is no ceiling to quote against. 43% was 16 of 37 checks
+# matching strict in **one** comparison at N = 2, and one sample of a
+# population that flips is not a ceiling. The twelve-run selfcheck asks
+# whether a check reproduces under strict in *all eleven* comparisons, and
+# the answer for this corpus was **0 of 55** — not one check, with the least
+# unstable nine sitting at exactly 5 of 11.
+#
+# **Corrected again 2026-08-04: it is now 35 of 60.** The cause below was
+# removed rather than tolerated — `compare::project` drops a `move_entity`
+# that failed vanilla's own movement test (`dx²+dy²+dz² < 128` in wire units,
+# exactly `lengthSqr < 2⁻¹⁷` in blocks) unless a check names the kind, because
+# such a packet cleared no movement test and exists only because the 60-tick
+# counter wrapped. The paragraph below is left standing because it is still the
+# correct description of what the number used to be measuring.
+#
+# `ServerEntity.sendChanges` re-broadcasts every tracked entity on
+# `tickCount % 60 == 0` whether or not it moved; every scenario has a second
+# player five blocks away; every measured window is under three seconds. So
+# the broadcast lands inside the window on a coin flip, under every check at
+# once, and 5/11 is what that coin flip looks like.
+#
+# **So no strict figure may be quoted as a parity claim anywhere**, and none
+# is ratcheted by this file — the `[verdicts]` table above is declared only,
+# and always was. The strict line below is recorded as the run's own output
+# and means nothing on its own.
+
+# **Corpus 70 -> 80, 2026-08-05/06.** Ten checks added, in the two families
+# with the newest verbs and the thinnest coverage: `container_click`'s seven
+# `ContainerInput` branches (only PICKUP had a check before this) and
+# `sneak`'s generic block-use gate (only a lever had one). All ten are live —
+# 0 vacuous, 0 inert, 0 error against real vanilla, on the Threadripper,
+# seed 20260803, `spawn-radius=0`, workspaces at absolute
+# `(-(n+1) * 32, spawn_y, 0)` — measured on the fourth recording of this
+# batch; the first three are the reason two mechanisms this run's own agent
+# also wrote (a sneak-driven `set_entity_data` pose check and a pair of
+# checks attacking a freshly spawned pig) are **not** in this file or in
+# `ci/checks/gameplay/`: both landed `error` or `vacuous` at this corpus's
+# own tail — 80-odd files out, workspace 79 sits roughly 2,560 blocks from
+# spawn — because a brand-new entity's own tracking and a bystander's
+# broadcast of another player's pose both depend on `ChunkMap.isChunkTracked`
+# catching up after a multi-thousand-block teleport, and how long that takes
+# is sensitive to how loaded the box is. An isolated recording (this file's
+# ten checks plus one pig check, replayed alone against a fresh vanilla, no
+# second server) went clean with an 8-second buffer of harmless `walk` round
+# trips before the measured step; the same file, in the full corpus against
+# real contention from other trees on the same box, still came back `error`
+# twice in three tries. A fixed-duration wait is not a fix for a
+# contention-sensitive race, so both were dropped rather than shipped
+# flaky. See the agent's own handoff for the full measurement; the two
+# mechanisms are real and worth another run once the corpus has a way to
+# wait on confirmation rather than on a clock, or once new entity-broadcast
+# checks can land nearer the front of a still-growing corpus.
+#
+# THE CONTAINER-CLICK BRANCHES, EACH VERIFIED FROM THE JAR BEFORE BEING
+# WRITTEN, NOT AFTER — javap -p -c -constants on
+# `AbstractContainerMenu.doClick` and `ServerGamePacketListenerImpl.
+# handleContainerClick`, on the pinned 26.2 jar:
+#
+#   QUICK_MOVE   601 stores a hotbar item into a chest in one click, 603 is
+#                the reverse direction (chest back into the inventory), 602
+#                is the degenerate half of 601 (an empty slot) — three files
+#                because the two directions are different branches of
+#                `quickMoveStack` and a one-directional stub would pass one
+#                and fail the other.
+#   SWAP         604, bounds-checked to hotbar 0..8 or 40 (offhand) and never
+#                touching the cursor — a fundamentally different code path
+#                from PICKUP, which a "map everything unknown to PICKUP"
+#                server cannot reach by accident.
+#   THROW        605/606, a pair on a two-stone stack for the reason 230/235
+#                already established for this corpus: on a one-count stack
+#                button 0 and button 1 take the same single item, so the pair
+#                needs the rig 552/553 didn't.
+#   PICKUP_ALL   607, which requires a non-empty cursor first (verified: the
+#                bytecode returns immediately on an empty one) and then
+#                drains every matching slot into it — the opposite direction
+#                from a plain PICKUP, so a "default to PICKUP" server is
+#                caught moving the wrong way, not just failing to move.
+#   the bounds
+#   check itself 608, `isValidSlotIndex` failing on slot 999 in a 63-slot
+#                menu — `handleContainerClick` returns before `clicked` is
+#                ever called, no packet at all, which 561 already named as
+#                unclaimed.
+#   CLONE and
+#   QUICK_CRAFT  not attempted. `clone`'s only wire-visible effect is the
+#                cursor item, and this harness's own trace decoder has no
+#                arm for `ClientboundSetCursorItemPacket` — every existing
+#                `pickup` click already changes the cursor and none of them
+#                can see it either, so a clone check would have had no
+#                observable content of its own. `quick_craft` is a
+#                begin/add/end multi-click drag with its own state machine;
+#                not attempted this run.
+#
+# THE SNEAK-GATE EXTENSION. 552/553 pin `isSecondaryUseActive()` against a
+# lever; 609 is the same gate against a chest, the corpus's other
+# interactive block-entity block, chosen because `docs/SERVER.md`'s own
+# named divergence text says "the block's own use", not "the lever's". Its
+# `observe` list includes `open_screen`/`container_set_content`/`block_event`
+# specifically so a server that places the stone correctly but also opens
+# the chest as an unwanted side effect cannot pass — 552/553's own list
+# could not have caught that shape of bug for a lever, because a lever flip
+# is a `block_update` and a chest opening is not one at all.
+#
+# 611 IS THE FIRST CHECK TO NAME `close_container` ON PURPOSE rather than
+# relying on `record.rs`'s structural reset to send it — closing a crafting
+# table with an unconsumed log in the grid, so `CraftingMenu.removed`'s
+# `clearContainer` call is itself what is being measured, not incidental to
+# it.
+container-click-quick-move-stores-a-hotbar-item = "match"
+# **`match` -> `diverge`, and this is a published number moving DOWN on
+# purpose.** 602 held a `match` that no server behaviour earned: this server
+# has never implemented `QUICK_MOVE` (`crates/rustmc-server/src/click.rs`
+# opens `do_click` with `if input != ContainerInput::Pickup { return false; }`),
+# so the click the check is named for produced no observation on either side
+# and the whole verdict rested on the rig step that opens the chest. Its own
+# file carries the argument and the measurement; `docs/PARITY-GAP.md` §0.1
+# carries how it was found. The scenario now ends with a QUICK_MOVE that must
+# move something, so it fails until the verb exists — which it does today.
+#
+# **The declared corpus is therefore 55/86 earned, not 56.** This line is the
+# whole of that change.
+container-click-quick-move-on-an-empty-slot-changes-nothing = "match"
+container-click-quick-move-retrieves-a-stored-item = "match"
+container-click-swap-exchanges-a-hotbar-slot = "match"
+# **`diverge` -> `match`, 2026-08-09, branch `gameplay-container-throw`.**
+# Measured `ci/t2-gameplay.sh`, corpus 88, seed 20260803, Threadripper,
+# 10:04-10:47, declared 62/88 -> 64/88 with 2 of 88 rows moved, and re-run on
+# the committed tip 12:29-13:10 with 0 of 88 rows moved against that.
+#
+# The branch wrote here that the five `container-click-quick-move-*` /
+# `pickup-all` / `out-of-range` conversions above were "still not ratcheted",
+# on the rule that an agent does not lock in somebody else's conversion — a
+# rule it kept for three rounds and was right to keep. That sentence is
+# **no longer true and has been removed rather than merged**: `42946522`
+# ratcheted all five on main, measured six times, before this branch rebased.
+# The rule held; the fact it described expired.
+#
+# **Safe to ratchet because the reference reproduces them**, which is the
+# question a `match` baseline actually asks. They were declared unstable at
+# 2/2 on 2026-08-08 for `ItemEntity`'s random spawn yaw; the yaw is now a
+# named field that `compare::project` drops for `minecraft:item` alone, and
+# `ci/selfcheck-recompare.sh` over three cold vanilla recordings makes them
+# **0/2** on the declared denominator. Their *strict* columns are still
+# unstable 2/2 — the item's own physics, `set_entity_motion` and
+# `move_entity`, which vanilla does not reproduce either — and strict is
+# reported, not gated. `docs/PARITY-ROADMAP.md` §14; the N = 3 caveat on that
+# 0/2 is written out in `ci/checks/gameplay-unstable.toml`.
+container-click-throw-drops-one-item = "match"
+container-click-throw-drops-the-whole-stack = "match"
+# **`match` -> `diverge`, 2026-08-11, branch `corpus-third-verdict`, and this
+# is the second published number in this file to move DOWN on purpose.** 602
+# above is the precedent and the same sentence applies: 607 held a `match` no
+# server behaviour earned.
+#
+# 607 passed by comparing two silences. Its measured step contributed **zero
+# declared observations on both sides** while the whole scenario showed a
+# healthy `reference_obs: 7` / `subject_obs: 7` — all seven earned by the rig
+# clicks before the one the file is named for. The step's one packet was
+# `packet:0x60`, which the check did not `observe`, and its digest was
+# byte-identical to the previous step's: vanilla resyncing a cursor it had not
+# changed. The check was green whatever `click.rs` did.
+#
+# The file now reaches a state where vanilla actually sweeps — `PICKUP_ALL`'s
+# arm enters the gather only from an EMPTY clicked slot (offset 1649) — and it
+# observes `packet:0x60`. Vanilla answers with a real gather; this server has
+# never implemented `PICKUP_ALL`, so it diverges, which is the check finally
+# doing its job. Measured `ci/t2-gameplay.sh`, corpus 87, ports :26584/:26585,
+# Threadripper, 2026-08-11, declared 67/87.
+#
+# The same two recordings scored by the **stack-tip** comparator
+# (`proj:b385528330fee646`, which has no `mute` verdict at all) give the
+# identical census, 67/87 with 15 diverge and 5 absent — so this conversion is
+# the scenario rewrite, not the new verdict.
+container-click-pickup-all-gathers-matching-stacks = "match"
+container-click-with-an-out-of-range-slot-changes-nothing = "match"
+sneaking-with-a-block-in-hand-does-not-open-a-chest = "match"
+closing-a-crafting-table-returns-the-grid-contents = "match"
+
+# declared: {"absent": 6, "diverged": 31, "errored": 0, "inert": 0, "matched": 43, "total": 80, "vacuous": 0}
+# strict:   {"absent": 3, "diverged": 53, "errored": 0, "inert": 0, "matched": 23, "total": 80, "vacuous": 1}
+#
+# Measured 2026-08-06, Threadripper, `T2_GAMEPLAY_VANILLA_PORT=25860
+# T2_GAMEPLAY_RUSTMC_PORT=25861` (default ports collide with other trees on
+# this box; see the HARD PRECONDITION block in `docs/AGENT-BRIEF.md`).
+# `redstone-wire-climbs-the-block-beside-it` moved `diverge -> match` between
+# whenever this file's own summary above was last written and this run; that
+# line is left unedited above and the check's own baseline entry is left as
+# it was, since the change is unrelated to this batch and belongs to whoever
+# is tracking that check.
+
+# ---------------------------------------------------------------------------
+# The `animate` family, added 2026-08-06 on branch `chain-signs-eviction-swing`.
+#
+# `animate` had **zero** coverage: the packet had a projection in
+# `crate::trace` and no scenario had ever produced one. `Step::Swing` existed
+# as a bare unit variant — main hand, 60 ms — and no check in the corpus used
+# it, which is why the gap was invisible rather than merely open.
+#
+# 60 ms is the number worth keeping: it is **one tick**, and one tick after a
+# swing `swingTime` is 0, which is inside the window `swing` swallows. So the
+# old verb could not have expressed 581 at all — two consecutive `swing` steps
+# under it produce one animation on vanilla and the scenario would have read
+# as though the second packet had simply been lost. The verb now carries the
+# hand and the delay, and its default is 200 ms — past the swallow — so a
+# scenario lands in that branch only by saying so.
+#
+# All three are `observe_from = "observer"`. `LivingEntity.swing(hand)` passes
+# `iconst_0` to `swing(hand, boolean)`, which selects
+# `sendToTrackingPlayers` over `...AndSelf`, and `seenBy` never contains the
+# entity's own player — so the swinger receives nothing and a check reading
+# the actor's stream would compare silence with silence.
+#
+# Measured against real vanilla on the Threadripper, 2026-08-06, ports
+# 26414/26415, and each one watched failing against an injected server bug
+# before it was recorded here. See `docs/WORKLIST.md` for the sweep.
+swinging-an-arm-shows-to-a-bystander = "match"
+a-second-swing-inside-the-animation-is-swallowed = "match"
+the-off-hand-swings-with-a-different-action = "match"
+
+# ---------------------------------------------------------------------------
+# RATCHETED 2026-08-06, branch `chain-signs-eviction-swing`, whole corpus,
+# `./ci/t2-gameplay.sh` on the Threadripper, ports 26420/26421, fresh vanilla
+# world, 86 checks:
+#
+#   CORPUS  declared  53/86 match   (27 diverge, 6 absent, 0 vacuous, 0 inert, 0 error)
+#   CORPUS  strict    31/86 match   (51 diverge,  3 absent, 1 vacuous, 0 inert, 0 error)
+#
+# Re-run on the final tree after the ratchet: identical declared line, no
+# BETTER and no REGRESSED, `T2-GAMEPLAY GREEN`. The strict line moved by one
+# between the two runs (32 -> 31) with nothing changed in between, which is
+# the strict denominator's documented instability and the reason it is never
+# quoted alone.
+#
+# Five BETTER, all of them the sign block entity:
+#
+#   sign-takes-a-sixteenth-of-a-turn             diverge -> match
+#   placing-a-sign-opens-its-editor              diverge -> match
+#   typing-on-a-sign-you-placed-sets-its-text     absent -> match
+#   a-second-edit-of-the-same-sign-is-ignored     absent -> match
+#   a-sign-update-for-the-back-face-is-carried    absent -> match
+#
+# **270 was not expected and is the interesting one.** It is the sign's
+# *placement*, not the verb, and it had been diverging since the corpus
+# existed. It moved because a placed sign now creates a `SignBlockEntity`,
+# which makes `openTextEdit` reachable, which is what emits the
+# `block_update` and `open_sign_editor` the check was missing. Nobody aimed
+# at it.
+#
+# The three `animate` entries above were written from a
+# `ci/t2-gameplay-subset.sh` run and that was a mistake worth recording: the
+# subset said `match` and the full corpus said `vacuous`, because
+# `530-walking-away-drops-a-standing-player-from-view` is not in a subset and
+# is what leaves the stale placement that bounded them out. **A baseline
+# entry may only ever be written from the full gate.**
+
+# ---------------------------------------------------------------------------
+# CORPUS 87 -> 92, branch `corpus-coverage-audit`, 2026-08-11. Full gate,
+# `./ci/t2-gameplay.sh` in `~/rustmc-cov3` on the Threadripper, vanilla 26.2
+# protocol 776 on `:26612` against ours on `:26613`, superflat, fresh world,
+# projection `proj:b385528330fee646`:
+#
+#   CORPUS  declared  71/92 match   (16 diverge, 5 absent, 0 vacuous, 0 inert, 0 error)
+#   CORPUS  strict    67/92 match   (23 diverge,  2 absent, 0 vacuous, 0 inert, 0 error)
+#
+# **The denominator is 92 and this branch was briefed with 93.** It was
+# written against 88 and adds five; `water-spreads-cascade` then took main
+# 88 -> 87 by parking `160-water-spreads.toml` in `ci/checks/gameplay/open/`.
+# 87 + 5 = 92, and the run's own recorder prints `recording 92 scenario(s)`.
+# 0 vacuous / 0 inert / 0 error is unchanged, which matters more than the
+# match count and is the property that must not regress.
+#
+# The five below are `700`/`701`/`710`/`720`/`790`, docs/PARITY-ROADMAP.md
+# §20.4 and §20.8. Before the run they were the five names the gate refused
+# with `not in the baseline — a new check must record what it currently does`,
+# which is that rule working rather than a failure.
+#
+# **`720` reads `match` here, and the previous full-corpus reading of it as
+# `diverge` is NOT reproduced.** That reading was taken on the 93-corpus under
+# the older projection `proj:58380c9e4cbeae81` and was attributed to window-id
+# drift inherited from `closing-a-crafting-table-returns-the-grid-contents`
+# (vanilla `window = 17`, ours `18`). On this tree `720` has no first
+# difference at all under either lens, and the crafting table's own diverge is
+# now `window = 0` on both sides — the chain the attribution rested on is not
+# present, so the explanation cannot be carried forward even as a caveat.
+# `609-sneaking-with-a-block-in-hand-does-not-open-a-chest` went
+# `diverge -> match` in main between the two runs and is the likeliest cause;
+# that is named as the suspect and not as a measurement.
+#
+# `700` and `720` were both shown able to go red before being trusted (§20.7):
+# `use_without_item` returning `Pass` for `fence_gate` broke `700`, and
+# dropping `Reply::SetCursor`'s send broke `720`; both reverted in the turn
+# that took them.
+#
+# **`790` is baselined `diverge`, and WAS also reference-unstable** — 9/15
+# pairs. Those were two separate facts and neither excused the other: the
+# diverge is a real gap (`FlowerPotBlock.useWithoutItem` is not ported; we
+# answer `block_changed_ack` where vanilla sends `block_update` to
+# `flower_pot`), and the instability was in a different field on the same
+# scenario (`container_set_slot`'s cumulative state id).
+#
+# **The instability half is gone as of 2026-08-11** — the state id is now
+# rebased onto the scenario by `compare::rebase_session_counters` and `790`'s
+# entry, with the other two on that field, is retired from
+# `ci/checks/gameplay-unstable.toml`. **The baselined verdict does not move.**
+# It is still `diverge` and for the reason it always was: the port is missing.
+# This is the case the two-separate-facts sentence was written for — removing
+# the instability does not convert the verdict, and nothing here changes until
+# `FlowerPotBlock.useWithoutItem` is ported.
+a-fence-gate-opens-when-right-clicked = "match"
+
+# **Locked in 2026-08-17.** `gameplay-block-interactions`'s fence-gate port
+# (`0915d909`, `fence_gate()` in `crates/rustmc-server/src/useblock.rs`) has
+# been on main since 2026-08-11 and this row stayed `diverge` because only
+# ONE gate log had it (`docs/cold-start/gameplay-baseline-lockins.md`: "not
+# locked in... re-check after a second, independent gate lands on a tip that
+# includes gameplay-block-interactions's fence-gate port"). Two independent
+# trees now do, both far downstream of `0915d909` and unrelated to each
+# other: `~/grit/work-falsev-sound` (`0615e789`) and `~/grit/wt-servreach`
+# (`e437ab99`). Both `report.json`s read `verdict = "match", strict = "match"`
+# for this scenario, 4/4 reference and subject observations, no missing or
+# extra kinds — the second citation the doc asked for.
+a-fence-gate-opened-from-behind-turns-to-face-you = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-daylight-detector-inverts-when-right-clicked = "match"
+a-container-click-puts-the-item-in-your-cursor = "match"
+a-flower-pot-empties-when-right-clicked = "match"
+
+# 2026-08-12, branch `corpus-dark-systems`. The first check that turns a game
+# rule on for its own measured window (`[[gamerule]]`, see
+# `docs/PARITY-ROADMAP.md` §22), and therefore the first whose two recordings
+# are taken on deliberately different substrates: `record --console` is passed
+# for vanilla and this server has no console and no game rules to be told
+# through, so the run prints
+#
+#   !! random-ticks-turn-covered-grass-to-dirt: [[gamerule]] random_tick_speed
+#      = 1000 NOT APPLIED — no --console for 127.0.0.1:26383
+#
+# on its own stderr. `absent` is therefore the honest starting verdict and not
+# a symptom: measured 2026-08-12 on the Threadripper, seed 20260803, corpus 93,
+# reference_obs 2 (one `block_update` on each client), subject_obs 0.
+#
+# It is stable before it is locked in, which is the rule the five above were
+# locked in under: 0 of 15 pairs over N = 6 cold vanilla servers,
+# ensemble `dark-probe-n6`, projection `proj:f7fbb29926074663`,
+# `ci/dark-systems-probe.sh`. Resolving power 39.3% — quote it with the zero.
+#
+# CLOSED 2026-08-17, branch `gamerules-console`. `crates/rustmc-server/src/
+# gamerules.rs` (the typed registry, 59 rules transcribed from the pinned
+# 26.2 jar's `GameRules.<clinit>`) plus `crates/rustmc-server/src/console.rs`
+# (a real `--console <fifo>` capability, not a test backdoor) give this server
+# a game-rule store `ci/vanilla-server.sh console`-style tooling can address;
+# `crate::randomtick::random_tick_grass` ports `SpreadingSnowyBlock.
+# randomTick`'s covered-arm only (the spread arm is a named, undischarged
+# gap — see that module's doc). `ci/t2-gameplay.sh RUSTMC_CHECKS=/tmp/
+# checks-780`, corpus 1/1, both substrates on protocol 776:
+# `CORPUS declared 1/1 match (0 diverge, 0 absent...)`, `BETTER
+# random-ticks-turn-covered-grass-to-dirt: was absent, is now match` —
+# `oracle-work/gameplay/report.json` in `~/rustmc-gamerules`. Single-scenario
+# subset run, so the corpus floor above is unrelated to this figure and this
+# is not a full-corpus re-sweep.
+random-ticks-turn-covered-grass-to-dirt = "match"
+
+# ---------------------------------------------------------------------------
+# THE SEVENTEEN MENU CHECKS — 2026-08-12, branch `gameplay-container-menus`.
+#
+# `docs/PARITY-ROADMAP.md` §21 scored the corpus `menu 3 / 25` against
+# vanilla's own registry, and §28 is the item that moved it. Each of these
+# opens one `minecraft:menu` type the corpus had never opened -- `740`-`756`,
+# a range assigned so it cannot collide with `gameplay-sound-coverage`'s
+# `730`-`739` or `gameplay-block-entities`' `760`-`772` -- and every one
+# of them was checked against two cold vanilla boots by `ci/menu-probe.sh`
+# before it was written down.
+#
+# **They start `absent` because `menu_for_state` knows three blocks**, and its
+# own doc comment has listed the other eighteen as a named gap since it was
+# written. This is that gap becoming measurable rather than becoming smaller:
+# nothing in this branch touches `crates/rustmc-server`. The verdicts below
+# are what the run measured, not what was predicted.
+# ---------------------------------------------------------------------------
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-dispenser-opens-a-three-by-three-menu = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-hopper-opens-a-menu-of-its-own-type = "match"
+# **The one that is not `absent`, and it is the one the check was written
+# for.** This server has a chest, so it opens a menu here -- `menu=2`,
+# `minecraft:generic_9x3`, against vanilla's `menu=5`,
+# `minecraft:generic_9x6`, on the same click. `ChestBlock.getMenuProvider`'s
+# two-half combiner is what is missing, not the block and not the block
+# entity, and nothing else in the corpus could have said so: `090` opens a
+# single chest and passes.
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-double-chest-opens-a-six-row-menu = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-shulker-box-opens-its-own-menu = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-blast-furnace-is-not-a-furnace = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-smoker-is-not-a-furnace = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-brewing-stand-opens-a-menu-with-its-own-slot-shape = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-beacon-opens-a-menu-with-one-payment-slot = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+an-anvil-opens-a-container-that-is-not-a-container = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+an-enchanting-table-opens-a-menu-with-ten-data-slots = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-grindstone-opens-a-menu = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-loom-opens-a-menu = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-smithing-table-opens-a-menu = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-cartography-table-opens-a-menu = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-stonecutter-opens-a-menu = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-crafter-opens-a-three-by-three-menu-that-is-not-crafting = "match"
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-lectern-with-a-book-opens-a-menu-with-no-inventory = "match"
+
+# ---------------------------------------------------------------------------
+# The six place-sound scenarios — branch `gameplay-sound-coverage`, 2026-08-12.
+#
+# **All six start at `match`, and a `match` is the honest verdict here rather
+# than a flattering one.** `world_send::place_sound` reads the same jar-derived
+# `data/vanilla/sound_types.json` vanilla's `SoundType` table was extracted
+# from, so the event NAME could not have disagreed; what these six adjudicate
+# is that a placement emits a sound at all, that the state used to index the
+# table is the state that was placed (`basalt`, `bone_block` and
+# `ochre_froglight` take `axis` from the clicked face), that the source, the
+# position and the volume `(getVolume() + 1) / 2` are right, and that the sound
+# and the `block_update` go to the two different streams the bytecode sends
+# them to. See `docs/PARITY-ROADMAP.md` §27.5, which says this in full so that
+# a green here is not read as "48 sound names verified".
+#
+# Each is `match` declared and `diverge` strict, which is the corpus's usual
+# shape and is not a property of these six.
+#
+# Measured 2026-08-12 by `ci/t2-gameplay-subset.sh`, vanilla 26.2, protocol
+# 776, superflat, seed 20260803, Threadripper. Stability taken separately over
+# N = 6 independently cold-booted vanillas by `ci/subset-stability.sh`.
+# ---------------------------------------------------------------------------
+deepslate-and-tuff-blocks-each-place-with-their-own-sound = "match"
+nether-blocks-each-place-with-their-own-sound = "match"
+soul-mud-and-sculk-blocks-each-place-with-their-own-sound = "match"
+soft-blocks-each-place-with-their-own-sound = "match"
+cave-blocks-each-place-with-their-own-sound = "match"
+newer-blocks-each-place-with-their-own-sound = "match"
+
+# ---------------------------------------------------------------------------
+# THE FIVE ABOVE WERE RATCHETED `diverge -> match` IN THE SAME 2026-08-11 RUN,
+# AND THEY ARE NOT THIS BRANCH'S WORK. `slab-stacks-into-a-double-slab`,
+# `snow-layers-stack`, `a-comparator-switches-to-subtract-mode`,
+# `sneaking-with-a-block-in-hand-places-it-on-a-lever` and
+# `sneaking-with-a-block-in-hand-does-not-open-a-chest` were moved by commits
+# already in `main` `1f8f3813`; the branches that moved them did not re-run
+# the corpus, so the gate has been printing five `BETTER` advisories on every
+# run since, telling whoever read them to lock these in.
+#
+# Locked in here because an advisory nobody acts on is an advisory nobody
+# reads, which is the same argument that got the floor re-stamped in this
+# commit's parent. Until now these five could silently regress to `diverge`
+# and the ratchet would have called it acceptable.
+#
+# Safe to lock because all five were checked stable on the corpus floor
+# ensemble before being written, not merely observed to pass once: 0/15 pairs
+# and 1 distinct projection each over `coverage92-selfcheck-n6-20260811`
+# (N = 6, one recorder). A `match` locked in over an unstable scenario is a
+# red waiting for the next branch, and that check is the difference between
+# ratcheting and guessing.
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# BLOCK ENTITIES, 760-772 — 2026-08-12, branch `gameplay-block-entities`.
+#
+# Thirteen checks, all entering at `match`, which is unusual enough in this
+# file to need saying why: the mechanism was **ported in the same branch that
+# wrote the checks**, off payloads recorded from a real 26.2 socket by
+# `ci/block-entity-probe.sh`. They are not a discovery that this server was
+# already right.
+#
+# What they cover: eleven `minecraft:block_entity_type`s that had never been
+# observed by any check. `BlockEntity.getUpdatePacket()` is
+# `aconst_null; areturn` and 29 of the 49 registered types inherit it, so
+# vanilla never sends `block_entity_data` for them at all, which caps THAT
+# channel at 20 of 49. `docs/PARITY-ROADMAP.md` §25.
+#
+# **That was written here as a ceiling on the census ROW, and as of `788`
+# below it is not one.** The row's second channel is the chunk payload, which
+# vanilla fills with every block entity in the chunk and applies no
+# `getUpdatePacket` filter to; it was invisible only because
+# `trace::is_housekeeping` dropped `LEVEL_CHUNK_WITH_LIGHT` before any decoder
+# saw it, and it no longer does. The 20 keeps its rule, its section and its
+# channel. What caps the row is open. §31.
+#
+# **Shown able to go red before being trusted**, per §20.7. Two defects were
+# injected and the subset re-run on 2026-08-12, Threadripper, on a third cold
+# vanilla:
+#
+#   * `for_state` no longer recognising `minecraft:decorated_pot`
+#   * `Kind::HangingSign.id()` answering `minecraft:sign` — one wrong integer
+#     on the wire and every other byte of the packet correct
+#
+# and the four checks those touch went red while 762, 767 and 770 stayed
+# `match` as the controls that the run itself was sound. See the commit.
+#
+# Stability: the payloads were identical across three separate cold vanilla
+# boots on 2026-08-12 (the probe, the subset, the falsification run). The
+# three types whose payload is **not** stable are deliberately not here —
+# `mob_spawner` redraws `Delay` as `min + nextInt(max - min)`, `vault` rerolls
+# `display_item` and carries a per-run uuid, and neither could ever be `match`
+# for anybody.
+placing-a-decorated-pot-creates-its-block-entity = "match"
+a-decorated-pot-sends-block-entity-data-and-a-lectern-does-not = "match"
+placing-a-campfire-carries-an-empty-item-list = "match"
+placing-a-banner-carries-an-empty-component-map = "match"
+placing-a-beacon-reports-zero-levels = "match"
+placing-a-shelf-carries-two-keys-in-vanillas-own-order = "match"
+placing-a-skull-creates-its-block-entity = "match"
+placing-suspicious-sand-creates-a-brushable-block-entity = "match"
+placing-a-conduit-creates-its-block-entity = "match"
+placing-a-creaking-heart-creates-its-block-entity = "match"
+placing-a-copper-golem-statue-creates-its-block-entity = "match"
+a-hanging-sign-is-a-different-block-entity-type-from-a-sign = "match"
+typing-on-a-hanging-sign-you-placed-sets-its-text = "match"
+
+# 2026-08-13, branch `corpus-item-registry`. MEASURED, not predicted: both of
+# these came back `match` on their first run against 26.2, and the provisional
+# `diverge` they were written with is gone.
+#
+# 861 is NOT here. It is in `ci/checks/gameplay-blocked/`, because vanilla
+# refuses the packet it sends — see PARITY-ROADMAP 44.7. A scenario the
+# reference disconnects on is not a measurement, and an `error` verdict is not
+# a baseline value.
+a-new-item-reaches-the-cursor-and-the-census = "match"
+a-second-new-item-moves-the-census-again = "match"
+
+# ---------------------------------------------------------------------------
+# NINE LOCKED, ONE REFUSED — 2026-09-05, corpus-instruments.
+#
+# `~/rustmc-private/gates/gate-stack-extract-20260905-052404.log:1063-1073`
+# listed TEN scenarios that had turned from `diverge`/`absent` to `match` and
+# asked for them to be locked. Nine of the ten are locked here; the tenth is
+# not, and the difference is which tree measured them.
+#
+# **The nine are on `main`, and the evidence is four independent full gate
+# runs, not one.** Each is `./ci/handoff.sh`'s stage-6 `ci/t2-gameplay.sh`
+# against vanilla 26.2, on four different branches, none of which touches a
+# hoe, a repeater, an observer, a flower pot, the off-hand, a container click
+# or the attack path:
+#
+#   gate-commands-extract-wip-20260904-221430   98/108   BETTER x 9
+#   gate-mobs-goals-20260905-005924             98/108   BETTER x 9
+#   gate-mobs-goals-2-20260905-064947           98/108   BETTER x 9
+#   gate-mobs-brains-20260905-083017            98/108   BETTER x 9
+#
+# All four print the SAME nine names, and all four print
+# `CORPUS declared 98/108 match (8 diverge, 2 absent, 0 vacuous, 0 mute,
+# 0 inert, 0 error)`. After the nine edits above this file's own tally is
+# 98 match / 8 diverge / 2 absent — the same three numbers, which is the
+# arithmetic check that the baseline now equals what the gate measures rather
+# than something adjacent to it.
+#
+# That is a much stronger reading than the run that asked for the lock. Nine
+# rows agreeing across four trees over ten hours is not a coin toss, and the
+# thing the ratchet exists to catch — a check that goes BACK — becomes
+# catchable for these nine only once the row says `match`.
+#
+# **The tenth is `a-daylight-detector-inverts-when-right-clicked`, and it is
+# deliberately left at `diverge`.** It appears in stack-extract's BETTER list
+# and in NONE of the four above; that gate reads 99/108 where they read 98,
+# and the one is exactly this. So it is `match` on `origin/stack-extract`,
+# which is 4 commits and NOT merged (`git merge-base --is-ancestor
+# origin/stack-extract origin/main` -> false, checked 2026-09-05).
+#
+# Locking it from this branch would ratchet `main` to a verdict main's server
+# cannot produce: every branch gating between now and stack-extract landing
+# would come back REGRESSED on a check nothing had regressed. It lands in
+# stack-extract's own merge, from stack-extract's own gate, which is the run
+# that measured it.
+# ---------------------------------------------------------------------------
+
+# **`788` entered at `absent`, and the source line it named has since been
+# fixed — so this row is the one to re-measure, not to trust.**
+#
+# Measured 2026-08-12 on the 93-corpus, branch `trace-chunk-block-entities`,
+# seed 20260803, superflat/creative, Threadripper. Vanilla puts the chest in
+# the chunk payload when the chunk comes back into view — one
+# `chunk_block_entities` observation, `block_entity_type` 1, at step 1 — and
+# this server said nothing, because every chunk was built with
+# `block_entities: Vec::new()`. It had no block-entity list at all, not a
+# wrong one.
+#
+# TWO CORRECTIONS TO THE PARAGRAPH ABOVE, 2026-08-18, branch
+# `chunk-send-path`. The check was renumbered 787 -> 788 and this comment kept
+# the old number; and the site was named as `world_send.rs`, which is wrong.
+# `world_send.rs::flat_chunk` is called from nothing but its own two unit
+# tests. The site the corpus actually exercises is `World::chunk` in
+# `world.rs`, reached through `Session::chunk_at -> Tiles::chunk`, and
+# PARITY-ROADMAP §32 fixed exactly that one. A comment naming the wrong file
+# is worse than none: it sends the next reader to a function no scenario
+# reaches, which is how this row stayed `absent` in the file after the defect
+# it describes had been repaired.
+#
+# Shown able to go red before being trusted, in the direction that matters
+# here: the check was written *after* the decoder arm it controls was measured
+# firing zero times across five scenarios, and it is the only scenario in the
+# corpus that makes it fire at all. Delete the walk-back step and vanilla's own
+# side goes silent — the observation is the chunk being re-sent, not the chest
+# being placed. `docs/PARITY-ROADMAP.md` §31.3, §31.4.
+#
+# It closes when `world_send.rs` fills that list from the chunk's block
+# entities, at which point the verdict is `match` and 28 more block entity
+# types are one scenario each away from the census.
+# 2026-09-30 `diverge-burndown`: absent -> match, full corpus 171/179 (~/rustmc-diverge).
+a-chest-is-in-its-chunks-payload-when-the-chunk-returns = "match"
+
+# 2026-08-18, branch `sky-light-model`. **A PROVISIONAL FLOOR, NOT A
+# MEASUREMENT, AND SAID SO RATHER THAN GUESSED QUIETLY.** The corpus lock was
+# four deep with the oldest waiter at 210 minutes when this landed, so the
+# value below is the conservative one a ratchet cannot be broken by, not the
+# one this check is expected to produce.
+#
+# What it is expected to produce is `match`, and the reasoning is in
+# `ci/checks/gameplay/711-...toml`: at the substrate's pinned noon the second
+# click computes `round(15 * cos(0)) = 15` where an unported server writes 0.
+# Tighten this row from the run's own verdict — do not tighten it from this
+# comment.
+#
+# The neighbouring `a-daylight-detector-inverts-when-right-clicked = "diverge"`
+# is itself stale in the same direction: measured 2026-08-18 on
+# `~/rustmc-corpusgap`, this server's whole trace for `710` is byte-identical
+# to vanilla's. It is left alone deliberately — one recording pair from one
+# tree is N=1, and tightening a ratchet on N=1 is how a flapping check becomes
+# a gate failure for somebody else.
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-daylight-detector-recomputes-its-power-from-the-sky = "match"
+
+# **Measured 2026-08-16 by gameplay-entity-coverage's own corpus run in /home/sayer/grit/work-falsev-entity** — vanilla 26.2 on the
+# Threadripper, superflat, seed 20260803. Recorded as observed, not as
+# hoped: a baseline that flatters the server is a ratchet with nothing
+# under it, and every one of these is the state the check found today.
+a-boat-is-placed-by-right-clicking-the-world = "absent"
+a-carved-pumpkin-on-copper-makes-a-copper-golem = "diverge"
+a-carved-pumpkin-on-iron-makes-an-iron-golem = "diverge"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-minecart-sits-on-a-rail = "match"
+an-armor-stand-is-placed-as-a-living-entity = "diverge"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+an-end-crystal-sits-on-obsidian = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+an-item-frame-hangs-on-a-blocks-side = "match"
+
+# **Measured 2026-08-16 by gameplay-menus-round2's own corpus run in /home/sayer/grit/work-gp-menus, rebased onto d2c20893** — vanilla 26.2 on the
+# Threadripper, superflat, seed 20260803. Recorded as observed, not as
+# hoped: a baseline that flatters the server is a ratchet with nothing
+# under it, and every one of these is the state the check found today.
+two-menus-in-one-scenario-take-consecutive-container-ids = "match"
+
+# **The wall pair and the candle, 2026-08-16.** Measured in this tree by
+# `ci/t2-gameplay.sh`, 109 scenarios against cold vanilla 26.2 on the
+# Threadripper, seed 20260803, the same run whose recordings took these three
+# checks' red-when-broken evidence. All three `diverge`, and that is the port
+# gap they were written to expose: we send one block change where vanilla
+# sends three, and the middle wall's `up` never drops. Recorded as `diverge`
+# rather than aspirationally as `match` because a baseline that flatters the
+# server is a ratchet with nothing under it.
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-wall-between-two-walls-connects-and-drops-its-post = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-block-on-top-of-a-wall-raises-its-connection-to-tall = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-candle-placed-on-a-candle-makes-it-two-candles = "match"
+
+# **Measured 2026-08-16 by gameplay-useitemon-unit's own corpus run in /home/sayer/grit/work-falsev-uio2** — vanilla 26.2 on the
+# Threadripper, superflat, seed 20260803. Recorded as observed, not as
+# hoped: a baseline that flatters the server is a ratchet with nothing
+# under it, and every one of these is the state the check found today.
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-skeleton-skull-goes-on-top-of-a-note-block-instead-of-playing-it = "match"
+
+# **Measured 2026-08-16 by gameplay-serverbound-reach's own corpus run in /home/sayer/grit/work-falsev-sbreach** — vanilla 26.2 on the
+# Threadripper, superflat, seed 20260803. Recorded as observed, not as
+# hoped: a baseline that flatters the server is a ratchet with nothing
+# under it, and every one of these is the state the check found today.
+acknowledging-a-teleport-twice-is-refused = "match"
+
+# --- 2026-08-13, branch `gameplay-block-schemas`, corpus 106 -> 110 ---------
+#
+# Four checks against the schemas a constant already satisfied. Measured on
+# the Threadripper against vanilla 26.2, N=1, the same run that produced
+# `oracle-work/gameplay/vanilla.json`.
+#
+# All four were shown to go red before this run, against THIS SERVER ALONE
+# with no vanilla and no lock — `ci/schema-check-falsify.sh` pins 960 and
+# 961's placement table row to a constant and restores it (match -> diverge ->
+# match), and `ci/schema-check-falsify.py` flips one property in the recording
+# for all four. So the two `match` rows below are checks that have been
+# observed failing, not checks that have never been tried.
+#
+# The two `diverge` rows are the point of the exercise, and both were
+# predicted from the jar before the run:
+#
+#   * the lamp — `power.rs`'s `lamp_wants_a_tick` logs "this server has no
+#     lamp tick — it will not go out" and pushes no `TickRequest`, so our
+#     lamp reports `lit=true` on both steps. Vanilla's falling edge is a
+#     different method on the scheduled-tick path (`RedstoneLampBlock.tick`),
+#     which nothing in the corpus had ever required a server to have.
+#   * the end rod — `placement.rs`'s `computed_with_neighbours` handles
+#     `ladder` and `redstone_wire` and nothing else, so both rods take the
+#     clicked face. Vanilla reads the NEIGHBOUR's own `facing` and inverts.
+#
+# Neither is a regression and neither is new breakage: both mechanisms were
+# already missing and nothing had ever looked.
+a-log-clicked-on-the-top-and-the-side-lies-two-ways = "match"
+an-anvil-and-a-pumpkin-from-one-yaw-are-a-quarter-turn-apart = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-redstone-lamp-goes-out-when-the-lever-goes-back = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+an-end-rod-placed-on-an-end-rod-points-the-other-way = "match"
+# redstone, 2026-09-05: the nine new checks at the verdict their first recording gave them.
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-comparator-passes-the-signal-behind-it = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-comparator-reads-a-cake = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-comparator-subtracts-its-side-input = "match"
+a-piston-retracts-when-its-power-is-dug-out = "match"
+a-sticky-piston-pulls-the-block-back = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-lever-dug-out-darkens-the-lamp-through-its-block = "match"
+a-torch-dug-out-darkens-the-lamp-on-its-block = "match"
+a-repeater-locks-when-powered-from-the-side = "match"
+a-redstone-block-lights-the-lamp-beside-it = "match"
+
+# 2026-09-05, branch `block-entity-behaviour`. The bell is the only
+# block-entity behaviour on that branch that reaches the wire — every other
+# ticker it ports needs per-type state on `crate::blockentity::BlockEntity`
+# that `block-entities-2` is rewriting — and it is the only right-click in
+# this corpus that consumes the interaction and writes no block state, so
+# `use_without_item.json` has no row shape for it. It lands at **match**:
+# the recording of 2026-09-05 20:08 shows the same `block_event(1, 3)` and
+# `block.bell.use` on both streams. It is listed here at the verdict it was
+# measured at rather than at `diverge`, because a new check that starts
+# below what it does is a ratchet that protects nothing.
+a-bell-rings-when-its-side-is-clicked = "match"
+
+# 2026-09-24, branch `recorder-housekeeping`: the three chunk-view checks,
+# registered from this branch's own corpus run (`ci/t2-gameplay.sh` on
+# 90f2a3ed4, Threadripper, 114 scenarios, `~/rustmc-rhk/t2.log`). All three
+# walk z 0 -> 20 -> 0 at view distance 4 and read one limb each of
+# `ChunkMap.applyChunkTrackingView`.
+#
+# `546` matches: the centre chunk is the player's own chunk on both servers.
+# `547` and `548` diverge on the tracked SET, from its two sides: vanilla's
+# `ChunkTrackingView$Positioned.isWithinDistance` is a disc padded by two,
+# `world_send::ChunkView` a Chebyshev square, so a crossing forgets and sends
+# eleven chunks on vanilla and nine here. `547`'s first difference is vanilla
+# forgetting chunk (-5, -4) where we forget (-4, -4); `548`'s is vanilla's
+# tenth chunk of the crossing arriving at step 0 where we have sent our last.
+# Both close when `ChunkView` walks vanilla's disc.
+walking-into-the-next-chunk-moves-the-cache-centre = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+walking-into-the-next-chunk-forgets-what-is-behind = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+walking-into-the-next-chunk-sends-the-row-ahead = "match"
+
+# 2026-09-30, `train-a`: block-entity-behaviour-2's three wired checks were
+# registered in the falsifiable ledger and never baselined, so `ci/t2-gameplay.sh`
+# refused all three as "not in the baseline". Rows at the verdicts the train's
+# corpus run measured (after d12d0a326, the tick-pass lock fix): 796 and 798
+# match; 797 diverges, 8 observations against vanilla's 9.
+food-put-on-a-campfire-reaches-its-block-entity = "match"
+# 2026-09-30 `diverge-burndown`: diverge -> match, full corpus 171/179 (~/rustmc-diverge).
+a-fed-furnace-lights-on-the-next-tick = "match"
+a-disc-in-a-jukebox-plays-and-names-its-song = "match"
+
+# ---------------------------------------------------------------------------
+# CORPUS 111 -> 112, branch `entity-tracker`, 2026-09-24. Full gate,
+# `./ci/t2-gameplay.sh` in `~/rustmc-eng-b` on the Threadripper at 2081bdad3:
+# 103/112 declared match, 7 diverge, 2 absent, 0 vacuous/mute/inert/error.
+# The new check starts `match`: the observer's stream carries the dig beside it
+# and not the one seven chunks up +z. Tier 2 in the same sweep.
+a-block-broken-out-of-view-is-not-broadcast = "match"
+
+# menus-workstations, 2026-10-01: the workstation menus' computed half.
+# ci/t2-gameplay-subset.sh over 810-871 on the Threadripper (record r3,
+# tree 30f5d0e05): declared 26/26 match, strict 25/26. Seed 20260803.
+a-stone-in-a-stonecutter-clears-the-selection = "match"
+a-stonecutter-button-cuts-stone-into-two-slabs = "match"
+a-different-stonecutter-button-cuts-a-different-recipe = "match"
+taking-a-stonecutter-result-spends-the-stone = "match"
+pressing-the-selected-stonecutter-button-again-sends-nothing = "match"
+a-stonecutter-button-past-the-recipe-list-changes-nothing = "match"
+an-anvil-renames-a-stone-for-one-level = "match"
+an-anvil-repairs-a-pickaxe-with-an-ingot = "match"
+an-anvil-combines-two-worn-pickaxes = "match"
+taking-an-anvil-result-uses-up-both-inputs = "match"
+a-grindstone-merges-two-worn-pickaxes = "match"
+a-lone-plain-pickaxe-in-a-grindstone-makes-nothing = "match"
+taking-a-grindstone-result-empties-both-inputs = "match"
+a-grindstone-refuses-a-stone = "match"
+an-enchanting-table-offers-three-enchantments-for-a-book = "match"
+an-enchanting-table-offers-a-pickaxe-something-else = "match"
+an-enchanting-table-offers-nothing-for-a-stone = "match"
+an-enchanting-table-turns-a-book-into-an-enchanted-book = "match"
+a-smithing-table-upgrades-a-diamond-sword = "match"
+a-smithing-upgrade-keeps-the-swords-wear = "match"
+taking-a-smithing-result-spends-one-of-each-input = "match"
+a-loom-button-puts-a-pattern-on-a-banner = "match"
+a-different-loom-button-and-dye-make-a-different-banner = "match"
+taking-a-loom-result-spends-the-banner-and-the-dye = "match"
+a-cartography-table-takes-paper-beside-its-map = "match"
+a-cartography-table-refuses-a-stone-beside-its-map = "match"
+
+# menus-workstations, 2026-10-01: the crafted take, the whole-stack result
+# containers, the gathers, the crafting and cartography quick-moves, smithing
+# trims, and the quick-moves of r4. ci/t2-gameplay-subset.sh on the
+# Threadripper, seed 20260803: r6 (tree 8689f04b2, 42 checks) declared 41/42
+# match, the one diverge being 844, whose seed slot read a value 843's enchant
+# had just redrawn from the unseeded Player.random — 843 is now 849 so 844 runs
+# on a player that has not enchanted; r8 re-records 840-849 in that order.
+# r7 (tree e0d234629): 864 1/1 match.
+taking-crafted-planks-spends-the-log = "match"
+taking-planks-from-two-logs-refills-the-result = "match"
+throwing-crafted-planks-spends-the-log = "match"
+right-clicking-crafted-planks-takes-all-four = "match"
+a-gather-skips-the-stonecutters-result = "match"
+a-gather-skips-the-crafting-tables-result = "match"
+shift-clicking-crafted-planks-crafts-both-logs = "match"
+a-number-key-on-crafted-planks-spends-the-log = "match"
+taking-a-log-back-out-of-the-grid-sends-the-result-twice = "match"
+shift-clicking-a-stonecutter-result-sends-it-to-the-hotbars-far-end = "match"
+shift-clicking-an-anvil-result-uses-up-both-inputs = "match"
+a-shift-clicked-pickaxe-goes-into-the-grindstone = "match"
+a-shift-clicked-book-goes-onto-the-enchanting-table = "match"
+a-smithing-table-trims-an-iron-chestplate = "match"
+a-trimmed-chestplate-cannot-take-the-same-trim-again = "match"
+a-shift-clicked-dye-goes-to-the-looms-dye-slot = "match"
+a-shift-clicked-paper-goes-to-the-cartography-tables-second-slot = "match"
+# Fluids 161-169, from the fluids gate's own T2 (2026-10-01 19:57, tip
+# ee50d3fad on main 1b2dfe629): all nine declared `match`, lines 1037-1045 of
+# ~/rustmc-private/gates/gate-fluids-20261001-195745.log.
+water-poured-into-a-trench-flows-along-it-a-block-every-five-ticks = "match"
+lava-poured-into-a-trench-flows-along-it-a-block-every-thirty-ticks = "match"
+an-empty-bucket-takes-a-water-source-back = "match"
+lava-poured-onto-water-beside-a-water-source-becomes-obsidian = "match"
+water-poured-between-lava-makes-obsidian-on-one-side-and-cobblestone-on-the-other = "match"
+two-water-sources-make-a-third-between-them = "match"
+a-water-bucket-waterlogs-a-slab-instead-of-replacing-it = "match"
+water-flowing-over-a-hole-falls-into-it = "match"
+a-water-bucket-fills-a-cauldron-and-an-empty-one-takes-it-back = "match"
+# mining 990-992, creative subset on f8a50298a, subset-2.log in
+# /home/sayer/mining-rec/c7-1001-1524: CORPUS declared 4/4 match (0 diverge, 0 absent, 0 vacuous, 0 mute, 0 inert, 0 error)
+a-sword-breaks-nothing-in-creative = "match"
+a-dig-out-of-reach-breaks-nothing = "match"
+a-piston-placed-looking-west-faces-east = "match"
+# mining 993-994, creative subset (c8, subset-2.log) in /home/sayer/mining-rec/c10-sub: CORPUS declared 3/3 match (0 diverge, 0 absent, 0 vacuous, 0 mute, 0 inert, 0 error)
+a-crafter-placed-against-a-redstone-block-is-triggered = "match"
+a-torch-knocked-off-its-block-drops-itself = "match"
+
+# 2026-10-01, `commands-exec`: console and player commands through `crate::cmdexec`.
+# Measured with `ci/t2-gameplay-subset.sh` over these 25 (116-119, 121-129,
+# 133-139, 141-145), ~/rustmc-cmdexec2 at c516033d2: declared 25/25 match, strict
+# 22/25 (the strict diverges are outside the declared projections).
+a-console-difficulty-reaches-every-client = "match"
+a-console-gamemode-tells-the-target-and-only-the-target = "match"
+a-non-operator-is-not-told-gamemode-exists = "match"
+a-console-teleport-moves-the-target-to-the-destination = "match"
+a-console-say-reaches-every-client-as-the-server = "match"
+a-console-msg-reaches-only-its-target = "match"
+console-xp-points-carry-into-a-level = "match"
+console-xp-fifth-level-plays-the-levelup-sound = "match"
+console-title-times-then-clear-reach-the-target = "match"
+console-execute-as-target-changes-who-the-source-is = "match"
+console-execute-at-moves-where-relative-coordinates-start = "match"
+console-setblock-above-a-player-reaches-both = "match"
+console-fill-a-hollow-box-above-a-player = "match"
+console-clone-copies-the-floor-over-a-player = "match"
+console-tellraw-and-a-title-reach-only-their-target = "match"
+a-player-random-value-with-no-room-is-refused-in-red = "match"
+console-rotate-turns-each-target-to-the-angles-given = "match"
+console-swing-reaches-the-swinger-and-its-watchers = "match"
+console-particle-reaches-the-players-in-range = "match"
+a-player-teammsg-without-a-team-is-refused-in-red = "match"
+console-dialog-clear-reaches-only-its-targets = "match"
+console-bossbar-reaches-the-players-it-is-set-for = "match"
+console-playsound-reaches-every-listener-inline = "match"
+console-stopsound-tells-only-its-target = "match"
+console-teleport-with-a-rotation-turns-the-target = "match"
+
+# 2026-10-01, `random-ticks`: ServerLevel.tickChunk's random ticks and the
+# bone meal arms they share bodies with. Measured with a two-vanilla-pass
+# derivative of `ci/t2-gameplay-subset.sh` (job `rt2-k1`, seed 20260803, lane
+# code identical to this branch on an older main): declared 12/12 match over
+# 780 + 970-980, and vanilla against itself 12/12 declared. Recordings
+# ~/rustmc-rt2-keep/k1/{vanilla-1,vanilla-2,rustmc}.json.
+random-ticks-grow-wheat-to-its-last-age = "match"
+random-ticks-return-bare-farmland-to-grass = "match"
+random-ticks-melt-a-snow-layer-beside-a-torch = "match"
+random-ticks-melt-ice-beside-a-torch = "match"
+random-ticks-ripen-a-sweet-berry-bush = "match"
+bone-meal-ripens-a-sweet-berry-bush-one-age-at-a-time = "match"
+bone-meal-turns-a-torchflower-crop-into-a-torchflower = "match"
+bone-meal-grows-a-bamboo-sapling-into-a-stalk = "match"
+bone-meal-grows-a-pitcher-crop-into-two-halves = "match"
+random-ticks-kill-grass-under-a-bottom-slab-and-not-under-glass = "match"
+picking-a-ripe-sweet-berry-bush-sets-it-back-to-age-one = "match"
+
+# 2026-10-01, `train-f` (animals, passive-mobs, xp-orbs, item-pickup): the
+# lanes' 31 live checks at the verdicts their own subset recordings measured
+# (`anim-rec8`, `pm-rec3` run 2, `xp-r3`, `pickup-chain3`), compared on the
+# train's splice (`trainf/cmp-splice.log`; 683 re-compared after `within = 4`).
+# 993 and 996 diverge on order: vanilla sends the hotbar slot's
+# `container_set_slot` before the taken item's `remove_entities`, and this
+# server after it. Six parked checks are not here: docs/cold-start/train-f.md.
+feeding-a-pig-its-food-puts-it-in-love = "match"
+a-pig-already-in-love-will-not-eat-again = "match"
+a-pig-spawn-egg-used-on-a-pig-hatches-a-baby = "match"
+a-golden-dandelion-locks-a-baby-pigs-age = "match"
+a-second-golden-dandelion-after-the-cooldown-unlocks-the-age = "match"
+a-lead-used-on-a-pig-ties-it-to-the-player = "match"
+a-lead-used-again-on-its-pig-unties-it = "match"
+two-pigs-in-love-two-blocks-apart-make-a-baby = "match"
+two-pigs-in-love-four-blocks-apart-never-breed = "match"
+a-bucket-milks-a-cow-into-the-inventory = "match"
+a-bowl-on-a-mooshroom-adds-mushroom-stew = "match"
+shears-turn-a-mooshroom-into-a-cow = "match"
+a-dye-colours-a-sheep = "match"
+shears-shear-a-sheep = "match"
+feeding-a-cow-its-food-puts-it-in-love = "match"
+feeding-a-sheep-its-food-puts-it-in-love = "match"
+feeding-a-chicken-its-food-puts-it-in-love = "match"
+a-spawned-cow-syncs-its-movement-speed-a-tick-later = "match"
+a-spawned-mooshroom-syncs-its-movement-speed-a-tick-later = "match"
+a-spawned-sheep-syncs-its-movement-speed-a-tick-later = "match"
+a-spawned-chicken-syncs-its-movement-speed-a-tick-later = "match"
+an-egg-thrown-at-the-ground-breaks = "match"
+xp-points-cross-a-level = "match"
+xp-levels-to-five-plays-the-level-up-sound = "match"
+an-orb-beside-a-player-is-picked-up = "match"
+an-orb-four-blocks-away-creeps-to-the-player = "match"
+an-orb-of-count-two-is-taken-twice = "match"
+a-thrown-item-is-picked-up-when-its-delay-runs-out = "diverge"
+a-torch-in-the-placers-own-feet-is-placed = "match"
+two-thrown-stones-merge-and-are-picked-up-as-one = "diverge"
+a-full-creative-inventory-takes-an-item-and-it-vanishes = "match"
+
+# train-g, 2026-10-01: rows the nine branches each declared, re-joined. The
+# ledger merge kept one side of this one-table file; each row below is the
+# best verdict any branch measured on its own server (main, item-components,
+# be-hopper-dispense and the lanes).
+a-comparator-reads-a-hopper = "match"
+a-comparator-reads-a-hopper-as-it-fills = "match"
+a-crafter-with-no-recipe-clicks = "match"
+a-dispenser-lights-a-fire-in-front = "match"
+a-dispenser-will-not-throw-bone-meal-at-nothing = "match"
+a-dropper-fills-the-chest-in-front = "match"
+a-furnace-fuel-slot-refuses-stone = "match"
+a-furnace-result-slot-refuses-a-placement = "match"
+a-hopper-catches-what-a-dropper-drops = "match"
+a-hopper-empties-into-the-chest-below = "match"
+a-hopper-feeds-a-furnace-side-coal-but-not-ore = "match"
+a-hopper-feeds-nether-wart-into-a-brewing-stand = "match"
+a-hopper-filling-a-chest-lights-the-comparator-behind-the-chest = "match"
+a-hopper-into-a-double-chest-fills-the-right-half-first = "match"
+a-hopper-pulls-from-the-chest-above = "match"
+a-lava-bucket-burns-down-to-an-empty-bucket = "match"
+a-plain-potion-over-gunpowder-brews-for-twenty-seconds-and-stays-a-potion = "match"
+a-potion-in-a-brewing-stand-shows-on-the-block = "match"
+a-powered-crafter-makes-planks = "match"
+a-powered-dropper-drops-its-item = "match"
+a-powered-hopper-is-disabled = "match"
+a-smoker-cooks-raw-beef-in-a-hundred-ticks = "match"
+a-stone-put-in-a-chest-through-its-menu-lights-the-comparator-reading-it = "match"
+an-empty-dispenser-clicks = "match"
+an-observer-watching-a-furnace-pulses-when-it-lights = "match"
+an-unsmokable-item-in-a-smoker-still-gets-a-cook-total-of-two-hundred = "match"
+blaze-powder-in-a-brewing-stand-becomes-twenty-brews-of-fuel = "match"
+coal-put-in-a-furnace-lights-the-comparator-reading-it = "match"
+raw-iron-in-a-blast-furnace-sets-a-cook-total-of-one-hundred = "match"
+raw-iron-in-a-cold-furnace-sets-a-cook-total-of-two-hundred = "match"
+shift-clicking-blaze-powder-into-a-brewing-stand-fuels-it = "match"
+shift-clicking-coal-into-a-furnace-puts-it-in-the-fuel-slot = "match"
+shift-clicking-raw-iron-into-a-furnace-puts-it-in-the-ingredient-slot = "match"
+# train-g: checks no branch had baselined, at their verdict on the
+# splice (each a lane recording of the lane's own server).
+a-bastion-sword-carries-its-damage-before-its-enchantment = "match"
+a-buried-treasure-potion-carries-its-potion-contents = "match"
+a-chest-placed-from-a-stocked-stack-opens-stocked = "match"
+a-decorated-pot-reports-its-sherds = "match"
+a-dungeon-chests-enchanted-book-carries-its-stored-enchantment = "match"
+a-held-damaged-sword-shows-its-wear-in-a-chests-content-packet = "match"
+a-held-enchanted-book-shows-its-enchantment-in-a-chests-content-packet = "match"
+a-log-placed-with-a-block-state-takes-its-axis = "match"
+a-loot-chest-with-no-seed-draws-from-the-tables-random-sequence = "match"
+a-looted-enchanted-book-shift-clicked-out-keeps-its-enchantment = "match"
+a-named-banner-reports-its-name = "match"
+a-named-chest-opens-under-its-name = "match"
+a-named-furnace-opens-under-its-name = "match"
+a-named-skull-reports-its-name-in-lower-case = "match"
+a-second-seedless-loot-chest-continues-the-same-sequence = "match"
+a-seeded-loot-chest-fills-when-first-opened = "match"
+a-seedless-dungeon-chest-draws-from-its-own-sequence = "match"
+a-shipwreck-stew-carries-its-effect-in-ticks = "match"
+a-trial-reward-ominous-bottle-carries-its-amplifier = "match"
+an-outposts-goat-horn-carries-its-instrument = "match"
+pickup-all-leaves-a-differently-enchanted-stack-behind = "match"
+quick-move-does-not-merge-into-a-differently-enchanted-stack = "match"
+stone-patched-to-stack-to-one-does-not-merge = "match"

@@ -1,0 +1,9 @@
+name = "break-block"
+about = "digging the ground beside the player makes the server say it is gone, and acknowledges the sequence"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[step]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"

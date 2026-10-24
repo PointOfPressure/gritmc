@@ -1,0 +1,103 @@
+name = "two-pigs-in-love-two-blocks-apart-make-a-baby"
+about = "two pigs in love in separate pits two blocks apart still breed: BreedGoal.getFreePartner looks eight blocks out, neither can reach the other, and BreedGoal.tick breeds once loveTime passes thirty goal ticks with the partner under three blocks away (distanceToSqr < 9), so a baby pig is paired with its baby flag set"
+observe_from = "actor"
+observe = ["set_entity_data"]
+within = 336
+settle_ms = 1500
+
+[[gamerule]]
+rule = "mob_drops"
+value = "false"
+restore = "true"
+
+# THE MECHANISM: `096`'s, with the parents in two pits two blocks apart on x
+# instead of one. `BreedGoal.tick` sets `navigation.moveTo(partner)` every
+# tick, and a pinned pig's path never leaves its own node, so the two stay
+# exactly 2.0 apart: `distanceToSqr` 4.0 < 9.0 and the breed fires on the
+# thirtieth goal tick of whichever parent got there first. WHICH parent is a
+# coin the goal phase tosses (`096`'s header), and here it moves the baby by
+# two blocks — so, as in `096`, only `set_entity_data` is observed, which
+# carries no position. `mob_drops` is off for `096`'s reason.
+#
+# `101` is the control: the same rig four blocks apart, where the partner is
+# found (8 > 4) and the breed never fires (16 >= 9).
+# THE RIG, AND WHY IT IS OUT HERE. The pit is `083`'s: digging [1,-1] and
+# [1,-2] leaves a 1x1 shaft two deep whose floor has no walkable neighbour, so
+# every path a pig in it is ever given is its own node and it never moves —
+# its unseeded `RandomStrollGoal` and look goals cannot reach anything this
+# check observes. The rig sits +320 blocks out on z, past `083`-`089`'s
+# rigs at +-80 and +-160 and alternating sign with its neighbours here (same
+# sign 64 apart on x and 80 on z), so no other scenario's mob is tracked from
+# it and nothing it leaves is tracked from theirs: the actor tracks to 64
+# blocks at view-distance 4. `within` is opened to reach the rig; the observer
+# stays at the workspace and tracks none of it, hence `observe_from = "actor"`.
+# Coordinates in the steps carry the offset.
+
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 320.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, 321]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, 321]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [3, -1, 321]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [3, -2, 321]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [1, -3, 321]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [3, -3, 321]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:carrot"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, 320.95]
+
+[[setup]]
+do = "wait"
+ms = 1500
+
+[[step]]
+do = "interact"
+target = "minecraft:pig"
+pick = "oldest"
+
+[[step]]
+do = "interact"
+target = "minecraft:pig"
+pick = "newest"
+
+[[step]]
+do = "wait"
+ms = 5000

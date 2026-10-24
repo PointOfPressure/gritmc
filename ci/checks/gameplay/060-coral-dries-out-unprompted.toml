@@ -1,0 +1,14 @@
+name = "coral-dries-out-unprompted"
+about = "a coral block placed out of water turns into its dead block a few seconds later with the client sending nothing in between — a scheduled tick firing, observed as the one block update that no packet asked for"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 8000
+
+[[setup]]
+do = "hold"
+item = "minecraft:fire_coral_block"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

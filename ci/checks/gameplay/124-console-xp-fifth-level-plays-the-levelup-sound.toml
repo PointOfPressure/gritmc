@@ -1,0 +1,24 @@
+name = "console-xp-fifth-level-plays-the-levelup-sound"
+about = """
+`xp add oracle 5 levels` from the console: the target gets `set_experience`
+at level 5 with the total untouched, and BOTH players hear
+`entity.player.levelup` at the target's position, volume 0.125, pitch 1
+
+`Player.giveExperienceLevels` plays the sound when the level gained is
+positive and lands on a multiple of five: `level.playSound(null, x, y, z,
+PLAYER_LEVELUP, PLAYERS, f * 0.75F, 1.0F)` with `f = level / 30.0F` below 31.
+A `null` player means nobody is excepted, so the observer hears it too.
+`ServerPlayer.giveExperienceLevels` sets `lastSentExp = -1`, which forces the
+`set_experience` although the total did not change — a server that keyed the
+send on the total alone sends nothing here.
+
+Level 2, through the console. The restore puts the level back to zero.
+"""
+console_restore = ["xp set oracle 0 levels"]
+observe_from = "both"
+observe = ["set_experience", "sound", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "xp add oracle 5 levels"

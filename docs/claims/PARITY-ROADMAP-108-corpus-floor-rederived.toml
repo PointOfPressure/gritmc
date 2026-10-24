@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 108
+slug   = "corpus-floor-rederived"
+title  = "The standing corpus floor was stale on both axes — 2026-09-05, branch `gate-instruments`"
+branch = "gate-instruments"
+status = "written"

@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 27
+slug   = "third-verdict-mute"
+title  = "A corpus scenario that cannot fail now says so — the third verdict (2026-08-10)"
+branch = "corpus-third-verdict"

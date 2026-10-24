@@ -1,0 +1,21 @@
+name = "drowning-damage-makes-no-impact"
+about = """
+`/damage oracle 1 minecraft:drown`. `drown` is the ONE member of
+`minecraft:no_impact`, and `LivingEntity.hurtServer` offsets 328..349 skip
+`markHurt` for it — so a full drowning hit sends a `damage_event` and moves
+health (20 -> 19) but puts NO `set_entity_motion` on the wire, where every other
+hit in this directory does. The hurt sound is `entity.player.hurt_drown`
+(`"effects": "drowning"`).
+
+What would make it fail: a server that marks every full hit hurt sends a
+`set_entity_motion` vanilla does not; one that uses the generic hurt sound
+diverges on `sound`.
+"""
+console_restore = ["effect give oracle minecraft:instant_health 1 4 true"]
+observe_from = "both"
+observe = ["damage_event", "set_health", "set_entity_motion", "set_entity_data", "sound", "entity_event"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "damage oracle 1 minecraft:drown"

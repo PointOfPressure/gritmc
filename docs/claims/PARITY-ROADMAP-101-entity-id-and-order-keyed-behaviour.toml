@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 101
+slug   = "entity-id-and-order-keyed-behaviour"
+title  = "Entity id allocation is behaviour-visible, and it is one of four order-keyed surfaces"
+branch = "entid-alloc-order"
+status = "written"

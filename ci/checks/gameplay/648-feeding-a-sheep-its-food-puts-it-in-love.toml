@@ -1,0 +1,74 @@
+name = "feeding-a-sheep-its-food-puts-it-in-love"
+about = "wheat used on an adult sheep puts it in love: Animal.mobInteract finds #sheep_food, setInLove broadcasts entity event 18 and SUCCESS_SERVER swings the player's arm for everyone, the player included"
+observe_from = "actor"
+observe = ["entity_event", "animate"]
+within = 816
+settle_ms = 1500
+
+# THE MECHANISM: `091`'s, through this kind's own `isFood`:
+#
+#   Sheep.isFood      stack.is(#sheep_food)
+#   Animal.mobInteract          14-65  age 0 && canFallInLove -> usePlayerItem,
+#                                      setInLove(player) (entity event 18),
+#                                      playEatingSound (Animal's: empty — only
+#                                      Pig overrides it), SUCCESS_SERVER
+#   handleInteract            199-217  animate to trackers and self
+#
+# THE RIG. `083`'s pit: digging [1,-1] and [1,-2] leaves a 1x1 shaft two deep
+# whose floor has no walkable neighbour, so the mob hatched at its bottom never
+# moves — its unseeded stroll and look goals reach nothing observed here. The
+# rig sits +800 blocks out on z, perpendicular to the line the workspaces are
+# laid along (`-(n+1) * 32` on x), alternating sign with its neighbours in this
+# block and 80 further out every pair (640/641 at +-480 ... 652/653 at +-960),
+# so the nearest same-side rig is 64 blocks away on x and 80 on z: nothing it
+# leaves is tracked from another scenario and nothing another leaves is
+# tracked from it — the actor tracks to 64 blocks at view-distance 4. The mob is SILENT
+# (`minecraft:entity_data` `Silent` on the egg, applied by
+# `EntityType.updateCustomEntityTag` through `Entity.load`), because
+# `Mob.baseTick`'s ambient roll (`nextInt(1000) < ambientSoundTime++`, unseeded)
+# can land in any window; `Entity.playSound` refuses every sound of a silent
+# entity and the roll still happens, so its random stream is unchanged.
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 800.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, 801]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, 801]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:sheep_spawn_egg"
+components = [{ type = "minecraft:entity_data", entity = "minecraft:sheep", silent = true }]
+
+[[setup]]
+do = "place"
+on = [1, -3, 801]
+face = "up"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, 800.95]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "hold"
+item = "minecraft:wheat"
+
+[[step]]
+do = "interact"
+target = "minecraft:sheep"

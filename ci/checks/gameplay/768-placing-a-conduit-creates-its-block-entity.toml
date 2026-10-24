@@ -1,0 +1,24 @@
+name = "placing-a-conduit-creates-its-block-entity"
+about = "`ConduitBlockEntity` type 25, empty payload with no target bound — placed on dry land, where its ticker never activates, so the check is about the block entity's creation and not about the conduit mechanic"
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:conduit"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

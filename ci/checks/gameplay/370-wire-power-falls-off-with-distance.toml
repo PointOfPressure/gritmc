@@ -1,0 +1,39 @@
+name = "wire-power-falls-off-with-distance"
+about = "a line of redstone wire beside a redstone block reads 15, 14, 13 as it gets further away — the core rule of redstone, and the one thing about wire that a table of block states cannot hold because the value depends on how far the signal has travelled"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 2000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [3, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_block"
+
+# The source arrives last, so the whole line re-powers in one tick.
+[[step]]
+do = "place"
+on = [4, -1, 0]
+face = "up"

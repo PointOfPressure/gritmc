@@ -1,0 +1,48 @@
+name = "lava-poured-into-a-trench-flows-along-it-a-block-every-thirty-ticks"
+about = "a lava bucket emptied into one end of a four-block trench flows along it one block per thirty game ticks, dropping two levels per block and stopping at the third — LavaFluid.getTickDelay 30, getDropOff 2 and getSlopeFindDistance 2 in a dimension without FAST_LAVA"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 6000
+# Lava's overworld delay is `bipush 30` — 1500 ms per wave, and the nether's
+# FAST_LAVA would make it 10 (500 ms). 750 ms is half the overworld spacing:
+# the waves round to 1500, 3000 and 4500 and the nearest boundary is 375 ms
+# away, while a 10-tick lava would round every wave somewhere else.
+timing = { bucket = { ms = 750 } }
+#
+# Same trench and same aim as 161 (see its header): dx = 1, dz = 0..3, one
+# chunk section, the ray from (yaw -74.5, pitch 54.5) landing on the floor of
+# column (1, 0). Lava from a source has amount 8; each block drops 2, so the
+# trench reads level 2, 4, 6 and the fourth cell stays dry — the drop-off is
+# graded by that cell, which a water-like drop of 1 would fill.
+
+[[setup]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -1, 2]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -1, 3]
+face = "up"
+
+[[setup]]
+do = "look"
+yaw = -74.5
+pitch = 54.5
+
+[[setup]]
+do = "hold"
+item = "minecraft:lava_bucket"
+
+[[step]]
+do = "use_item"

@@ -1,0 +1,24 @@
+name = "placing-a-skull-creates-its-block-entity"
+about = "`SkullBlockEntity` type 16, empty payload for a skull with no profile — one of the fourteen blocks that share the type, and the type id is the whole assertion: a server that answered every block entity with type 41 would pass 760 and fail this"
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:skeleton_skull"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

@@ -1,0 +1,58 @@
+name = "a-powered-crafter-makes-planks"
+about = "one oak log in a crafter's first slot and a lever beside it: `CrafterBlock.neighborChanged` writes `TRIGGERED` with flags 2 and schedules four ticks; `dispenseFrom` finds the shapeless planks recipe in `asCraftInput`, writes `CRAFTING=true` with flags 2, and `dispenseItem` — no container in front — spawns the four planks at the front face with `DefaultDispenseItemBehavior.spawnItem` and sends `levelEvent(1049)` then `levelEvent(2010, front)`; the log shrinks to nothing. Six ticks later `CrafterBlockEntity.serverTick` clears `CRAFTING` with flags 3. Placed looking south, so the crafter is `north_up` and 2010's data is 2. Crafter menu slot 36 is hotbar 0 — nine grid slots, then the 36, then the result"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "level_event", "add_entity", "set_entity_data"]
+settle_ms = 2000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:crafter"
+
+[[setup]]
+do = "place"
+on = [3, -1, 2]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [4, -1, 2]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_log"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[setup]]
+do = "place"
+on = [3, 0, 2]
+face = "up"
+
+[[setup]]
+do = "container_click"
+slot = 36
+
+[[setup]]
+do = "container_click"
+slot = 0
+
+[[setup]]
+do = "close_container"
+
+[[step]]
+do = "place"
+on = [4, 0, 2]
+face = "up"

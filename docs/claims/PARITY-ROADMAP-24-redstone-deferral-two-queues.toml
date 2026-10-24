@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 24
+slug   = "redstone-deferral-two-queues"
+title  = "The five redstone diverges are two deferral queues, not one — 2026-08-11, branch `gameplay-redstone-group`"
+branch = "gameplay-redstone-group"

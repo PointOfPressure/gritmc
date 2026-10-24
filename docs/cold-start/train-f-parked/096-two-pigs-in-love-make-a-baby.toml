@@ -1,0 +1,111 @@
+name = "two-pigs-in-love-make-a-baby"
+about = "two adult pigs fed carrots breed: each BreedGoal finds the other in love within eight blocks, and thirty goal ticks later spawnChildFromBreeding adds a baby pig at the breeder's position, which reaches the client as a pig paired with its baby flag set"
+observe_from = "actor"
+observe = ["set_entity_data"]
+within = 416
+settle_ms = 1500
+
+[[gamerule]]
+rule = "mob_drops"
+value = "false"
+restore = "true"
+
+# THE MECHANISM, read from the pinned jar:
+#
+#   BreedGoal.canUse                   isInLove() && getFreePartner() != null
+#   BreedGoal.getFreePartner     0-122 the nearest canMate, non-panicking
+#                                      animal of the same class within 8
+#   BreedGoal.tick                     loveTime++; >= adjustedTickDelay(60) = 30
+#                                      and distanceToSqr < 9 -> breed()
+#   Animal.spawnChildFromBreeding 0-47 getBreedOffspring; setBaby(true);
+#                                      snapTo(this x y z, 0, 0); finalize;
+#                                      addFreshEntityWithPassengers
+#   Animal.finalizeSpawnChildFromBreeding
+#                               27-49  both setAge(6000), resetLove,
+#                                      broadcastEntityEvent(this, 18)
+#                               56-112 MOB_DROPS -> new ExperienceOrb(...)
+#
+# WHY THE TWO PIGS SHARE ONE PIT, AND WHY ONLY `set_entity_data`. A running
+# goal ticks every other tick, on the parity of `tickCount + getId()`
+# (`Mob.serverAiStep` 36-57), so WHICH of the two parents reaches loveTime 30
+# first depends on the tick the second carrot lands in, and vanilla does not
+# agree with itself about it. Both eggs are used on the same block, so both
+# pigs stand at exactly the same position — `Entity.push` does nothing below a
+# 0.01 separation — and the baby appears at the same place whichever parent
+# breeds. The breeder's own `entity_event 18` would name it, so it is not
+# observed; the baby's pairing data (health 10.0 at 9, baby true at 16) and its
+# next-tick dirty re-send are the same on every run.
+#
+# `mob_drops` is off for the window: the orb `finalizeSpawnChildFromBreeding`
+# drops carries `random.nextInt(7) + 1` from the breeder's unseeded random in
+# its own pairing `set_entity_data`, and this server never ticks the orb.
+
+# THE RIG, AND WHY IT IS OUT HERE. The pit is `083`'s: digging [1,-1] and
+# [1,-2] leaves a 1x1 shaft two deep whose floor has no walkable neighbour, so
+# every path a pig in it is ever given is its own node and it never moves —
+# its unseeded `RandomStrollGoal` and look goals cannot reach anything this
+# check observes. The rig sits -400 blocks out on z, past `083`-`089`'s
+# rigs at +-80 and +-160 and alternating sign with its neighbours here (same
+# sign 64 apart on x and 80 on z), so no other scenario's mob is tracked from
+# it and nothing it leaves is tracked from theirs: the actor tracks to 64
+# blocks at view-distance 4. `within` is opened to reach the rig; the observer
+# stays at the workspace and tracks none of it, hence `observe_from = "actor"`.
+# Coordinates in the steps carry the offset.
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, -400.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, -401]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, -401]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [1, -3, -401]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [1, -3, -401]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:carrot"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, -399.95]
+
+[[setup]]
+do = "wait"
+ms = 1500
+
+[[step]]
+do = "interact"
+target = "minecraft:pig"
+pick = "oldest"
+
+[[step]]
+do = "interact"
+target = "minecraft:pig"
+pick = "newest"
+
+[[step]]
+do = "wait"
+ms = 5000

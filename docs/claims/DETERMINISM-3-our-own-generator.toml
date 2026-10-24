@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 3
+slug   = "our-own-generator"
+title  = "Our own generator"
+branch = "backfill"

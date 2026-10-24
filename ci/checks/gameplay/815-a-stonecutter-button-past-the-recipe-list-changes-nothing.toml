@@ -1,0 +1,46 @@
+name = "a-stonecutter-button-past-the-recipe-list-changes-nothing"
+about = "button 40 is past the end of the eleven stone recipes, so `isValidRecipeIndex` refuses it and `clickMenuButton` returns true having changed nothing: the selection stays -1, the result stays empty and the broadcast that follows finds nothing to send — a server that clamped the index, or wrapped it, would put a recipe in the result"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1000
+measured_step = "silent"
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stonecutter"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 29
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_button_click"
+button = 40

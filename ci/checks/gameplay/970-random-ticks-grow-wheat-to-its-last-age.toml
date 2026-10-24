@@ -1,0 +1,87 @@
+name = "random-ticks-grow-wheat-to-its-last-age"
+about = "wheat planted on dry farmland and left under random ticks reaches age 7 and stops there, read back by breaking it: the observer's `level_event` 2001 carries the broken state's id, so a crop that grew to the wrong age, past its last one, or not at all is a different number"
+observe = ["level_event", "block_update"]
+settle_ms = 1500
+console_restore = ["gamerule random_tick_speed 0"]
+
+# WHAT IS MEASURED AND WHY IT IS THE BREAK, NOT THE GROWTH.
+#
+# `CropBlock.randomTick` (javap -p -c -constants, 26.2):
+#
+#    3: level.getRawBrightness(pos, 0) >= 9            else return
+#   13: age = getAge(state); age < getMaxAge() (7)     else return
+#   30: f = getGrowthSpeed(this, level, pos)
+#   45: random.nextInt((int)(25.0F / f) + 1) == 0      else return
+#   64: level.setBlock(pos, getStateForAge(age + 1), 2)
+#
+# A lone crop on its own dry farmland has f = 1 + 1 = 2 (offsets 47-84: the
+# farmland under it is in `GROWS_CROPS` with moisture 0, and none of the
+# eight around it is), so each random tick that lands on it grows it with
+# probability 1/13. `Level.random` is `RandomSource.create()` — unseeded —
+# so WHEN each age arrives differs between two vanilla runs, and two ages
+# can land in one tick and reach a client as one `block_update`. The
+# sequence of ages on the wire is therefore not a property of vanilla and
+# no check may grade it.
+#
+# What IS a property of vanilla is where it stops: `isRandomlyTicking` is
+# `!isMaxAge(state)`, so once at 7 the crop never ticks again. So the
+# growth happens in `[[setup]]`, whose observations are discarded, and the
+# measured step breaks the crop. `ServerPlayerGameMode.destroyBlock` ->
+# `Block.playerWillDestroy` -> `spawnDestroyParticles` sends
+# `levelEvent(player, 2001, pos, Block.getId(state))` to everyone but the
+# breaker, so the observer's 2001 names the state that was there.
+#
+# HOW LONG, AND THE ODDS IT IS NOT LONG ENOUGH.
+#
+# Seven successes at 1/13 per pick. At `random_tick_speed` 4096 a section
+# draws 4096 positions per tick, one per block on average, so the crop is
+# picked about once per tick. The wait below is long enough for 364 picks
+# at the tick rate vanilla measured at that speed in the calibration run
+# recorded in this file's commit message; P(fewer than 7 successes in 364
+# picks at 1/13) is under 1e-5.
+#
+# Everything is at relative z = +1, one side of the chunk boundary at z = 0.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_hoe"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:wheat_seeds"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "console"
+text = "gamerule random_tick_speed 4096"
+
+[[setup]]
+do = "wait"
+ms = 30000
+
+[[setup]]
+do = "console"
+text = "gamerule random_tick_speed 0"
+
+[[setup]]
+do = "wait"
+ms = 500
+
+[[step]]
+do = "dig"
+at = [1, 0, 1]
+face = "up"

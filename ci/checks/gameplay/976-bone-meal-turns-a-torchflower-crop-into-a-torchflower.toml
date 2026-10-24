@@ -1,0 +1,57 @@
+name = "bone-meal-turns-a-torchflower-crop-into-a-torchflower"
+about = "two bone meals turn a torchflower seed into a torchflower: the first takes the crop to age 1 and the second to `getStateForAge(2)`, which `TorchflowerCropBlock` overrides to be a different block — the flower — and not a third age of the crop"
+observe = ["block_update", "level_event"]
+settle_ms = 1500
+
+# `TorchflowerCropBlock` (javap -p -c -constants, 26.2):
+#
+#   getMaxAge               iconst_2
+#   getBonemealAgeIncrease  iconst_1; ireturn           — no draw
+#   getStateForAge(i)       i == 2 ? TORCHFLOWER.defaultBlockState()
+#                                  : super.getStateForAge(i)
+#
+# and `CropBlock.growCrops` writes `getStateForAge(min(max, age + inc))`
+# with flags 2. The crop's own `AGE` property runs 0..1, so a port that
+# spelled the result as `torchflower_crop[age=2]` asked for a state that
+# does not exist.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_hoe"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:torchflower_seeds"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[step]]
+do = "hold"
+item = "minecraft:bone_meal"
+
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "up"
+
+[[step]]
+do = "hold"
+item = "minecraft:bone_meal"
+
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "up"

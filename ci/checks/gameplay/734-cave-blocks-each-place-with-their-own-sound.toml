@@ -1,0 +1,181 @@
+name = "cave-blocks-each-place-with-their-own-sound"
+about = "eight lush-cave, dripstone and nether-forest blocks, placed one after another, each of which should be answered by its own `*.place` sound — `bone_block` and `ochre_froglight` are `RotatedPillarBlock`s taking `axis` from the clicked face, and `moss_block`'s event is `block.moss.place` while `nether_wart_block`'s is `block.wart_block.place`"
+# **Deliberately no `observe_from`, and that is the check.**
+#
+# `BlockItem.place`, javap -p -c -constants on the pinned jar:
+#
+#    203: BlockState.getSoundType()                -> SoundType
+#    210: aload 6                                  <- the PLACING PLAYER
+#    217: getPlaceSound(state)                     -> SoundEvent
+#    220: SoundSource.BLOCKS
+#    225: SoundType.getVolume() ; fconst_1 fadd fconst_2 fdiv    (v + 1) / 2
+#    234: SoundType.getPitch()  ; ldc 0.8f fmul                  p * 0.8
+#    240: Level.playSound(Entity, BlockPos, SoundEvent, SoundSource, float, float)
+#
+# The leading `Entity` is the entity `PlayerList.broadcast` **skips**, and at
+# offset 210 it is the placer. So the placement sound is on the *observer's*
+# stream and the `block_update` and `block_changed_ack` are on the actor's:
+# reading either stream alone loses half of this check. The default
+# `observe_from` reads both, which is why this file does not set it.
+#
+# THE SHAPE OF THIS CHECK, STATED PLAINLY. The sound is observed **beside**
+# the state change it accompanies, not on its own. A scenario whose only
+# observation is a sound on a path we do not implement reports `absent` and
+# says nothing the census did not already say; this one asks whether the two
+# are emitted together, at the right position, with the right volume — which
+# is what a client would notice.
+#
+# WHY EIGHT BLOCKS AND NOT ONE. Every one of the eight is a distinct
+# `SoundType` instance in the jar, so each contributes one sound event the
+# corpus has never heard. The mechanism under test is the same for all eight —
+# one table lookup keyed by block state — so this is one claim measured eight
+# ways rather than eight claims, and splitting it into eight scenarios would
+# multiply the corpus denominator by eight for no extra information.
+#
+# `rooted_dirt` is a second dirt that is *not* `block.gravel.place` — it has a row
+# of its own — so this scenario and `733` together pin that the table is read per
+# state rather than inferred from the block's material.
+#
+# PITCH AND SEED ARE NOT COMPARED, AND VOLUME IS. `trace::decode`'s SOUND arm
+# reads the packet's `long seed` and its pitch and throws both away — the seed
+# because `Level.playSound` fills it from `soundSeedGenerator.nextLong()`, the
+# pitch because several callers draw it. Volume is kept: here it is
+# `(SoundType.getVolume() + 1) / 2`, a pure function of the table row, so it
+# is behaviour and it is compared.
+#
+# THE HOLDS ARE DONE TWICE ON PURPOSE. Every item is held once in setup,
+# where observations are discarded, and again in the step that places it.
+# `ServerPlayer` unlocks recipes when it first receives an ingredient and
+# `RecipeBook.add` returns false for one it already knows, so the setup pass
+# absorbs every `recipe_book_add` and the measured window carries none. See
+# `040-stairs-and-furnace-face-apart`, which observes `packet:0x4A` because it
+# does not do this.
+#
+# GEOMETRY. Eight blocks at relative `[1..3, 0, 0..2]`, all at `z >= 0` and so
+# all in chunk `z = 0`, per this directory's rule. Each is placed on the
+# superflat's own `grass_block` at `y = -1` with `face = "up"`, one step apart,
+# so each arrives as its own `block_update` rather than as a coalesced
+# `section_blocks_update`; both kinds are observed so either is compared.
+observe = ["block_update", "section_blocks_update", "block_changed_ack", "sound"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# The recipe-book pass: every item once, into the same hotbar slot.
+
+[[setup]]
+do = "hold"
+item = "minecraft:amethyst_block"
+
+[[setup]]
+do = "hold"
+item = "minecraft:dripstone_block"
+
+[[setup]]
+do = "hold"
+item = "minecraft:moss_block"
+
+[[setup]]
+do = "hold"
+item = "minecraft:rooted_dirt"
+
+[[setup]]
+do = "hold"
+item = "minecraft:bone_block"
+
+[[setup]]
+do = "hold"
+item = "minecraft:ochre_froglight"
+
+[[setup]]
+do = "hold"
+item = "minecraft:shroomlight"
+
+[[setup]]
+do = "hold"
+item = "minecraft:nether_wart_block"
+
+# One block, one sound, eight times.
+
+# `minecraft:block.amethyst_block.place` at relative [1, 0, 0]
+[[step]]
+do = "hold"
+item = "minecraft:amethyst_block"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# `minecraft:block.dripstone_block.place` at relative [2, 0, 0]
+[[step]]
+do = "hold"
+item = "minecraft:dripstone_block"
+
+[[step]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+# `minecraft:block.moss.place` at relative [3, 0, 0]
+[[step]]
+do = "hold"
+item = "minecraft:moss_block"
+
+[[step]]
+do = "place"
+on = [3, -1, 0]
+face = "up"
+
+# `minecraft:block.rooted_dirt.place` at relative [1, 0, 1]
+[[step]]
+do = "hold"
+item = "minecraft:rooted_dirt"
+
+[[step]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+# `minecraft:block.bone_block.place` at relative [2, 0, 1]
+[[step]]
+do = "hold"
+item = "minecraft:bone_block"
+
+[[step]]
+do = "place"
+on = [2, -1, 1]
+face = "up"
+
+# `minecraft:block.froglight.place` at relative [3, 0, 1]
+[[step]]
+do = "hold"
+item = "minecraft:ochre_froglight"
+
+[[step]]
+do = "place"
+on = [3, -1, 1]
+face = "up"
+
+# `minecraft:block.shroomlight.place` at relative [1, 0, 2]
+[[step]]
+do = "hold"
+item = "minecraft:shroomlight"
+
+[[step]]
+do = "place"
+on = [1, -1, 2]
+face = "up"
+
+# `minecraft:block.wart_block.place` at relative [2, 0, 2]
+[[step]]
+do = "hold"
+item = "minecraft:nether_wart_block"
+
+[[step]]
+do = "place"
+on = [2, -1, 2]
+face = "up"

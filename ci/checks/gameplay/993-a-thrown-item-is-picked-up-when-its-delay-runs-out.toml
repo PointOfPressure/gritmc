@@ -1,0 +1,22 @@
+name = "a-thrown-item-is-picked-up-when-its-delay-runs-out"
+about = "a stone thrown straight down lands at the thrower's feet and, when its 40-tick pickup delay runs out, is taken back: take_item_entity (count 1) to everyone tracking it, remove_entities, and the hotbar slot's container_set_slot from the next tick's sweep. The drop itself sends no container_set_slot — ServerPlayer.drop moves the menu's belief with the slot. Fails for a server with no ItemEntity tick or no Player.aiStep touch loop (it says nothing), and for one that re-sends the slot at the drop"
+# Looking straight down makes the aimed throw land within a few hundredths of
+# the feet: horizontal speed is `-sin(yaw) * cos(90°) * 0.3` plus at most
+# `0.02` of unseeded noise. So the item is inside the player's reach on every
+# run and the only clock is the pickup delay. `add_entity` is not observed:
+# its tail is unseeded (see `gameplay-unstable.toml`'s
+# `dropping-an-item-throws-it-on-the-floor`).
+observe = ["take_item_entity", "remove_entities", "container_set_slot"]
+settle_ms = 4000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 90.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[step]]
+do = "drop"

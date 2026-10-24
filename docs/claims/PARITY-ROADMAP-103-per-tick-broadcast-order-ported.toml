@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 103
+slug   = "per-tick-broadcast-order-ported"
+title  = "The per-tick broadcast order, ported: fastutil's open-hash walk over entity ids"
+branch = "bcast-order"
+status = "written"

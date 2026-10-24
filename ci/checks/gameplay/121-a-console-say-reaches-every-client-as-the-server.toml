@@ -1,0 +1,24 @@
+name = "a-console-say-reaches-every-client-as-the-server"
+about = """
+`say hello from the console` reaches BOTH players as one chat line whose
+chat type is `say_command` and whose sender is the literal `Server`
+
+`SayCommand` hands the message to `PlayerList.broadcastChatMessage` bound to
+the SOURCE, and the console's display name is `Component.literal("Server")`
+(`MinecraftServer.createCommandSourceStack`). There is no signing context on
+the console, so the message is `PlayerChatMessage.system` and each player is
+sent a `disguised_chat`, which this harness records as `chat` and compares
+byte for byte. A server that used a player's name, the wrong chat type, or a
+`system_chat`, moves it on both sides.
+
+The restore line sets `send_command_feedback` to the value it already has:
+a console step must declare one, and `/say` leaves no state to put back.
+"""
+console_restore = ["gamerule send_command_feedback true"]
+observe_from = "both"
+observe = ["chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "say hello from the console"

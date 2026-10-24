@@ -1,0 +1,25 @@
+name = "console-playsound-reaches-every-listener-inline"
+about = """
+`execute at oracle_eye run playsound minecraft:block.note_block.bell block @a
+~ ~ ~ 1 1.5` from the console sends each player one `sound` naming the
+event INLINE, at the observer's position, source `block`, volume 1, pitch 1.5
+
+`PlaySoundCommand.playSound` builds `Holder.direct(SoundEvent.
+createVariableRangeEvent(id))`, so the packet's holder is `0` followed by the
+identifier — for a registered sound too — and a server that sent the
+registry id moves the `sound` field. Both players are within the 16-block
+range of a volume-1 sound, so both hear it at the given position; the pitch
+is the argument and is compared as given. The seed is one level-random draw
+for all targets and is read and dropped.
+
+The restore sets `send_command_feedback` to the value it already has: a
+console step must declare one, and a sound leaves no state to put back.
+"""
+console_restore = ["gamerule send_command_feedback true"]
+observe_from = "both"
+observe = ["sound", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "execute at oracle_eye run playsound minecraft:block.note_block.bell block @a ~ ~ ~ 1 1.5"

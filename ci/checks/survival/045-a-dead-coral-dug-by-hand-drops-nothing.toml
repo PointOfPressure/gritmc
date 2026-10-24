@@ -1,0 +1,46 @@
+name = "a-dead-coral-dug-by-hand-drops-nothing"
+about = """
+Dead coral breaks on the first hit (destroy time 0) and REQUIRES a pickaxe for
+its drop (`requiresCorrectToolForDrops`), which makes it the one natural pair
+where the hit and the drop can be graded apart. By hand:
+`ServerPlayerGameMode.destroyBlock` offsets 244-269 call `playerDestroy` only
+when `removed && hasCorrectToolForDrops`, and `Player.hasCorrectToolForDrops`
+is `!requires || item.isCorrectToolForDrops` — false for an empty hand. So the
+block goes, and no item entity appears: no add_entity, no set_entity_data.
+`046` is the same dig with a wooden pickaxe, which drops the coral. What would
+make it fail: a server that drops whatever the loot table says regardless of
+the tool spawns a coral here; one that refuses the dig keeps the block.
+"""
+# The console gave this rig its items; `clear` takes them back so the
+# next scenario starts empty-handed, on both servers.
+console_restore = ["clear oracle"]
+observe_from = "both"
+observe = ["add_entity", "set_entity_data", "block_update", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "console"
+text = "clear oracle"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:dead_tube_coral"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "wait"
+ms = 300
+
+[[step]]
+do = "dig"
+at = [1, 0, 0]
+face = "up"

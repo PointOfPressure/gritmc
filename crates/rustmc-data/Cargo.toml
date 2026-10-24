@@ -1,0 +1,22 @@
+[package]
+name = "rustmc-data"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+
+[dev-dependencies]
+# `tests/golden_float_precision.rs` needs the same parser the goldens are read
+# with, because the defect it measures IS that parser.
+serde_json.workspace = true
+
+[features]
+# Named wrong implementations for T1 positive controls. **Never in a default
+# set** — `ci/t0.sh` refuses a tree where it is, because a control that can be
+# switched on in production is not a control, it is a backdoor.
+t1-sabotage = []
+
+[lints]
+workspace = true

@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 1
+slug   = "concurrency-cause"
+title  = "The cause: concurrency, demonstrated rather than argued"
+branch = "backfill"

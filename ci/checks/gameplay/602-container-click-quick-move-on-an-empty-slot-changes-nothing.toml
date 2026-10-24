@@ -1,0 +1,119 @@
+name = "container-click-quick-move-on-an-empty-slot-changes-nothing"
+about = "the same slot 561 clicks — a freshly placed chest's own slot 0, guaranteed empty because the chest itself did not exist a moment ago — clicked with QUICK_MOVE instead of PICKUP; vanilla's doClick reaches the same code as 601 but the slot it reads is empty, so nothing moves. 561 made this argument for PICKUP and this is the same argument for QUICK_MOVE, which is a different branch of the same method and is not guaranteed to inherit 561's guarantee for free. The third step is the control that makes the second one mean anything: it QUICK_MOVEs a slot that is NOT empty, so a server whose QUICK_MOVE does nothing at all fails here instead of passing on the silence it owes to the empty slot. What would make this fail: a server that answers every QUICK_MOVE click with a correction regardless of what was clicked fails at step 2, and a server that answers no QUICK_MOVE click at all fails at step 3."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot"]
+settle_ms = 1000
+
+# The chest lid repeats on a free-running 5-tick timer for as long as the chest
+# is open — `ContainerOpenersCounter.recheckOpeners` re-arms unconditionally
+# (offsets 178-186 call `Level.scheduleTick(pos, block, 5)`) and calls
+# `openerCountChanged` on both paths (offset 84's `if_icmpeq 167` lands on the
+# call itself), and `ChestBlockEntity.signalOpenCount` offsets 0-13 turn that
+# into `level.blockEvent(pos, block, 1, newCount)`. So the same `block_event`
+# goes out every 250 ms, forever.
+#
+# This check does not observe `block_event` and so never saw them declared.
+# It sees them under `strict`, where **how many arrived and which step each
+# was stamped with are set by where a free-running timer's edges fell against
+# this window** — measured on the 2026-08-07 07:10 subset pair, six of the
+# seven scenarios that leave a chest open disagreed on step attribution while
+# agreeing on the total.
+#
+# What stops being tested here: the repeat count and the step attribution of
+# `block_event`. What is still tested: that the lid opens at all, at the right
+# position, with the right viewer count, on the right stream — and the cadence
+# itself, in `rustmc_server::containers::tests::
+# the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`, which measures
+# the gap rather than the count.
+collapse_repeats = ["block_event"]
+
+# THE SLOT IS THE CHEST'S OWN, NOT A HOTBAR SLOT LEFT UNTOUCHED.
+#
+# A hotbar slot's contents outlive the scenario that set them — `record.rs`
+# resets the menu and the sneak flag between scenarios but names nothing about
+# the inventory — so "a hotbar slot nobody held this run" is not the same
+# claim as "an empty slot". Whether it actually held nothing at the start of
+# THIS scenario would depend on whether 601's own QUICK_MOVE worked on
+# whichever server ran before it, which is exactly the coupling that made 552
+# and 553 stop distinguishing anything until the fix in `record.rs`. A slot on
+# a chest placed fresh at this scenario's own workspace has no such history:
+# it did not exist until the `place` step below created it.
+#
+# STEP 3 IS THE POSITIVE CONTROL AND IT IS INSIDE THE SCENARIO ON PURPOSE.
+#
+# **This check spent its whole life scoring `match` against a server that has
+# never implemented QUICK_MOVE at all**, and the third step is what ends that.
+# `crates/rustmc-server/src/click.rs` opened `do_click` with
+# `if input != ContainerInput::Pickup { return false; }` — every other
+# `ContainerInput` produced no state change and therefore no packet — so this
+# server answered step 2 with the same silence vanilla answers it with, for a
+# reason that has nothing to do with the rule being checked. Measured on the
+# recording pair of 2026-08-07 02:19: the whole of this check's declared
+# projection was **two observations on each side and both came from step 0**,
+# the `place` that opens the chest. Its own measured step contributed **zero
+# observations on either side**.
+#
+# 561's file already states the rule this violated — "a check that asserts an
+# absence needs positive content in the same scenario, or its non-vacuity
+# rests on whatever incidental packet happens to be nearby". 561 satisfies it:
+# its positive content is the container opening, and its subject verb PICKUP
+# is live, so its silence is a live verb declining to act. **This check
+# satisfied the letter of that rule and not its point.** The container opening
+# is positive content, but it is positive content about a *different verb*,
+# and a negative control is only evidence when the positive control for **its
+# own verb** is live. Both of this verb's cross-scenario positive controls,
+# 601 and 603, were `diverge` at the time this was `match`.
+#
+# Naming 601 as a positive control in a field and relabelling this check when
+# 601 is not itself `match` was the other candidate fix and was rejected on a
+# measurement of the harness, not on taste: the only verdict such a relabel
+# could honestly produce is `inert`, `oracle-runner`'s own
+# `Verdict::baselineable` refuses `inert` unconditionally
+# (`tools/oracle-runner/src/compare.rs`), and `main.rs` counts every inert
+# scenario as a fault whatever the baseline says. That fix would leave the
+# corpus permanently red rather than honestly scored. Putting the control in
+# the scenario keeps the check inside the corpus, keeps the count at 86, and
+# makes the verdict something a run measures rather than something a table
+# asserts.
+#
+# The cost, stated rather than found later: step 3 is 601's click, so this
+# check no longer fails for exactly one reason. It fails at step 2 for the
+# over-eager server and at step 3 for the silent one, and `first_difference`
+# names which. That is the price of a negative control that can fail at all.
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# The stone is what step 3 moves. It sits in hotbar slot 0, which is menu slot
+# 54 in a 63-slot chest menu — the same numbering 601 uses and for the same
+# reason. Held before the stick so that the stick, not the stone, is what the
+# `place` step below right-clicks the chest with.
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 0
+input = "quick_move"
+
+[[step]]
+do = "container_click"
+slot = 54
+input = "quick_move"

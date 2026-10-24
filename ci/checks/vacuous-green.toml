@@ -1,0 +1,266 @@
+# ci/checks/vacuous-green.toml — DERIVED. Do not hand-edit.
+#
+# Regenerate with `python3 ci/vacuous-green-census.py --write`.
+# `ci/check-vacuous-green.py` re-derives this file in T0 and refuses a
+# tree where it has gone stale, so a hand edit here is a T0 red rather
+# than a hidden one.
+
+# Invoked verdict scripts with no visible floor on their own
+# population. A CANDIDATE list, not a verdict — see the module
+# docstring of ci/vacuous-green-census.py.
+no_population_floor_scripts = [
+    "ci/admissible-residual.py",
+    "ci/batch-arith.py",
+    "ci/bench-pair.sh",
+    "ci/box-skip-audit.py",
+    "ci/check-dependency-pins.py",
+    "ci/check-generator-arms.sh",
+    "ci/check-handoff-terminals-falsify.py",
+    "ci/check-shell-footguns.py",
+    "ci/check-sound-pitch-table.py",
+    "ci/check-vacuous-green-falsify.sh",
+    "ci/click-surface-falsify.py",
+    "ci/command-surface-falsify.py",
+    "ci/command-surface.py",
+    "ci/command-tree-compare.py",
+    "ci/command-tree-parity-falsify.py",
+    "ci/corpus-machinery-falsify.py",
+    "ci/corpus-shard-equivalence.py",
+    "ci/dump-registries.sh",
+    "ci/explosion-falsify.sh",
+    "ci/gate-lock.sh",
+    "ci/gen-vanilla-region.sh",
+    "ci/item-props-golden.sh",
+    "ci/mob-projection-search.py",
+    "ci/mob-tick-census.py",
+    "ci/nether-ladder-refs.sh",
+    "ci/order-keyed-census.py",
+    "ci/order-pair-decompose.py",
+    "ci/projection-drops.py",
+    "ci/refs-12345-widen2.sh",
+    "ci/setup-merge-drivers.sh",
+    "ci/shell-footguns.py",
+    "ci/t0-ordering-falsify.sh",
+    "ci/t0-stages.sh",
+    "ci/t1-allowlist.py",
+    "ci/t2-gameplay-subset.sh",
+    "ci/t2-regiondiff.sh",
+    "ci/t2-vanilla-opens-our-world.sh",
+    "ci/unfalsifiable-falsify.py",
+    "ci/wall-reads-check.sh",
+    "ci/wall-reads-falsify.sh",
+]
+
+[meta]
+scripts_scanned = 539
+verdict_scripts = 148
+uninvoked_verdict_scripts = 33
+green_on_refusal_scripts = 11
+green_on_refusal_sites = 11
+errexit_dead_scripts = 0
+errexit_dead_captures = 0
+no_population_floor = 40
+
+# A script that declares a verdict and that nothing in this tree runs.
+
+[[uninvoked]]
+script = "ci/batching-selftests.sh"
+verdict_lines = [55]
+
+[[uninvoked]]
+script = "ci/be-channel-falsify.sh"
+verdict_lines = [72, 114, 125, 137]
+
+[[uninvoked]]
+script = "ci/bench-attrib-through.sh"
+verdict_lines = [65]
+
+[[uninvoked]]
+script = "ci/bench-boot-onecore.sh"
+verdict_lines = [41]
+
+[[uninvoked]]
+script = "ci/bench-stamp-sha.sh"
+verdict_lines = [62]
+
+[[uninvoked]]
+script = "ci/biome-palette-order.sh"
+verdict_lines = [119, 150, 171, 216, 237]
+
+[[uninvoked]]
+script = "ci/block-schema-queue.py"
+verdict_lines = [454]
+
+[[uninvoked]]
+script = "ci/chat-commands-falsify.sh"
+verdict_lines = [40]
+
+[[uninvoked]]
+script = "ci/corpus-delay-curve.py"
+verdict_lines = [213]
+
+[[uninvoked]]
+script = "ci/corpus-exclusion-cost.sh"
+verdict_lines = [141]
+
+[[uninvoked]]
+script = "ci/corpus-history.py"
+verdict_lines = [228]
+
+[[uninvoked]]
+script = "ci/decoded-kind-reach.py"
+verdict_lines = [160]
+
+[[uninvoked]]
+script = "ci/dig-probe.py"
+verdict_lines = [207]
+
+[[uninvoked]]
+script = "ci/falsify-ruined-portal.py"
+verdict_lines = [333]
+
+[[uninvoked]]
+script = "ci/feature-body-shift.py"
+verdict_lines = [320]
+
+[[uninvoked]]
+script = "ci/fill-compare.sh"
+verdict_lines = [126, 136]
+
+[[uninvoked]]
+script = "ci/floor-ladder.py"
+verdict_lines = [353]
+
+[[uninvoked]]
+script = "ci/fluid-tape.sh"
+verdict_lines = [73]
+
+[[uninvoked]]
+script = "ci/lockfile-falsify.sh"
+verdict_lines = [77]
+
+[[uninvoked]]
+script = "ci/movement-falsify.sh"
+verdict_lines = [161]
+
+[[uninvoked]]
+script = "ci/nether-parity-windows.py"
+verdict_lines = [88]
+
+[[uninvoked]]
+script = "ci/pack-census.py"
+verdict_lines = [207]
+
+[[uninvoked]]
+script = "ci/place-subset-probe.sh"
+verdict_lines = [134]
+
+[[uninvoked]]
+script = "ci/recipe-match-falsify.sh"
+verdict_lines = [156]
+
+[[uninvoked]]
+script = "ci/schema-check-falsify.py"
+verdict_lines = [314, 372]
+
+[[uninvoked]]
+script = "ci/shared-refs-falsify.sh"
+verdict_lines = [88]
+
+[[uninvoked]]
+script = "ci/structure-surface.py"
+verdict_lines = [797]
+
+[[uninvoked]]
+script = "ci/subset-stability-locked.sh"
+verdict_lines = [95]
+
+[[uninvoked]]
+script = "ci/sulfur-read-trace.sh"
+verdict_lines = [77, 91]
+
+[[uninvoked]]
+script = "ci/sweep-guard.py"
+verdict_lines = [75]
+
+[[uninvoked]]
+script = "ci/tick-section-classify.py"
+verdict_lines = [124, 1324, 1384]
+
+[[uninvoked]]
+script = "ci/useitemon-unit.py"
+verdict_lines = [512]
+
+[[uninvoked]]
+script = "ci/waterlog-poison-control.sh"
+verdict_lines = [43, 77, 92, 107, 115]
+
+# An exit-0 path whose own message says the check could not run.
+
+[[green_on_refusal]]
+script = "ci/bench-pair-summary.py"
+exit_line = 148
+message_line = 143
+message = "print(\"\\ninstructions: NOT CAPTURED (perf unavailable) — \""
+
+[[green_on_refusal]]
+script = "ci/check-source-citations.py"
+exit_line = 631
+message_line = 626
+message = "print(f\"\\n{len(skipped)} left for a human — ambiguous, unresolved, or \""
+
+[[green_on_refusal]]
+script = "ci/corpus-dead-observe.py"
+exit_line = 132
+message_line = 131
+message = "print(\"no recordings found; nothing to say.\")"
+
+[[green_on_refusal]]
+script = "ci/entity-leak-audit.py"
+exit_line = 235
+message_line = 231
+message = "print(\"`placeable 0` means the spatial bound cannot exclude the leak — \""
+
+[[green_on_refusal]]
+script = "ci/entity-reach-falsify.sh"
+exit_line = 71
+message_line = 69
+message = "echo \"      Refusing to report a green from a tree that could not read the registry.\""
+
+[[green_on_refusal]]
+script = "ci/hold-phases.sh"
+exit_line = 54
+message_line = 53
+message = "echo \"hold-phases: cannot write $HOLD_PHASE_LOG — this run will not be measured\" >&2"
+
+[[green_on_refusal]]
+script = "ci/mob-projection-search.py"
+exit_line = 376
+message_line = 375
+message = "print(\"  cannot produce five. At least one further source is open.\")"
+
+[[green_on_refusal]]
+script = "ci/reference-cache.sh"
+exit_line = 417
+message_line = 416
+message = "echo \"reference-cache: not storing — a key input is unavailable\" >&2"
+
+[[green_on_refusal]]
+script = "ci/refusal-ledger.py"
+exit_line = 783
+message_line = 778
+message = "print(\"| table | what the harness could not answer | refused |\")"
+
+[[green_on_refusal]]
+script = "ci/village-oracle.sh"
+exit_line = 37
+message_line = 36
+message = "echo \"skipping: no vanilla wide reference\""
+
+[[green_on_refusal]]
+script = "ci/village-pieces.sh"
+exit_line = 41
+message_line = 40
+message = "echo \"skipping: no vanilla datagen extract\""
+
+# `cmd; VAR=$?` under an active `set -e`: the handler cannot run.

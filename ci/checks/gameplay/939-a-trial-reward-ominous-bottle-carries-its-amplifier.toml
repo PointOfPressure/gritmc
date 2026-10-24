@@ -1,0 +1,36 @@
+name = "a-trial-reward-ominous-bottle-carries-its-amplifier"
+about = "a seeded chests/trial_chambers/reward_common chest rolls an ominous bottle through set_ominous_bottle_amplifier at amplifier 1, and the content packet carries minecraft:ominous_bottle_amplifier 1; amplifier 0 is the prototype and would carry nothing"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_event"]
+settle_ms = 1000
+
+# The lid repeats every 5 ticks while the chest is open; collapsed as in 090.
+collapse_repeats = ["block_event"]
+
+# A seeded loot chest, placed the one way a client can: `block_entity_data`
+# on the held chest (see 930). `LootTableSeed` is a LONG.
+#
+# Seed 58: one ominous bottle in slot 17, amplifier 1 (clamped 0..4 from the
+# table's provider).
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+components = [
+    { type = "minecraft:block_entity_data", block_entity = "minecraft:chest", strings = { LootTable = "minecraft:chests/trial_chambers/reward_common" }, longs = { LootTableSeed = 58 } },
+]
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Overwrite the component-bearing chest, so the inventory half of the content
+# packet holds nothing but a stick.
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

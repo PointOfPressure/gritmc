@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 31
+slug   = "decoration-margin-does-not-converge"
+title  = "DECORATION_MARGIN converges at no width, and the gate that said otherwise was one seed wide — 2026-08-12, branch `worldgen-decoration-margin`"
+branch = "worldgen-decoration-margin"

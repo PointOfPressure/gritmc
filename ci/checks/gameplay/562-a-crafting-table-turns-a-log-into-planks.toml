@@ -1,0 +1,108 @@
+name = "a-crafting-table-turns-a-log-into-planks"
+about = "putting one oak log into an open crafting grid fills the result slot with four oak planks — the recipe runs on `slotsChanged` and vanilla sends the result slot unprompted, so this is the first check that can see a crafting table do anything but open"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot"]
+settle_ms = 1000
+
+# CRAFTING, WHICH IS A DIFFERENT MECHANISM FROM STORING AND NOT A SECOND CASE
+# OF IT.
+#
+# 560 asks whether an item stays where it was put. This asks whether putting it
+# somewhere makes the server *compute* something. `CraftingMenu.slotsChanged`
+# runs the recipe over the grid and calls `slotChangedCraftingGrid`, which
+# constructs a `ClientboundContainerSetSlotPacket` **directly** — visible in
+# `javap -c` on `CraftingMenu` as a `new ClientboundContainerSetSlotPacket`
+# with an `iconst_0` slot argument. So the result slot is not a correction to a
+# client prediction like the other two; it is sent because a recipe matched.
+#
+# THE RECIPE IS READ FROM THE EXTRACT, NOT FROM MEMORY.
+#
+# `data/vanilla/recipes.json`, `oak_planks`:
+#
+#   type        minecraft:crafting_shapeless
+#   ingredients ["#minecraft:oak_logs"]
+#   result      { "count": 4, "id": "minecraft:oak_planks" }
+#
+# One ingredient, shapeless, so a single log anywhere in the grid matches and
+# the scenario does not have to reproduce a shape.
+#
+# THE SLOT NUMBERS, WHICH ARE A DIFFERENT SET FROM 560's.
+#
+# `CraftingMenu` adds the result slot first, then the 3x3 grid, then the
+# standard inventory — 46 slots:
+#
+#   0       the result
+#   1..9    the 3x3 grid
+#   10..36  the player's three inventory rows
+#   37..45  the hotbar        <- 37 is `hold`'s slot 0
+#
+# Confirmed against `CraftingMenu.quickMoveStack`, whose `moveItemStackTo`
+# bounds are the same 1/10/37/46 boundaries. **37 here and 54 in 560**: the
+# hotbar's position depends on how many slots the container itself has, so
+# there is no single number for "the thing I am holding" and a scenario that
+# copies one from the other file clicks a random inventory slot.
+#
+# WHAT VANILLA SENDS AND WHAT THIS SERVER SENDS.
+#
+#   click 37  picks the log up off the hotbar   -> correction for slot 37
+#   click 1   puts it in the grid               -> correction for slot 1,
+#                                                  and slot 0 filled with
+#                                                  4 oak planks by the recipe
+#
+# This server opens the menu — `menu.rs` knows `minecraft:crafting_table` is a
+# 46-slot `minecraft:crafting` — and then has neither a grid to put the log in
+# nor a recipe engine to run over it. `data/vanilla/recipes.json` is in the
+# tree and unused by the server.
+#
+# ITS GUARD IS 561, NOT A CRAFTING-SPECIFIC ONE.
+#
+# 561 forbids answering every click with a correction, which is the wrong fix
+# for this file too. What 561 does *not* forbid is a server that fills the
+# result slot with a constant, and that is worth a second recipe eventually —
+# the same shape as 330/335 and 230/235 in this directory's README. Unclaimed.
+#
+# WHAT IT LEAVES BEHIND.
+#
+# A log in a crafting grid. `CraftingMenu.removed` returns the grid's contents
+# to the player rather than dropping them, and the close that does it is
+# `record.rs`'s per-scenario reset — which is why it is structural rather than
+# a step at the end of this file: whatever check runs next, `run_one` closes
+# an open menu before that scenario's own setup starts.
+#
+# **This was the last check in corpus order until 611 was added
+# (2026-08-05).** 611 names `close_container` on purpose, on the same
+# mechanism this file leaves to the structural reset, so the log this file
+# leaves behind is no longer "inherited by nothing" — it is inherited by
+# 601, the next scenario's own reset, exactly as every other check's
+# leftovers already were.
+
+[[setup]]
+do = "hold"
+item = "minecraft:crafting_table"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_log"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 37
+
+[[step]]
+do = "container_click"
+slot = 1

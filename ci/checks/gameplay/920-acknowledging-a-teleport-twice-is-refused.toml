@@ -1,0 +1,71 @@
+name = "acknowledging-a-teleport-twice-is-refused"
+about = "a client that acknowledges the same teleport id a second time is disconnected — `handleAcceptTeleportPacket` clears `awaitingPositionFromClient` and never `awaitingTeleport`, so the second acknowledgement matches the id and finds nothing held. The one packet the serverbound census found in the `accepted` tier: decoded into `PlayerState::acknowledged_teleport`, and read by nothing"
+observe_from = "probe"
+observe = ["disconnect"]
+settle_ms = 1200
+
+# THE FIRST CHECK IN THIS REPOSITORY THAT READS A THIRD CONNECTION.
+#
+# `observe_from = "probe"`, and it has to be. The actor and the observer are
+# logged in once by `crate::record::record` and replay every scenario in the
+# corpus, so a check whose content is "the server hangs up on this client"
+# cannot be written on either of them: the disconnect would destroy every
+# scenario after it, and the corpus would report it as ninety checks that
+# suddenly had nothing to say. `crate::trace::Who::Probe` is a connection
+# opened in this scenario's setup and dropped by the runner when the scenario
+# ends, whether or not the server hung up first.
+#
+# WHY THIS PACKET.
+#
+# `ci/serverbound-surface.py` censuses the serverbound half of the play
+# protocol and splits the packets this server decodes three ways: `handled`
+# (the arm reaches an observable sink), `discarded` (the arm drops the body on
+# purpose) and `accepted` — an arm that decodes cleanly, writes a field, and
+# whose field no line of this server ever reads. `ACCEPT_TELEPORTATION` was the
+# only packet in `accepted`. The arm could have been deleted and every check in
+# the repository would have stayed green.
+#
+# FROM THE JAR — `ServerGamePacketListenerImpl.handleAcceptTeleportPacket`,
+# read with `javap -p -c -constants` against the pinned `server-26.2.jar`:
+#
+#     12: getId()                       ; the id the client acknowledged
+#     17: getfield awaitingTeleport
+#     20: if_icmpne 128                 ; an id we are not awaiting -> silent return
+#     24: getfield awaitingPositionFromClient
+#     27: ifnonnull 41
+#     31: ldc "multiplayer.disconnect.invalid_player_movement"
+#     37: disconnect(...)               ; right id, nothing awaited
+#     41..116: absSnapTo, lastGoodX/Y/Z, hasChangedDimension()
+#    123: awaitingPositionFromClient = null      <- ONLY this is cleared
+#    128: return
+#
+# `awaitingTeleport` is never cleared, and that asymmetry is the whole
+# mechanism. The first acknowledgement takes the branch at 27 and nulls the
+# held position; the second one still matches the id at 20, finds null at 27,
+# and takes the disconnect.
+#
+# WHY THE PROBE IS ALREADY ACKNOWLEDGED WHEN THE MEASURED WINDOW OPENS.
+# `login_to_play` answers the join `player_position` the moment it arrives —
+# that is how every connection in this harness reaches the play state — so by
+# the time setup returns the probe has acknowledged exactly once and is a
+# normal, healthy client. `probe_ack_teleport_again` re-sends *that* id.
+#
+# WHY THE JOIN IS IN SETUP.
+# Setup observations are discarded. A login is a login packet, a game event,
+# chunk batches, a player position and a tab-list entry, and a check that
+# measured them alongside the one packet it is named for would report a
+# difference in any of them as this verdict.
+#
+# WHAT MAKES THIS CHECK FAIL.
+# Vanilla writes a `ClientboundDisconnectPacket` carrying
+# `Component.translatable("multiplayer.disconnect.invalid_player_movement")`
+# and closes the channel. A server that merely decodes the packet writes
+# nothing and keeps the connection open, so its probe records no observation at
+# all. `observe = ["disconnect"]` is a single kind on purpose: this check
+# claims one packet and should not go red because a chunk arrived late.
+
+[[setup]]
+do = "probe_join"
+
+[[step]]
+do = "probe_ack_teleport_again"

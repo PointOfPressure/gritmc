@@ -1,0 +1,33 @@
+name = "console-particle-reaches-the-players-in-range"
+about = """
+`execute at oracle_eye run particle minecraft:flame ~ ~2 ~ 0.5 0.25 0.5 0.01
+7` reaches both players as one `level_particles` each, and `execute at
+oracle run particle minecraft:heart ~ ~1 ~ 0 0 0 0 1 force oracle_eye`
+reaches only the observer, with `override_limiter` set
+
+`ParticleCommand.sendParticles` builds one `ClientboundLevelParticlesPacket`
+per viewer — the type's registry id, the position, the three spreads, the
+speed and the count — and `ServerLevel.sendParticles` sends it only when the
+viewer's block centre is within 32 blocks, or 512 under `force`, which is
+also the packet's `overrideLimiter`. Without `viewers` every player is a
+viewer; with it, only the named one. A server that sent no particles, sent
+the second to both players, centre-corrected the spread, or left the flag
+clear under `force`, moves the observation. The success lines are the
+console's log, so `chat` is silent.
+
+Level 2, through the console. A particle leaves nothing behind, so the
+restore only needs to be declared: it sets `send_command_feedback` to the
+value it already has.
+"""
+console_restore = ["gamerule send_command_feedback true"]
+observe_from = "both"
+observe = ["level_particles", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "execute at oracle_eye run particle minecraft:flame ~ ~2 ~ 0.5 0.25 0.5 0.01 7"
+
+[[step]]
+do = "console"
+text = "execute at oracle run particle minecraft:heart ~ ~1 ~ 0 0 0 0 1 force oracle_eye"

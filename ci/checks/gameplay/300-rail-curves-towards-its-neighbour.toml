@@ -1,0 +1,28 @@
+name = "rail-curves-towards-its-neighbour"
+about = "a rail placed at right angles to another bends both of them into a corner — BaseRailBlock's `shape` has ten values and is recomputed from the neighbours on every placement, which is a wider connective family than a fence's four booleans and the only one in the game that can turn a straight piece into a curve"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:rail"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[step]]
+do = "place"
+on = [2, -1, 1]
+face = "up"

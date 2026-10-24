@@ -1,0 +1,29 @@
+name = "redstone-torch-powers-wire"
+about = "a redstone torch placed beside dust raises the dust's power — neighborChanged, the redstone half of a block update, which no shape update can produce"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 1500
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_torch"
+slot = 1
+
+[[step]]
+do = "place"
+on = [3, -1, 0]
+face = "up"

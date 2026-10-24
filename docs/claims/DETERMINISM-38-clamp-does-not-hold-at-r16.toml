@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 38
+slug   = "clamp-does-not-hold-at-r16"
+title  = "The clamp does not hold at r=16: -Dmax.bg.threads=1 removes 45% of the harvest floor and none of its non-zero-ness — 2026-08-17, branch `clamped-floor-probe`"
+branch = "clamped-floor-probe"

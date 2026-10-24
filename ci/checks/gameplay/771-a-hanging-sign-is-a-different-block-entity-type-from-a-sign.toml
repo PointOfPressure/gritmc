@@ -1,0 +1,41 @@
+name = "a-hanging-sign-is-a-different-block-entity-type-from-a-sign"
+about = "`HangingSignBlockEntity` extends `SignBlockEntity` and inherits its `getUpdateTag`, so a freshly placed hanging sign's NBT payload is byte-identical to a freshly placed sign's — the two are distinguishable on the wire by the type id alone, 8 against 7. That makes this the sharpest check in the set: a server that resolved a hanging sign to `minecraft:sign` writes a packet whose every other byte is right, decodes cleanly on a client, and renders the wrong block entity"
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+# A hanging sign needs something to hang from, so the rig builds one. The whole
+# rig sits at relative z >= 0: z >= 0 is chunk z 0 and z <= -1 is chunk z -1,
+# and a rig spanning the two measures vanilla's inter-chunk send order rather
+# than the mechanic (ci/checks/gameplay/README.md).
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_hanging_sign"
+slot = 1
+
+# Clicking the stone's south face puts the sign at [1,0,2] as
+# `oak_wall_hanging_sign` — a different block from `oak_hanging_sign` and the
+# same block entity type, which is the second thing this pins.
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "south"

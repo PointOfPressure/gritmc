@@ -1,0 +1,4 @@
+# Derived measurement artefacts. The scripts beside them regenerate these
+# from the committed golden vectors and the run outputs in ~/rp-logs/village.
+*.txt
+*.tsv

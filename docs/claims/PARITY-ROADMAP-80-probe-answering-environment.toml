@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 80
+slug   = "probe-answering-environment"
+title  = "The probe's environment answers, and the silent 100 becomes 3"
+branch = "probe-answering-environment"
+status = "written"

@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 42
+slug   = "window-counter-coupling"
+title  = "The `window` counter couples nothing, and the corpus was blind to the defect that would prove it — 2026-08-12, branch `gameplay-menus-round2`"
+branch = "gameplay-menus-round2"

@@ -1,0 +1,24 @@
+name = "digging-a-door-takes-both-halves"
+about = "breaking the bottom of a door removes the top as well — a server driven by the extracted shape table alone leaves a doorway hanging in the air, and this is the check that says so. THE STATED REASON WAS WRONG AND THE CONCLUSION SURVIVES IT, corrected 2026-08-05. This said 'every multi-block block is in the shape table's refused set'. Doors are not refused: data/vanilla/update_shape.json carries 32 oak_door rows. But every one of them is half=lower with dir=DOWN -> minecraft:air, which is the lower half losing its support, and there are ZERO half=upper rows for any door anywhere in the table. The half this check breaks is precisely the half the table does not carry, so 'captures doors fully, 32 rows' is equally wrong in the other direction. Counting rows is not the same as covering the behaviour"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_door"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "dig"
+at = [1, 0, 0]
+face = "up"

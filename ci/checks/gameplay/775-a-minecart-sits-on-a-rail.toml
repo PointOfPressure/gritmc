@@ -1,0 +1,36 @@
+name = "a-minecart-sits-on-a-rail"
+about = "a minecart can only be placed on a rail, and sits 1/16 of a block above it"
+observe = ["add_entity", "set_entity_data", "block_update", "section_blocks_update"]
+settle_ms = 1500
+
+# The y of the recorded `add_entity` is the point: vanilla puts the cart at
+# `pos.getY() + 0.0625`, not at the block top, and the probe recorded exactly
+# `[1.5, 0.0625, -0.5]` in both runs. A server that spawned it at the block
+# top would agree about the type, the rail and the x/z and still fail here,
+# which is what stops this being a check that a cart merely exists.
+#
+# `MinecartItem` has no random draw (`javap`: `ServerLevel.addFreshEntity` is
+# the only interesting call) and a minecart is not a `LivingEntity`. See 773.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:rail"
+
+[[setup]]
+do = "place"
+on = [1, -1, -1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:minecart"
+
+[[step]]
+do = "place"
+on = [1, 0, -1]
+face = "up"

@@ -1,0 +1,100 @@
+name = "a-hopper-into-a-double-chest-fills-the-right-half-first"
+about = "a hopper pointing down into the LEFT (west) half of a double chest: `HopperBlockEntity.getContainerAt` asks `ChestBlock.getContainer`, which returns `CompoundContainer(first, second)` with the `type=right` half FIRST whichever half was asked (`getBlockType` offsets 0-36, `DoubleBlockCombiner.combineWithNeigbour` 219-255), so the coal lands in the right half's slot 0 — slot 0 of the open six-row menu. A port that treats the half it faces as the whole container puts it in that half's slot 0, which is menu slot 27. The hopper is filled while a lever locks it and the double chest is opened before the lever goes off, so the transfer is the measured step"
+observe_from = "actor"
+observe = ["container_set_slot", "block_update", "section_blocks_update"]
+settle_ms = 1500
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [2, -1, 1]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [3, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:hopper"
+
+[[setup]]
+do = "sneak"
+on = true
+
+[[setup]]
+do = "place"
+on = [2, 0, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [1, 0, 1]
+face = "up"
+
+[[setup]]
+do = "sneak"
+on = false
+
+[[setup]]
+do = "hold"
+item = "minecraft:coal"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[setup]]
+do = "place"
+on = [1, 1, 1]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [2, 1, 1]
+face = "south"
+
+[[setup]]
+do = "container_click"
+slot = 32
+
+[[setup]]
+do = "container_click"
+slot = 0
+
+[[setup]]
+do = "close_container"
+
+[[setup]]
+do = "place"
+on = [3, 0, 1]
+face = "south"
+
+[[step]]
+do = "place"
+on = [1, 1, 1]
+face = "up"

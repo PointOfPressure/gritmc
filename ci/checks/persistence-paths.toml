@@ -1,0 +1,220 @@
+# ci/checks/persistence-paths.toml — the tree paths whose change makes
+# `ci/t2-persistence.sh` a stage this gate has to run.
+#
+# # WHY THIS IS A DECLARED LIST AND NOT AN UNCONDITIONAL STAGE
+#
+# The persistence gates boot a JVM or a pair of rustmc servers once per gate
+# and once per control, and rebuild `rustmc-world` four times more. That is
+# minutes on top of a merge gate whose measured mean is already 65.2 minutes
+# and which is
+# serial — `/home/sayer/grit/CLAUDE.md`'s rule zero is that nothing may exceed
+# what the gate can land, and a stage on every gate is paid by every branch
+# including the ~90% that cannot touch the save path.
+#
+# So the stage is conditional, and this file is the condition. Two properties
+# make that honest rather than a hole:
+#
+#   * **the skip is loud and is not a green.** `ci/handoff.sh` prints
+#     `stage 7 not applicable` with the reason, and the verdict line carries
+#     `t2p=n/a`, which is a different string from `t2p=0/1`. A reader can
+#     never mistake "the stage did not apply" for "the stage passed" — the
+#     distinction `t1=99` did not have until 2026-08-18 and which cost 113
+#     wrong RED verdicts.
+#   * **a wrong list can only be as bad as today.** Before this file the
+#     persistence gates ran on nothing at all. A path that should be here and
+#     is not leaves that branch exactly where every branch already is, so the
+#     filter cannot regress anything; it can only fail to improve it.
+#
+# # WHAT WOULD MAKE A PATH BELONG HERE
+#
+# A path belongs here if a change to it can move what one of the four gates
+# reads. That is a stronger test than "it is about saving": `ci/t0.sh` already
+# runs the byte-identity golden as a unit test, so this stage exists for the
+# claims T0 cannot make — that VANILLA can open the directory, that a player
+# survives a restart of the real binary, and that the golden can go red.
+#
+# # HOW TO EDIT IT
+#
+# Add a `[[path]]` with the prefix, the gates it feeds, and why. Then run
+# `ci/persistence-paths-falsify.sh`, which requires every declared prefix to
+# make the stage apply and requires a doc-only change not to. A prefix nothing
+# in the tree matches is a refusal, not a warning: a stale prefix reads as
+# coverage and provides none.
+
+[meta]
+# The floor exists for the reason every floor in this tree exists: an empty
+# list matches nothing and would make the stage skip on every branch, which is
+# byte-identical in the log to a tree where the save path is never touched.
+min_paths = 8
+
+[[path]]
+prefix = "crates/rustmc-world/src/anvil.rs"
+gates = ["anvil-byte-identity-falsify", "t2-vanilla-loads-ours"]
+why = """
+The chunk encoder and decoder. `ci/anvil-byte-identity-falsify.sh` patches
+this exact file three times, so a change here can move both the golden and
+its falsifier; `ci/t2-vanilla-loads-ours.sh` hands what `encode_chunk` writes
+to a real vanilla server.
+"""
+
+[[path]]
+prefix = "crates/rustmc-world/src/level.rs"
+gates = ["t2-vanilla-opens-our-world"]
+why = """
+`level.dat` and the nine `data/minecraft/*.dat` files. Arm A of
+`ci/t2-vanilla-opens-our-world.sh` reads the seed back out of
+`world_gen_settings.dat` through a real vanilla boot, and arm B reads
+`ServerBrands` out of `level.dat` after vanilla has rewritten it.
+"""
+
+[[path]]
+prefix = "crates/rustmc-world/src/playerdat.rs"
+gates = ["t2-player-survives-a-restart"]
+why = """
+`players/data/<uuid>.dat`. The restart gate's whole assertion is that the
+position written here on logout is the position read back on rejoin.
+"""
+
+[[path]]
+prefix = "crates/rustmc-world/src/nbt.rs"
+gates = ["anvil-byte-identity-falsify", "t2-vanilla-opens-our-world", "t2-player-survives-a-restart"]
+why = """
+Every one of the three files above is NBT, and byte-identity is a claim about
+the encoder as much as about the fields. A tag written with the wrong length
+prefix is invisible to a round trip through our own reader and fatal to
+vanilla's.
+"""
+
+[[path]]
+prefix = "crates/rustmc-world/src/entitystore.rs"
+gates = ["t2-vanilla-loads-ours"]
+why = """
+`entities/r.X.Z.mca` — the second region container, and the one whose
+`Entities` list is still empty by refusal. It shares the Anvil sector-table
+and merging-write code with the block region, which is the container
+`ci/t2-vanilla-loads-ours.sh` exists for: a writer that lays out only the
+chunks it is handed drops the region's other 1,023 slots.
+
+(This entry read `crates/rustmc-world/src/region.rs` when it was written, and
+`ci/persistence-applies.py --check` refused it on its first run: there is no
+such file — the Anvil container lives inside `anvil.rs`. That refusal is this
+ledger's own red-when-broken evidence and is the reason the prefix-exists
+check is in `--check` rather than left as a comment.)
+"""
+
+[[path]]
+prefix = "crates/rustmc-server/src/levelstore.rs"
+gates = ["t2-vanilla-opens-our-world", "t2-player-survives-a-restart"]
+why = """
+The server's own view of the world directory — where `level.dat` goes, where
+`players/data` goes, and what a `PlayerSnapshot` contains. Both gates boot
+`rustmc-server` and read what this module wrote.
+"""
+
+[[path]]
+prefix = "crates/rustmc-server/src/tiles.rs"
+gates = ["t2-player-survives-a-restart"]
+why = """
+`Tiles::save_all` and `Tiles::retain_around` are the two paths by which an
+edited chunk reaches disk at all. The restart gate boots the server twice, so
+a save that stops happening surfaces here and nowhere in T0.
+"""
+
+[[path]]
+prefix = "crates/rustmc-server/src/main.rs"
+gates = ["t2-vanilla-opens-our-world", "t2-player-survives-a-restart"]
+why = """
+`--world`, `--autosave-seconds` and the autosave thread. Both gates pass
+`--world`; the restart gate passes `--autosave-seconds` and depends on the
+timer firing between its two boots.
+"""
+
+[[path]]
+prefix = "crates/rustmc-server/src/status.rs"
+gates = ["t2-player-survives-a-restart"]
+why = """
+The disconnect path that calls `save_player`, and `listen`'s readiness line —
+which is the restart gate's registered liveness proof. A change to either
+moves what that gate measures or whether it can measure anything.
+"""
+
+[[path]]
+prefix = "ci/t2-persistence.sh"
+gates = ["all"]
+why = "The stage itself. Changing a gate's driver is changing the gate."
+
+[[path]]
+prefix = "ci/t2-persistence-falsify.sh"
+gates = ["all"]
+why = """
+The driver's own red-when-broken evidence. It runs in T0 and needs no gate, so
+a change here does not strictly require stage 7 — but a branch that edits the
+falsifier and not the driver is exactly the branch worth running the real
+gates for once.
+"""
+
+[[path]]
+prefix = "ci/t2-vanilla-loads-ours.sh"
+gates = ["t2-vanilla-loads-ours"]
+why = "A gate whose own source changed has not been run in that form."
+
+[[path]]
+prefix = "ci/t2-vanilla-opens-our-world.sh"
+gates = ["t2-vanilla-opens-our-world"]
+why = "A gate whose own source changed has not been run in that form."
+
+[[path]]
+prefix = "ci/t2-player-survives-a-restart.sh"
+gates = ["t2-player-survives-a-restart"]
+why = "A gate whose own source changed has not been run in that form."
+
+[[path]]
+prefix = "ci/anvil-byte-identity-falsify.sh"
+gates = ["anvil-byte-identity-falsify"]
+why = "A gate whose own source changed has not been run in that form."
+
+[[path]]
+prefix = "ci/t2-sigterm-saves.sh"
+gates = ["t2-sigterm-saves"]
+why = "A gate whose own source changed has not been run in that form."
+
+[[path]]
+prefix = "ci/rejoin-probe.py"
+gates = ["t2-player-survives-a-restart", "t2-sigterm-saves"]
+why = """
+The client both restart gates drive. `--stay` is what makes the SIGTERM gate
+possible at all — a probe that always closed its socket could not tell a
+shutdown hook from a disconnect handler, because both end with the same file
+in the same place.
+"""
+
+[[path]]
+prefix = "crates/rustmc-server/src/shutdown.rs"
+gates = ["t2-sigterm-saves"]
+why = "The signal handler, the watchdog and `stopServer`'s reduced body — the whole subject of that gate."
+
+[[path]]
+prefix = "crates/rustmc-server/src/autosave.rs"
+gates = ["t2-player-survives-a-restart", "t2-sigterm-saves"]
+why = """
+The interval, the tick counter and `saveEverything`'s order. Both gates depend
+on the autosave firing (the restart one) or provably not firing (the SIGTERM
+one, which asserts its absence from the server's own log).
+"""
+
+[[path]]
+prefix = "tools/level-probe"
+gates = ["t2-vanilla-opens-our-world"]
+why = """
+The binary that writes the world directory the vanilla-opens gate hands to
+vanilla. It is the subject of that gate as much as `level.rs` is.
+"""
+
+[[path]]
+prefix = "tools/anvil-probe"
+gates = ["t2-vanilla-loads-ours"]
+why = """
+The binary that pokes a block through our writer. The 2026-08 falsification of
+that gate worked by substituting a truncating write inside this crate, which
+is the direct evidence that a change here moves the gate's outcome.
+"""

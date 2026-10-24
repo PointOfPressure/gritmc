@@ -1,0 +1,47 @@
+name = "a-seedless-dungeon-chest-draws-from-its-own-sequence"
+about = "a seedless chests/simple_dungeon chest fills from that table's own random sequence — a different md5 key from the weaponsmith's, and a table whose rolls split many stacks, so shuffleAndSplitItems draws and Util.shuffle reorders over a full list; a server that keyed every table to one stream, or split stacks without the nextBoolean gates, puts different items in different slots"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_event"]
+settle_ms = 1000
+
+# The lid repeats every 5 ticks while the chest is open, and how many repeats
+# land inside settle_ms is this harness's sampling — see 090's header, which
+# measured it. Collapsed for the same reason.
+collapse_repeats = ["block_event"]
+
+# The only route a client has to a chest that carries a loot table:
+# `block_entity_data` on the held stack, which `BlockItem.place` loads through
+# `updateCustomBlockEntityTag` (offset 143). `container_loot` would be the
+# natural component and is `persistent` only — no stream codec, so no client
+# can send it. `LootTableSeed` must be a LONG: `tryLoadLootTable` reads it with
+# `getLongOr`, so an int would arrive as seed 0 and roll from the random
+# sequence instead.
+#
+# No `LootTableSeed`: `MinecraftServer.getRandomSequence(
+# minecraft:chests/simple_dungeon)`, first draw in the corpus. Golden
+# (`LootGolden` fills, world seed 20260803, pass 0): seventeen stacks, rotten
+# flesh split across ten slots, bread, wheat, string x2 x2, a name tag and a
+# golden apple — no enchanted book, so the content packet stays legible to its
+# last slot.
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+components = [
+    { type = "minecraft:block_entity_data", block_entity = "minecraft:chest", strings = { LootTable = "minecraft:chests/simple_dungeon" } },
+]
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Overwrite the component-bearing stack, so the inventory half of the content
+# packet holds nothing this server does not echo.
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

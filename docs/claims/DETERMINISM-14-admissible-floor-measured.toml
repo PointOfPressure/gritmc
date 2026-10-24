@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 14
+slug   = "admissible-floor-measured"
+title  = "The admissible instrument's own floor — measured 2026-08-09, and §12's last paragraph was wrong"
+branch = "backfill"

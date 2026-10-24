@@ -1,0 +1,86 @@
+name = "a-hopper-catches-what-a-dropper-drops"
+about = "a dropper on a stone pillar faces north over a hopper set one block down and one block in front: the dropped coal spawns at y + 1.34375 over the hopper, inside `Hopper.SUCK_AABB` (`Block.column(16, 11, 32)`, so 0.6875..2.0 above the hopper), and the hopper's next `pushItemsTick` — no container above it — takes the `getItemsAtAndAbove` branch of `suckInItems`, absorbs the whole stack and discards the entity. The client sees the item announced and then removed in the same breath; a server without the item-entity half announces it and leaves it there"
+observe_from = "actor"
+observe = ["level_event", "add_entity", "remove_entities", "block_update", "section_blocks_update"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:hopper"
+
+[[setup]]
+do = "place"
+on = [3, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [3, -1, 2]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:dropper"
+
+[[setup]]
+do = "place"
+on = [3, 0, 2]
+face = "up"
+
+# The lever goes on the dropper's east face, sneaking so the dropper does not
+# open; it powers the dropper directly as the block it is attached to.
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "sneak"
+on = true
+
+[[setup]]
+do = "place"
+on = [3, 1, 2]
+face = "east"
+
+[[setup]]
+do = "sneak"
+on = false
+
+[[setup]]
+do = "hold"
+item = "minecraft:coal"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[setup]]
+do = "place"
+on = [3, 1, 2]
+face = "up"
+
+[[setup]]
+do = "container_click"
+slot = 36
+
+[[setup]]
+do = "container_click"
+slot = 0
+
+[[setup]]
+do = "close_container"
+
+[[step]]
+do = "place"
+on = [4, 1, 2]
+face = "up"

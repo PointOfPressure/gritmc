@@ -1,0 +1,96 @@
+name = "a-skeleton-skull-goes-on-top-of-a-note-block-instead-of-playing-it"
+about = "the same block and the same click as `430`, holding a skeleton skull instead of a stick: `NoteBlock.useItemOn` returns `PASS` rather than `TRY_WITH_EMPTY_HAND`, so `useWithoutItem` never runs, the note does NOT advance, and the skull is placed on top instead. The first check in this corpus whose subject is the **held item** rather than the block — `docs/PARITY-ROADMAP.md` §43"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack", "sound"]
+settle_ms = 1500
+
+# WHAT THIS DISCRIMINATES, AND WHY THE CORPUS COULD NOT SEE IT BEFORE.
+#
+# `docs/PARITY-ROADMAP.md` §43: `useItemOn` is a function of two arguments and
+# every coverage figure this project has quoted for it was keyed on one. The
+# class-keyed figure counts `NoteBlock` as covered because the corpus can
+# place a note block — and that is the **floor**, the cell that any item at
+# all selects. `NoteBlock` has two item control-classes; `430` reaches one of
+# them. This is the other, and it is the whole of the difference between a
+# server that reads the held stack and one that does not.
+#
+# **This check exists because the instrument that found the gap cannot close
+# it.** `ci/useitemon-unit.py` scores this cell as reached *today*, from two
+# scenarios that never meet: `766` holds a skeleton skull to make a skull
+# block entity, and `430` places a note block. Neither has ever put the one in
+# front of the other. That is the difference between a bound on reach and a
+# record of touching, which §43 states as its first blind spot — this file is
+# the first place in the corpus where the two differ by something a server can
+# fail.
+#
+# FROM THE JAR, pinned 26.2, `javap -p -c -constants`:
+#
+#   NoteBlock.useItemOn
+#      0: if (!stack.is(ItemTags.NOTE_BLOCK_TOP_INSTRUMENTS)
+#             || hit.getDirection() != Direction.UP)
+#             -> super.useItemOn(...)  == TRY_WITH_EMPTY_HAND
+#         else -> InteractionResult.PASS
+#
+# **BOTH halves of that condition are load-bearing and this check pins both.**
+# `PASS` does not consume the action, so `ServerPlayerGameMode.useItemOn` goes
+# on to `Item.useOn` and the skull is placed at the position above; and
+# because `useWithoutItem` is never reached, the note block's own state is
+# untouched. The face is `up` on purpose — the identical click on a side face
+# takes the first branch and behaves exactly like `430`.
+#
+# `data/vanilla/use_item_on.json`, regenerated under this tree's own stamp,
+# records the exception group for `minecraft:note_block` as exactly seven
+# items — `skeleton_skull`, `wither_skeleton_skull`, `player_head`,
+# `zombie_head`, `creeper_head`, `dragon_head`, `piglin_head` — answering
+# `PASS` where the default answers `TRY_WITH_EMPTY_HAND`. Any one of the seven
+# would do. The skeleton skull is chosen because it is the one with no second
+# mechanism attached: `player_head` carries a profile component and
+# `dragon_head` and `piglin_head` animate.
+#
+# THE EVIDENCE IS PARTLY AN ABSENCE, AND `430` IS WHAT MAKES AN ABSENCE MEAN
+# SOMETHING. What separates the two servers here is that **no `block_update`
+# arrives at the note block's own position** and no instrument is heard. An
+# absence is only evidence if the same rig demonstrably produces the presence,
+# and `430` is that demonstration — same block, same position, same verb, same
+# face, one item different. Read the pair; this file alone proves nothing.
+# That is also why `430` is not duplicated here under a new number: a second
+# copy of a check that already exists is not a control, it is a second thing
+# to keep in step.
+#
+# THE SKULL'S ROTATION IS DETERMINISTIC HERE AND IS NOT ASSUMED TO BE.
+# `SkullBlock`'s placed `rotation` is derived from the placer's yaw. The setup
+# sets `yaw = 0.0` before anything else for that reason; without it this check
+# would carry a hidden dependence on wherever the actor happened to be facing
+# when the previous scenario ended.
+#
+# NUMBERED ABOVE 790, WHICH THAT FILE'S HEADER FORBIDS WITHOUT A REASON.
+# `790` must stay last because it leaves a dandelion in the actor's first free
+# inventory slot and every later check inherits it. The inheritance is real
+# and this check is immune to it by construction: it observes no inventory
+# kind at all — no `container_set_slot`, no `container_set_content` — and its
+# blocks are in its own workspace. This comment is not licence for a later
+# check in this range that does want an inventory observation; that one does
+# not belong above `790`.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:note_block"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:skeleton_skull"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

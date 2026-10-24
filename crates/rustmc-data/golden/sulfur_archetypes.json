@@ -1,0 +1,185 @@
+{
+  "table": "sulfur_archetypes",
+  "archetypes": [
+    {
+      "tag": "regular",
+      "buoyant": true,
+      "knockbackHorizontal": {"bits": "1054028595", "repr": "0.4125"},
+      "knockbackVertical": {"bits": "1035489772", "repr": "0.09"},
+      "explosion": null,
+      "contactDamage": null,
+      "modifiers": [
+        {"attribute": "minecraft:knockback_resistance", "id": "minecom:regular_add_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4616189618054758400", "repr": "-1.0"}},
+        {"attribute": "minecraft:explosion_knockback_resistance", "id": "minecom:regular_add_explosion_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4616189618054758400", "repr": "-1.0"}},
+        {"attribute": "minecraft:bounciness", "id": "minecom:regular_add_bounciness", "operation": "ADD_VALUE", "amount": {"bits": "4602678819172646912", "repr": "0.5"}},
+        {"attribute": "minecraft:friction_modifier", "id": "minecom:regular_mul_friction_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4618891777938554880", "repr": "-0.699999988079071"}},
+        {"attribute": "minecraft:air_drag_modifier", "id": "minecom:regular_mul_air_drag_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4617090337993654272", "repr": "-0.8999999985098839"}}
+      ]
+    },
+    {
+      "tag": "bouncy",
+      "buoyant": true,
+      "knockbackHorizontal": {"bits": "1054028595", "repr": "0.4125"},
+      "knockbackVertical": {"bits": "1037503037", "repr": "0.105"},
+      "explosion": null,
+      "contactDamage": null,
+      "modifiers": [
+        {"attribute": "minecraft:knockback_resistance", "id": "minecom:bouncy_add_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4611686018427387904", "repr": "-2.0"}},
+        {"attribute": "minecraft:explosion_knockback_resistance", "id": "minecom:bouncy_add_explosion_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4611686018427387904", "repr": "-2.0"}},
+        {"attribute": "minecraft:bounciness", "id": "minecom:bouncy_add_bounciness", "operation": "ADD_VALUE", "amount": {"bits": "4606281698659794944", "repr": "0.8999999761581421"}},
+        {"attribute": "minecraft:friction_modifier", "id": "minecom:bouncy_mul_friction_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4618891777938554880", "repr": "-0.699999988079071"}},
+        {"attribute": "minecraft:air_drag_modifier", "id": "minecom:bouncy_mul_air_drag_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4616279690045292544", "repr": "-0.9900000002235174"}}
+      ]
+    },
+    {
+      "tag": "slow_bouncy",
+      "buoyant": false,
+      "knockbackHorizontal": {"bits": "1054028595", "repr": "0.4125"},
+      "knockbackVertical": {"bits": "1047904911", "repr": "0.24"},
+      "explosion": null,
+      "contactDamage": null,
+      "modifiers": [
+        {"attribute": "minecraft:knockback_resistance", "id": "minecom:slow_bouncy_add_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "4600877379429072896", "repr": "0.4000000059604645"}},
+        {"attribute": "minecraft:explosion_knockback_resistance", "id": "minecom:slow_bouncy_add_explosion_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "4600877379429072896", "repr": "0.4000000059604645"}},
+        {"attribute": "minecraft:bounciness", "id": "minecom:slow_bouncy_add_bounciness", "operation": "ADD_VALUE", "amount": {"bits": "4603579539312869376", "repr": "0.6000000238418579"}},
+        {"attribute": "minecraft:friction_modifier", "id": "minecom:slow_bouncy_mul_friction_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4618891777938554880", "repr": "-0.699999988079071"}},
+        {"attribute": "minecraft:air_drag_modifier", "id": "minecom:slow_bouncy_mul_air_drag_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4616639978024206336", "repr": "-0.9499999992549419"}}
+      ]
+    },
+    {
+      "tag": "slow_flat",
+      "buoyant": false,
+      "knockbackHorizontal": {"bits": "1054028595", "repr": "0.4125"},
+      "knockbackVertical": {"bits": "1037503037", "repr": "0.105"},
+      "explosion": null,
+      "contactDamage": null,
+      "modifiers": [
+        {"attribute": "minecraft:knockback_resistance", "id": "minecom:slow_flat_add_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "4602678819172646912", "repr": "0.5"}},
+        {"attribute": "minecraft:explosion_knockback_resistance", "id": "minecom:slow_flat_add_explosion_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "4602678819172646912", "repr": "0.5"}},
+        {"attribute": "minecraft:bounciness", "id": "minecom:slow_flat_add_bounciness", "operation": "ADD_VALUE", "amount": {"bits": "4600877379429072896", "repr": "0.4000000059604645"}},
+        {"attribute": "minecraft:friction_modifier", "id": "minecom:slow_flat_mul_friction_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4619792497810341888", "repr": "-0.5999999940395355"}},
+        {"attribute": "minecraft:air_drag_modifier", "id": "minecom:slow_flat_mul_air_drag_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4617090337993654272", "repr": "-0.8999999985098839"}}
+      ]
+    },
+    {
+      "tag": "fast_flat",
+      "buoyant": false,
+      "knockbackHorizontal": {"bits": "1063885210", "repr": "0.9125"},
+      "knockbackVertical": {"bits": "1035489772", "repr": "0.09"},
+      "explosion": null,
+      "contactDamage": null,
+      "modifiers": [
+        {"attribute": "minecraft:knockback_resistance", "id": "minecom:fast_flat_add_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4616189618054758400", "repr": "-1.0"}},
+        {"attribute": "minecraft:explosion_knockback_resistance", "id": "minecom:fast_flat_add_explosion_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4616189618054758400", "repr": "-1.0"}},
+        {"attribute": "minecraft:bounciness", "id": "minecom:fast_flat_add_bounciness", "operation": "ADD_VALUE", "amount": {"bits": "4602678819172646912", "repr": "0.5"}},
+        {"attribute": "minecraft:friction_modifier", "id": "minecom:fast_flat_mul_friction_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4617991057932550144", "repr": "-0.7999999970197678"}},
+        {"attribute": "minecraft:air_drag_modifier", "id": "minecom:fast_flat_mul_air_drag_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4616279690045292544", "repr": "-0.9900000002235174"}}
+      ]
+    },
+    {
+      "tag": "light",
+      "buoyant": true,
+      "knockbackHorizontal": {"bits": "1054028595", "repr": "0.4125"},
+      "knockbackVertical": {"bits": "1043878380", "repr": "0.18"},
+      "explosion": null,
+      "contactDamage": null,
+      "modifiers": [
+        {"attribute": "minecraft:knockback_resistance", "id": "minecom:light_add_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4616189618054758400", "repr": "-1.0"}},
+        {"attribute": "minecraft:explosion_knockback_resistance", "id": "minecom:light_add_explosion_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4616189618054758400", "repr": "-1.0"}},
+        {"attribute": "minecraft:bounciness", "id": "minecom:light_add_bounciness", "operation": "ADD_VALUE", "amount": {"bits": "4607182418800017408", "repr": "1.0"}},
+        {"attribute": "minecraft:friction_modifier", "id": "minecom:light_mul_friction_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4618891777938554880", "repr": "-0.699999988079071"}},
+        {"attribute": "minecraft:air_drag_modifier", "id": "minecom:light_mul_air_drag_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "4605380978519572480", "repr": "0.7999999523162842"}}
+      ]
+    },
+    {
+      "tag": "fast_sliding",
+      "buoyant": false,
+      "knockbackHorizontal": {"bits": "1059690906", "repr": "0.6625"},
+      "knockbackVertical": {"bits": "1035489772", "repr": "0.09"},
+      "explosion": null,
+      "contactDamage": null,
+      "modifiers": [
+        {"attribute": "minecraft:knockback_resistance", "id": "minecom:fast_sliding_add_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "4602678819172646912", "repr": "0.5"}},
+        {"attribute": "minecraft:explosion_knockback_resistance", "id": "minecom:fast_sliding_add_explosion_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "4602678819172646912", "repr": "0.5"}},
+        {"attribute": "minecraft:bounciness", "id": "minecom:fast_sliding_add_bounciness", "operation": "ADD_VALUE", "amount": {"bits": "4591870180174331904", "repr": "0.10000000149011612"}},
+        {"attribute": "minecraft:friction_modifier", "id": "minecom:fast_sliding_mul_friction_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4616639978024206336", "repr": "-0.9499999992549419"}},
+        {"attribute": "minecraft:air_drag_modifier", "id": "minecom:fast_sliding_mul_air_drag_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4616279690045292544", "repr": "-0.9900000002235174"}}
+      ]
+    },
+    {
+      "tag": "slow_sliding",
+      "buoyant": false,
+      "knockbackHorizontal": {"bits": "1054028595", "repr": "0.4125"},
+      "knockbackVertical": {"bits": "1035489772", "repr": "0.09"},
+      "explosion": null,
+      "contactDamage": null,
+      "modifiers": [
+        {"attribute": "minecraft:knockback_resistance", "id": "minecom:slow_sliding_add_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "4605380979056443392", "repr": "0.800000011920929"}},
+        {"attribute": "minecraft:explosion_knockback_resistance", "id": "minecom:slow_sliding_add_explosion_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "4605380979056443392", "repr": "0.800000011920929"}},
+        {"attribute": "minecraft:bounciness", "id": "minecom:slow_sliding_add_bounciness", "operation": "ADD_VALUE", "amount": {"bits": "4591870180174331904", "repr": "0.10000000149011612"}},
+        {"attribute": "minecraft:friction_modifier", "id": "minecom:slow_sliding_mul_friction_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4616639978024206336", "repr": "-0.9499999992549419"}},
+        {"attribute": "minecraft:air_drag_modifier", "id": "minecom:slow_sliding_mul_air_drag_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4616279690045292544", "repr": "-0.9900000002235174"}}
+      ]
+    },
+    {
+      "tag": "sticky",
+      "buoyant": false,
+      "knockbackHorizontal": {"bits": "1054028595", "repr": "0.4125"},
+      "knockbackVertical": {"bits": "1035489772", "repr": "0.09"},
+      "explosion": null,
+      "contactDamage": null,
+      "modifiers": [
+        {"attribute": "minecraft:knockback_resistance", "id": "minecom:sticky_add_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4611686018427387904", "repr": "-2.0"}},
+        {"attribute": "minecraft:explosion_knockback_resistance", "id": "minecom:sticky_add_explosion_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4611686018427387904", "repr": "-2.0"}},
+        {"attribute": "minecraft:bounciness", "id": "minecom:sticky_add_bounciness", "operation": "ADD_VALUE", "amount": {"bits": "0", "repr": "0.0"}},
+        {"attribute": "minecraft:friction_modifier", "id": "minecom:sticky_mul_friction_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "4607182418800017408", "repr": "1.0"}},
+        {"attribute": "minecraft:air_drag_modifier", "id": "minecom:sticky_mul_air_drag_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4616279690045292544", "repr": "-0.9900000002235174"}}
+      ]
+    },
+    {
+      "tag": "high_resistance",
+      "buoyant": false,
+      "knockbackHorizontal": {"bits": "1054028595", "repr": "0.4125"},
+      "knockbackVertical": {"bits": "1035489772", "repr": "0.09"},
+      "explosion": null,
+      "contactDamage": null,
+      "modifiers": [
+        {"attribute": "minecraft:knockback_resistance", "id": "minecom:high_resistance_add_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "4604480258916220928", "repr": "0.699999988079071"}},
+        {"attribute": "minecraft:explosion_knockback_resistance", "id": "minecom:high_resistance_add_explosion_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "4604480258916220928", "repr": "0.699999988079071"}},
+        {"attribute": "minecraft:bounciness", "id": "minecom:high_resistance_add_bounciness", "operation": "ADD_VALUE", "amount": {"bits": "4596373779801702400", "repr": "0.20000000298023224"}},
+        {"attribute": "minecraft:friction_modifier", "id": "minecom:high_resistance_mul_friction_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "0", "repr": "0.0"}},
+        {"attribute": "minecraft:air_drag_modifier", "id": "minecom:high_resistance_mul_air_drag_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4616279690045292544", "repr": "-0.9900000002235174"}}
+      ]
+    },
+    {
+      "tag": "explosive",
+      "buoyant": true,
+      "knockbackHorizontal": {"bits": "1054028595", "repr": "0.4125"},
+      "knockbackVertical": {"bits": "1035489772", "repr": "0.09"},
+      "explosion": {"power": 3, "causesFire": false, "fuse": 120},
+      "contactDamage": null,
+      "modifiers": [
+        {"attribute": "minecraft:knockback_resistance", "id": "minecom:explosive_add_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4616189618054758400", "repr": "-1.0"}},
+        {"attribute": "minecraft:explosion_knockback_resistance", "id": "minecom:explosive_add_explosion_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4616189618054758400", "repr": "-1.0"}},
+        {"attribute": "minecraft:bounciness", "id": "minecom:explosive_add_bounciness", "operation": "ADD_VALUE", "amount": {"bits": "4602678819172646912", "repr": "0.5"}},
+        {"attribute": "minecraft:friction_modifier", "id": "minecom:explosive_mul_friction_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4618891777938554880", "repr": "-0.699999988079071"}},
+        {"attribute": "minecraft:air_drag_modifier", "id": "minecom:explosive_mul_air_drag_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4618891777938554880", "repr": "-0.699999988079071"}}
+      ]
+    },
+    {
+      "tag": "hot",
+      "buoyant": true,
+      "knockbackHorizontal": {"bits": "1054028595", "repr": "0.4125"},
+      "knockbackVertical": {"bits": "1035489772", "repr": "0.09"},
+      "explosion": null,
+      "contactDamage": {"damageType": "minecraft:sulfur_cube_hot", "amount": {"bits": "1065353216", "repr": "1.0"}, "attributeToSource": false},
+      "modifiers": [
+        {"attribute": "minecraft:knockback_resistance", "id": "minecom:hot_add_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4616189618054758400", "repr": "-1.0"}},
+        {"attribute": "minecraft:explosion_knockback_resistance", "id": "minecom:hot_add_explosion_knockback_resistance", "operation": "ADD_VALUE", "amount": {"bits": "-4616189618054758400", "repr": "-1.0"}},
+        {"attribute": "minecraft:bounciness", "id": "minecom:hot_add_bounciness", "operation": "ADD_VALUE", "amount": {"bits": "4602678819172646912", "repr": "0.5"}},
+        {"attribute": "minecraft:friction_modifier", "id": "minecom:hot_mul_friction_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4618891777938554880", "repr": "-0.699999988079071"}},
+        {"attribute": "minecraft:air_drag_modifier", "id": "minecom:hot_mul_air_drag_modifier", "operation": "ADD_MULTIPLIED_TOTAL", "amount": {"bits": "-4617090337993654272", "repr": "-0.8999999985098839"}}
+      ]
+    }
+  ]
+}

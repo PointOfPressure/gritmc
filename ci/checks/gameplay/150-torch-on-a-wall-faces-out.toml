@@ -1,0 +1,23 @@
+name = "torch-on-a-wall-faces-out"
+about = "a torch placed on the side of a block becomes a wall torch facing away from it — a different block from the item's own, chosen by the clicked face"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:torch"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "east"

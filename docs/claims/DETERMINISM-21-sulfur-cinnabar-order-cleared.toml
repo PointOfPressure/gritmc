@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 21
+slug   = "sulfur-cinnabar-order-cleared"
+title  = "The order-inverted row: `sulfur -> cinnabar` is ours, and the instrument is cleared (2026-08-10)"
+branch = "backfill"

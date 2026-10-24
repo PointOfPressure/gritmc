@@ -1,0 +1,51 @@
+name = "a-spawned-pig-syncs-its-movement-speed-a-tick-later"
+about = "one tick after a pig is put in the world it tells every player tracking it its movement speed, in a packet vanilla sends for a reason nothing else about the spawn shares — so this is the one thing about a fresh mob every recording agrees on, and the first mob packet a check can grade to the byte"
+observe = ["update_attributes"]
+settle_ms = 3000
+
+# WHY THIS PACKET AND NOT THE SPAWN ITSELF
+#
+# `080-spawn-egg-makes-a-mob` observes `add_entity` + `set_entity_data` and
+# can never `match`: the spawn yaw is `level.random.nextFloat() * 360` at
+# `EntityType.create:103` and the pig's sound variant is
+# `Registry.getRandom` at `Pig.finalizeSpawn:34`, both from an unseeded
+# generator, so vanilla disagrees with itself 15/15 (gameplay-floor.toml).
+# `docs/cold-start/mob-tick-surface.md` measured every candidate projection
+# over sixteen recordings and found exactly one that is identical in all
+# 120 pairs: `{update_attributes}`.
+#
+# WHY VANILLA SENDS IT, read out of the jar rather than assumed:
+#
+#   AttributeMap.attributes starts EMPTY. `getValue(holder)` reads the
+#   supplier's base and creates nothing; `getInstance(holder)` creates an
+#   instance and `replaceFrom` ends in `setDirty()`, which puts a syncable
+#   attribute into `attributesToSync`. `LivingEntity.<init>` reads
+#   `getMaxHealth()` through `getValue` (no instance). `Mob.finalizeSpawn`
+#   creates FOLLOW_RANGE — not syncable. So the pairing bundle carries NO
+#   `update_attributes`. The first `aiStep` runs `removeFrost()`, which is
+#   `getAttribute(MOVEMENT_SPEED)`: a syncable instance, created, dirty.
+#   The next tick's `ServerEntity.sendChanges` → `sendDirtyEntityData`
+#   (offset 204, BEFORE the update-interval gate) sends
+#   `ClientboundUpdateAttributesPacket(id, {movement_speed: 0.25, []})`.
+#
+# So the bytes are: varint id, 1, varint 26 (Registries.ATTRIBUTE
+# movement_speed), double 0.25, 0 modifiers. One attribute, so the
+# identity-hash walk order of the set cannot vary it. Each player tracking
+# the pig gets one — both streams are observed.
+#
+# WHAT A SERVER THAT DOES NOT HAVE THIS LOOKS LIKE: `absent`. A server that
+# sent the attribute in the pairing bundle instead would still `match`
+# here — the check is order-blind across ticks — and that shape is pinned
+# by `mob::attributes` unit tests rather than by this check.
+#
+# The rig is `080`'s: a pig egg on the ground beside the actor, +x so the
+# actor's own box is not in the way.
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

@@ -1,0 +1,6660 @@
+{
+ "attributes": {
+  "LivingEntity": {
+   "createLivingAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": null
+     },
+     {
+      "attribute": "KNOCKBACK_RESISTANCE",
+      "value": null
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": null
+     },
+     {
+      "attribute": "ARMOR",
+      "value": null
+     },
+     {
+      "attribute": "ARMOR_TOUGHNESS",
+      "value": null
+     },
+     {
+      "attribute": "MAX_ABSORPTION",
+      "value": null
+     },
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": null
+     },
+     {
+      "attribute": "SCALE",
+      "value": null
+     },
+     {
+      "attribute": "GRAVITY",
+      "value": null
+     },
+     {
+      "attribute": "SAFE_FALL_DISTANCE",
+      "value": null
+     },
+     {
+      "attribute": "FALL_DAMAGE_MULTIPLIER",
+      "value": null
+     },
+     {
+      "attribute": "JUMP_STRENGTH",
+      "value": null
+     },
+     {
+      "attribute": "ENTITY_INTERACTION_RANGE",
+      "value": null
+     },
+     {
+      "attribute": "OXYGEN_BONUS",
+      "value": null
+     },
+     {
+      "attribute": "BURNING_TIME",
+      "value": null
+     },
+     {
+      "attribute": "EXPLOSION_KNOCKBACK_RESISTANCE",
+      "value": null
+     },
+     {
+      "attribute": "WATER_MOVEMENT_EFFICIENCY",
+      "value": null
+     },
+     {
+      "attribute": "MOVEMENT_EFFICIENCY",
+      "value": null
+     },
+     {
+      "attribute": "ATTACK_KNOCKBACK",
+      "value": null
+     },
+     {
+      "attribute": "CAMERA_DISTANCE",
+      "value": null
+     },
+     {
+      "attribute": "WAYPOINT_TRANSMIT_RANGE",
+      "value": null
+     },
+     {
+      "attribute": "BOUNCINESS",
+      "value": null
+     },
+     {
+      "attribute": "AIR_DRAG_MODIFIER",
+      "value": null
+     },
+     {
+      "attribute": "FRICTION_MODIFIER",
+      "value": null
+     },
+     {
+      "attribute": "NAME_TAG_DISTANCE",
+      "value": null
+     },
+     {
+      "attribute": "BELOW_NAME_DISTANCE",
+      "value": null
+     }
+    ],
+    "base": null
+   }
+  },
+  "Mob": {
+   "createMobAttributes": {
+    "adds": [
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 16.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/LivingEntity.createLivingAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "ambient/Bat": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 6.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/Animal": {
+   "createAnimalAttributes": {
+    "adds": [
+     {
+      "attribute": "TEMPT_RANGE",
+      "value": "double 10.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/allay/Allay": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 20.0d"
+     },
+     {
+      "attribute": "FLYING_SPEED",
+      "value": "double 0.10000000149011612d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.10000000149011612d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 2.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/armadillo/Armadillo": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 12.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.14d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/axolotl/Axolotl": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 14.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 1.0d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 2.0d"
+     },
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": "double 1.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/bee/Bee": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 10.0d"
+     },
+     {
+      "attribute": "FLYING_SPEED",
+      "value": "double 0.6000000238418579d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.30000001192092896d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 2.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/camel/Camel": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 32.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.09000000357627869d"
+     },
+     {
+      "attribute": "JUMP_STRENGTH",
+      "value": "double 0.41999998688697815d"
+     },
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": "double 1.5d"
+     }
+    ],
+    "base": "createBaseHorseAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/chicken/Chicken": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 4.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.25d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/cow/AbstractCow": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 10.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.20000000298023224d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/dolphin/Dolphin": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 10.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 1.2000000476837158d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 3.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/equine/AbstractChestedHorse": {
+   "createBaseChestedHorseAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.17499999701976776d"
+     },
+     {
+      "attribute": "JUMP_STRENGTH",
+      "value": "double 0.5d"
+     }
+    ],
+    "base": "createBaseHorseAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/equine/AbstractHorse": {
+   "createBaseHorseAttributes": {
+    "adds": [
+     {
+      "attribute": "JUMP_STRENGTH",
+      "value": "double 0.7d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 53.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.22499999403953552d"
+     },
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": "double 1.0d"
+     },
+     {
+      "attribute": "SAFE_FALL_DISTANCE",
+      "value": "double 6.0d"
+     },
+     {
+      "attribute": "FALL_DAMAGE_MULTIPLIER",
+      "value": "double 0.5d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/equine/Llama": {
+   "createAttributes": {
+    "adds": [],
+    "base": "createBaseChestedHorseAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/equine/SkeletonHorse": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 15.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.20000000298023224d"
+     }
+    ],
+    "base": "createBaseHorseAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/equine/ZombieHorse": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 25.0d"
+     }
+    ],
+    "base": "createBaseHorseAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/feline/Cat": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 10.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.30000001192092896d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 3.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/feline/Ocelot": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 10.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.30000001192092896d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 3.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/fish/AbstractFish": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 3.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/fox/Fox": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.30000001192092896d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 10.0d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 2.0d"
+     },
+     {
+      "attribute": "SAFE_FALL_DISTANCE",
+      "value": "double 5.0d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 32.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/frog/Frog": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 1.0d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 10.0d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 10.0d"
+     },
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": "double 1.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/frog/Tadpole": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 1.0d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 6.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/goat/Goat": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 10.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.20000000298023224d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 2.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/golem/CopperGolem": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.20000000298023224d"
+     },
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": "double 1.0d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 12.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/golem/IronGolem": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 100.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.25d"
+     },
+     {
+      "attribute": "KNOCKBACK_RESISTANCE",
+      "value": "double 1.0d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 15.0d"
+     },
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": "double 1.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/golem/SnowGolem": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 4.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.20000000298023224d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/happyghast/HappyGhast": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 20.0d"
+     },
+     {
+      "attribute": "TEMPT_RANGE",
+      "value": "double 16.0d"
+     },
+     {
+      "attribute": "FLYING_SPEED",
+      "value": "double 0.05d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.05d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 16.0d"
+     },
+     {
+      "attribute": "CAMERA_DISTANCE",
+      "value": "double 8.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/nautilus/AbstractNautilus": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 15.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 1.0d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 3.0d"
+     },
+     {
+      "attribute": "KNOCKBACK_RESISTANCE",
+      "value": "double 0.30000001192092896d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/nautilus/ZombieNautilus": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 1.100000023841858d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/nautilus/AbstractNautilus.createAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/panda/Panda": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.15000000596046448d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 6.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/parrot/Parrot": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 6.0d"
+     },
+     {
+      "attribute": "FLYING_SPEED",
+      "value": "double 0.4000000059604645d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.20000000298023224d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 3.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/pig/Pig": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 10.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.25d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/polarbear/PolarBear": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 30.0d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 20.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.25d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 6.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/rabbit/Rabbit": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 3.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.30000001192092896d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 3.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/sheep/Sheep": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 8.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.23000000417232513d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/sniffer/Sniffer": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.10000000149011612d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 14.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/squid/Squid": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 10.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/turtle/Turtle": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 30.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.25d"
+     },
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": "double 1.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "animal/wolf/Wolf": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.30000001192092896d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 8.0d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 4.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "boss/enderdragon/EnderDragon": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 200.0d"
+     },
+     {
+      "attribute": "CAMERA_DISTANCE",
+      "value": "double 16.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "boss/wither/WitherBoss": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 300.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.6000000238418579d"
+     },
+     {
+      "attribute": "FLYING_SPEED",
+      "value": "double 0.6000000238418579d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 40.0d"
+     },
+     {
+      "attribute": "ARMOR",
+      "value": "double 4.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "decoration/ArmorStand": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": "double 0.0d"
+     }
+    ],
+    "base": "createLivingAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Blaze": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 6.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.23000000417232513d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 48.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Creeper": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.25d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/ElderGuardian": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.30000001192092896d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 8.0d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 80.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Guardian.createAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/EnderMan": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 40.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.30000001192092896d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 7.0d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 64.0d"
+     },
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": "double 1.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Endermite": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 8.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.25d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 2.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Ghast": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 10.0d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 100.0d"
+     },
+     {
+      "attribute": "CAMERA_DISTANCE",
+      "value": "double 8.0d"
+     },
+     {
+      "attribute": "FLYING_SPEED",
+      "value": "double 0.06d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Giant": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 100.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.5d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 50.0d"
+     },
+     {
+      "attribute": "CAMERA_DISTANCE",
+      "value": "double 16.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Guardian": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 6.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.5d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 30.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Monster": {
+   "createMonsterAttributes": {
+    "adds": [
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": null
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Ravager": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 100.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.3d"
+     },
+     {
+      "attribute": "KNOCKBACK_RESISTANCE",
+      "value": "double 0.75d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 12.0d"
+     },
+     {
+      "attribute": "ATTACK_KNOCKBACK",
+      "value": "double 1.5d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 32.0d"
+     },
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": "double 1.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Shulker": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 30.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Silverfish": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 8.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.25d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 1.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Strider": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.17499999701976776d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/animal/Animal.createAnimalAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Vex": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 14.0d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 4.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Witch": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 26.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.25d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/Zoglin": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 40.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.30000001192092896d"
+     },
+     {
+      "attribute": "KNOCKBACK_RESISTANCE",
+      "value": "double 0.6000000238418579d"
+     },
+     {
+      "attribute": "ATTACK_KNOCKBACK",
+      "value": "double 1.0d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 6.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/breeze/Breeze": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.6299999952316284d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 30.0d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 24.0d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 3.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/creaking/Creaking": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 1.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.4000000059604645d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 3.0d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 32.0d"
+     },
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": "double 1.0625d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/cubemob/MagmaCube": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.20000000298023224d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/cubemob/SulfurCube": {
+   "createSulfurCubeAttributes": {
+    "adds": [
+     {
+      "attribute": "TEMPT_RANGE",
+      "value": "double 8.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/hoglin/Hoglin": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 40.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.30000001192092896d"
+     },
+     {
+      "attribute": "KNOCKBACK_RESISTANCE",
+      "value": "double 0.6000000238418579d"
+     },
+     {
+      "attribute": "ATTACK_KNOCKBACK",
+      "value": "double 1.0d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 6.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/illager/Evoker": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.5d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 12.0d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 24.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/illager/Illusioner": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.5d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 18.0d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 32.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/illager/Pillager": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.3499999940395355d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 24.0d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 5.0d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 32.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/illager/Vindicator": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.3499999940395355d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 12.0d"
+     },
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 24.0d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 5.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/piglin/Piglin": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 16.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.3499999940395355d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 5.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/piglin/PiglinBrute": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 50.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.3499999940395355d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 7.0d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 12.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/skeleton/AbstractSkeleton": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.25d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/skeleton/Bogged": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 16.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/skeleton/AbstractSkeleton.createAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/skeleton/Parched": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 16.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/skeleton/AbstractSkeleton.createAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/spider/CaveSpider": {
+   "createCaveSpider": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 12.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/spider/Spider.createAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/spider/Spider": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 16.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.30000001192092896d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/warden/Warden": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MAX_HEALTH",
+      "value": "double 500.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.30000001192092896d"
+     },
+     {
+      "attribute": "KNOCKBACK_RESISTANCE",
+      "value": "double 1.0d"
+     },
+     {
+      "attribute": "ATTACK_KNOCKBACK",
+      "value": "double 1.5d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 30.0d"
+     },
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 24.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/zombie/Drowned": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "STEP_HEIGHT",
+      "value": "double 1.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/zombie/Zombie.createAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/zombie/Zombie": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "FOLLOW_RANGE",
+      "value": "double 35.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.23000000417232513d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 3.0d"
+     },
+     {
+      "attribute": "ARMOR",
+      "value": "double 2.0d"
+     },
+     {
+      "attribute": "SPAWN_REINFORCEMENTS_CHANCE",
+      "value": null
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/Monster.createMonsterAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "monster/zombie/ZombifiedPiglin": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "SPAWN_REINFORCEMENTS_CHANCE",
+      "value": "double 0.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.23000000417232513d"
+     },
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 5.0d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/monster/zombie/Zombie.createAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "npc/villager/Villager": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.5d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/Mob.createMobAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  },
+  "player/Player": {
+   "createAttributes": {
+    "adds": [
+     {
+      "attribute": "ATTACK_DAMAGE",
+      "value": "double 1.0d"
+     },
+     {
+      "attribute": "MOVEMENT_SPEED",
+      "value": "double 0.10000000149011612d"
+     },
+     {
+      "attribute": "ATTACK_SPEED",
+      "value": null
+     },
+     {
+      "attribute": "LUCK",
+      "value": null
+     },
+     {
+      "attribute": "BLOCK_INTERACTION_RANGE",
+      "value": null
+     },
+     {
+      "attribute": "BLOCK_BREAK_SPEED",
+      "value": null
+     },
+     {
+      "attribute": "SUBMERGED_MINING_SPEED",
+      "value": null
+     },
+     {
+      "attribute": "SNEAKING_SPEED",
+      "value": null
+     },
+     {
+      "attribute": "MINING_EFFICIENCY",
+      "value": null
+     },
+     {
+      "attribute": "SWEEPING_DAMAGE_RATIO",
+      "value": null
+     },
+     {
+      "attribute": "WAYPOINT_TRANSMIT_RANGE",
+      "value": "double 6.0E7d"
+     },
+     {
+      "attribute": "WAYPOINT_RECEIVE_RANGE",
+      "value": "double 6.0E7d"
+     }
+    ],
+    "base": "net/minecraft/world/entity/LivingEntity.createLivingAttributes:()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;"
+   }
+  }
+ },
+ "note": "generated by ci/gen-mob-goal-tables.py; tokens are verbatim bytecode operands in push order",
+ "register_goals": {
+  "Mob": [],
+  "animal/bee/Bee": [
+   {
+    "args": [
+     "this",
+     "this",
+     "double 1.399999976158142d",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/animal/bee/Bee$BeeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/bee/Bee;Lnet/minecraft/world/entity/PathfinderMob;DZ)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/bee/Bee$BeeEnterHiveGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/bee/Bee;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d",
+     "lambda#0:test:()Ljava/util/function/Predicate;",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DLjava/util/function/Predicate;Z)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/bee/Bee$ValidateHiveGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/bee/Bee;)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/bee/Bee$ValidateFlowerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/bee/Bee;)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/bee/Bee$BeePollinateGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/bee/Bee;)V",
+    "field": "beePollinateGoal",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowParentGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/bee/Bee$BeeLocateHiveGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/bee/Bee;)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/bee/Bee$BeeGoToHiveGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/bee/Bee;)V",
+    "field": "goToHiveGoal",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/bee/Bee$BeeGoToKnownFlowerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/bee/Bee;)V",
+    "field": "goToKnownFlowerGoal",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/bee/Bee$BeeGrowCropGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/bee/Bee;)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/bee/Bee$BeeWanderGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/bee/Bee;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this"
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/animal/bee/Bee$BeeHurtByOtherGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/animal/bee/Bee$BeeHurtByOtherGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/bee/Bee;Lnet/minecraft/world/entity/animal/bee/Bee;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/bee/Bee$BeeBecomeAngryTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/bee/Bee;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/ResetUniversalAngerTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   }
+  ],
+  "animal/camel/Camel": [],
+  "animal/chicken/Chicken": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.4d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/PanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "lambda#0:test:()Ljava/util/function/Predicate;",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DLjava/util/function/Predicate;Z)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.1d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowParentGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 6.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/cow/AbstractCow": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 2.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/PanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d",
+     "lambda#0:test:()Ljava/util/function/Predicate;",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DLjava/util/function/Predicate;Z)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowParentGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 6.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/dolphin/Dolphin": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreathAirGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TryFindWaterGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/dolphin/Dolphin$DolphinSwimToTreasureGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/dolphin/Dolphin;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 4.0d"
+    ],
+    "class": "net/minecraft/world/entity/animal/dolphin/Dolphin$DolphinSwimWithPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/dolphin/Dolphin;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "10"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomSwimmingGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DI)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 6.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "10"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/DolphinJumpGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/dolphin/Dolphin;I)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.2000000476837158d",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MeleeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DZ)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/dolphin/Dolphin$PlayWithItemsGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/dolphin/Dolphin;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/vehicle/boat/AbstractBoat"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowPlayerRiddenEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/nautilus/AbstractNautilus"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowPlayerRiddenEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/Guardian",
+     "float 8.0f",
+     "double 1.0d",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": [
+       "class net/minecraft/world/entity/monster/Guardian"
+      ]
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   }
+  ],
+  "animal/equine/AbstractHorse": [
+   {
+    "args": [
+     "this",
+     "double 1.2d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RunAroundLikeCrazyGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/equine/AbstractHorse;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "class net/minecraft/world/entity/animal/equine/AbstractHorse"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;DLjava/lang/Class;)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowParentGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.7d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 6.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomStandGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/equine/AbstractHorse;)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/equine/Llama": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.2d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RunAroundLikeCrazyGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/equine/AbstractHorse;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 2.0999999046325684d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LlamaFollowCaravanGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/equine/Llama;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d",
+     "40",
+     "float 20.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RangedAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/RangedAttackMob;DIF)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.2d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/PanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d",
+     "lambda#0:test:()Ljava/util/function/Predicate;",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DLjava/util/function/Predicate;Z)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowParentGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.7d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 6.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/equine/Llama$LlamaHurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/equine/Llama;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/equine/Llama$LlamaAttackWolfGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/equine/Llama;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   }
+  ],
+  "animal/equine/TraderLlama": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/animal/equine/Llama.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this",
+     "double 2.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/PanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/equine/TraderLlama$TraderLlamaDefendWanderingTraderGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/equine/Llama;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/zombie/Zombie",
+     "1",
+     "lambda#0:test:()Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;ZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/illager/AbstractIllager",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   }
+  ],
+  "animal/feline/Cat": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.5d"
+    ],
+    "class": "net/minecraft/world/entity/TamableAnimal$TamableAnimalPanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/SitWhenOrderedToGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/feline/Cat$CatRelaxOnOwnerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/feline/Cat;)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.6d",
+     "lambda#0:test:()Ljava/util/function/Predicate;",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/animal/feline/Cat$CatTemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/feline/Cat;DLjava/util/function/Predicate;Z)V",
+    "field": "temptGoal",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.1d",
+     "8"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/CatLieOnBedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/feline/Cat;DI)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "float 10.0f",
+     "float 5.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowOwnerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;DFF)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.8d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/CatSitOnBlockGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/feline/Cat;D)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "float 0.3f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LeapAtTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;F)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/OcelotAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.8d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.8d",
+     "float 1.0000001E-5f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DF)V",
+    "priority": 11,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 10.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 12,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/rabbit/Rabbit",
+     "0",
+     "null"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NonTameRandomTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;Ljava/lang/Class;ZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/turtle/Turtle",
+     "0",
+     "getstatic net/minecraft/world/entity/animal/turtle/Turtle.BABY_ON_LAND_SELECTOR"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NonTameRandomTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;Ljava/lang/Class;ZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   }
+  ],
+  "animal/feline/Ocelot": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.6d",
+     "lambda#0:test:()Ljava/util/function/Predicate;",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/animal/feline/Ocelot$OcelotTemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/feline/Ocelot;DLjava/util/function/Predicate;Z)V",
+    "field": "temptGoal",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "float 0.3f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LeapAtTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;F)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/OcelotAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.8d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.8d",
+     "float 1.0000001E-5f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DF)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 10.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 11,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/chicken/Chicken",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/turtle/Turtle",
+     "10",
+     "0",
+     "0",
+     "getstatic net/minecraft/world/entity/animal/turtle/Turtle.BABY_ON_LAND_SELECTOR"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;IZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   }
+  ],
+  "animal/fish/AbstractFish": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/animal/fish/WaterAnimal.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/PanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f",
+     "double 1.6d",
+     "double 1.4d",
+     "getstatic net/minecraft/world/entity/EntitySelector.NO_SPECTATORS"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDDLjava/util/function/Predicate;)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/fish/AbstractFish$FishSwimGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fish/AbstractFish;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/fish/AbstractSchoolingFish": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/animal/fish/AbstractFish.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowFlockLeaderGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fish/AbstractSchoolingFish;)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/fish/Pufferfish": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/animal/fish/AbstractFish.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/fish/Pufferfish$PufferfishPuffGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fish/Pufferfish;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/fox/Fox": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$FoxFloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this call level:()Lnet/minecraft/world/level/Level;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/ClimbOnTopOfPowderSnowGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Lnet/minecraft/world/level/Level;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$FaceplantGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 2.2d"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$FoxPanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$FoxBreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;D)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 16.0f",
+     "double 1.6d",
+     "double 1.4d",
+     "this lambda#2:test:(Lnet/minecraft/world/entity/animal/fox/Fox;)Ljava/util/function/Predicate;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDDLjava/util/function/Predicate;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/wolf/Wolf",
+     "float 8.0f",
+     "double 1.6d",
+     "double 1.4d",
+     "this lambda#3:test:(Lnet/minecraft/world/entity/animal/fox/Fox;)Ljava/util/function/Predicate;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDDLjava/util/function/Predicate;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/polarbear/PolarBear",
+     "float 8.0f",
+     "double 1.6d",
+     "double 1.4d",
+     "this lambda#4:test:(Lnet/minecraft/world/entity/animal/fox/Fox;)Ljava/util/function/Predicate;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDDLjava/util/function/Predicate;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$StalkPreyGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$FoxPounceGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$SeekShelterGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;D)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.2000000476837158d",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$FoxMeleeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;DZ)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$SleepGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$FoxFollowParentGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;D)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "32",
+     "200"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$FoxStrollThroughVillageGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;II)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.2000000476837158d",
+     "12",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$FoxEatBerriesGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;DII)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "float 0.4f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LeapAtTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;F)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 11,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$FoxSearchForItemsGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;)V",
+    "priority": 11,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 24.0f"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$FoxLookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 12,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$PerchAndSearchGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;)V",
+    "priority": 13,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/LivingEntity",
+     "0",
+     "0",
+     "this lambda#5:test:(Lnet/minecraft/world/entity/animal/fox/Fox;)Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;"
+    ],
+    "class": "net/minecraft/world/entity/animal/fox/Fox$DefendTrustedTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/fox/Fox;Ljava/lang/Class;ZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   }
+  ],
+  "animal/golem/IronGolem": [
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MeleeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DZ)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.9d",
+     "float 32.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MoveTowardsTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DF)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.6d",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MoveBackToVillageGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DZ)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.6d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/GolemRandomStrollInVillageGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/OfferFlowerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/golem/IronGolem;)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 6.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/DefendVillageTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/golem/IronGolem;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": []
+     }
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "10",
+     "1",
+     "0",
+     "this lambda#0:test:(Lnet/minecraft/world/entity/animal/golem/IronGolem;)Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;IZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/Mob",
+     "5",
+     "0",
+     "0",
+     "lambda#1:test:()Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;IZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/ResetUniversalAngerTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Z)V",
+    "priority": 4,
+    "selector": "targetSelector"
+   }
+  ],
+  "animal/golem/SnowGolem": [
+   {
+    "args": [
+     "this",
+     "double 1.25d",
+     "20",
+     "float 10.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RangedAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/RangedAttackMob;DIF)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "float 1.0000001E-5f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DF)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 6.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/Mob",
+     "10",
+     "1",
+     "0",
+     "lambda#0:test:()Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;IZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   }
+  ],
+  "animal/happyghast/HappyGhast": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/happyghast/HappyGhast$HappyGhastFloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/happyghast/HappyGhast;)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "this lambda#1:test:(Lnet/minecraft/world/entity/animal/happyghast/HappyGhast;)Ljava/util/function/Predicate;",
+     "0",
+     "double 7.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TemptGoal$ForNonPathfinders",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;DLjava/util/function/Predicate;ZD)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "16"
+    ],
+    "class": "net/minecraft/world/entity/monster/Ghast$RandomFloatAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;I)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/panda/Panda": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 2.0d"
+    ],
+    "class": "net/minecraft/world/entity/animal/panda/Panda$PandaPanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/panda/Panda;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/animal/panda/Panda$PandaBreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/panda/Panda;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.2000000476837158d",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/animal/panda/Panda$PandaAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/panda/Panda;DZ)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "lambda#0:test:()Ljava/util/function/Predicate;",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DLjava/util/function/Predicate;Z)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f",
+     "double 2.0d",
+     "double 2.0d"
+    ],
+    "class": "net/minecraft/world/entity/animal/panda/Panda$PandaAvoidGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/panda/Panda;Ljava/lang/Class;FDD)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/Monster",
+     "float 4.0f",
+     "double 2.0d",
+     "double 2.0d"
+    ],
+    "class": "net/minecraft/world/entity/animal/panda/Panda$PandaAvoidGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/panda/Panda;Ljava/lang/Class;FDD)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/panda/Panda$PandaSitGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/panda/Panda;)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/panda/Panda$PandaLieOnBackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/panda/Panda;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/panda/Panda$PandaSneezeGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/panda/Panda;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 6.0f"
+    ],
+    "class": "net/minecraft/world/entity/animal/panda/Panda$PandaLookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/panda/Panda;Ljava/lang/Class;F)V",
+    "field": "lookAtPlayerGoal",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/panda/Panda$PandaRollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/panda/Panda;)V",
+    "priority": 12,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowParentGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 13,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 14,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": []
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/animal/panda/Panda$PandaHurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/animal/panda/Panda$PandaHurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/panda/Panda;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   }
+  ],
+  "animal/parrot/Parrot": [
+   {
+    "args": [
+     "this",
+     "double 1.25d"
+    ],
+    "class": "net/minecraft/world/entity/TamableAnimal$TamableAnimalPanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;D)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/SitWhenOrderedToGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "float 5.0f",
+     "float 1.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowOwnerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;DFF)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/animal/parrot/Parrot$ParrotWanderGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LandOnOwnersShoulderGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/parrot/ShoulderRidingEntity;)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "float 3.0f",
+     "float 7.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowMobGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;DFF)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/pig/Pig": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/PanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.2d",
+     "lambda#0:test:()Ljava/util/function/Predicate;",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DLjava/util/function/Predicate;Z)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.2d",
+     "lambda#1:test:()Ljava/util/function/Predicate;",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DLjava/util/function/Predicate;Z)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.1d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowParentGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 6.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/polarbear/PolarBear": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/animal/Animal.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/polarbear/PolarBear$PolarBearMeleeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/polarbear/PolarBear;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 2.0d",
+     "lambda#0:apply:()Ljava/util/function/Function;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/PanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DLjava/util/function/Function;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowParentGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 6.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/polarbear/PolarBear$PolarBearHurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/polarbear/PolarBear;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/polarbear/PolarBear$PolarBearAttackPlayersGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/polarbear/PolarBear;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "10",
+     "1",
+     "0",
+     "this lambda#1:test:(Lnet/minecraft/world/entity/animal/polarbear/PolarBear;)Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;IZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/fox/Fox",
+     "10",
+     "1",
+     "1",
+     "this lambda#2:test:(Lnet/minecraft/world/entity/animal/polarbear/PolarBear;)Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;IZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 4,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/ResetUniversalAngerTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Z)V",
+    "priority": 5,
+    "selector": "targetSelector"
+   }
+  ],
+  "animal/rabbit/Rabbit": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this call level:()Lnet/minecraft/world/level/Level;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/ClimbOnTopOfPowderSnowGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Lnet/minecraft/world/level/Level;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 2.2d"
+    ],
+    "class": "net/minecraft/world/entity/animal/rabbit/Rabbit$RabbitPanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/rabbit/Rabbit;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.8d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "lambda#0:test:()Ljava/util/function/Predicate;",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DLjava/util/function/Predicate;Z)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f",
+     "double 2.2d",
+     "double 2.2d"
+    ],
+    "class": "net/minecraft/world/entity/animal/rabbit/Rabbit$RabbitAvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/rabbit/Rabbit;Ljava/lang/Class;FDD)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/wolf/Wolf",
+     "float 10.0f",
+     "double 2.2d",
+     "double 2.2d"
+    ],
+    "class": "net/minecraft/world/entity/animal/rabbit/Rabbit$RabbitAvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/rabbit/Rabbit;Ljava/lang/Class;FDD)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/Monster",
+     "float 4.0f",
+     "double 2.2d",
+     "double 2.2d"
+    ],
+    "class": "net/minecraft/world/entity/animal/rabbit/Rabbit$RabbitAvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/rabbit/Rabbit;Ljava/lang/Class;FDD)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/rabbit/Rabbit$RaidGardenGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/rabbit/Rabbit;)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.6d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 10.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 11,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/sheep/Sheep": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.25d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/PanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.1d",
+     "lambda#0:test:()Ljava/util/function/Predicate;",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DLjava/util/function/Predicate;Z)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.1d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowParentGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/EatBlockGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "field": "eatBlockGoal",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 6.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/squid/Squid": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/squid/Squid$SquidRandomMovementGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/squid/Squid;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/animal/squid/Squid$SquidFleeGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/squid/Squid;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/turtle/Turtle": [
+   {
+    "args": [
+     "this",
+     "double 1.2d"
+    ],
+    "class": "net/minecraft/world/entity/animal/turtle/Turtle$TurtlePanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/turtle/Turtle;D)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/animal/turtle/Turtle$TurtleBreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/turtle/Turtle;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/animal/turtle/Turtle$TurtleLayEggGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/turtle/Turtle;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.1d",
+     "lambda#0:test:()Ljava/util/function/Predicate;",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DLjava/util/function/Predicate;Z)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/animal/turtle/Turtle$TurtleGoToWaterGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/turtle/Turtle;D)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/animal/turtle/Turtle$TurtleGoHomeGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/turtle/Turtle;D)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/animal/turtle/Turtle$TurtleTravelGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/turtle/Turtle;D)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "100"
+    ],
+    "class": "net/minecraft/world/entity/animal/turtle/Turtle$TurtleRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/turtle/Turtle;DI)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   }
+  ],
+  "animal/wolf/Wolf": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.5d",
+     "getstatic net/minecraft/tags/DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES"
+    ],
+    "class": "net/minecraft/world/entity/TamableAnimal$TamableAnimalPanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;DLnet/minecraft/tags/TagKey;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/SitWhenOrderedToGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this",
+     "class net/minecraft/world/entity/animal/equine/Llama",
+     "float 24.0f",
+     "double 1.5d",
+     "double 1.5d"
+    ],
+    "class": "net/minecraft/world/entity/animal/wolf/Wolf$WolfAvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/wolf/Wolf;Lnet/minecraft/world/entity/animal/wolf/Wolf;Ljava/lang/Class;FDD)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "float 0.4f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LeapAtTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;F)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MeleeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DZ)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "float 10.0f",
+     "float 2.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowOwnerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;DFF)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BegGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/wolf/Wolf;F)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/OwnerHurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/OwnerHurtTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": []
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "10",
+     "1",
+     "0",
+     "this lambda#0:test:(Lnet/minecraft/world/entity/animal/wolf/Wolf;)Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;IZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 4,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/Animal",
+     "0",
+     "getstatic PREY_SELECTOR"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NonTameRandomTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;Ljava/lang/Class;ZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 5,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/turtle/Turtle",
+     "0",
+     "getstatic net/minecraft/world/entity/animal/turtle/Turtle.BABY_ON_LAND_SELECTOR"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NonTameRandomTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/TamableAnimal;Ljava/lang/Class;ZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 6,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/skeleton/AbstractSkeleton",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 7,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/ResetUniversalAngerTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Z)V",
+    "priority": 8,
+    "selector": "targetSelector"
+   }
+  ],
+  "boss/wither/WitherBoss": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/boss/wither/WitherBoss$WitherDoNothingGoal",
+    "ctor": "(Lnet/minecraft/world/entity/boss/wither/WitherBoss;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "40",
+     "float 20.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RangedAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/RangedAttackMob;DIF)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomFlyingGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": []
+     }
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/LivingEntity",
+     "0",
+     "0",
+     "0",
+     "getstatic LIVING_ENTITY_SELECTOR"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;IZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/Blaze": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Blaze$BlazeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Blaze;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MoveTowardsRestrictionGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "float 0.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DF)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": []
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/Creeper": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/SwellGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Creeper;)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/feline/Ocelot",
+     "float 6.0f",
+     "double 1.0d",
+     "double 1.2d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/feline/Cat",
+     "float 6.0f",
+     "double 1.0d",
+     "double 1.2d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MeleeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DZ)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.8d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": []
+     }
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/EnderMan": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/EnderMan$EndermanFreezeWhenLookedAt",
+    "ctor": "(Lnet/minecraft/world/entity/monster/EnderMan;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MeleeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DZ)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "float 0.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DF)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/EnderMan$EndermanLeaveBlockGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/EnderMan;)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/EnderMan$EndermanTakeBlockGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/EnderMan;)V",
+    "priority": 11,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this lambda#0:test:(Lnet/minecraft/world/entity/monster/EnderMan;)Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;"
+    ],
+    "class": "net/minecraft/world/entity/monster/EnderMan$EndermanLookForPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/EnderMan;Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": []
+     }
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/Endermite",
+     "1",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;ZZ)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/ResetUniversalAngerTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Z)V",
+    "priority": 4,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/Endermite": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this call level:()Lnet/minecraft/world/level/Level;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/ClimbOnTopOfPowderSnowGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Lnet/minecraft/world/level/Level;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MeleeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DZ)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": []
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/Ghast": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Ghast$RandomFloatAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Ghast$GhastLookGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Ghast$GhastShootFireballGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Ghast;)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "10",
+     "1",
+     "0",
+     "this lambda#1:test:(Lnet/minecraft/world/entity/monster/Ghast;)Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;IZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/Guardian": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Guardian$GuardianAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Guardian;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MoveTowardsRestrictionGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "local": "1",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "80"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DI)V",
+    "field": "randomStrollGoal",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/Guardian",
+     "float 12.0f",
+     "float 0.01f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;FF)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/LivingEntity",
+     "10",
+     "1",
+     "0",
+     {
+      "args": [
+       "this"
+      ],
+      "class": "net/minecraft/world/entity/monster/Guardian$GuardianAttackSelector",
+      "ctor": "(Lnet/minecraft/world/entity/monster/Guardian;)V"
+     }
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;IZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/PatrollingMonster": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/monster/Monster.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this",
+     "double 0.7d",
+     "double 0.595d"
+    ],
+    "class": "net/minecraft/world/entity/monster/PatrollingMonster$LongDistancePatrolGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/PatrollingMonster;DD)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   }
+  ],
+  "monster/Phantom": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Phantom$PhantomAttackStrategyGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Phantom;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Phantom$PhantomSweepAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Phantom;)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Phantom$PhantomCircleAroundAnchorGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Phantom;)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Phantom$PhantomAttackPlayerTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Phantom;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/Ravager": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/raid/Raider.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MeleeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DZ)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.4d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 6.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/Mob",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": [
+       "class net/minecraft/world/entity/raid/Raider"
+      ]
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/npc/villager/AbstractVillager",
+     "1",
+     "lambda#0:test:()Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;ZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 4,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/golem/IronGolem",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 4,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/Shulker": [
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f",
+     "float 0.02f",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;FFZ)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Shulker$ShulkerAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Shulker;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Shulker$ShulkerPeekGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Shulker;)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": [
+       "this call java/lang/Object.getClass:()Ljava/lang/Class;"
+      ]
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Shulker$ShulkerNearestAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Shulker;Lnet/minecraft/world/entity/monster/Shulker;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Shulker$ShulkerDefenseAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Shulker;)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/Silverfish": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this call level:()Lnet/minecraft/world/level/Level;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/ClimbOnTopOfPowderSnowGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Lnet/minecraft/world/level/Level;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Silverfish$SilverfishWakeUpFriendsGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Silverfish;)V",
+    "field": "friendsGoal",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MeleeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DZ)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Silverfish$SilverfishMergeWithStoneGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Silverfish;)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": []
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/Strider": [
+   {
+    "args": [
+     "this",
+     "double 1.65d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/PanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/BreedGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.4d",
+     "lambda#0:test:()Ljava/util/function/Predicate;",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TemptGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DLjava/util/function/Predicate;Z)V",
+    "field": "temptGoal",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/monster/Strider$StriderGoToLavaGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Strider;D)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FollowParentGoal",
+    "ctor": "(Lnet/minecraft/world/entity/animal/Animal;D)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "60"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DI)V",
+    "priority": 7,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/Strider",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   }
+  ],
+  "monster/Vex": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/monster/Monster.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Vex$VexChargeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Vex;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Vex$VexRandomMoveGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Vex;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 3.0f",
+     "float 1.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;FF)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/Mob",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": [
+       "class net/minecraft/world/entity/raid/Raider"
+      ]
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/Vex$VexCopyOwnerTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Vex;Lnet/minecraft/world/entity/PathfinderMob;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/Witch": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/raid/Raider.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "60",
+     "float 10.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RangedAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/RangedAttackMob;DIF)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": [
+       "class net/minecraft/world/entity/raid/Raider"
+      ]
+     }
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/raid/Raider",
+     "1",
+     "this lambda#0:test:(Lnet/minecraft/world/entity/monster/Witch;)Lnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestHealableRaiderTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/raid/Raider;Ljava/lang/Class;ZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "field": "healRaidersGoal",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "10",
+     "1",
+     "0",
+     "null"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableWitchTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/raid/Raider;Ljava/lang/Class;IZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "field": "attackPlayersGoal",
+    "priority": 3,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/cubemob/AbstractCubeMob": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/cubemob/AbstractCubeMob$CubeMobFloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/cubemob/AbstractCubeMob;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/cubemob/AbstractCubeMob$CubeMobRandomDirectionGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/cubemob/AbstractCubeMob;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/cubemob/AbstractCubeMob$CubeMobKeepOnJumpingGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/cubemob/AbstractCubeMob;)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   }
+  ],
+  "monster/illager/AbstractIllager": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/raid/Raider.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   }
+  ],
+  "monster/illager/Evoker": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/monster/illager/SpellcasterIllager.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/illager/Evoker$EvokerCastingSpellGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/illager/Evoker;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f",
+     "double 0.6d",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/creaking/Creaking",
+     "float 8.0f",
+     "double 0.6d",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/illager/Evoker$EvokerSummonSpellGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/illager/Evoker;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/illager/Evoker$EvokerAttackSpellGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/illager/Evoker;)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/illager/Evoker$EvokerWololoSpellGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/illager/Evoker;)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.6d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 3.0f",
+     "float 1.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;FF)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/Mob",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": [
+       "class net/minecraft/world/entity/raid/Raider"
+      ]
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "1"
+    ],
+    "chain": [
+     "300",
+     "call net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal.setUnseenMemoryTicks:(I)Lnet/minecraft/world/entity/ai/goal/target/TargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/npc/villager/AbstractVillager",
+     "0"
+    ],
+    "chain": [
+     "300",
+     "call net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal.setUnseenMemoryTicks:(I)Lnet/minecraft/world/entity/ai/goal/target/TargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/golem/IronGolem",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/illager/Illusioner": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/monster/illager/SpellcasterIllager.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/illager/SpellcasterIllager$SpellcasterCastingSpellGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/illager/SpellcasterIllager;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/creaking/Creaking",
+     "float 8.0f",
+     "double 1.0d",
+     "double 1.2d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/illager/Illusioner$IllusionerMirrorSpellGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/illager/Illusioner;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/illager/Illusioner$IllusionerBlindnessSpellGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/illager/Illusioner;)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.5d",
+     "20",
+     "float 15.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RangedBowAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Monster;DIF)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.6d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 3.0f",
+     "float 1.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;FF)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/Mob",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": [
+       "class net/minecraft/world/entity/raid/Raider"
+      ]
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "1"
+    ],
+    "chain": [
+     "300",
+     "call net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal.setUnseenMemoryTicks:(I)Lnet/minecraft/world/entity/ai/goal/target/TargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/npc/villager/AbstractVillager",
+     "0"
+    ],
+    "chain": [
+     "300",
+     "call net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal.setUnseenMemoryTicks:(I)Lnet/minecraft/world/entity/ai/goal/target/TargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/golem/IronGolem",
+     "0"
+    ],
+    "chain": [
+     "300",
+     "call net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal.setUnseenMemoryTicks:(I)Lnet/minecraft/world/entity/ai/goal/target/TargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/illager/Pillager": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/monster/illager/AbstractIllager.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/creaking/Creaking",
+     "float 8.0f",
+     "double 1.0d",
+     "double 1.2d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "float 10.0f"
+    ],
+    "class": "net/minecraft/world/entity/raid/Raider$HoldGroundAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/illager/AbstractIllager;F)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RangedCrossbowAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/Monster;DF)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.6d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 15.0f",
+     "float 1.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;FF)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/Mob",
+     "float 15.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": [
+       "class net/minecraft/world/entity/raid/Raider"
+      ]
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/npc/villager/AbstractVillager",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/golem/IronGolem",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/illager/Vindicator": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/monster/illager/AbstractIllager.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/creaking/Creaking",
+     "float 8.0f",
+     "double 1.0d",
+     "double 1.2d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/illager/Vindicator$VindicatorBreakDoorGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/illager/AbstractIllager$RaiderOpenDoorGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/illager/AbstractIllager;Lnet/minecraft/world/entity/raid/Raider;)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "float 10.0f"
+    ],
+    "class": "net/minecraft/world/entity/raid/Raider$HoldGroundAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/illager/AbstractIllager;F)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d",
+     "0"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MeleeAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;DZ)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": [
+       "class net/minecraft/world/entity/raid/Raider"
+      ]
+     }
+    ],
+    "chain": [
+     "0",
+     "anewarray",
+     "call net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.setAlertOthers:([Ljava/lang/Class;)Lnet/minecraft/world/entity/ai/goal/target/HurtByTargetGoal;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/npc/villager/AbstractVillager",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/golem/IronGolem",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/illager/Vindicator$VindicatorJohnnyAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/illager/Vindicator;)V",
+    "priority": 4,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.6d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 3.0f",
+     "float 1.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;FF)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/Mob",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   }
+  ],
+  "monster/skeleton/AbstractSkeleton": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RestrictSunGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FleeSunGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/wolf/Wolf",
+     "float 6.0f",
+     "double 1.0d",
+     "double 1.2d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": []
+     }
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/golem/IronGolem",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/turtle/Turtle",
+     "10",
+     "1",
+     "0",
+     "getstatic net/minecraft/world/entity/animal/turtle/Turtle.BABY_ON_LAND_SELECTOR"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;IZZLnet/minecraft/world/entity/ai/targeting/TargetingConditions$Selector;)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/skeleton/WitherSkeleton": [
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/piglin/AbstractPiglin",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;Z)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/monster/skeleton/AbstractSkeleton.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   }
+  ],
+  "monster/spider/Spider": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/armadillo/Armadillo",
+     "float 6.0f",
+     "double 1.0d",
+     "double 1.2d",
+     "lambda#0:test:()Ljava/util/function/Predicate;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDDLjava/util/function/Predicate;)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "float 0.4f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LeapAtTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;F)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/monster/spider/Spider$SpiderAttackGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/spider/Spider;)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.8d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 6,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "array": []
+     }
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;[Ljava/lang/Class;)V",
+    "priority": 1,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player"
+    ],
+    "class": "net/minecraft/world/entity/monster/spider/Spider$SpiderTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/spider/Spider;Ljava/lang/Class;)V",
+    "priority": 2,
+    "selector": "targetSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/animal/golem/IronGolem"
+    ],
+    "class": "net/minecraft/world/entity/monster/spider/Spider$SpiderTargetGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/spider/Spider;Ljava/lang/Class;)V",
+    "priority": 3,
+    "selector": "targetSelector"
+   }
+  ],
+  "monster/zombie/Zombie": [
+   {
+    "args": [
+     "this",
+     "this",
+     "double 1.0d",
+     "3"
+    ],
+    "class": "net/minecraft/world/entity/monster/zombie/Zombie$ZombieAttackTurtleEggGoal",
+    "ctor": "(Lnet/minecraft/world/entity/monster/zombie/Zombie;Lnet/minecraft/world/entity/PathfinderMob;DI)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/RandomLookAroundGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   }
+  ],
+  "npc/wanderingtrader/WanderingTrader": [
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/FloatGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "getstatic net/minecraft/world/item/Items.POTION getstatic net/minecraft/world/item/alchemy/Potions.INVISIBILITY callstatic net/minecraft/world/item/alchemy/PotionContents.createItemStack:(Lnet/minecraft/world/item/Item;Lnet/minecraft/core/Holder;)Lnet/minecraft/world/item/ItemStack;",
+     "getstatic net/minecraft/sounds/SoundEvents.WANDERING_TRADER_DISAPPEARED",
+     "this lambda#0:test:(Lnet/minecraft/world/entity/npc/wanderingtrader/WanderingTrader;)Ljava/util/function/Predicate;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/UseItemGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/sounds/SoundEvent;Ljava/util/function/Predicate;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     {
+      "args": [
+       "getstatic net/minecraft/world/item/Items.MILK_BUCKET"
+      ],
+      "class": "net/minecraft/world/item/ItemStack",
+      "ctor": "(Lnet/minecraft/world/level/ItemLike;)V"
+     },
+     "getstatic net/minecraft/sounds/SoundEvents.WANDERING_TRADER_REAPPEARED",
+     "this lambda#1:test:(Lnet/minecraft/world/entity/npc/wanderingtrader/WanderingTrader;)Ljava/util/function/Predicate;"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/UseItemGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/sounds/SoundEvent;Ljava/util/function/Predicate;)V",
+    "priority": 0,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/TradeWithPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/npc/villager/AbstractVillager;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/zombie/Zombie",
+     "float 8.0f",
+     "double 0.5d",
+     "double 0.5d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/illager/Evoker",
+     "float 12.0f",
+     "double 0.5d",
+     "double 0.5d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/illager/Vindicator",
+     "float 8.0f",
+     "double 0.5d",
+     "double 0.5d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/Vex",
+     "float 8.0f",
+     "double 0.5d",
+     "double 0.5d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/illager/Pillager",
+     "float 15.0f",
+     "double 0.5d",
+     "double 0.5d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/illager/Illusioner",
+     "float 12.0f",
+     "double 0.5d",
+     "double 0.5d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/monster/Zoglin",
+     "float 10.0f",
+     "double 0.5d",
+     "double 0.5d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/AvoidEntityGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;FDD)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.5d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/PanicGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtTradingPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/npc/villager/AbstractVillager;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this",
+     "double 2.0d",
+     "double 0.35d"
+    ],
+    "class": "net/minecraft/world/entity/npc/wanderingtrader/WanderingTrader$WanderToPositionGoal",
+    "ctor": "(Lnet/minecraft/world/entity/npc/wanderingtrader/WanderingTrader;Lnet/minecraft/world/entity/npc/wanderingtrader/WanderingTrader;DD)V",
+    "priority": 2,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.35d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/MoveTowardsRestrictionGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 0.35d"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/WaterAvoidingRandomStrollGoal",
+    "ctor": "(Lnet/minecraft/world/entity/PathfinderMob;D)V",
+    "priority": 8,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/player/Player",
+     "float 3.0f",
+     "float 1.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/InteractGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;FF)V",
+    "priority": 9,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "class net/minecraft/world/entity/Mob",
+     "float 8.0f"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/LookAtPlayerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;F)V",
+    "priority": 10,
+    "selector": "goalSelector"
+   }
+  ],
+  "raid/Raider": [
+   {
+    "args": [],
+    "class": "super",
+    "ctor": "net/minecraft/world/entity/monster/PatrollingMonster.registerGoals:()V",
+    "priority": null,
+    "selector": null
+   },
+   {
+    "args": [
+     "this",
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/raid/Raider$ObtainRaidLeaderBannerGoal",
+    "ctor": "(Lnet/minecraft/world/entity/raid/Raider;Lnet/minecraft/world/entity/raid/Raider;)V",
+    "priority": 1,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/ai/goal/PathfindToRaidGoal",
+    "ctor": "(Lnet/minecraft/world/entity/raid/Raider;)V",
+    "priority": 3,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "double 1.0499999523162842d",
+     "1"
+    ],
+    "class": "net/minecraft/world/entity/raid/Raider$RaiderMoveThroughVillageGoal",
+    "ctor": "(Lnet/minecraft/world/entity/raid/Raider;DI)V",
+    "priority": 4,
+    "selector": "goalSelector"
+   },
+   {
+    "args": [
+     "this",
+     "this"
+    ],
+    "class": "net/minecraft/world/entity/raid/Raider$RaiderCelebration",
+    "ctor": "(Lnet/minecraft/world/entity/raid/Raider;Lnet/minecraft/world/entity/raid/Raider;)V",
+    "priority": 5,
+    "selector": "goalSelector"
+   }
+  ]
+ },
+ "source": "server-26.2.jar"
+}

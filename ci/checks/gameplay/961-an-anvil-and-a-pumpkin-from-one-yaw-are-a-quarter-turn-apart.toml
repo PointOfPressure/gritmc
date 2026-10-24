@@ -1,0 +1,122 @@
+name = "an-anvil-and-a-pumpkin-from-one-yaw-are-a-quarter-turn-apart"
+about = "an anvil takes `getHorizontalDirection().getClockWise()` and a carved pumpkin takes `getHorizontalDirection().getOpposite()`, so one unchanged yaw produces two facings a QUARTER turn apart inside a single property schema — which no shared rule, and no sign error, can reproduce"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 1500
+
+# WHAT THIS ADDS OVER `040`, WHICH LOOKS LIKE THE SAME CHECK AND IS NOT.
+#
+# `040-stairs-and-furnace-face-apart` places two blocks from one yaw and shows
+# them coming back opposite: `StairBlock` takes `getHorizontalDirection()`,
+# `AbstractFurnaceBlock` takes its opposite. That is a **reflection**, and the
+# two blocks are in two different property schemas — stairs are
+# `facing half shape waterlogged`, a furnace is `facing lit`. So `040` says
+# nothing about the schema below, and a 180-degree pair cannot distinguish a
+# server that has `getClockWise` backwards.
+#
+# This check is inside ONE schema — plain `facing`, four horizontal values,
+# **44 blocks**, the second-largest property-carrying signature in the
+# registry — and the two answers are a quarter turn apart in a named
+# direction, so handedness is part of what is being asked.
+#
+# THE SCHEMA IS SEEN AT EXACTLY ONE VALUE TODAY. Over the six recordings in
+# `~/rustmc-stackdec` (N=6, 2026-08-12) the only state of it the corpus ever caused vanilla to
+# broadcast is `wall_torch[facing=east]`, from `torch-on-a-wall-faces-out`.
+# `ci/block-schema-queue.py --unvaried` prints it. And a wall torch is the
+# easy half: its `facing` is the clicked face. The 44 blocks split into two
+# families with two different functions —
+#
+#   wall-attached  (wall_torch, soul_wall_torch, copper_wall_torch,
+#                   16 wall banners)          facing <- the clicked face
+#   yaw-derived    (3 anvils, carved_pumpkin, jack_o_lantern,
+#                   16 glazed_terracotta, loom, stonecutter,
+#                   2 attached stems)          facing <- the PLAYER
+#
+# — and the corpus has never observed the second family at all. A server that
+# implements this schema as "the clicked face", which is what the one existing
+# observation rewards, gets every one of the 24 yaw-derived blocks wrong.
+#
+# FROM THE JAR. `javap -p -c -constants`, `getStateForPlacement` in each:
+#
+#   AnvilBlock
+#      1: defaultBlockState()   4: getstatic FACING
+#      8: BlockPlaceContext.getHorizontalDirection()
+#     11: Direction.getClockWise()
+#     14: setValue
+#
+#   CarvedPumpkinBlock
+#      1: defaultBlockState()   4: getstatic FACING
+#      8: BlockPlaceContext.getHorizontalDirection()
+#     11: Direction.getOpposite()
+#     14: setValue
+#
+# **The anvil is not one example of the quarter-turn family, it is the whole
+# of it.** Every other yaw-derived member of this schema was read out of the
+# jar the same way and every one of them is `getOpposite()`:
+# `GlazedTerracottaBlock`, `StonecutterBlock`, `CarvedPumpkinBlock` (and
+# `jack_o_lantern` through it), `LoomBlock`. So the only blocks in these 44
+# that turn a quarter are `anvil`, `chipped_anvil` and `damaged_anvil`, and if
+# this check does not use one of them nothing in the corpus ever asks which
+# way round `getClockWise` goes. That is why the rig accepts a `FallingBlock`:
+# the anvil is placed on the superflat surface with solid ground beneath, so
+# `FallingBlock.tick` finds `isFree(below)` false and emits nothing, and
+# `settle_ms` is wide enough that a server which DID drop it would be caught
+# rather than missed.
+#
+# `Direction.getClockWise` is a `tableswitch` on the ordinal and the ordinals
+# are DOWN 0, UP 1, NORTH 2, SOUTH 3, WEST 4, EAST 5:
+#
+#     2 NORTH -> EAST     3 SOUTH -> WEST
+#     5 EAST  -> SOUTH    4 WEST  -> NORTH
+#
+# so it is clockwise seen from above, and `getClockWise` is NOT `getOpposite`
+# composed with anything the other three blocks in the corpus would reveal.
+#
+# THE ARITHMETIC OF THIS CHECK. The player looks `yaw = 0.0`, which is south.
+#
+#     anvil          SOUTH.getClockWise() = WEST
+#     carved_pumpkin SOUTH.getOpposite()  = NORTH
+#
+# Neither answer is SOUTH (the player's own direction), neither is UP (the
+# clicked face), and they are not each other's opposite. Four wrong models,
+# all of which pass every `facing` observation the corpus has today:
+#
+#   * facing <- the clicked face                  -> both `up`, or refused
+#   * facing <- getHorizontalDirection()          -> both `south`
+#   * facing <- getHorizontalDirection().opposite -> both `north`; passes the
+#     pumpkin and fails the anvil, which is the case a one-block check misses
+#   * getClockWise implemented counter-clockwise  -> anvil `east`, pumpkin
+#     `north`; the pumpkin still passes. This is the model `040` cannot see.
+#
+# THE LOOK IS SET ONCE, IN SETUP, AND IS NOT TOUCHED AGAIN. That is the whole
+# instrument: if the yaw moved between the two placements the pair would no
+# longer be a statement about the two rules.
+#
+# RIG AT z = +1 for the README's chunk-boundary rule. Both blocks sit on the
+# superflat surface; neither needs a pedestal and neither is a block entity,
+# so nothing here can reach the container counters `790` documents.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# Step 1 — the anvil. Lands at [1,0,1], must be `facing=west`.
+[[step]]
+do = "hold"
+item = "minecraft:anvil"
+
+[[step]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+# Step 2 — the carved pumpkin, same yaw, one block along x. Lands at [2,0,1],
+# must be `facing=north`.
+[[step]]
+do = "hold"
+item = "minecraft:carved_pumpkin"
+
+[[step]]
+do = "place"
+on = [2, -1, 1]
+face = "up"

@@ -1,0 +1,78 @@
+name = "container-click-swap-exchanges-a-hotbar-slot"
+about = "pressing a hotbar number key while hovering a chest slot swaps the two stacks directly, with no cursor step in between — javap -p -c -constants on AbstractContainerMenu.doClick's ContainerInput.SWAP arm (offsets 1080..1382) bounds-checks `button` to 0..8 or 40 (the offhand) as an InventoryMenu hotbar index, then calls Slot.setByPlayer on the chest slot and Inventory.setItem on the hotbar slot in the same click. What would make this fail: a server that treats every ContainerInput it does not specifically implement as PICKUP would need the cursor as an intermediate step and this single click would leave the chest slot unchanged, where vanilla answers with a stone-for-dirt exchange at slot 0 and the matching dirt-for-stone at slot 55."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot"]
+settle_ms = 1000
+
+# The chest lid repeats on a free-running 5-tick timer for as long as the chest
+# is open — `ContainerOpenersCounter.recheckOpeners` re-arms unconditionally
+# (offsets 178-186 call `Level.scheduleTick(pos, block, 5)`) and calls
+# `openerCountChanged` on both paths (offset 84's `if_icmpeq 167` lands on the
+# call itself), and `ChestBlockEntity.signalOpenCount` offsets 0-13 turn that
+# into `level.blockEvent(pos, block, 1, newCount)`. So the same `block_event`
+# goes out every 250 ms, forever.
+#
+# This check does not observe `block_event` and so never saw them declared.
+# It sees them under `strict`, where **how many arrived and which step each
+# was stamped with are set by where a free-running timer's edges fell against
+# this window** — measured on the 2026-08-07 07:10 subset pair, six of the
+# seven scenarios that leave a chest open disagreed on step attribution while
+# agreeing on the total.
+#
+# What stops being tested here: the repeat count and the step attribution of
+# `block_event`. What is still tested: that the lid opens at all, at the right
+# position, with the right viewer count, on the right stream — and the cadence
+# itself, in `rustmc_server::containers::tests::
+# the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`, which measures
+# the gap rather than the count.
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+# The SWAP target: a different item from the one being stored, so the
+# exchange is visible in the digest rather than being a same-item shuffle
+# that would compare equal to doing nothing.
+[[setup]]
+do = "hold"
+item = "minecraft:dirt"
+slot = 1
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 2
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# Store the stone the plain way, so the SWAP click below is the only one
+# whose branch is in question.
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0
+
+# THE MEASURED CLICK. `button = 1` names hotbar index 1, which holds the
+# dirt. Chest slot 0 (stone) and hotbar slot 1 (dirt, menu slot 55) trade
+# places in one packet.
+[[step]]
+do = "container_click"
+slot = 0
+button = 1
+input = "swap"

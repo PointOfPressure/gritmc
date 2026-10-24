@@ -1,0 +1,73 @@
+name = "picking-a-ripe-sweet-berry-bush-sets-it-back-to-age-one"
+about = "right-clicking a ripe sweet berry bush with anything but bone meal picks it: the bush goes back to age 1 — a write the use table cannot hold, because the whole body sits behind `instanceof ServerLevel` and the table's harness is not one"
+observe = ["block_update"]
+settle_ms = 1500
+
+# `SweetBerryBushBlock` (javap -p -c -constants, 26.2):
+#
+#   useItemOn       age != 3 && stack.is(BONE_MEAL) -> PASS
+#                   else super.useItemOn -> TRY_WITH_EMPTY_HAND
+#   useWithoutItem  age > 1 && level instanceof ServerLevel:
+#                     dropFromBlockInteractLootTable(HARVEST_SWEET_BERRY_BUSH)
+#                     playSound(null, pos, PICK_BERRIES, BLOCKS, 1.0, 0.8 + nextFloat() * 0.4)
+#                     setBlock(pos, AGE=1, 2)
+#                   return SUCCESS
+#
+# The drops and the pitch are draws on `Level.random`, unseeded, so the
+# check observes only the block: `age=1`, the same on every run. The stick
+# is any item that is not bone meal — it routes through
+# TRY_WITH_EMPTY_HAND exactly as an empty hand would.
+#
+# `ci/checks/server-level-gates.toml` records why the extracted row reads
+# `consumes: true, writes: []` and what this server did with it: ate the
+# click and left the bush ripe.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:sweet_berries"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:bone_meal"
+
+[[setup]]
+do = "place"
+on = [1, 0, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:bone_meal"
+
+[[setup]]
+do = "place"
+on = [1, 0, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:bone_meal"
+
+[[setup]]
+do = "place"
+on = [1, 0, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "up"

@@ -1,0 +1,30 @@
+name = "a-console-gamemode-tells-the-target-and-only-the-target"
+about = """
+`gamemode survival oracle` from the console reaches the target as
+`player_abilities`, `game_event` 3 with value 0, `player_abilities` again, and
+then a `gameMode.changed` chat line — and reaches the other player as none of
+those
+
+The order is `ServerPlayer.setGameMode`'s: `changeGameModeForPlayer` sends
+abilities (and broadcasts the tab-list update, which this harness does not
+decode), then the game event, then `onUpdateAbilities` sends abilities again.
+The chat line is `GameModeCommand.logGamemodeChange`'s other-source arm:
+`player.sendSystemMessage(gameMode.changed)` because the source — the console
+— is not the target, gated on `send_command_feedback`. A server that
+answered the target with `commands.gamemode.success.self`, or sent the line to
+everyone, or sent the abilities once, moves this check.
+
+Creative to survival flips every ability flag (13 to 0), so the abilities are
+a real measurement and not a repeat of the join's.
+
+Level 2, so it goes through the console. `gamemode creative oracle` puts the
+substrate back for every later scenario, which is measured creative.
+"""
+console_restore = ["gamemode creative oracle"]
+observe_from = "both"
+observe = ["player_abilities", "game_event", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "gamemode survival oracle"

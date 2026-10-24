@@ -1,0 +1,91 @@
+name = "a-candle-placed-on-a-candle-makes-it-two-candles"
+about = "right-clicking a candle with a candle does not place a second block — it rewrites the one already there — the corpus's only placement that reads the target block's state instead of replacing it"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 1500
+
+# WHAT THIS DISCRIMINATES, AND WHY IT IS NOT ANOTHER PLACEMENT CHECK.
+#
+# Every other `place` in this corpus writes a block into the space *next to*
+# the one clicked. This one writes into the clicked space, and which of the
+# two happens is decided by the clicked block's own state. A server whose
+# placement path is "resolve the face, offset the position, set the item's
+# default state" — which is the natural implementation and is what
+# `010-place-block` and `020-place-log-axis` both accept — puts a second
+# candle at [1,1,1] and leaves the first at `candles=1`. Vanilla puts nothing
+# at [1,1,1] and moves [1,0,1] to `candles=2`. The two answers differ in
+# position as well as in state, so this cannot be passed by accident.
+#
+# FROM THE JAR. `javap -p -c -constants` on
+# `net/minecraft/world/level/block/CandleBlock.class`, pinned server-26.2.jar.
+#
+#   canBeReplaced(BlockState state, BlockPlaceContext ctx)
+#      0: ctx.isSecondaryUseActive()          : ifne 40   <- sneaking: no
+#      7: ctx.getItemInHand().getItem()
+#     15: this.asItem() / 18: if_acmpne 40               <- other item: no
+#     21: state.getValue(CANDLES)
+#     34: iconst_4 / 35: if_icmpge 40                    <- already 4: no
+#     38: iconst_1 ireturn                               <- else: replace
+#     40: AbstractCandleBlock.canBeReplaced(state, ctx)
+#
+# Three guards, and this check clears all three: the scenario never sneaks,
+# holds the same item it clicked, and the target is at `candles=1`. The
+# `iconst_4` bound is the reason a fourth placement would be the interesting
+# negative, and it is deliberately not taken here — see below.
+#
+# THE SCHEMA THIS REACHES.
+#
+#   17 blocks x 16 states = 272 states
+#   props: candles, lit, waterlogged
+#
+# unobserved by the corpus before this file. `docs/PARITY-ROADMAP.md` §41 has
+# the full 116-schema decomposition and the argument for counting schemas
+# rather than states.
+#
+# WHAT IS DELIBERATELY NOT TESTED HERE. The `candles >= 4` refusal arm at
+# offset 35 needs three more placements and would return the *fourth* to
+# `AbstractCandleBlock.canBeReplaced`, whose answer depends on the item's
+# `BlockItem` rather than on this class. That is a second mechanism and
+# belongs in its own file if anyone wants it; stacking it on here would make
+# a failure ambiguous between the counter and the refusal.
+#
+# The candle is placed unlit and nothing in this scenario lights it, so `lit`
+# is constant across the whole window and no part of this check depends on
+# `AbstractCandleBlock`'s flame handling.
+#
+# WHAT VANILLA ACTUALLY SAYS. Measured — `ci/place-subset-probe.sh`,
+# 2026-08-12, cold vanilla 26.2 on the Threadripper:
+#
+#   block_update  [1,0,1]  minecraft:candle[candles=2,lit=false,waterlogged=false]
+#   block_update  [1,1,1]  minecraft:air
+#   block_update  [1,0,1]  minecraft:candle[candles=2,...]      (x2 more)
+#
+# **The second line is the strongest observation in this branch.** Vanilla is
+# explicitly telling the client that `[1,1,1]` is air — it is putting the
+# refutation of the resolve-face-offset-write model on the wire, at the exact
+# position that model would have written to. There is no
+# `section_blocks_update` here and there should not be: one position changed.
+#
+# THE RIG IS ENTIRELY AT RELATIVE z = +1.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:candle"
+
+# One candle on the ground at [1,0,1], `candles=1`, `lit=false`.
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+# The measured step clicks the candle itself, not the ground. `on` is the
+# candle's own position and the face is its top, which is exactly the click a
+# player makes when they mean "put another one here".
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "up"

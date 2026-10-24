@@ -1,0 +1,36 @@
+name = "other-player-is-an-entity"
+about = "when one player moves, every other client is told about it — the player IS an entity, tracked and broadcast, and this is the smallest check that says so"
+observe = ["move_entity", "entity_position"]
+settle_ms = 1500
+
+# A short walk, deliberately.
+#
+# Two earlier versions of this check walked 24 and then 140 blocks, meaning
+# to leave the observer's tracking range and be removed from its world. Both
+# recorded nothing and the harness called them vacuous, correctly. 24 blocks
+# never leaves a 4-chunk view distance at all; 140 does, but vanilla
+# rubber-banded the actor and the trace showed its own idea of its position
+# 7.5 blocks adrift of where vanilla had put it.
+#
+# **The cause of that rubber-band was found on 2026-08-04 and it was the rig,
+# not the distance.** `Session::hop_to` moved 8 blocks a packet every 30 ms
+# against a 50 ms tick, so two hops reached the server against one `lastGood`
+# and `handleMovePlayer` refused their 16-block sum — `100.0f * i` — with
+# `oracle moved too quickly!` in vanilla's own log. A measured step never
+# reads the socket, so the `accept_teleportation` never went out and the
+# first refusal pinned the player for the rest of the walk. `hop_to` is now
+# four blocks a packet and a long walk is real;
+# `530-walking-away-drops-a-standing-player-from-view` is the check that
+# leaves the tracking range, and it works.
+#
+# This one stays short on purpose. Being *told that another player moved*
+# needs no range crossing at all, and vanilla emits it constantly; keeping
+# that question and the range question in separate checks is what lets 530 be
+# read as pinning the range.
+[[step]]
+do = "walk"
+to = [4.0, 0.0, 0.0]
+
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 0.0]

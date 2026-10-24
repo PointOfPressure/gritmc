@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 59
+slug   = "section-numbers-are-allocated-now"
+title  = "Section numbers are allocated, not guessed — and nineteen citations in CLOSED rows pointed at unrelated code"
+branch = "claims-allocator"
+status = "written"

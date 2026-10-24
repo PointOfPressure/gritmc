@@ -1,0 +1,39 @@
+name = "a-comparator-reads-a-cake"
+about = "the analog read — `ComparatorBlock.getInputSignal` asks the block behind for `getAnalogOutputSignal` before it asks for redstone, and `CakeBlock` answers `(7 - bites) * 2`, so a whole cake behind a comparator lights the dust in front at 14 rather than 15, two ticks after the cake is placed"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 2000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:comparator"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:cake"
+
+# A cake is not a signal source; nothing but the analog read can light the
+# dust, and the number it lights at is the cake's, not a redstone level.
+[[step]]
+do = "place"
+on = [1, -1, -1]
+face = "up"

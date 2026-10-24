@@ -1,0 +1,12 @@
+name = "a-torch-in-the-placers-own-feet-is-placed"
+about = "isUnobstructed asks the placed state's COLLISION shape, and a torch has none: clicking the top of the block under your own feet places the torch in the space you occupy. A server that refuses any placement into the player's column (the test this replaced) sends air back instead"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:torch"
+
+[[step]]
+do = "place"
+on = [0, -1, 0]
+face = "up"

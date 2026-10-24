@@ -1,0 +1,90 @@
+name = "a-hopper-feeds-a-furnace-side-coal-but-not-ore"
+about = "a hopper pointing west into a furnace's east face, locked by a floor lever beside it (a hopper's top is not sturdy, so a lever clicked onto it has nowhere to hang) while raw iron goes into slot 0 and coal into slot 1. When the lever goes off (`checkPoweredState`, `enabled=true`) the next `ejectItems` offers the items to `SLOTS_FOR_SIDES = {1}`, the fuel slot, where `canPlaceItem` takes only fuel: the iron is tried, refused and restored, the coal goes, so hopper slot 1 empties and slot 0 never does. A server with no hopper transfer empties nothing; one that ignores the worldly faces or the fuel rule empties slot 0; one that ignores `ENABLED` empties slot 1 at the click. Hopper menu 32 and 34 are hotbar 0 and 2"
+observe_from = "actor"
+observe = ["container_set_slot", "block_update", "section_blocks_update"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:furnace"
+
+[[setup]]
+do = "place"
+on = [2, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:hopper"
+
+[[setup]]
+do = "sneak"
+on = true
+
+[[setup]]
+do = "place"
+on = [2, 0, 1]
+face = "east"
+
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [4, -1, 1]
+face = "up"
+
+[[setup]]
+do = "sneak"
+on = false
+
+[[setup]]
+do = "hold"
+item = "minecraft:raw_iron"
+
+[[setup]]
+do = "hold"
+item = "minecraft:coal"
+slot = 2
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[setup]]
+do = "place"
+on = [4, 0, 1]
+face = "up"
+
+[[step]]
+do = "place"
+on = [3, 0, 1]
+face = "south"
+
+[[step]]
+do = "container_click"
+slot = 32
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 34
+
+[[step]]
+do = "container_click"
+slot = 1
+
+[[step]]
+do = "place"
+on = [4, 0, 1]
+face = "up"

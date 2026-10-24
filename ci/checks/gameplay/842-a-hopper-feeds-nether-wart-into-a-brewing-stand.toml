@@ -1,0 +1,104 @@
+name = "a-hopper-feeds-nether-wart-into-a-brewing-stand"
+about = "nether wart clicked into a chest that sits on a hopper that sits on a brewing stand, with a comparator reading the stand. The hopper pulls the wart out of the chest (suckInItems), then offers it to the stand through Direction.UP, whose getSlotsForFace is {3}, and canPlaceItemThroughFace is canPlaceItem — for slot 3, level.potionBrewing().isIngredient(stack), which nether wart is. The transfer's setChanged on the stand reaches the comparator, which reads getRedstoneSignalFromBlockEntity = lerpDiscrete(1/64/5) = 1 and lights the dust in front at power 1. A server whose stand refused PotionBrewing leaves the wart in the hopper and the dust dark"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 3000
+
+# Recorded first as a click into an OPEN HOPPER on the stand, and this
+# server opens no hopper menu (741 is `absent`), so the subject errored with
+# "this client has been told of no open menu" and the session reconnect cost
+# the next scenario its walk too (2026-10-01 subset, ~/rustmc-befurn). The
+# wart now goes in through a chest above the hopper, whose menu this server
+# does open, and the stand's acceptance is read off a comparator rather than
+# off the hopper's own menu.
+#
+# Layout, facing south: comparator at (1, 0, 0) facing NORTH reads the stand
+# at (1, 0, -1) and lights the dust at (1, 0, 1). The hopper goes on the
+# stand and the chest on the hopper, each with a sneak, because a plain
+# right-click on a brewing stand (or, on vanilla, a hopper) opens its menu
+# instead. Placed on a top face the hopper faces DOWN, into the stand. A
+# 3-row chest menu is 27 slots then 36, so hotbar 0 is menu slot 54.
+#
+# Timing: the hopper's next tick pulls the wart (cooldown 8), the tick after
+# that cooldown pushes it, and the comparator's own delay is 2 — about half
+# a second, inside `settle_ms`.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:comparator"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:brewing_stand"
+
+[[setup]]
+do = "place"
+on = [1, -1, -1]
+face = "up"
+
+[[setup]]
+do = "sneak"
+on = true
+
+[[setup]]
+do = "hold"
+item = "minecraft:hopper"
+
+[[setup]]
+do = "place"
+on = [1, 0, -1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, 1, -1]
+face = "up"
+
+[[setup]]
+do = "sneak"
+on = false
+
+[[setup]]
+do = "hold"
+item = "minecraft:nether_wart"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 2, -1]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0

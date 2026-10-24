@@ -1,0 +1,22 @@
+{
+  "source": "ClientboundMerchantOffersPacket.STREAM_CODEC, 26.2",
+  "emeraldId": 927,
+  "wheatId": 980,
+  "codId": 1086,
+  "cookedCodId": 1090,
+  "coalId": 924,
+  "paperId": 1057,
+  "offers": [
+    {"name": "wheat_emerald", "outOfStock": false, "uses": 0, "maxUses": 16, "xp": 2, "specialPriceDiff": 0, "priceMultiplier": 0.05, "demand": 0, "costACount": 20, "resultCount": 1, "hasCostB": false},
+    {"name": "cod_and_emerald_cooked_cod", "outOfStock": false, "uses": 0, "maxUses": 16, "xp": 5, "specialPriceDiff": 0, "priceMultiplier": 0.05, "demand": 0, "costACount": 6, "resultCount": 6, "hasCostB": true},
+    {"name": "coal_emerald_out_of_stock", "outOfStock": true, "uses": 16, "maxUses": 16, "xp": 1, "specialPriceDiff": 0, "priceMultiplier": 0.05, "demand": 0, "costACount": 15, "resultCount": 1, "hasCostB": false},
+    {"name": "paper_emerald_priced", "outOfStock": false, "uses": 5, "maxUses": 16, "xp": 1, "specialPriceDiff": -3, "priceMultiplier": 0.2, "demand": -6, "costACount": 24, "resultCount": 1, "hasCostB": false}
+  ],
+  "packet": "c80104d4071400019f0700000000000000000000001000000002000000003d4ccccd00000000be08060006c2080000019f07010000000000000000001000000005000000003d4ccccd000000009c070f00019f0700000001000000100000001000000001000000003d4ccccd00000000a1081800019f0700000000000000050000001000000001fffffffd3e4ccccdfffffffa0396010100",
+  "containerId": 200,
+  "villagerLevel": 3,
+  "villagerXp": 150,
+  "showProgress": true,
+  "canRestock": false,
+  "emptyPacket": "000001000001"
+}

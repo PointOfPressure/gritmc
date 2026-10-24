@@ -1,0 +1,26 @@
+name = "a-burning-hit-sounds-like-fire"
+about = """
+`/damage oracle 1 minecraft:on_fire`. The damage TYPE decides the hurt sound:
+`Player.getHurtSound` is `source.type().effects().sound()` (offsets 0..10), and
+`on_fire`'s JSON says `"effects": "burning"`, whose `DamageEffects` constant
+carries `SoundEvents.PLAYER_HURT_ON_FIRE`. So the observer hears
+`entity.player.hurt_on_fire`, not `entity.player.hurt`, and the
+`damage_event`'s `source` is `on_fire`'s registry id, not `generic`'s.
+
+`on_fire` is in `minecraft:is_fire` (so `hurtServer` offset 20 consults Fire
+Resistance, which the actor does not have) and in `minecraft:no_knockback`, so
+`markHurt` still fires and the velocity sent is the actor's own. Health 20 ->
+19.
+
+What would make it fail: a server that plays one hurt sound for every damage
+type, or that sends every `damage_event` as one type, diverges on the `sound`
+id or the `source` field.
+"""
+console_restore = ["effect give oracle minecraft:instant_health 1 4 true"]
+observe_from = "both"
+observe = ["damage_event", "set_health", "set_entity_motion", "set_entity_data", "sound", "entity_event"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "damage oracle 1 minecraft:on_fire"

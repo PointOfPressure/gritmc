@@ -1,0 +1,31 @@
+name = "a-held-enchanted-book-shows-its-enchantment-in-a-chests-content-packet"
+about = "a creative client puts an enchanted book storing mending I in its hotbar, then opens a chest with it; the inventory half of container_set_content carries minecraft:stored_enchantments back exactly — a server that keeps only the item id sends a blank enchanted book"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_event"]
+settle_ms = 1000
+
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# `ItemEnchantments.STREAM_CODEC`: count 1, then `minecraft:mending` as its
+# registry id — 23, its position in the enchantment registry the capture
+# sends (`crate::patch::HolderIds`, checked against `enchantments.json`'s
+# order in `the_holder_ids_are_the_clients_own`) — then level 1.
+[[setup]]
+do = "hold"
+item = "minecraft:enchanted_book"
+slot = 1
+components = [{ type = "minecraft:stored_enchantments", bytes = [1, 23, 1] }]
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

@@ -1,0 +1,79 @@
+{
+  "source": "26.2 bytecode; packets encoded by their own STREAM_CODEC",
+  "methodAdd": 0, "methodRemove": 1, "methodChange": 2,
+  "displaySlots": {
+    "list": 0,
+    "sidebar": 1,
+    "below_name": 2,
+    "sidebar.team.black": 3,
+    "sidebar.team.dark_blue": 4,
+    "sidebar.team.dark_green": 5,
+    "sidebar.team.dark_aqua": 6,
+    "sidebar.team.dark_red": 7,
+    "sidebar.team.dark_purple": 8,
+    "sidebar.team.gold": 9,
+    "sidebar.team.gray": 10,
+    "sidebar.team.dark_gray": 11,
+    "sidebar.team.blue": 12,
+    "sidebar.team.green": 13,
+    "sidebar.team.aqua": 14,
+    "sidebar.team.red": 15,
+    "sidebar.team.light_purple": 16,
+    "sidebar.team.yellow": 17,
+    "sidebar.team.white": 18
+  },
+  "teamColors": {
+    "black": 0,
+    "dark_blue": 1,
+    "dark_green": 2,
+    "dark_aqua": 3,
+    "dark_red": 4,
+    "dark_purple": 5,
+    "gold": 6,
+    "gray": 7,
+    "dark_gray": 8,
+    "blue": 9,
+    "green": 10,
+    "aqua": 11,
+    "red": 12,
+    "light_purple": 13,
+    "yellow": 14,
+    "white": 15
+  },
+  "visibility": {
+    "always": 0,
+    "never": 1,
+    "hideForOtherTeams": 2,
+    "hideForOwnTeam": 3
+  },
+  "collisionRules": {
+    "always": 0,
+    "never": 1,
+    "pushOtherTeams": 2,
+    "pushOwnTeam": 3
+  },
+  "renderTypes": {
+    "integer": 0,
+    "hearts": 1
+  },
+  "packets": {
+    "set_objective/add/kills": "056b696c6c73000800054b696c6c730000",
+    "set_objective/change/kills": "056b696c6c73020800054b696c6c730000",
+    "set_objective/remove/kills": "056b696c6c7301",
+    "set_objective/add/hp-hearts": "0268700008000248500100",
+    "set_score/positive": "066f7261636c65056b696c6c73070000",
+    "set_score/negative": "066f7261636c65056b696c6c73fdffffff0f0000",
+    "set_score/with-display": "066f7261636c65056b696c6c730001080005736576656e00",
+    "reset_score/one-objective": "066f7261636c6501056b696c6c73",
+    "reset_score/all-objectives": "066f7261636c6500",
+    "set_display_objective/list": "00056b696c6c73",
+    "set_display_objective/sidebar": "01056b696c6c73",
+    "set_display_objective/sidebar.team.white": "12056b696c6c73",
+    "set_player_team/create": "04726564730008000854686520526564730800015b0800015d0203010c0202066f7261636c65077375626a656374",
+    "set_player_team/update": "04726564730208000854686520526564730800015b0800015d0203010c02",
+    "set_player_team/remove": "047265647301",
+    "set_player_team/join": "04726564730301066f7261636c65",
+    "set_player_team/leave": "04726564730401066f7261636c65",
+    "set_player_team/create-defaults": "0567726579730008000567726579730800000800000000000100"
+  }
+}

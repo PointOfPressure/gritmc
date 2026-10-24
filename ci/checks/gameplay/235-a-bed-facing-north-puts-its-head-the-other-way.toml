@@ -1,0 +1,55 @@
+name = "a-bed-facing-north-puts-its-head-the-other-way"
+about = "the same placement as check 230 with the player turned around — BedBlock.setPlacedBy writes its head at pos.relative(FACING), so the second block moves from +z to -z, and this is the check that says the offset is read from the state rather than hard-coded; 230 alone passes for a server that always writes the head one block south, which is exactly what a consumer written against a door (always `above`) would do"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:red_bed"
+
+# The only difference from 230. `Direction.fromYRot(180)` is NORTH, so the
+# head goes one block *behind* the foot where 230's goes one in front.
+#
+# **The placement is offset to [1, -1, 1] so that both halves land in the same
+# chunk, and that is not cosmetic.** Written as `on = [1, -1, 0]` this check
+# was a coin flip. Workspaces sit at absolute `(-(n+1) * 32, spawn_y, 0)`, so
+# the foot was at world z=0 and a north-facing head at world z=-1 — chunk
+# (-50, 0) and chunk (-50, -1), two different chunks. Vanilla cannot put two
+# chunks' worth of changes in one `section_blocks_update`, so it sent two bare
+# `block_update`s instead, and **the order it sends them in is not stable**.
+#
+# Measured on the Threadripper 2026-08-03, six consecutive recordings of this
+# scenario against real vanilla, seed 20260803, `spawn-radius=0`, projected
+# through this check's own `observe` list:
+#
+#     foot, foot, head   4 of 6 runs
+#     foot, head, foot   2 of 6 runs
+#
+# rustmc is deterministic here — three full recordings of the whole 55-check
+# corpus were byte-identical — and produces `foot, head, foot`. So this check
+# matched or diverged depending on which way vanilla fell, and it was locked
+# into `gameplay-baseline.toml` as `match` on the strength of a single run.
+# Two gates of the same commit an hour apart read 23/55 and 22/55 because of
+# this one scenario and nothing else.
+#
+# With the foot at [1, 0, 1] and the head at [1, 0, 0] both are in chunk
+# (-50, 0), vanilla carries them in one `section_blocks_update` as it does for
+# 230, and the trace is stable: **1 distinct projected trace over 4 runs, and
+# ours is identical to it.**
+#
+# The check still does its job. A server that hard-codes the head one block
+# south — the door-derived mistake this exists to catch — would write it at
+# [1, 0, 2], and the section update carries the positions.
+#
+# The general rule, because the next check to cross a chunk boundary will hit
+# this again: **a scenario that writes on both sides of a chunk edge is
+# measuring vanilla's inter-chunk send order, not the mechanic it names.**
+[[step]]
+do = "look"
+yaw = 180.0
+pitch = 0.0
+
+[[step]]
+do = "place"
+on = [1, -1, 1]
+face = "up"

@@ -1,0 +1,123 @@
+name = "a-five-block-fall-costs-two-health"
+about = "the first fall in this corpus, and the first scenario on either substrate that can grade `set_health`. Two `move_player_pos` packets: one claiming five blocks straight up with the on-ground bit CLEAR, one claiming the starting position with it SET. `Entity.checkFallDamage` accumulates `fallDistance -= (double)(float)dy` on the second (offsets 0..24) and then, because the packet says on-ground and the block below is not air, calls `Block.fallOn` (25..98), whose default arm is `causeFallDamage(fallDistance, 1.0f, damageSources().fall())`. `calculateFallPower` is `d + 1.0E-6 - safe_fall_distance` and `safe_fall_distance` is 3.0 for a player, so five blocks floors to **2** damage and the player ends at 18.0. What would make it fail: a server that models no fall damage (which is what this one did until `player-systems-2`) reports `diverge` with set_health in missing_kinds; a server that deals a flat one-heart fall reports the wrong health; a server that resets `fallDistance` on the ascent reports none at all."
+# The fall leaves the actor at 18.0 and nothing on this substrate heals it
+# (`natural_health_regeneration false`). Instant Health IV heals
+# `4 << 4 = 64` on its one tick (`HealOrHarmMobEffect.applyEffectTick`),
+# capped at max health, after the window — so every check after this one
+# starts from 20.0. Added 2026-09-30 with the
+# `/damage` checks, whose `set_health` readings would otherwise carry this
+# check's two points.
+console_restore = ["effect give oracle minecraft:instant_health 1 4 true"]
+observe_from = "actor"
+# Widened 2026-09-30 from ["set_health"] alone: a fall reaches the same
+# `LivingEntity.hurtServer` a console hit does, and vanilla answers it with
+# the same level half — `damage_event` (type `fall`), the `markHurt` velocity,
+# the synched health — plus `causeFallDamage`'s two sounds ahead of the hurt
+# (`entity.player.small_fall` for two points, the grass block's fall sound at
+# half volume). `player-systems-2` projected `set_health` alone because this
+# server had no `damage_event`; it has one now.
+#
+# `set_entity_motion` is NOT observed, and that is measured: two vanilla runs
+# of this check sent (0, -0.649, 0) and (0, -0.715, 0) — the velocity is the
+# server's own `travel` over however many ticks fell between the two lurch
+# packets, which the harness's 200 ms wait does not pin.
+observe = ["set_health", "damage_event", "set_entity_data", "sound"]
+settle_ms = 2000
+
+# NOT SWEPT, AND SAYING SO IS THE POINT.
+#
+# This file carries **no tier**, exactly as `005` records for itself.
+# `ci/corpus-falsifiable.py`'s `DEFAULT_CHECKS` is `ci/checks/gameplay` and
+# its `DEFAULT_LEDGER` is `ci/checks/gameplay-falsifiable.toml`, and no line
+# in `ci/t0.sh` reads a survival ledger — so nothing here has been shown able
+# to go red and this must not be quoted as tier 2. The sweep that would give
+# it one is
+#
+#   ci/corpus-falsifiable.py --sweep --bin target/release/oracle-runner \
+#       --checks ci/checks/survival --ledger ci/checks/survival-falsifiable.toml \
+#       oracle-work/gameplay/survival/{vanilla,rustmc}.json
+#
+# and it needs a `ci/t2-gameplay-survival.sh` recording pair, not the corpus
+# lock. The T0 hook that would read the ledger is written and parked in
+# `docs/cold-start/player-systems-2.md`; it is deliberately NOT committed,
+# because a gate line whose ledger does not exist is a red gate on every
+# branch that touches this tree.
+#
+# It is committed unswept rather than left in a worktree because
+# `docs/FINDINGS.md` and the cold start both cite it by path, and a dangling
+# citation is worse than an unswept check that says it is unswept.
+
+# WHY THIS IS `lurch` AND NOT `walk`.
+#
+# `Step::Walk`'s `hop_to` caps a move at four blocks a packet AND applies one
+# `on_ground` flag to every packet it sends. Both are fatal here. The cap
+# would split the descent into two packets and `Entity.checkFallDamage`
+# offsets 25..98 reset `fallDistance` on *every* on-ground packet, so the
+# first hop would land for nothing and the second would carry only the
+# remainder. `Step::Lurch` is one packet at whatever distance the scenario
+# asks for, which is exactly the shape a fall needs.
+#
+# WHY FIVE BLOCKS.
+#
+# Two reasons, and neither is aesthetic.
+#
+#   * `handleMovePlayer` offsets 460..489 refuse a move whose `distanceSq`
+#     exceeds `100.0f * i`. Five blocks is 25 and ten blocks is 100, which is
+#     ON the boundary; five leaves the whole speed check well clear, so this
+#     scenario measures fall damage and not the correction teleport. `542`
+#     measures the correction teleport.
+#   * Four blocks is one damage and three blocks is zero. A check written at
+#     four could be passed by a server that deals one heart for any landing,
+#     and one written at three could be passed by a server that deals nothing
+#     at all. Five is the smallest distance whose answer is neither of those.
+#
+# WHY THE ASCENT HAS THE ON-GROUND BIT CLEAR.
+#
+# `checkFallDamage` returns at offset 24 when the packet says not-on-ground,
+# leaving `fallDistance` alone; with the bit SET the ascent would reach
+# offsets 25..98 and reset it — which is harmless here, because the distance
+# is zero going up, and is written the honest way so that the reason the
+# descent works is the descent and not luck.
+#
+# WHY `set_health` IS THE WHOLE PROJECTION.
+#
+# `damage_event` is deliberately NOT observed and its absence is a stated gap
+# rather than a silent one. `ClientboundDamageEventPacket.write` carries the
+# damage type as `DamageType.STREAM_CODEC`, a varint into the **dynamic**
+# `minecraft:damage_type` registry, and `data/vanilla/damage_types.json`
+# records no registry id for a row — `ci/damage-types-golden.sh` reads the
+# types out of a `RegistryAccess` and emits ids and tags but no index. So
+# this server cannot write that packet without inventing a number, and a
+# scenario that asked for it would report a divergence about a missing field
+# rather than about fall damage. Adding `registryId` to that golden is the
+# next item; see `docs/cold-start/player-systems-2.md`.
+#
+# NO `hold` STEP, for the reason `001` and `005` record: on this substrate
+# `handleSetCreativeModeSlot` refuses the packet outright for a non-creative
+# player, silently, so a `hold` would do nothing rather than fail. Nothing
+# here needs a held item.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# Straight up, one packet, not on the ground.
+[[step]]
+do = "lurch"
+to = [0.0, 5.0, 0.0]
+on_ground = false
+
+# A tick of settling so the ascent and the descent are not in the same server
+# tick — `handleMovePlayer`'s speed budget is `100.0f * i` where `i` is the
+# packets received THIS tick, and two packets in one tick would be measuring
+# the budget rather than the fall.
+[[step]]
+do = "wait"
+ms = 200
+
+# Back down to the floor, one packet, landing.
+[[step]]
+do = "lurch"
+to = [0.0, 0.0, 0.0]
+on_ground = true

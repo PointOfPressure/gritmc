@@ -1,0 +1,40 @@
+name = "a-dungeon-chests-enchanted-book-carries-its-stored-enchantment"
+about = "a seeded chests/simple_dungeon chest rolls an enchanted book, and the content packet carries it with minecraft:stored_enchantments (projectile_protection II) as vanilla's ItemEnchantments stream codec writes it; a server that sends the item id alone sends a blank enchanted book"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_event"]
+settle_ms = 1000
+
+# The lid repeats every 5 ticks while the chest is open; collapsed as in 090.
+collapse_repeats = ["block_event"]
+
+# A seeded loot chest, placed the one way a client can: `block_entity_data`
+# on the held chest (see 930). `LootTableSeed` is a LONG.
+#
+# Seed 7 (crate::lootroll's seed scanner, the LegacyRandomSource(seed) arm):
+# golden_horse_armor in slot 0, then the enchanted book in slot 2 —
+# enchant_randomly on a book becomes new ItemStack(ENCHANTED_BOOK) and
+# ItemStack.enchant puts one enchantment under stored_enchantments. The book
+# is the first patched stack, so the recorder reads slots 0 and 1 and digests
+# the rest.
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+components = [
+    { type = "minecraft:block_entity_data", block_entity = "minecraft:chest", strings = { LootTable = "minecraft:chests/simple_dungeon" }, longs = { LootTableSeed = 7 } },
+]
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Overwrite the component-bearing chest, so the inventory half of the content
+# packet holds nothing but a stick.
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

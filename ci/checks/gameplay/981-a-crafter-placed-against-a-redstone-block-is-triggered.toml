@@ -1,0 +1,37 @@
+name = "a-crafter-placed-against-a-redstone-block-is-triggered"
+about = """
+`CrafterBlock.getStateForPlacement` offsets 105-122 set
+`TRIGGERED = level.hasNeighborSignal(context.getClickedPos())` as the state
+is chosen, so a crafter placed beside a redstone block goes down already
+triggered, in the placement's own `block_update` — no neighbour update is
+involved, and nothing crafts (that is `neighborChanged`'s rising edge). The
+orientation is the look-facing rule `992` grades: looking south, the front
+is NORTH and the top UP. What would make it fail: `triggered=false` (the
+default the placement table answers), or a triggered crafter facing the
+wrong way.
+"""
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_block"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:crafter"
+
+[[step]]
+do = "place"
+on = [3, -1, 0]
+face = "up"

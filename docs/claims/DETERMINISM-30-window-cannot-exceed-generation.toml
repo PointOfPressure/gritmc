@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 30
+slug   = "window-cannot-exceed-generation"
+title  = "A window cannot be widened past what was generated, and this pool was never generated as wide as it looks (2026-08-11)"
+branch = "sulfur-cinnabar-r19"

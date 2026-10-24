@@ -1,0 +1,29 @@
+name = "placing-a-sign-opens-its-editor"
+about = "putting a sign down opens the text editor on the placer's screen without any second interaction — `SignItem` reaches `SignBlock.openTextEdit` from inside the placement itself, so a server that treats placement as purely a block write never sends this at all"
+observe_from = "actor"
+observe = [
+    "open_sign_editor",
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_sign"
+
+# This is 270's rig, asked a different question. 270 is about the sign's
+# `rotation` property; this is about the block entity and the screen the
+# placement opens, which is a separate mechanism that happens to share a
+# trigger.
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 48
+slug   = "overworld-window-is-one-place"
+title  = "The overworld's three published windows are one map location, hold 18 of 55 biomes, and one reading of twenty-two clears its floor"
+branch = "overworld-biome-census"

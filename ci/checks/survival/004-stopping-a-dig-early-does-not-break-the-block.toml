@@ -1,0 +1,43 @@
+name = "stopping-a-dig-early-does-not-break-the-block"
+about = "An EARLY STOP does not break the block NOW — and, contrary to this file's name, which is kept because a published name is never changed, it does break it LATER. `Step::FinishDig` sends STOP_DESTROY_BLOCK ~350 ms (about seven ticks, 0.44) into a bare-handed dig of grass, below the 0.7 at `handleBlockBreakAction` offsets 561-565, so vanilla takes the `hasDelayedDestroy` branch at 600-627, which sets three fields and sends no packet, and the STOP is acknowledged at once. `ServerPlayerGameMode.tick` offsets 10-78 then finish the dig on the server's own clock and destroy the block on tick 17 — vanilla's recording of 2026-09-30 has the block_update ~520 ms after the STOP's ack, drop and all. So the actor's stream is ack, ack, block_update: the reverse of `040`, where an on-time STOP puts the block_update before its ack. What would make it fail: a server that trusts the client's STOP breaks the block before the ack (instant survival mining — what this server did before the dig state machine); one that honours only on-time STOPs never breaks it."
+observe_from = "actor"
+observe = ["block_destruction", "block_update", "block_changed_ack"]
+settle_ms = 2500
+
+# THE 100 ms IS THE WHOLE DESIGN OF THIS FILE, so it is argued rather than
+# tuned.
+#
+# The threshold at offset 561 is `getDestroyProgress(...) * (elapsed + 1) >=
+# 0.7f`, so the number of ticks needed to reach it is inversely proportional
+# to the block's own destroy time. 100 ms is TWO ticks. For the STOP to land
+# above the threshold at two ticks, `getDestroyProgress` would have to be
+# 0.234 or more per tick, which is a block roughly five times softer than the
+# superflat surface this scenario digs.
+#
+# The margin is stated that way — as a bound on what would have to be true for
+# the file to be measuring the other branch — rather than as a predicted tick
+# count, because the surface block's destroy time has NOT been read out of the
+# jar for this branch. `data/vanilla/flat_preset.json` pins the block
+# (`minecraft:grass_block`, the single top layer over two dirt and one
+# bedrock) and that is the part this file depends on; the exact tick count is
+# what the recording will report, and it belongs in the baseline row next to
+# its N rather than in a comment here.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[step]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 100
+
+[[step]]
+do = "finish_dig"
+at = [1, -1, 0]
+face = "up"

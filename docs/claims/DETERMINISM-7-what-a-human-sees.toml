@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 7
+slug   = "what-a-human-sees"
+title  = "What a human sees"
+branch = "backfill"

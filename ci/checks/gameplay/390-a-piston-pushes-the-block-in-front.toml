@@ -1,0 +1,48 @@
+name = "a-piston-pushes-the-block-in-front"
+about = "a powered piston moves a stone block one place along — the block leaves a position nobody touched and arrives at another, by way of `MovingPistonBlock` and a `PistonMovingBlockEntity` that exists for two ticks and then is not there any more. **That block entity is invisible on the wire and `block_entity_data` is expected to be empty here**: vanilla creates it with `Level.setBlockEntity`, which sends nothing, and places its `moving_piston` with `setBlock` flag 324, which has no `Block.UPDATE_CLIENTS` bit. The client is told only the `block_event` and predicts the two-tick animation itself. `block_entity_data` stays in `observe` on purpose — a packet appearing there is a defect worth catching, and dropping the field would make this check unable to see one"
+observe_from = "actor"
+observe = [
+    "block_update",
+    "section_blocks_update",
+    "block_event",
+    "block_entity_data",
+    # As `380`: the extend sound is part of what a piston firing looks like on
+    # the wire, and this scenario was recording it and projecting nothing.
+    "sound",
+    "block_changed_ack",
+]
+settle_ms = 2500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# The piston will face north (see 380), so [1, 0, -1] is what it pushes and
+# [1, 0, -2] is where that block ends up.
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, -1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:piston"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_block"
+
+[[step]]
+do = "place"
+on = [2, -1, 0]
+face = "up"

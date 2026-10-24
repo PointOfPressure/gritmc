@@ -1,0 +1,29 @@
+name = "a-named-chest-opens-under-its-name"
+about = "a chest placed from a stack carrying minecraft:custom_name (the plain text \"Loot\") opens with that name as the menu title. BlockItem.place -> applyComponentsFromItemStack -> BaseContainerBlockEntity.applyImplicitComponents (offsets 5-18: name = components.get(CUSTOM_NAME)), and ChestBlock's single-chest provider is the block entity itself, whose getDisplayName is getName (offsets 1-13: the name when set, else getDefaultName). The open_screen title is the component under ComponentSerialization's stream codec — the bare string tag, not 090's translate compound. What would make this fail: a server that drops the stack's components at placement, or one that always sends container.chest, sends the default title."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_event"]
+settle_ms = 1000
+
+# The lid repeats every 5 ticks while the chest is open; collapsed as in 090.
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+components = [{ type = "minecraft:custom_name", text = "Loot" }]
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Overwrite the named chest, so the inventory half of the content packet
+# holds nothing but a stick (as in 934).
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

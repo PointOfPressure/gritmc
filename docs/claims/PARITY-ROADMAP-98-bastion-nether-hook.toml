@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 98
+slug   = "bastion-nether-hook"
+title  = "The nether decoration hook and bastion_remnant"
+branch = "bastion-nether"
+status = "written"

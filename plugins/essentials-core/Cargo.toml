@@ -1,0 +1,12 @@
+[package]
+name = "essentials-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+rustmc-api.workspace = true
+
+[lints]
+workspace = true

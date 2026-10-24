@@ -1,0 +1,50 @@
+name = "a-stone-in-a-stonecutter-clears-the-selection"
+about = "putting a stone into a stonecutter's input runs `StonecutterMenu.slotsChanged` -> `setupRecipeList`, which sets the menu's one data slot, `selectedRecipeIndex`, from its constructed 0 to -1 and writes EMPTY to the result — so the click is answered with the input slot and a `container_set_data` the client never asked for; a stonecutter that only stores the stone sends the slot and no data"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data", "set_cursor_item"]
+settle_ms = 1000
+
+# StonecutterMenu: input 0, result 1, then the 36 — so hotbar 0 is menu
+# slot 2 + 27 = 29. One data slot, `selectedRecipeIndex`,
+# `DataSlot.standalone()`, which starts at 0 and is sent as 0 on open.
+#
+# `StonecutterMenu$1.setChanged` calls `slotsChanged`, and
+# `SimpleContainer.setItem` calls `setChanged` — so the recompute is inside
+# the click, and `broadcastChanges` at the end of `handleContainerClick`
+# carries both the slot and the data slot.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stonecutter"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 29
+
+[[step]]
+do = "container_click"
+slot = 0

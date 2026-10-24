@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 48
+slug   = "block-schema-queue"
+title  = "32,366 block states is a Cartesian product; 116 schemas is the unit, and one of the 116 is empty — 2026-08-13, branch `gameplay-block-schemas`"
+branch = "gameplay-block-schemas"

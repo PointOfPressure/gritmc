@@ -1,0 +1,1111 @@
+# EVERY ENTRY NAMES THE ENSEMBLE ITS RATE CAME FROM — 2026-08-18, and this file
+# held three ensembles' worth of rates before it did.
+#
+# A rate belongs to the ensemble that produced it, exactly as a floor does.
+# `docs/PARITY.md` 4.1 states the rule for the corpus floor's 9 and 7 and says
+# what follows from it: quote whichever you like WITH ITS ENSEMBLE, and never
+# quote one against the other as a movement. This file is where that rule was
+# not being kept.
+#
+#   four entries    an unnamed N = 26 sweep, main 92f1658, 2026-08-04, corpus 61
+#   one entry       twin-homog-20260809, N = 6
+#   the standing floor  coverage92-selfcheck-n6-20260811, N = 6, corpus 92
+#                       (ci/checks/gameplay-floor.toml)
+#
+# **The disagreement this hid is real and is not a contradiction.**
+# `a-player-that-leaves-the-ground-is-resynced` reads 8/15 here and 5/15 in the
+# floor file — the same scenario, the same N = 6, the same 15 pairs, two
+# different ensembles. Neither number was wrong and neither said which ensemble
+# it belonged to, so nothing could tell the difference between that and a
+# regression.
+#
+# **It was not cosmetic.** `ci/corpus-floor.py`'s EVIDENCE DOES NOT REPRODUCE
+# check is guarded on `evidence.distinct_projections`, and with no `[evidence]`
+# table at all it was unreachable on five entries out of five — a check that
+# could not fail, switched off by a field nobody supplied rather than by anyone
+# deciding to switch it off. `ci/corpus-floor.py emit` has printed the
+# sub-table since it was written; these five predate it. UNSTAMPED and
+# UNVERIFIABLE now red, and `ci/corpus-floor-falsify.sh` cases 29 and 30 hold
+# both open.
+#
+# WHAT WAS KEPT AND WHY. `water-spreads` is here while its scenario is parked
+# in `ci/checks/gameplay/open/` and loaded by nothing, so no current ensemble
+# measures it and the floor file's evidence does not list it. That absence is
+# the scenario being parked, not the scenario stabilising, and the entry stays:
+# this file is a measurement record and not a gate input
+# (`ci/corpus-floor-falsify.sh` case 11 pins that the gate does not read it),
+# and 24/25 at N = 26 cannot be re-taken at the N = 6 the current ensembles
+# run. `ci/checks/gameplay-baseline.toml` made the opposite call for the same
+# name and was right to: a name in a GATE INPUT that no scenario answers to is
+# a line nobody can act on. The two files differ because one is read by the
+# gate and one is not.
+#
+# Checks the REFERENCE cannot reproduce against itself.
+#
+# Not a list of things we are allowed to fail. A list of things **vanilla
+# fails**, measured by `ci/t2-gameplay-selfcheck.sh`, which records the whole
+# corpus against twelve cold-booted vanilla servers and diffs each run
+# against the first. Every name here is a check whose projection includes a value that
+# vanilla draws fresh on every run, so the check can never come back `match`
+# for anybody — not for us, and not for vanilla against itself.
+#
+# This file is **declared, and the selfcheck verifies it**. It is not written
+# by the selfcheck. If the measured set and this file disagree in either
+# direction the selfcheck exits non-zero:
+#
+#   * something newly unstable means an instrument regression, or a check
+#     that has grown a dependency on a random field, and it must be looked
+#     at rather than absorbed;
+#   * something no longer unstable means this file is stale, and a stale
+#     caveat list reads as authoritative and is worse than none.
+#
+# # Why this exists at all, and what it costs
+#
+# `ci/t2-gameplay-selfcheck.sh` was written on 2026-08-03 and first run on
+# 2026-08-03. It came back **34/37, not all-match**, and all three failures
+# were vanilla disagreeing with itself.
+#
+# That is the mirror image of the failure mode this project keeps finding.
+# The usual one is a check that cannot fail. These are checks that cannot
+# **pass**: no matter how correct this server becomes, they report `diverge`
+# forever. Left unlabelled they are read as three defects we do not have, and
+# they cap the corpus — which matters more as the corpus grows into entities,
+# because the field that moves is on `add_entity` and every entity check
+# carries one.
+#
+# The direction of the error is at least the safe one. An unstable check
+# makes this server look worse than it is, never better, and the ratchet in
+# `gameplay-baseline.toml` still works because the verdict is stable at
+# `diverge`. So this is a labelling problem, not a correctness hole.
+#
+# Measured 2026-08-03, vanilla 26.2, protocol 776, superflat, Threadripper.
+#
+# # One of this class was FIXED rather than declared, and that is the shape
+# # to prefer
+#
+# `ClientboundSoundPacket` carries a `long seed` that `Level.playSound` fills
+# from `soundSeedGenerator.nextLong()` — a fresh 64-bit draw per sound. The
+# trace digested the packet body whole, so **every check naming `sound` in
+# its projection was permanently unmatchable**, exactly like the entries
+# below, and two checks added on 2026-08-03 walked into it
+# (`a-comparator-switches-to-subtract-mode` and
+# `a-note-block-retunes-when-right-clicked`).
+#
+# It is not listed here because it did not have to be: the seed is the only
+# random field in that packet and everything else in it — the sound, the
+# source, the position, the volume, the pitch — is behaviour. `crate::trace`
+# now decodes the packet and drops the seed, with a test that two bodies
+# differing only in their seed produce the same observation.
+#
+# **Prefer that. An entry in this file is an admission that a mechanism
+# cannot be compared; a decoder is the thing that removes the need for one.**
+# The entries below are here because vanilla's randomness, or vanilla's own
+# tick alignment, *is* the observable value rather than a field beside it.
+#
+# # A note on what "measured" means when the phenomenon is probabilistic
+#
+# This file demands set equality with what the selfcheck measured, in both
+# directions. That is right when every declared instability fires on every run,
+# and it is **not** what several of these do: `a-bystander-sees-a-chest-open`
+# reproduced in one pair of runs and failed to in another three, because its
+# cause is a window boundary landing either side of a 250 ms repeat. So a
+# declared entry that does not reproduce is only evidence of staleness if the
+# run had the power to catch it, which is why the default `SELFCHECK_RUNS` is
+# 12 and why the arithmetic for that number lives in the script's header.
+# A short run that reports NO LONGER UNSTABLE is a statement about N.
+#
+# # The five added 2026-08-03, and what they cost
+#
+# The corpus grew 37 -> 55 and the selfcheck was not re-run against the new
+# checks until after they had been baselined. When it was, vanilla reproduced
+# only **48/55** against itself: seven unstable, of which three were declared
+# and four were not. Raising the selfcheck from two runs to twelve then found
+# two more that the two-run design had never seen — `chest-opens-a-screen`,
+# declared below, and `a-lever-lights-a-lamp`, which turned out to be a rig
+# straddling a chunk boundary and was **fixed** rather than declared. All of
+# them are `absent` or `diverge` for this server today, so nothing in the
+# baseline moves — but they are the ceiling the corpus can reach the
+# moment entities and containers land, and three of the four are on exactly
+# the channels that work is about.
+#
+# Each was traced to its mechanism in vanilla's bytecode before being written
+# down, because "these two runs differed" is a symptom and this file is a list
+# of causes. One of the four had a *second*, separable cause that is ours
+# rather than vanilla's; it is recorded on the entry rather than hidden,
+# because it will outlive the entry.
+#
+# # `flaps` AND `comparisons` ARE THE MACHINE-READABLE FORM OF `measured`
+#
+# Added 2026-08-04. `measured` is prose and was only ever read by people;
+# `flaps` and `comparisons` are the same two integers in a form
+# `ci/selfcheck-aggregate.py` can do arithmetic with, and it does. When a run
+# does not see a declared entry, the aggregator computes
+# `(1 - flaps/comparisons) ** C` for that run's comparison count `C` and, above
+# alpha = 0.05, prints `UNRESOLVED AT THIS N` with the arithmetic instead of
+# `NO LONGER UNSTABLE`, and does not fail.
+#
+# **This is not a softening of the gate. It is the gate finally being able to
+# tell the two claims apart.** "This entry is stale" and "this run was too
+# small to see this entry" were reported identically for as long as this file
+# existed, and the cost is written out four times below on
+# `chest-opens-a-screen` alone: declared, removed, re-declared, removed, and
+# re-declared at N = 26 with the rate unchanged the whole way. Every one of
+# those readings was honest. The instrument simply had no way to say "I could
+# not have seen this", so it said "this is gone".
+#
+# The direction that is NOT power-tested is `NEWLY UNSTABLE`, deliberately: an
+# observed flap is a fact about the reference at any N, and only absence is a
+# claim about the sampling.
+#
+# **These two numbers are declarations like every other field here, and they
+# must be updated only from a measurement, with its N.** An entry whose
+# `flaps`/`comparisons` are absent, zero or nonsensical is failed closed by the
+# aggregator rather than exempted — an exemption that switches itself on when
+# its input is missing is the failure mode this file is a catalogue of.
+#
+# Every rate below is from the N = 26 run of 2026-08-04, reports 2..26 in
+# `oracle-work/gameplay-selfcheck`, read out by `ci/selfcheck-aggregate.py`
+# itself; the invocation is in the commit message.
+#
+# **How many entries there are is deliberately not written here.** That
+# sentence read "All seven rates below" over five `[[unstable]]` entries: the
+# set had moved and the sentence had not, which is this project's oldest small
+# defect — a count in a comment is a count every reader takes on trust and
+# nobody re-checks. It is a bad line to leave in *this* file in particular,
+# which is a catalogue of instruments that stopped meaning what they said. The
+# entries are immediately below and countable, and the set is adjudicated
+# rather than described: `ci/t2-gameplay-selfcheck.sh` compares declared
+# against measured in both directions and exits non-zero on either mismatch,
+# so a set that has moved is a red run and not a stale sentence.
+#
+# ===========================================================================
+# THREE CHECKS FLAP UNDER **strict** AND ARE DELIBERATELY NOT ENTRIES HERE.
+# Measured 2026-08-06. Recorded as a comment on purpose — read this before
+# promoting any of them.
+# ===========================================================================
+#
+# Two runs of the *same tip* — `redstone-power` at caff4e0, gated in
+# `~/rustmc-gate-tables` and in `~/rustmc-redstone-power` on the threadripper —
+# agreed on **declared for all 86 checks** and disagreed on three under strict:
+#
+#   fences-connect-to-each-other                match -> diverge
+#   a-furnace-opens-a-screen-a-chest-does-not   match -> diverge
+#   a-second-edit-of-the-same-sign-is-ignored   diverge -> match
+#
+# Net strict 34/86 -> 33/86, declared 56/86 both times with an identical
+# 24 diverge / 6 absent / 0 vacuous / 0 inert / 0 error split. **The movement is
+# bidirectional**, which is the part that matters: a missing or stale table, or
+# any systematic effect, moves checks one way and moves declared with them.
+#
+# They are NOT `[[unstable]]` entries, and adding them would be a category
+# error with a red on the end of it:
+#
+#   * this file means "the REFERENCE cannot reproduce this against itself, in
+#     **declared** mode", measured by `ci/t2-gameplay-selfcheck.sh` at N = 26.
+#     These three flapped in **strict**, between our tree and vanilla. Different
+#     axis, different instrument, different question.
+#   * `ci/t2-gameplay-selfcheck.sh` compares this file against its measured set
+#     in both directions and is known to fire — its own header records the
+#     replay: an extra declared name gives `NO LONGER UNSTABLE`, exit 1. Three
+#     names the selfcheck does not measure as unstable would redden it three
+#     times over.
+#   * an entry needs `flaps`/`comparisons` from a selfcheck run. Nobody has
+#     measured these three there. Writing plausible integers into those fields
+#     is precisely "an exemption that switches itself on when its input is
+#     missing", named twelve lines above as the failure mode this file
+#     catalogues.
+#
+# What this comment is for: `strict` is reported and **not** gated — see the
+# header of `ci/selfcheck-aggregate.py`, which also records a strict corpus
+# number moving 5/55 -> 7/55 with nothing watching it. So no gate is wrong
+# today. The cost is quoting precision: a strict figure given to one unit is
+# over-precise, and at least these three names are why. Closing it properly
+# means characterising strict flap in the selfcheck and giving it its own
+# declared list, which is an item, not a line.
+
+# ===========================================================================
+# EVERY ENTRY BELOW WAS RE-MEASURED TWICE ON 2026-08-09, ON TWO INDEPENDENT
+# ENSEMBLES, AND THE TWO AGREE ON THE WHOLE SET.
+#
+# `ci/corpus-floor.sh`, Threadripper, 15 pairwise comparisons each:
+#
+#   * **`twin-homog-20260809`** — six cold boots of ONE tree and ONE recorder,
+#     `SELFCHECK_RUNS=6 ci/t2-gameplay-selfcheck.sh`, corpus 88. This is the
+#     quoted one, because it controls the recorder.
+#   * **`nightly6-20260809`** — six full-corpus recordings from six different
+#     trees and three different recorders, corpus 86. The control.
+#
+#                                                    homog   hetero
+#     spawn-egg-makes-a-mob                          15/15   15/15
+#     a-dropped-item-goes-into-your-inventory        15/15   15/15
+#     dropping-an-item-throws-it-on-the-floor        15/15   15/15
+#     container-click-throw-drops-the-whole-stack    15/15   15/15
+#     container-click-throw-drops-one-item           14/15   15/15
+#     water-spreads                                  14/15   14/15
+#     swapping-to-the-offhand-shows-on-both-channels  8/15   12/15
+#     closing-a-crafting-table-returns-the-grid...     8/15   12/15
+#
+# **The SET is identical and the rates are not, which is the honest shape of
+# this.** Nine names, the same nine, with the same classes, out of two
+# ensembles that share no recording and no recorder. What a rate at N = 6 can
+# support is "this does not reproduce"; what it cannot support is a second
+# decimal place, and the two columns above are the size of that uncertainty
+# rather than an argument about it.
+#
+# Nothing here changed as a result; the point is that it no longer has to be
+# taken on trust. The per-scenario evidence — the ensemble, the sha256 of
+# every recording, the distinct-projection count and the first difference —
+# is in the GENERATED `ci/checks/gameplay-floor.toml`, and
+# `ci/corpus-floor.py adjudicate` re-derives all of it. The rates for the five
+# entries measured at N = 26 are LEFT AT THEIR N = 26 VALUES: six runs resolve
+# a 39% flap and twenty-six resolve an 11% one, so replacing them would throw
+# power away, and the power test's exponent is the run count.
+#
+# **TWO OF THE NAMES IN THAT TABLE ARE NO LONGER ENTRIES — 2026-08-11.**
+# `swapping-to-the-offhand-shows-on-both-channels` and
+# `closing-a-crafting-table-returns-the-grid-contents` were both on
+# `container_set_slot — the cumulative state id` and are retired with the
+# decoder that removes it; see the block below where the first of them was.
+# The table itself is left exactly as measured — it records what those two
+# ensembles saw on 2026-08-09 under the projection of that day, and none of
+# that has changed. What changed is the projection, and a rate is a property
+# of the pair (ensemble, projection), which is the whole reason
+# `ci/checks/gameplay-floor.toml` carries a `projection` stamp.
+# ===========================================================================
+
+[[unstable]]
+name = "spawn-egg-makes-a-mob"
+flaps = 25
+comparisons = 25
+runs = 26
+class = "reference"
+measured = "25/25 comparisons at N = 26 — twenty-six cold vanilla servers, run 1 against runs 2..26, corpus 61, main 92f1658, 2026-08-04"
+# Position matched exactly ([1.5, 0.0, 0.5] on both runs); only the digest of
+# the packet's tail moved. That tail is pitch/yaw/head-yaw, the data varint
+# and three velocity shorts.
+field = "add_entity — the spawn rotation; AND set_entity_data — the sound variant (2026-08-19)"
+why = """
+`EntityType.spawn` calls
+`entity.snapTo(x, y, z, Mth.wrapDegrees(serverLevel.getRandom().nextFloat() * 360.0F), 0.0F)`.
+The yaw of any spawned mob is a fresh draw from the level's shared RNG,
+which is unseeded and whose stream position depends on everything else the
+level has done. No implementation can match it, including vanilla.
+
+CORRECTED 2026-08-19, branch `mobs-tick-surface`: the paragraph above is
+sufficient to explain the FLAP and it is not sufficient to explain what a fix
+would have to address. There are TWO unseeded draws in this scenario's
+projection, on two different packets, and this row named one.
+
+Measured by `ci/mob-projection-search.py` over 16 distinct recordings on one
+recorder schema, 120 pairs (see `ci/checks/mob-projection.json`):
+
+    observe as declared                          0/120     0.0%
+    observe, minus y_rot + y_head_rot           34/120    28.3%
+    {add_entity} minus y_rot + y_head_rot      120/120   100.0%
+    {set_entity_data} alone                     34/120    28.3%
+
+Removing the rotation takes `add_entity` to EXACT and takes the scenario to
+28.3%, not to 100%, because `set_entity_data` is independently unstable. Its
+cause, from the jar:
+
+    Pig.finalizeSpawn -> PigSoundVariants.pickRandomSoundVariant(
+                             registryAccess(), level.getRandom())
+                      -> Registry.getRandom(RandomSource) -> setSoundVariant
+
+a uniform pick over `minecraft:pig_sound_variant`, three entries in the shipped
+jar: `big`, `classic`, `mini`. Same unseeded generator, different call site,
+different packet.
+
+The other two sources in that blob are `Mob.finalizeSpawn`'s
+`nextFloat() -> setLeftHanded` (a 5% draw) and `AgeableMob.finalizeSpawn`'s
+`nextFloat() -> setAge`. Five distinct payloads over 16 runs at 8/3/3/1/1 reads
+as three sound variants with two rarer left-handed ones beside them — the
+recorded field is a digest, so that decomposition is inference and is not
+claimed as more.
+
+AND ONE DRAW THAT DOES NOT REACH A CLIENT, which is the row that would
+otherwise be mis-filed here. `Mob.finalizeSpawn` also calls
+`RandomSource.triangle(0.0, 0.11228)` into a `FOLLOW_RANGE` modifier — a
+CONTINUOUS draw, which looks like the worst case there is. It is not a case at
+all: `{update_attributes}` alone is 120/120 identical over the same sixteen
+runs. `Attributes` registers `FLYING_SPEED` through
+`RangedAttribute.setSyncable(true)` at offsets 420-424 and registers
+`FOLLOW_RANGE` at 430-451 with NO `setSyncable` call, so `isClientSyncable()`
+is false and no client is ever told. A divergence in the server is not a
+divergence on the wire.
+
+The `flaps`, `comparisons` and `runs` above are untouched: they were measured
+at N = 26 in 2026-08-04 and they were right. Only the mechanism was
+under-described, which is the field this file exists to carry."""
+
+[unstable.evidence]
+ensemble = "unnamed — SELFCHECK_RUNS=26 ci/t2-gameplay-selfcheck.sh on main 92f1658, 2026-08-04, corpus 61. It predates the ensemble-id convention entirely: the earliest id in this tree is twin-homog-20260809. Named here as unnamed rather than given one now, because an id invented after the fact cannot be matched against a recording set nobody kept."
+[[unstable]]
+name = "a-dropped-item-goes-into-your-inventory"
+flaps = 25
+comparisons = 25
+runs = 26
+class = "reference"
+measured = "25/25 comparisons at N = 26 — twenty-six cold vanilla servers, run 1 against runs 2..26, corpus 61, main 92f1658, 2026-08-04"
+# Stronger than a moved field: one run picked the item up and the other did
+# not, so `container_set_slot`, `take_item_entity` and `remove_entities` were
+# present in one trace and absent from the other.
+field = "add_entity — the item's position, and whether the pickup happens at all"
+why = """
+`Block.popResource(Level, BlockPos, ItemStack)` places the item entity at
+`pos + 0.5 + Mth.nextDouble(level.getRandom(), -0.25, 0.25)` on each of the
+three axes. Confirmed numerically as well as structurally: the two runs put
+the torch's drop at y 1.2427 and y 1.3222, and the torch was at [1, 1, 0],
+so both sit inside `1.5 - ITEM.getHeight()/2 +/- 0.25`.
+
+The consequence is not only that the position differs. The item lands in a
+different place, so whether it is inside the player's pickup radius differs
+too, and with it three whole observation kinds."""
+
+[unstable.evidence]
+ensemble = "unnamed — SELFCHECK_RUNS=26 ci/t2-gameplay-selfcheck.sh on main 92f1658, 2026-08-04, corpus 61. It predates the ensemble-id convention entirely: the earliest id in this tree is twin-homog-20260809. Named here as unnamed rather than given one now, because an id invented after the fact cannot be matched against a recording set nobody kept."
+[[unstable]]
+name = "water-spreads"
+# **PARKED 2026-08-10 in `ci/checks/gameplay/open/`, so this entry now
+# describes a check that is not loaded.** It is kept rather than deleted
+# because the measurement below is what justified the parking: 24 flaps in 25
+# comparisons means it could never adjudicate, so removing it from the corpus
+# costs no coverage. Nothing here reads this file as a gate input — see
+# `ci/t2-gameplay.sh`, "no reporter so much as reads the unstable list" — so a
+# name without a scenario is inert. Re-arm it by writing the set-comparison
+# opt-out named in `why` below, not by moving the file back.
+flaps = 24
+comparisons = 25
+runs = 26
+class = "reference"
+measured = "24/25 comparisons at N = 26 — twenty-six cold vanilla servers, run 1 against runs 2..26, corpus 61, main 92f1658, 2026-08-04"
+# Not RNG. The two runs disagreed on how the same changes were PACKAGED: one
+# sent a `block_update`, the other a `section_blocks_update` carrying two
+# positions.
+field = "which tick's broadcast each spread landed in"
+why = """
+Fluid spreading runs on scheduled ticks, and `ChunkHolder.broadcastChanges`
+coalesces every change made to one section in one tick into a single
+`section_blocks_update`. How many spreads fall inside the same tick depends
+on where in the tick the placement packet arrived, which is wall-clock
+jitter and not behaviour.
+
+This one is fixable in principle, unlike the two above, and the fix is a
+projection that compares the set of (position, final state) rather than the
+packet sequence. It is not done here because the packaging is itself a real
+property this corpus checks -- `crate::shortset` exists because of it -- so
+throwing it away corpus-wide would cost more than the check is worth. A
+per-scenario opt-out is the shape it should take when it is done."""
+
+[unstable.evidence]
+ensemble = "unnamed — SELFCHECK_RUNS=26 ci/t2-gameplay-selfcheck.sh on main 92f1658, 2026-08-04, corpus 61. It predates the ensemble-id convention entirely: the earliest id in this tree is twin-homog-20260809. Named here as unnamed rather than given one now, because an id invented after the fact cannot be matched against a recording set nobody kept."
+note = """
+The scenario this entry is about is PARKED in ci/checks/gameplay/open/ since 2026-08-10 and is not loaded, so no current ensemble can measure it and none does — it is absent from ci/checks/gameplay-floor.toml's evidence for that reason and not because it stabilised. The entry is kept because this file is a measurement record and not a gate input (ci/corpus-floor-falsify.sh case 11), and 24/25 at N = 26 cannot be re-taken at the N = 6 the current ensembles run."""
+[[unstable]]
+name = "dropping-an-item-throws-it-on-the-floor"
+flaps = 25
+comparisons = 25
+runs = 26
+class = "reference"
+measured = "25/25 comparisons at N = 26 — twenty-six cold vanilla servers, run 1 against runs 2..26, corpus 61, main 92f1658, 2026-08-04"
+# The item's *position* is identical to the last bit on every run
+# ([0.0, 1.3199999928474426, 0.0]), which is what rules out the mechanism the
+# already-declared `a-dropped-item-goes-into-your-inventory` has: that one is
+# `Block.popResource` scattering the position. This one keeps the position and
+# moves the velocity, so it is a different method with a different draw.
+#
+# Five runs in, the split is clean: the position matched in all of them, the
+# `add_entity` tail digest differed in all of them (8e2b33c0, 8312c4f1,
+# f163f279, ...), and the normalised entity id moved in only one pair. So the
+# velocity draws are the standing cause and the numbering artefact below is a
+# rarer second one — which is why removing the artefact would not remove this
+# entry.
+field = "add_entity — the item's spawn rotation (and, until 2026-08-05, its velocity)"
+why = """
+**THIS ENTRY NAMED THE WRONG FIELD AND HAD THE WRONG CAUSE COUNT, AND A
+PRE-REGISTERED PREDICTION BUILT ON IT WAS REFUTED. 2026-08-05.**
+
+It said the field was "the three velocity shorts in the packet's tail".
+`javap -p -c -constants ClientboundAddEntityPacket.write` on the pinned 26.2
+jar gives: id, uuid, type, x, y, z, `Vec3.LP_STREAM_CODEC` **movement**, xRot,
+yRot, yHeadRot, data. There are no velocity shorts, and the movement is
+written *before* the rotations, not in the tail.
+
+The velocity half of the cause was real, and ORACLE rule 26 removed it: the
+movement is now consumed and discarded by `trace::decode`. The prediction
+written down before the run was that this entry would fall from 25/25 to
+**0/25**. **Measured 0/25 -> nothing: it is still 25/25**, 26 cold-booted
+vanilla servers, run 1 against runs 2..26, corpus 63, Threadripper,
+2026-08-05, `SELFCHECK_RUNS=26 ./ci/t2-gameplay-selfcheck.sh`. The first
+difference is still `add_entity` at step 0 with the position identical to the
+last bit and only `rest` moving.
+
+**Because there were always two random fields in this packet for an item, not
+one.** `ItemEntity`'s constructor calls
+`setYRot(random.nextFloat() * 360.0F)` — offsets 44-52 — so the item's spawn
+rotation is a fresh draw, and it is still inside `rest`. It is the same
+mechanism `spawn-egg-makes-a-mob` is declared for, on the same packet, which
+is exactly why that check was chosen as this exemption's control and exactly
+why it had to stay at 25/25. It did.
+
+So the exemption is **correct and not wide enough to matter here**: removing
+one of two independent random fields cannot stabilise a check, and the entry
+stays. Do not read the surviving 25/25 as evidence that the movement was not a
+cause — read it as evidence that it was not the *only* cause. The velocity
+derivation below stands and is kept:
+
+A thrown item's velocity carries four fresh draws from the thrower's
+`RandomSource`, and the velocity is exactly what the `LpVec3` movement field
+of `ClientboundAddEntityPacket` holds.
+
+`ServerboundPlayerActionPacket.Action.DROP_ITEM` reaches `Player.drop`, which
+calls `LivingEntity.drop(stack, dropAround = false, traceItem)` and so takes
+the *aimed* branch of `LivingEntity.createItemStackToDrop` at offset 125. That
+branch sets the throw vector from `getXRot`/`getYRot` — deterministic, and it
+is why the spawn position matches exactly — and then adds a scatter built from
+**four** `RandomSource.nextFloat()` calls, at offsets 190, 207, 254 and 263:
+an angle, a magnitude, and a two-call difference on the vertical component.
+
+The `random` there is the entity's own unseeded source, so no implementation
+can reproduce it, vanilla included. The position is comparable and is; the
+velocity is not.
+
+A second and separate cause was found on the same check and was **ours**, not
+vanilla's: the normalised `entity` field also moved, 1 in one run and 0 in the
+other. `Normalizer::entity` numbered ids by order of first sighting **across
+every packet recorded on the connection**, including packets the check's own
+`observe` list excludes; in one run a stray `move_entity` for the other player
+arrived before the drop and took number 0, and in the other it did not.
+
+**Fixed 2026-08-04** — the numbering moved into `compare::project`, over the
+observations a check actually looks at, and `crate::trace::entity_ref` records
+the raw id until then. It did not remove this entry and was never going to:
+the velocity draws stand entirely on their own. Kept written down because the
+two causes are separable and a future reader finding a moved `entity` field
+here should know this one has already been closed once."""
+
+# `other-player-is-an-entity` WAS declared here at **8 of 11** and has been
+# removed, measured **0 of 11** on 2026-08-04. **This is the only entry ever
+# removed from this file by a change that predicted its removal in advance.**
+#
+# The prediction is in commit `d08cdab`, written before the run: this was the
+# ONLY check in the corpus naming `move_entity`, so it was the only declared
+# verdict the heartbeat exemption could reach, and it was predicted to go
+# 8/11 -> 0/11. It did.
+#
+# The entry's own text already contained the cause and had stopped short of
+# acting on it. It said one of the three `move_entity` payloads was "probably
+# not the walk at all" — `0afd0f14b68768f4`, which also turned up in
+# `break-block` and `place-log-axis`, two checks that walk nowhere — and named
+# the 60-tick re-broadcast as the reason. That was right. The projection now
+# files a `move_entity` failing vanilla's own movement test (dx²+dy²+dz² < 128
+# in wire units, exactly lengthSqr < 2^-17 in blocks) as
+# `move_entity_heartbeat` and drops it unless a check asks for it by name.
+#
+# So this entry leaves by the same door `sand-falls-when-unsupported` did: the
+# cause was removed, not declared. What remains of the check — a real
+# four-block walk, deltas of 16384 wire units, 181x the exemption boundary —
+# reproduces.
+
+# ===========================================================================
+# ALL THREE `container_set_slot — the cumulative state id` ENTRIES ARE RETIRED
+# — 2026-08-11, branch `corpus-stateid-decoder`. The decoder every one of them
+# asked for exists, and they leave by the door this file's header argues for:
+# **the cause was removed, not declared.**
+#
+#   swapping-to-the-offhand-shows-on-both-channels      (was here)
+#   closing-a-crafting-table-returns-the-grid-contents  (was further down)
+#   a-flower-pot-empties-when-right-clicked             (was further down)
+#
+# `compare::rebase_session_counters` already rebased `seq` and `window` onto
+# the scenario. `state` is the third counter of exactly that class and was the
+# last one still compared raw. It is now rebased too, scoped per
+# **(connection, window)** rather than per connection, because
+# `AbstractContainerMenu.stateId` is an instance field and each menu counts on
+# its own.
+#
+# THE MECHANISM, READ OFF THE PINNED JAR RATHER THAN OFF THESE THREE ENTRIES.
+# Three entries agreeing is three readings of code and ORACLE rule 9 says
+# readings of code do not move suspects, so it was re-derived before anything
+# was built on it. `javap -p -c -constants`, server-26.2.jar:
+# `AbstractContainerMenu` holds `private int stateId`; `incrementStateId` is
+# `stateId = (stateId + 1) & 32767` and returns the incremented value;
+# `ServerPlayer$1.sendSlotChange` — the `ContainerSynchronizer` — builds
+# `ClientboundContainerSetSlotPacket(containerId, incrementStateId(), slot,
+# stack)`, and `sendInitialData` calls the same method for
+# `container_set_content`. `broadcastChanges` walks every slot once a tick into
+# `synchronizeSlotToRemote`, which sends only where `RemoteSlot.matches` is
+# false. So the wire value counts packets sent on that menu since it opened,
+# not changes made, and which 50 ms tick sweep saw which intermediate state
+# decides whether an earlier write cost one packet or two. Every later packet
+# on that menu inherits the difference.
+#
+# REBASED, NOT DROPPED, AND THAT DIFFERENCE IS THE WHOLE DELIVERABLE. A decoder
+# that dropped the field would stop all three flapping too and would be wrong:
+# how far the counter moves *between two packets on one menu* is real behaviour
+# a check may legitimately assert. Both halves are pinned by tests, and both
+# wrong decoders were injected on the Threadripper and confirmed to redden
+# them:
+#
+#   drop the field (every state -> 0)   5 tests fail, incl.
+#                                       two_streams_differing_in_the_gap_...
+#   no rebase at all                    7 tests fail, incl.
+#                                       two_streams_differing_only_in_session_
+#                                       history_project_the_same
+#
+# WINDOW 0, STATED EXPLICITLY, BECAUSE IT IS THE CASE ALL THREE LAND ON. The
+# `window` FIELD of the player's own inventory is the constant 0 and is still
+# left alone — it is a name, not a draw. The `state` COUNTER on that same
+# window 0 is rebased like any other, and it is the one that pays:
+# `InventoryMenu` is created with the player and never closes, so window 0 is
+# the only menu whose counter accumulates across the whole corpus run. That is
+# what `ci/checks/gameplay/README.md` is about when it requires `790` to stay
+# the highest-numbered check.
+#
+# THE MEASUREMENT IS PAIRED, NOT STATISTICAL, AND THE CONTROL REPRODUCES THE
+# DECLARED RATES EXACTLY — the shape `chest-opens-a-screen` established.
+# Ensemble `coverage92-selfcheck-n6-20260811`: the same six cold-vanilla
+# recordings, `~/rustmc-cov2/oracle-work/gameplay-selfcheck/r{1..6}.json`, one
+# recorder (5b3add3e0a13036b), 15 pairwise comparisons, `ci/corpus-floor.sh`,
+# Threadripper, 2026-08-11. One binary, one variable — the three-element
+# `COUNTERS` array:
+#
+#                                                    rebase off   rebase on
+#     swapping-to-the-offhand-shows-on-both-channels   9/15         0/15
+#     closing-a-crafting-table-returns-the-grid-...    9/15         0/15
+#     a-flower-pot-empties-when-right-clicked          9/15         0/15
+#     distinct projections, each of the three          2            1
+#     CORPUS FLOOR                                     7/92         4/92
+#
+# The `rebase off` column is not only this run's control: it is what the
+# standing `ci/checks/gameplay-floor.toml` already records for all three on
+# this same ensemble under `proj:b385528330fee646`, first_difference naming
+# `container_set_slot` slot 36 / slot 38, window 0, in every case.
+#
+# ON THE POWER TEST, AND WHY THE OFFHAND ENTRY GOES OUT WITH THE OTHER TWO.
+# `ci/corpus-floor.py` prints `NO LONGER UNSTABLE` for the crafting table and
+# the flower pot and `UNRESOLVED AT THIS N` for the offhand swap, because it
+# tests this ensemble against the rate written on each ENTRY, and the offhand
+# entry's 11/25 comes from the N = 26 ensemble of 2026-08-04 that the
+# 2026-08-07 disk failure destroyed: (1 - 11/25)^5 = 0.0551 > alpha = 0.05.
+# Against the rate THIS ensemble itself measures for it — 9/15, twice, by two
+# different trees' binaries — five independent runs miss it with probability
+# 0.4^5 = 0.0102, inside alpha. And the comparison is paired rather than
+# independent, which is the same correction this file already makes for
+# `chest-opens-a-screen`: these are the same six recordings and the same 15
+# pairs, and the 9 that flapped are among the 15 that now agree. The flap was
+# not missed, it was removed.
+#
+# REMOVED AS A PREDICTION, NOT AS A CONCLUSION, on the terms
+# `sand-falls-when-unsupported` set: this file is declared and
+# `ci/t2-gameplay-selfcheck.sh` verifies it in both directions, so a run in
+# which the decoder did not hold reports `NEWLY UNSTABLE` for the name in
+# question and exits non-zero.
+#
+# A FOURTH CHECK MOVED AND IS NOT CLAIMED AS A CONVERSION.
+# `container-click-pickup-all-gathers-matching-stacks` was also flapping on
+# this field between r1 and r2 and now does not. It was never declared here, so
+# nothing comes out for it — but it did surface a real defect in
+# `ci/corpus-floor.sh`'s own rule-7 cross-check, which refused a correct
+# measurement; see that script's header and its own commit.
+# ===========================================================================
+
+# `chest-opens-a-screen` WAS declared here and has been removed. It was added
+# on 2026-08-03 from three cold runs — six `block_event`s on the actor's stream
+# in two of them and five in the third — during an attempt to raise the
+# selfcheck to twelve runs that **died in run 6 and never produced a single
+# pairwise comparison**, so the entry was reasoned from hand-read traces by
+# analogy with `a-bystander-sees-a-chest-open` rather than measured. The first
+# run that completed, twelve runs on 2026-08-03, reproduces it **11 of 11**.
+#
+# The mechanism in that entry was real and is still true — an open chest emits
+# the same `block_event(1, 1)` every 250 ms forever — but this check's
+# `settle_ms = 1000` is four whole cadences and evidently lands clear of the
+# boundary, while the other check's 2000 does not (and that one flapped, 2 of
+# 11). **A real mechanism is not a measured instability.**
+#
+# Honest caveat on the removal, since this file exists to not mislead: 0 of 11
+# is not proof of stability. At the 1-in-11 rate the newly-added entry below
+# was caught at, twelve runs miss a check about one time in nine. If it comes
+# back, it comes back with a measurement instead of an analogy.
+#
+# **IT CAME BACK, 2026-08-04, WITH A MEASUREMENT — 1 of 11.** The caveat above
+# was written on 2026-08-03 and cashed the next day, which is the strongest
+# argument this file can make for writing caveats down. It is re-declared
+# below on the terms that note set: a measurement, not an analogy.
+
+# `chest-opens-a-screen` WAS declared here at **1 of 11** and is out again at
+# **0 of 11**, 2026-08-04, on the branch `move-entity-heartbeat`.
+#
+# **Do NOT read this as a second thing the heartbeat exemption fixed. It is
+# not, and the distinction matters more than the entry does.** The exemption
+# can only touch a declared verdict through a check's `observe` list, and this
+# check names `block_event`, `open_screen` and `container_set_content` — no
+# entity kind at all. Nothing in that projection changed.
+#
+# What this is, is the third consecutive swap of the same pair:
+#
+#     2026-08-03   chest-opens-a-screen 0/11   a-bystander-sees-a-chest-open 2/11
+#     2026-08-04a  chest-opens-a-screen 1/11   a-bystander-sees-a-chest-open 0/11
+#     2026-08-04b  chest-opens-a-screen 0/11   a-bystander-sees-a-chest-open 2/11
+#
+# One mechanism — `ContainerOpenersCounter.CHECK_TICK_DELAY` is 5, so an open
+# chest re-broadcasts `block_event(1, 1)` every 250 ms forever — sampled by two
+# checks whose only difference is `settle_ms`, 1000 against 2000. At a rate
+# near 1 in 11, twelve runs miss the flap about one time in nine, so membership
+# of this file is a coin the pair keeps tossing. **The rate is the datum and
+# the membership is not.**
+#
+# This is now the measured case for N = 26 rather than an argument for it. The
+# note below predicted, in writing, that `a-bystander-sees-a-chest-open` would
+# return; it has, at 2 of 11, and it is re-declared with that measurement.
+#
+# **N = 26 WAS RUN ON 2026-08-04 AND IT SETTLED THE PAIR: BOTH ARE REAL.**
+# `chest-opens-a-screen` 1/25, `a-bystander-sees-a-chest-open` 3/25. Neither
+# was ever a phantom and neither was ever stale — twelve runs simply could not
+# resolve either of them, and the four swaps were the instrument's power limit
+# being read as the world changing.
+
+# `chest-opens-a-screen` AND `a-bystander-sees-a-chest-open` WERE BOTH DECLARED
+# HERE — 1/25 and 3/25 at N = 26 — AND BOTH ARE OUT AS OF 2026-08-05.
+#
+# **They leave by the door this file's header argues for: the cause was
+# removed, not declared.** Both now carry `collapse_repeats = ["block_event"]`,
+# so a run of identical consecutive observations compares as one. Nothing about
+# vanilla changed and nothing about this server changed; what changed is that
+# the projection no longer samples a quantity neither server controls.
+#
+# THE MEASUREMENT, AND IT IS PAIRED RATHER THAN STATISTICAL.
+#
+# `ci/selfcheck-recompare.sh` re-compares the **same 26 saved recordings** the
+# 1/25 and 3/25 were measured on, under a chosen projection, in seconds instead
+# of five hours. Run twice — once against a copy of the corpus with the new
+# line stripped, once as committed — same binary, same recordings, one
+# variable. On the Threadripper, 2026-08-05, tree 680fcaa, recordings
+# `~/rustmc/oracle-work/gameplay-selfcheck` r1..r26:
+#
+#     ci/selfcheck-recompare.sh --checks /tmp/control-corpus   # collapse stripped
+#       chest-opens-a-screen             1/25    a-bystander...  3/25
+#     ci/selfcheck-recompare.sh                                # as committed
+#       chest-opens-a-screen             0/25    a-bystander...  0/25
+#
+# **The control reproduces the declared rates exactly**, which is what makes
+# the treatment number mean anything (rule 7: when a measurement clears every
+# candidate, suspect the measurement).
+#
+# And the per-run projections say what varied, which is the part that settles
+# it. Across all 26 recordings, uncollapsed:
+#
+#     chest-opens-a-screen           8 observations in 25 runs, 7 in one (r19)
+#     a-bystander-sees-a-chest-open  10 in 23 runs, 9 in three (r16, r17, r18)
+#
+# and every flap's `first_difference` is the **last** `block_event`, present in
+# one run and absent in the other, byte-identical in every field it carries —
+# `at [1,0,0]`, `b0 1`, `b1 1`, `block 201`, digest `cbf29ce484222325`. So the
+# only dimension that moved across twenty-six cold-booted vanilla servers is
+# the length of a trailing run of identical observations. Collapsed, both
+# checks project to a constant on all 26: 3 observations and 1 respectively,
+# 25/25 match.
+#
+# THE POWER CAVEAT, ANSWERED RATHER THAN WAVED AT. `ci/selfcheck-aggregate.py`
+# resolves `a-bystander-sees-a-chest-open` — 25 comparisons miss a 3/25 event
+# with probability 0.041, inside alpha — and reports `chest-opens-a-screen`
+# UNRESOLVED, because 25 comparisons miss a 1/25 event 36% of the time. That
+# model treats the two runs as independent samples and they are not: this is
+# the *same* 26 recordings, and the single comparison that diverged (r19) is
+# one of the 25 that now matches. The flap was not missed, it was removed.
+#
+# Removed as a prediction, not a conclusion, on the same terms as
+# `sand-falls-when-unsupported`: this file is declared and the selfcheck
+# verifies it in both directions, so a future run in which the collapse did not
+# hold reports `NEWLY UNSTABLE` and exits non-zero. The replacement coverage for
+# what the two checks stopped testing — the 5-tick cadence — is
+# `rustmc_server::containers`'s
+# `the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`, which measures
+# the **gap** rather than the count, and it shipped in the same branch.
+
+# `a-standing-player-is-rebroadcast-on-a-timer` WAS declared here at **10 of
+# 11** and has been removed, measured **0 of 11** on 2026-08-04 on the branch
+# `vacuous-and-motion`. It leaves by the same door `sand-falls-when-unsupported`
+# and `other-player-is-an-entity` did: **the cause was removed, not declared.**
+#
+# The entry's mechanism was wrong about which entity was flapping, and the
+# error is worth keeping because it is the same error twice. It said the count
+# of 60-tick broadcasts inside `settle_ms` was structurally unstable, since a
+# fixed window holds floor(L/P) or ceil(L/P) events with P(ceil) = frac(L/P).
+# That arithmetic is correct and it was about the wrong entity. Twelve of this
+# check's twelve non-heartbeat observations in one corpus run were a dropped
+# item created by `500-dropping-an-item-throws-it-on-the-floor`, twenty checks
+# earlier, still alive and still inside the window because `compare::near`
+# could not bound an observation that carries no position — and vanilla puts
+# an entity's id on `set_entity_motion`, not its position. The flapping count
+# was the item's heartbeats. The players' own count reproduces exactly.
+#
+# `compare::place` bounds an entity observation by where the entity was
+# announced to arrive, and the check went 10/11 -> 0/11.
+#
+# **Removed as a prediction, not a conclusion**, on the same terms
+# `sand-falls-when-unsupported` was: this file is declared and the selfcheck
+# verifies it in both directions, so a run in which the bound did not work
+# reports `NEWLY UNSTABLE a-standing-player-is-rebroadcast-on-a-timer` and
+# exits non-zero.
+#
+# Honest caveat, and this file has cashed this one twice: 0 of 11 is a
+# statement about N, not a proof of stability. If it returns it returns with a
+# measurement. What does NOT depend on the flap is the check's job — it is
+# `absent` against this server and stays there until entity tracking lands,
+# which is the condition the heartbeat exemption ships on. See the check file
+# for what it can and cannot distinguish on each axis.
+
+# ---------------------------------------------------------------------------
+# `container-click-throw-drops-one-item` and
+# `container-click-throw-drops-the-whole-stack` WERE declared here, added on
+# 2026-08-08 from the S4 measurement at N = 3, and are **removed on
+# 2026-08-09 because the field they named is no longer compared**. This is the
+# second entry to leave by the door the header argues for rather than by being
+# found stale, and it left by a different route from the first: `070` left
+# because a defect in *our* harness was fixed, and these two leave because the
+# projection stopped asking a question vanilla cannot answer.
+#
+# What they named was one byte: `ItemEntity(EntityType, Level)` offsets 39-52,
+# `setYRot(this.random.nextFloat() * 360.0F)`, riding `add_entity`'s `yRot`.
+# `tools/oracle-runner/src/trace.rs` now decodes `xRot`, `yRot`, `yHeadRot`
+# and `data` as named fields instead of digesting them into `rest`, and
+# `compare::project`'s map drops `y_rot` — and only `y_rot`, and only for
+# `minecraft:item` read out of `data/vanilla/entity_types.json`. The other
+# three are constant `0` for every item vanilla spawns and are still compared,
+# `at` is still compared, and `070`'s falling block keeps all four.
+# `docs/PARITY-ROADMAP.md` §13.
+#
+# **Removed as a prediction, not as a conclusion**, which is what the `070`
+# removal established as this file's convention: taking the entries out before
+# the run means a run in which the exemption did not work reports
+# `NEWLY UNSTABLE container-click-throw-...` and exits non-zero, instead of
+# quietly agreeing with a file that was edited to match.
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# 605 / 606 WERE DECLARED HERE AND ARE NOW RETIRED — and the two branches that
+# met over them agreed, independently, on the field. 2026-08-09.
+#
+# `corpus-twin-protocol` measured them at N = 6 and filed them `class =
+# "reference"`: `container-click-throw-drops-one-item` at 14/15 pairs with five
+# distinct projections, `-drops-the-whole-stack` at 15/15 with six, reproduced
+# over two ensembles sharing no recording and no recorder (`twin-homog-20260809`
+# homogeneous, `nightly6-20260809` six trees and three recorders). It named the
+# cause: `add_entity` — the thrown item's spawn yaw, inside `rest`.
+#
+# `gameplay-container-throw` stopped comparing that byte, for `minecraft:item`
+# only, read from `entity_types.json` — and converted both checks to `match`.
+# Same field, two instruments, arrived at from opposite directions. The
+# instability was never vanilla being unreproducible in any way that mattered;
+# it was us comparing a value vanilla draws at random.
+#
+# The draw is still asserted, so the exemption cannot hide a server that writes
+# a constant: `rustmc_server::dropitem::tests::every_dropped_item_gets_a_random_spawn_yaw`
+# — a hundred spawns, more than ninety distinct yaws in `[0, 360)`. Same trade
+# `569323e` made for `sound.pitch`.
+#
+# **AND THAT TRADE HAS SINCE BEEN BOUGHT BACK, WHICH MAKES THIS ROW A
+# CANDIDATE RATHER THAN A PRECEDENT — 2026-08-17.** `sound.pitch` is no longer
+# dropped: `tools/oracle-runner/src/pitch.rs` compares a drawn value as the
+# **range it is drawn from**, so a chest-open pitch outside `[0.9, 1.0)` still
+# diverges while two honest draws still agree. The unit test asserting the draw
+# stops the exemption hiding a constant, exactly as the yaw test does here —
+# but the range check catches it in the corpus as well, which a unit test
+# cannot, because a unit test grades our server against itself.
+#
+# The same construction is available to `y_rot`. `add_entity`'s spawn yaw is a
+# byte over `[0, 360)` and a thrown item draws it from the whole interval, so
+# the exemption could become "any value" rather than "this field is not read" —
+# which would catch a server that writes a constant *in* the corpus instead of
+# only in `dropitem`'s tests. Not done here, and named rather than left to be
+# found: it needs the `rest` digest split so the yaw is a field of its own,
+# which is a recorder change and not a ledger one.
+#
+# ⚠ THE RETIREMENT'S OWN EVIDENCE IS WEAKER THAN THE DECLARATION'S. The
+# conversion was measured at N = 3 (2 comparisons, 0/2 flaps); the entries it
+# retires were measured at N = 6 (15 comparisons). By this file's own power
+# test `(1 - 0/2)` resolves nothing, and twin's `p_hide` says N = 2 hides a
+# scenario flapping up to 77.6% of the time. This is the exact shape of error
+# `ci/corpus-floor.py` exists to refuse, so it is written down rather than
+# rounded off: re-measure 605/606 at N = 6 under the NEW comparator, against
+# the `twin-homog-20260809` recordings already on the box — seconds, not a
+# five-hour re-record — and if they flap, they come back with a measurement
+# instead of a prediction.
+#
+# **ANSWERED 2026-08-09, branch `item-entity-tick`: they do not flap. 0/15
+# pairs at N = 6, one distinct projection in six runs, and the ensemble had the
+# power to see the 14/15 and 15/15 it refutes (miss probability 1.32e-06 and
+# 0).** The retirement stands and is now the *stronger* evidence, not the
+# weaker. One correction to the instruction above, and it is the reason this
+# took a new ensemble rather than a re-run: `twin-homog-20260809` is the WRONG
+# ensemble for this question. Its recordings predate `y_rot` being a named
+# field, so the exemption is inert over them and re-measuring there can only
+# reproduce the old numbers. The measurement is over six recordings that carry
+# `y_rot`; see the block further down where the entries used to be.
+# ---------------------------------------------------------------------------
+
+# `sand-falls-when-unsupported` WAS declared here, for one run of this file's
+# life, and has been removed because **the defect it named was fixed rather
+# than declared** — which is the outcome this header argues for and the first
+# time an entry has left by that door rather than by being found stale.
+#
+# It was the only entry here that was ever ours rather than vanilla's. The
+# diff was one field with everything around it identical:
+#
+#     vanilla  {"at":[1.5,1.0,0.5], "entity":0, "kind_id":51, "rest":"448df6d9252b2799"}
+#     ours     {"at":[1.5,1.0,0.5], "entity":1, "kind_id":51, "rest":"448df6d9252b2799"}
+#
+# Same position, same entity type, same digest of every remaining byte. Only
+# the number the harness assigned to the falling block moved.
+# `Normalizer::entity` ran inside `trace::decode`, on every non-housekeeping
+# packet, while a scenario's `observe` list is not applied until
+# `compare::project` — so an entity-bearing packet the check filters away
+# consumed an index anyway. The stray one was a `move_entity` for the other
+# player. The numbering now happens in `project`, over the observations the
+# check actually looks at and after the sort by `who`; see
+# `trace::entity_ref`.
+#
+# **Removed as a prediction, not as a conclusion.** This file is declared and
+# the selfcheck verifies it in both directions, so taking the entry out before
+# the run means a run in which the fix did not work reports `NEWLY UNSTABLE
+# sand-falls-when-unsupported` and exits non-zero. That is the point: the
+# declaration is falsifiable, and a green here is the fix being measured
+# rather than assumed.
+
+# ===========================================================================
+# TWO NAMES ADDED 2026-08-09 — the pair §11 saw on 2026-08-08 under a
+# different comparator and the 2026-08-09 gate saw again, adjudicated.
+#
+# They came back NEWLY UNSTABLE at 1/2 in a gate run and were reported the
+# same day by a second instrument, and a pairwise verdict count at N = 2 is
+# not evidence for either table: `p_hide(2) = 77.6%`. They are entered here on
+# a floor measurement — `ci/corpus-floor.sh` over `twin-homog-20260809`, six
+# cold boots of one tree with one recorder, 15 pairwise comparisons, corpus 88
+# — and `ci/corpus-floor.py adjudicate` re-derives every number below and
+# refuses either of them filed under `[[harness]]`.
+#
+# **One of the two spent its first measurement in the wrong table, and the
+# reason is written on `compare::place` rather than here**, because it will
+# outlive this entry: `a-player-that-leaves-the-ground-is-resynced` measured
+# `silent` — 2 of 6 runs "recorded nothing at all" — and it had recorded
+# plenty. The comparator was deleting it. See the entry.
+# ===========================================================================
+
+# `closing-a-crafting-table-returns-the-grid-contents` WAS DECLARED HERE at
+# 8/15 (N = 6, `twin-homog-20260809`) on `container_set_slot — the cumulative
+# state id`, and is retired 2026-08-11 with the other two entries on that
+# field. The measurement, the control and the reasoning are in the block
+# further up where `swapping-to-the-offhand-shows-on-both-channels` was: on
+# `coverage92-selfcheck-n6-20260811` this check goes **9/15 -> 0/15**, two
+# distinct projections to one, with the state-id rebase as the only variable.
+#
+# Its own signature is kept because it is the one the port landed on:
+# `container_set_slot` at step 3, slot 36, window 0, item digest
+# `cec2cbd74d50f332` identical on both sides, `state` 6 in one run and 7 in the
+# other — a constant shift of exactly one.
+
+[unstable.evidence]
+ensemble = "unnamed — SELFCHECK_RUNS=26 ci/t2-gameplay-selfcheck.sh on main 92f1658, 2026-08-04, corpus 61. It predates the ensemble-id convention entirely: the earliest id in this tree is twin-homog-20260809. Named here as unnamed rather than given one now, because an id invented after the fact cannot be matched against a recording set nobody kept."
+[[unstable]]
+name = "a-player-that-leaves-the-ground-is-resynced"
+flaps = 8
+comparisons = 15
+runs = 6
+class = "reference"
+measured = "8/15 pairs at N = 6 — ensemble twin-homog-20260809, six cold vanilla boots, one tree, one recorder, corpus 88, ci/corpus-floor.sh, Threadripper, 2026-08-09"
+# Two distinct projections over six runs, and they differ in the packet TYPE
+# of the outbound walk rather than in any field of it: four runs send
+# `entity_position` at [0, 0, 3] (a forced sync) and two send
+# `move_entity d = [0, 0, 12288]` (a delta), at 62-87 ms. The return walk is a
+# delta in all six.
+field = "the outbound walk's packet type — a forced position sync, or a delta"
+why = """
+`ServerEntity.sendChanges` offsets 648-691 choose a forced
+`ClientboundEntityPositionSyncPacket` over the `move_entity_*` deltas on any of
+five conditions, and the fifth is `wasOnGround != entity.onGround()`. The
+scenario's first step walks three blocks with the on-ground bit CLEAR, so it is
+written to cross exactly that disjunct.
+
+**Vanilla does not always take it, and the reason is inside vanilla.**
+`handleMovePlayer` does not trust the client's bit: it calls
+`player.move(MoverType.PLAYER, vec)` and `setOnGroundWithMovement(...)`, and
+the server's own tick then puts the player back on the superflat floor it is
+standing on. So `entity.onGround()` is true again within the tick, and whether
+`sendChanges` reads it before or after that restoration decides which packet
+the observer gets. Measured 4 of 6 one way and 2 of 6 the other, arrival
+62-140 ms against 64-87 ms — the same 50 ms grid as every other entry here,
+seen through a boolean instead of through a counter.
+
+Both branches are vanilla behaving correctly, no implementation can align the
+phase, and the check keeps all of its power: it still fails on a server that
+sends neither packet, and `540`'s own header records the falsification — with
+`|| self.was_on_ground != e.on_ground` deleted from `crate::tracker` this
+server emits nothing here at all.
+
+**IT MEASURED `silent` UNTIL 2026-08-09 AND THAT WAS THE COMPARATOR, NOT
+VANILLA.** `ci/corpus-floor.py` reported "2 of 6 runs (r5, r6) recorded nothing
+at all" and the evidence line read "the other said nothing more" about two
+recordings that both hold the delta above. `compare::place` was remembering
+where a player had been announced, `530-walking-away-drops-a-standing-player-from-view`
+announces one with `add_entity` inside its own window 32 blocks earlier, and a
+delta packet carries no position of its own — so in the two runs where vanilla
+sent no positioned packet, every observation in this scenario was bounded out
+and the projection came out empty. A player is no longer placed; the
+derivation and the recordings are on `compare::place`, and case 4 of
+`an_entity_is_bounded_by_where_it_is_and_never_by_a_position_nobody_sent` pins
+it. Before the repair this name was `silent` and would have been filed as a
+repair order against our own harness; after it, the residual is vanilla's and
+it is filed here."""
+
+# `a-flower-pot-empties-when-right-clicked` WAS DECLARED HERE at 9/15 (N = 6,
+# `coverage92-selfcheck-n6-20260811`, `NEWLY UNSTABLE` when it landed on
+# 2026-08-11) on `container_set_slot -- the cumulative state id`, with a full
+# `[unstable.evidence]` block. It is retired the same day with the other two
+# entries on that field; the measurement, the control and the reasoning are in
+# the block further up where `swapping-to-the-offhand-shows-on-both-channels`
+# was. On its own ensemble it goes **9/15 -> 0/15**, two distinct projections
+# to one, with the state-id rebase as the only variable — so the removal is
+# measured against exactly the recordings the entry was written from.
+#
+# Its signature is kept because it is the third door onto the same chain:
+# `container_set_slot` at step 0, slot **38** (not 36), window 0, item digest
+# `64371cd9cc8ac4c2` identical on both sides, `state` 9 in one run and 10 in
+# the other.
+#
+# **THE ENTRY GOING DOES NOT MAKE THE CHECK GREEN, AND THAT WAS ALWAYS TRUE OF
+# IT.** Its verdict is a real gap on a different field: vanilla sends
+# `block_update` returning the block to `minecraft:flower_pot` and we answer
+# `block_changed_ack` and nothing else, because `FlowerPotBlock.useWithoutItem`
+# is unported. It stays `diverge` and that is the honest reading.
+#
+# `ci/checks/gameplay/README.md`'s requirement that `790` stay the
+# highest-numbered check in that directory is UNAFFECTED and still load-bearing.
+# It is about `Player.addItem` advancing the window-0 counter for every later
+# check; the rebase makes that advance uncomparable rather than absent, and a
+# check numbered after `790` would still inherit both the advance and the
+# free-slot layout. Do not renumber it.
+
+# THE DAYLIGHT DETECTOR IS DELIBERATELY NOT DECLARED HERE, AND THAT IS A
+# MEASUREMENT RATHER THAN AN OMISSION -- 2026-08-11, docs/PARITY-ROADMAP.md
+# section 20.9. `ci/subset-stability.sh 6` over the five new checks measured
+# `a-daylight-detector-inverts-when-right-clicked` at 5/15 pairs, class
+# `reference`, ensemble coverage93-n6-20260810, and a draft entry for it was
+# written from that. The corpus ensemble refutes it: 0/15 pairs, 1 distinct
+# projection, class `stable`, over the same N and the same number of pairs.
+# The refutation is admissible because this ensemble HAD THE POWER to see the
+# claimed rate -- at 5/15, missing it in all 15 pairs has probability
+# (1 - 5/15)^15 = 0.0023, well under alpha = 0.05 -- so `ci/corpus-floor.py
+# adjudicate` would print `NO LONGER UNSTABLE ... the entry is stale` and red
+# on the entry the day it landed. The subset ran the five checks alone,
+# seconds after a cold boot, where boot jitter in the day/night phase
+# `DaylightDetectorBlock.useWithoutItem` recomputes POWER from is the whole
+# signal; in the corpus the scenario is reached ~60 scenarios in, along an
+# identical path in every run. **A subset is not the corpus, and this branch
+# already knew that about verdicts** -- `ci/checks/gameplay-baseline.toml`
+# says a baseline entry may only be written from the full gate. The same rule
+# holds for stability and it had not been written down.
+
+# ===========================================================================
+# THE TWO NAMES BELOW HAVE NOW LEFT — 2026-08-09, branch `item-entity-tick`.
+# They were added expecting to leave, and they left by the door this block
+# named. The measurement is at the end of the block; the reasoning it settles
+# is kept because a prediction that came true is worth more on the page than a
+# prediction quietly deleted.
+#
+# TWO NAMES ADDED 2026-08-09 THAT ARE EXPECTED TO LEAVE AGAIN, AND THE REASON
+# IS THE SHARPEST THING MEASURED THIS DAY.
+#
+# `gameplay-container-throw` was the first branch in this project's life to
+# change `compare::project`: `exempt_item_spawn_yaw` drops an item entity's
+# spawn yaw, which is a fresh `random.nextFloat() * 360` in every run of every
+# server. That exemption exists precisely to remove the cause of the two
+# entries below.
+#
+# **It has not removed them, and not because it is too narrow.** The exemption
+# reads a `y_rot` field, and `y_rot` is named by `trace::decode` only since
+# that same branch. `twin-homog-20260809` was recorded at 07:35-09:04 that
+# morning, before it, so those six recordings carry no `y_rot` at all: the
+# rotations are still inside the `rest` digest, the exemption's
+# `fields.contains_key("y_rot")` guard is false on every observation, and it is
+# **inert over this ensemble**. Measured, rather than reasoned: the floor over
+# `twin-homog-20260809` is 9/88 under the projection with the exemption and was
+# 9/88 without it, with these two names at 14/15 and 15/15 either way.
+#
+# What the exemption does when it can reach the field was measured too, on the
+# only two recordings on the box that carry one — `~/rustmc-gate` 13:18 and
+# `~/rustmc-throw` 11:48, both corpus 88, both post-branch. Their `add_entity`
+# for these two scenarios is identical in every field except `y_rot` (23
+# against 20, and -99 against -12), and the floor over that pair is **4/88
+# with neither of these names in it**. That is N = 2 and `p_hide(2) = 77.6%`,
+# so it is a positive control on the exemption and NOT a floor; it cannot
+# support "these reproduce", only "the exemption converts them".
+#
+# So both entries are declared on the standing ensemble, which is the honest
+# thing the measurement supports, and both are expected to leave the moment an
+# ensemble recorded by a decoder that names `y_rot` exists — by the same door
+# `other-player-is-an-entity` left by, the cause removed rather than declared.
+#
+# **AND THIS IS A RESIDUAL IN THE FLOOR'S PROVENANCE, NOT ONLY IN THESE TWO
+# ENTRIES.** `ci/checks/gameplay-floor.toml` now carries `projection`, so a
+# floor can no longer be quoted beside a score computed by a different
+# comparator. It does not carry the identity of the RECORDER that produced its
+# ensemble, and this is the case that proves the two are separate: the same
+# comparator over recordings from two decoders is two instruments. The
+# ensemble's decoder emits 91 (kind, field) pairs and the current one emits the
+# same 91 plus `add_entity.{y_rot, x_rot, y_head_rot, data}`. See
+# `docs/PARITY-ROADMAP.md` §15.
+#
+# ---------------------------------------------------------------------------
+# MEASURED, AND BOTH ENTRIES ARE GONE — 2026-08-09, branch `item-entity-tick`.
+#
+# The ensemble this block said it was waiting for now exists. Six recordings on
+# the box carry `y_rot`, from six independent cold vanilla boots:
+# `~/rustmc-throw/oracle-work/gameplay-selfcheck/r{1,2,3}.json`,
+# `~/rustmc-throw`, `~/rustmc-gate` and `~/rustmc-look`'s corpus
+# `vanilla.json`. `ci/corpus-floor.sh --id yrot6-20260809`, corpus 88, 88
+# scenarios common and 0 dropped, 15 pairwise comparisons, Threadripper.
+#
+#     container-click-throw-drops-one-item         0/15 pairs, 1 distinct, stable
+#     container-click-throw-drops-the-whole-stack  0/15 pairs, 1 distinct, stable
+#     CORPUS FLOOR 7/88   (the standing file's 9/88 minus exactly these two)
+#
+# **The ensemble had the power to see the old rates, and the adjudicator says
+# so in the arithmetic rather than by assertion**: at the declared 14/15, five
+# independent comparisons miss it with probability 0.0667^5 = 1.32e-06; at
+# 15/15, with probability 0. Both are far below alpha = 0.05, so this is a
+# refutation and not an N that failed to resolve. `p_hide(6) = 39.3%` is the
+# generic bound and it is not the binding one here.
+#
+# This is also the answer to the ⚠ raised further up this file: the retirement
+# is no longer the weaker evidence. It was N = 3 with 2 comparisons; it is now
+# N = 6 with 15, under the comparator that actually ships.
+#
+# **Neither `class` nor `distinct` is a low-N accident and neither is vacuous.**
+# The declared projection is 8 observations long in all six runs — `add_entity`
+# with `at`, `kind_id`, `data`, `x_rot`, `y_head_rot`, plus the
+# `container_set_slot` correction — so `ci/corpus-floor.py` classified them
+# `stable`, not `dead`. A projection that had been emptied by the exemption
+# would have come back `dead` and is the case that file refuses.
+#
+# **The two recorders in this ensemble cannot be hiding the flap.** r1-r4 share
+# one recorder digest and r5-r6 another; heterogeneity can only add
+# disagreements, and every one of the 15 pairs — cross-recorder pairs
+# included — agreed.
+#
+# **A pre-`y_rot` ensemble will still show them flapping, and that is a
+# statement about that ensemble's decoder, not about vanilla.** Re-running the
+# floor over `twin-homog-20260809` reproduces 14/15 and 15/15 for the reason
+# this block gives above, and doing so does not reopen the question. The floor
+# and the comparator now share a `projection` id and still differ in
+# vocabulary — `proj:58380c9e4cbeae81` stamps both this measurement and the
+# standing floor file — so this pair is the worked example of §15.4's residual:
+# a projection identity is necessary and is not sufficient.
+# ---------------------------------------------------------------------------
+# ===========================================================================
+
+[unstable.evidence]
+ensemble = "twin-homog-20260809"
+note = """
+READ THE TWO RATES TOGETHER AND DO NOT SUBTRACT THEM. This entry reads 8/15 over twin-homog-20260809 and ci/checks/gameplay-floor.toml reads 5/15 for the same scenario at the same N = 6 and the same 15 pairs, over coverage92-selfcheck-n6-20260811. That is two ensembles, not a movement — the same rule docs/PARITY.md 4.1 states for the corpus floor's 9 and 7. Until 2026-08-18 neither number said which ensemble it belonged to, so the disagreement was invisible."""

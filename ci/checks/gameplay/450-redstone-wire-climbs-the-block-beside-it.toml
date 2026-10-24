@@ -1,0 +1,40 @@
+name = "redstone-wire-climbs-the-block-beside-it"
+about = "putting dust on top of a block makes the dust beside that block point up at it — `RedStoneWireBlock`'s connection rule reads two blocks away and diagonally, which is the one shape rule in the game that a table of neighbour states cannot express"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+
+# The dust at [1, 0, 0] is what this is about: it should change from
+# `east = side` to `east = up` because of a block placed at [2, 1, 0], a
+# position it does not touch.
+[[step]]
+do = "place"
+on = [2, 0, 0]
+face = "up"

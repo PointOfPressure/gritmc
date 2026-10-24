@@ -1,0 +1,242 @@
+name = "walking-away-drops-a-standing-player-from-view"
+about = "the actor walks away from a player that never moves and back, twice, once to a distance vanilla still tracks at and once past it — so the entity whose visibility changes is the one that stood still, which is the half of `ChunkMap.tick` the entity loop cannot reach, and the two distances together pin the tracking limit rather than only the sweep's existence"
+observe_from = "actor"
+observe = ["add_entity", "remove_entities"]
+settle_ms = 3000
+
+# WHY THIS CHECK EXISTS: THREE FIXES WERE COVERED BY UNIT TESTS AND NOTHING
+# ELSE
+#
+# `ChunkMap.tick()` re-runs `updatePlayer` down two separate paths and they
+# cover opposite halves of the same question:
+#
+#   * the entity loop fires when the *tracked entity* changed section, and
+#     covers an entity moving towards or away from a stationary player;
+#   * the `movedPlayers` sweep afterwards fires when a *player* changed
+#     section, and covers a player moving towards or away from a stationary
+#     entity.
+#
+# Every existing check that moves anything moves the actor, and the only
+# entity that exists in most of them is the other player — so both entities
+# move, the entity loop happens to cover it, and the sweep can be deleted
+# with no check noticing. `080-other-player-is-an-entity` walks four blocks,
+# which changes nobody's visibility at all.
+#
+# This check moves exactly one entity — the actor — and reads the stream of
+# the client that moved. The observer never moves, so **its** `TrackedEntity`
+# never takes the entity loop's branch, and the only code in the server that
+# can put `remove_entities` for a stationary observer on a moving actor's
+# connection is the sweep.
+#
+# WHY TWO ROUND TRIPS AND NOT ONE
+#
+# One round trip past the limit tests that the sweep runs. It does **not**
+# test the limit, and this corpus has fourteen recorded cases of a check that
+# pinned only one value and so could not tell the mechanism from a constant.
+# Any server that drops a player at *some* distance and picks them up again
+# passes a one-trip version, whatever that distance is.
+#
+# `TrackedEntity.updatePlayer` limits visibility to
+# `min(getEffectiveRange(), getPlayerViewDistance(player) * 16)`, horizontally
+# — `d.y` never enters it. `EntityType.PLAYER.clientTrackingRange()` is 32, so
+# the type contributes 512 blocks and the view distance is what binds:
+# `ci/vanilla-server.sh` writes `view-distance=4`, and
+# `ChunkMap.getPlayerViewDistance` is `Mth.clamp(requested, 2,
+# serverViewDistance)`, so vanilla's limit here is **64 blocks**.
+#
+# So the check makes two trips either side of 64. The observer stands at
+# relative `[0, 0, 5]` (`record::OBSERVER_OFFSET`) and `Session::hop_to` moves
+# four blocks per packet, so the only thing that matters is the separation at
+# each *section change*, because that is the only moment the sweep runs:
+#
+# ```text
+#   out to 52   sections change at z = 16, 32, 48   dz = 11, 27, 43
+#               deepest separation reached  dz = 47  -> inside 64 throughout
+#   back to 0   sections change at z = 47, 31, 15    dz = 42, 26, 10
+#   out to 85   sections change at ... 64, 80        dz = 59, then 75
+#                                                    -> outside 64 at z = 80
+#   back to 0   sections change at 79, 63, ...       dz = 74, then 58
+#                                                    -> inside 64 again at 63
+# ```
+#
+# Vanilla should therefore say **nothing at all** on the first round trip and
+# emit one `remove_entities` and one `add_entity` on the second. A server
+# whose limit is anywhere below 43 blocks removes the observer on the first
+# trip too and says four things; a server with no sweep says nothing on either
+# and scores `absent`. The three outcomes are distinguishable, which is the
+# whole point of the second trip.
+#
+# **The hop size is load-bearing and it was wrong when this check was written.**
+# `hop_to` moved 8 blocks a packet, which vanilla refuses — it logged
+# `oracle moved too quickly! 0.0,0.0,16.0` and teleported the actor back, and
+# because a measured step never reads the socket the `accept_teleportation`
+# never went out and the actor stayed pinned about 24 blocks from where it
+# started. Vanilla was never further than 24 blocks from the observer in the
+# first two runs of this check, so it emitted nothing and the check was
+# measuring the rig.
+#
+# The repair overshot once: at one block a packet the walk was legal and
+# `080-other-player-is-an-entity` fell from `match` to `diverge`, because four
+# packets for its four-block walk are four things two servers can divide
+# differently where one packet is not. Four blocks a packet is legal with
+# margin *and* leaves 080 at the single hop it was measured `match` in. See
+# `Session::hop_to`'s header for both halves.
+#
+# WHY ON +z
+#
+# Workspaces are spaced along **x** at 32 blocks
+# (`record::WORKSPACE_SPACING`), so an 85-block walk on x would cross two
+# other scenarios' rigs and could pick up their entities. Nothing is built on
+# +z at all. This check writes no blocks, so the "keep a rig one side of
+# z = 0" rule in the README does not apply to it — it is about which chunk a
+# `section_blocks_update` covers, and there are none here.
+#
+# THE PREDICTION, WRITTEN BEFORE THE RUN THAT MEASURES IT
+#
+# **The first version of this prediction was wrong, and it was wrong because
+# it believed a doc comment in our own source.** `crate::play::JoinInfo`
+# documents `chunk_radius` as "the client's own view distance, echoed back",
+# which would have made this server's limit `10 * 16 = 160` — the
+# `client_information` `tools/oracle-runner` sends — and the prediction was
+# `absent`, this server tracking too far to notice an 80-block separation.
+#
+# `status.rs` does not do that. It sets
+# `join.chunk_radius = (area.max_chunk_x - area.min_chunk_x) / 2`, the radius
+# of the **spawn tile**, and then hands the same number to
+# `PlayerIdentity.view_distance`. `ci/t2-gameplay.sh` boots this server with
+# `--radius 2`, so the number is 2 and the limit is `2 * 16` = **32 blocks**,
+# five times smaller than the guess and half of vanilla's.
+#
+# So the measured prediction is `diverge`, not `absent`: vanilla emits two
+# observations and this server should emit four, removing the observer on the
+# first round trip as well because 47 blocks is outside 32. The defect is that
+# there is no server view distance here at all — the number that reaches
+# `updatePlayer` is how much world was generated, which is not a thing vanilla
+# would let it be.
+#
+# If it comes back anything else this comment gets the measurement written
+# beside it rather than being quietly replaced.
+#
+# MEASURED 2026-08-05, AND THE PREDICTION WAS RIGHT ABOUT THE MECHANISM AND
+# WRONG ABOUT THE CHECK BEING STABLE.
+#
+# This check went `match` on the run that introduced it and `match` on the next
+# one, was locked at `match`, and then came back `diverge` on a branch that
+# touches nothing it observes. The difference is the **trailing digest of
+# `add_entity`**, which is a field no decoder arm names, on the actor's stream
+# at step 3 — the re-add of the observer that never moved.
+#
+# WHOSE INSTABILITY IT IS, settled by three independent corpus runs whose
+# traces all still existed:
+#
+# ```text
+#                          ours              vanilla
+#   gate   2026-08-04      449516d9252be94f  449516d9252be94f   match
+#   menus  2026-08-04      449516d9252be94f  449516d9252be94f   match
+#   chain  2026-08-05      449516d9252be94f  ec94da22c1882da2   diverge
+# ```
+#
+# **Our bytes are identical in all three, on three different trees.** Vanilla's
+# moved. In that third run vanilla also sent a *different* value again on the
+# observer's stream (`2737654eceda12b3`), so it disagreed with itself within one
+# run as well as between runs.
+#
+# WHICH FIELD, by exhaustion rather than by eye. The decoder consumes id, uuid,
+# type and the three position doubles, so `rest` covers exactly
+# `movement (packed varlong) | xRot | yRot | yHeadRot | data (varint)`. Ours is
+# **five bytes, all zero** — `write_lp_vec3` writes a single `0` for a movement
+# under 3.05e-5 — and `digest` of those five bytes reproduces
+# `449516d9252be94f` exactly. Searching every one of the 256³ rotation triples
+# against `data` in {0, 1, 2} with the movement pinned at zero reproduces
+# **neither** vanilla value, so the field that moved is the **movement**:
+# `ServerEntity.getLastSentMovement()`, which vanilla carries into
+# `ClientboundAddEntityPacket` and which this server leaves at zero for ever.
+#
+# That is the same root `540-a-player-that-leaves-the-ground-is-resynced` named:
+# there is no server-side player physics here, so a player's delta movement is
+# never set. Vanilla's standing observer has a delta movement that depends on
+# which tick its last motion packet went out on, so whether it is zero at the
+# moment of a re-add is a **coin toss vanilla makes**, not a property of either
+# server.
+#
+# It does not reproduce in a subset: `ci/t2-gameplay-subset.sh` over this check
+# alone came back `match` three times out of three, with vanilla sending the
+# same five zero bytes we do. The observer has to have been standing for the
+# length of a full corpus for the state to differ, which is why one check's
+# rate cannot be measured cheaply here.
+#
+# **SO `match` WAS NOT A FLOOR THIS CHECK COULD HOLD** — for exactly the reason
+# `chest-opens-a-screen` could not hold one: it was a property of this server
+# *and* a coin toss. Two greens on a check written the same day were not
+# evidence of reproducibility; that is the second time this corpus has learned
+# it. The fix was not to soften the floor, which would hide a real fall, but the
+# one ORACLE rule 26 describes: take the dimension no check claims to test out
+# of the projection.
+#
+# RESOLVED 2026-08-05, AND MEASURED RATHER THAN ARGUED.
+#
+# `trace::decode` now consumes and discards `add_entity`'s movement, exactly as
+# it already did the uuid and `sound`'s seed. Nothing here was ever about
+# velocity — this check is about *visibility*.
+#
+# ```text
+#   vanilla against itself, N = 26 cold-booted servers, corpus 63,
+#   run 1 vs runs 2..26, Threadripper, 2026-08-05:   0/25 flaps, 25 match
+#   this server, two full corpus runs:               match, match
+#                                                    ref_obs 2, subject_obs 2
+#                                                    no missing or extra kinds
+#   our add_entity tail digest:                      dc545a7f9dce13f5
+#                                                    = digest of four zero bytes,
+#                                                      predicted before the run
+# ```
+#
+# **What claims the movement field, because an exemption with nothing behind it
+# manufactures a check that cannot fail** — and this corpus has fifteen of those
+# by accident already:
+#
+#   * `tracker::add_entity_announces_the_last_sent_movement` — this server puts
+#     `ServerEntity.lastSentMovement` into the packet, six bytes of `LpVec3`,
+#     and not the entity's live value. Seeding it from `e.movement` fails it.
+#   * `trace::an_add_entitys_movement_is_not_part_of_the_observation` — the
+#     exemption is exactly as wide as it claims: a body differing only in
+#     movement compares equal, one differing in a rotation still differs.
+#     Deleting the consume fails it; consuming a *fixed* six bytes instead of
+#     the variable `LpVec3` width also fails it.
+#
+# **The control that proves the exemption is not too wide.**
+# `spawn-egg-makes-a-mob` and `a-dropped-item-goes-into-your-inventory` are
+# declared unstable on *the same packet* for *different* fields — the spawn
+# rotation and the item's position. Both had to stay at 25/25 under the new
+# projection or the exemption would have been removing more than it claimed.
+# Both did, on the same 26 recordings.
+#
+# **Still unmeasured, written down rather than assumed closed:** no check
+# compares an entity's movement *value* against vanilla on the wire. The
+# quantity is not gone from the corpus — `set_entity_motion` decodes `v` as a
+# named field and vanilla does emit one for a thrown item — but this server
+# sends none, because our item's velocity never changes for want of
+# `ItemEntity.tick`. See `docs/SERVER.md`.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# Inside vanilla's limit at every section change. Vanilla should be silent
+# for both of these two steps.
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 52.0]
+
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 0.0]
+
+# Past it. One removal, then one re-add.
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 85.0]
+
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 0.0]

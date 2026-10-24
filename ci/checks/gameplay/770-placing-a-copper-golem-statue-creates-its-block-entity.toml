@@ -1,0 +1,24 @@
+name = "placing-a-copper-golem-statue-creates-its-block-entity"
+about = "`CopperGolemStatueBlockEntity` type 47, the highest-numbered block entity type any check reaches — one of eight weathering variants that share it, and empty in its placed state"
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:copper_golem_statue"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

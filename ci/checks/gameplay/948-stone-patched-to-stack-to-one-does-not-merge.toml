@@ -1,0 +1,57 @@
+name = "stone-patched-to-stack-to-one-does-not-merge"
+about = "two stone each carrying minecraft:max_stack_size 1 are put into the same chest slot one after the other. ItemInstance.getMaxStackSize is getOrDefault(MAX_STACK_SIZE, 1) over the PATCHED map, so the patch beats stone's prototype 64; doClick's PICKUP arm sees the same item and components and calls Slot.safeInsert, whose room is min(container 64, stack 1) - 1 = 0 — nothing goes down and the second stone stays on the cursor. What would make this fail: a stack size read from the item's prototype alone merges them into a slot of two."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot", "set_cursor_item"]
+settle_ms = 1500
+
+# The lid repeats every 5 ticks while the chest is open; collapsed as in 607.
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# `DataComponents.lambda$static$1`: max_stack_size is `ByteBufCodecs.VAR_INT`.
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+components = [{ type = "minecraft:max_stack_size", varint = 1 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+slot = 2
+components = [{ type = "minecraft:max_stack_size", varint = 1 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# The first into chest slot 0 (hotbar 0 is menu slot 54).
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0
+
+# THE MEASURED STEP: the second (hotbar 2, menu slot 56) onto the same slot.
+[[step]]
+do = "container_click"
+slot = 56
+
+[[step]]
+do = "container_click"
+slot = 0

@@ -1,0 +1,406 @@
+# use-probe-dependent.toml - every row of `data/vanilla/use_without_item.json`
+# whose recorded answer is a reading of the probe's own player rather than of
+# the block.
+#
+# # What this file is for
+#
+# `tools/goldengen/vanilla/UseGolden.java` drives ONE player at every block
+# state and writes down what happened. That player has a facing, a position, a
+# game mode, an ability set and a permission set, and `useWithoutItem` is handed
+# it. Where a block reads it, the recorded row is a fact about that player while
+# the table states it as a fact about the block - and nothing could ever
+# contradict it, because the only thing that could is a probe in another stance
+# and no such probe existed. 122 of the table's 184 rows sit on a
+# `useWithoutItem` that reads the player at all (`ci/probe-reads.py`); the
+# entries below are the ones whose recorded row actually MOVES when the player
+# does.
+#
+# `UseGolden.STANCES` now sweeps eleven further players and sets
+# `probeDependent` per block. This file is the allowlist for that column, and
+# `ci/use-golden.sh` refuses to write the table when a probe-dependent block
+# appears that is not here, when a listed block's axes change, or when a listed
+# block stops being probe-dependent. The defect can therefore be carried - it is
+# real vanilla behaviour and porting it is a different item - but it cannot be
+# reintroduced quietly, and a new block that reads the player cannot enter the
+# table without somebody writing a line here.
+#
+# # How to add an entry
+#
+# You should not want to. An entry here says "our golden table records one
+# quarter of this block's behaviour". The fix is to port the block by hand
+# ahead of the table (`crate::useblock::hand_ported` / `use_gate`), from its
+# bytecode, so the server's answer stops depending on the table's one
+# recorded player.
+#
+# **Deleting the entry once ported does NOT work with the checker as built,
+# and STALE is not the signal that tells you the port is done** - verified by
+# doing it (`useblock-port-the-17`, 2026-08-12; independently re-derived from
+# first principles before being confirmed against uncommitted work from an
+# earlier, unpushed attempt at the same branch name that reached the same
+# conclusion). `ci/check-use-probe.py`'s `STALE` branch fires only for a
+# listed block absent from a FRESH re-probe of the pinned jar, and that
+# re-probe reflects real vanilla's own bytecode, which nothing in
+# `crates/rustmc-server` can change: `minecraft:comparator` stays
+# `probeDependent: true` under `no_build` in every regeneration, hand-ported
+# or not. Deleting its entry regardless produces `NEW`, not `STALE`, and
+# refuses `ci/use-golden.sh` - which breaks `ci/gen-gameplay-tables.sh` for
+# every tree on the box, not just this one. Checked against all 17 rows, not
+# only the 5 `useblock-port-the-17` touched: deleting the already-hand-ported
+# `FenceGateBlock`/`DaylightDetectorBlock` entries produces the identical
+# `NEW`. So: port the block, leave its entry here. What would actually let an
+# entry be removed - plausibly a `hand_ported`-aware exemption added to
+# `UseGolden.java` or `ci/check-use-probe.py` - has not been built, and
+# building it is unscoped generator work, not a port.
+#
+# `axes` is the exact sorted list `UseGolden` produced, compared for equality
+# and not for membership: a block that gains an axis is as red as a new block,
+# because "already known to be wrong" is not the same finding as "wrong in a new
+# way". `unknown` is the other list - stances under which the harness refused
+# where `base` did not, so the answer is not merely different but unread.
+
+[meta]
+recorded = "2026-08-11"
+# Every stance in `UseGolden.STANCES`, `base` included. A sweep that quietly
+# stops sweeping would make every row look constant, so the count is pinned.
+#
+# 12 -> 14 on 2026-08-18. `hungry` and `invulnerable` are the two halves of
+# `Player.canEat(false)`, which is `abilities.invulnerable || foodData.needsFood()`
+# and which is the first thing a cake or a candle cake asks before it takes a
+# bite. This harness's player is full-fed and not invulnerable, so `eat`
+# answered `PASS` before writing anything, `interesting()` was false for every
+# state, and **18 blocks had no row at all** — one cake and seventeen candle
+# cakes. `crate::useblock` reads "not in the table" as a decline and falls
+# through to placement, so a right-click on a cake put a block down.
+#
+# The player it was measured against is inconsistent with itself, which is the
+# part worth carrying rather than quietly repairing: `HarnessPlayer.gameMode()`
+# answers `CREATIVE`, a real creative player has `abilities.invulnerable = true`
+# and can therefore always eat, and this probe's creative player never could.
+# `base` still cannot — it is not free to change, and every recorded cell in
+# this table was taken under it — so the two stances measure the gap instead of
+# hiding it, one axis each: `hungry` moves the food data, `invulnerable` moves
+# the ability, and the rows below say a cake moves under both.
+stances = 14
+# Stances this harness cannot set up.
+#
+# **Empty since 2026-08-12, and that is the fix rather than the erasure of the
+# problem.** It read `["full_inventory"]` because `new ItemStack` reads
+# `Holder.Reference.components()` and `Bootstrap.bootStrap()` alone does not
+# bind them - the same limit that put 39 `Components not bound yet` refusals in
+# this table. `UseGolden.bindItemComponents` runs the initializers a real
+# server runs; 141 pending registries apply, all 1,537 items mint a stack, the
+# 39 refusals are gone and `full_inventory` is swept. The blind spot that
+# paragraph named - `FlowerPotBlock`'s `Player.addItem` axis - is now measured,
+# and the entries below say what it measured.
+unavailable = []
+
+[[block]]
+id = "minecraft:acacia_fence_gate"
+class = "FenceGateBlock"
+reads = ["Player.getDirection"]
+axes = ["adjacent_south", "facing_east", "facing_north", "facing_west"]
+unknown = []
+
+[[block]]
+id = "minecraft:bamboo_fence_gate"
+class = "FenceGateBlock"
+reads = ["Player.getDirection"]
+axes = ["adjacent_south", "facing_east", "facing_north", "facing_west"]
+unknown = []
+
+[[block]]
+id = "minecraft:birch_fence_gate"
+class = "FenceGateBlock"
+reads = ["Player.getDirection"]
+axes = ["adjacent_south", "facing_east", "facing_north", "facing_west"]
+unknown = []
+
+[[block]]
+id = "minecraft:cherry_fence_gate"
+class = "FenceGateBlock"
+reads = ["Player.getDirection"]
+axes = ["adjacent_south", "facing_east", "facing_north", "facing_west"]
+unknown = []
+
+[[block]]
+id = "minecraft:comparator"
+class = "ComparatorBlock"
+reads = ["Player.getAbilities"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:crimson_fence_gate"
+class = "FenceGateBlock"
+reads = ["Player.getDirection"]
+axes = ["adjacent_south", "facing_east", "facing_north", "facing_west"]
+unknown = []
+
+[[block]]
+id = "minecraft:dark_oak_fence_gate"
+class = "FenceGateBlock"
+reads = ["Player.getDirection"]
+axes = ["adjacent_south", "facing_east", "facing_north", "facing_west"]
+unknown = []
+
+[[block]]
+id = "minecraft:daylight_detector"
+class = "DaylightDetectorBlock"
+reads = ["Player.mayBuild"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:jungle_fence_gate"
+class = "FenceGateBlock"
+reads = ["Player.getDirection"]
+axes = ["adjacent_south", "facing_east", "facing_north", "facing_west"]
+unknown = []
+
+[[block]]
+id = "minecraft:light"
+class = "LightBlock"
+reads = ["Player.canUseGameMasterBlocks"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:mangrove_fence_gate"
+class = "FenceGateBlock"
+reads = ["Player.getDirection"]
+axes = ["adjacent_south", "facing_east", "facing_north", "facing_west"]
+unknown = []
+
+[[block]]
+id = "minecraft:oak_fence_gate"
+class = "FenceGateBlock"
+reads = ["Player.getDirection"]
+axes = ["adjacent_south", "facing_east", "facing_north", "facing_west"]
+unknown = []
+
+[[block]]
+id = "minecraft:pale_oak_fence_gate"
+class = "FenceGateBlock"
+reads = ["Player.getDirection"]
+axes = ["adjacent_south", "facing_east", "facing_north", "facing_west"]
+unknown = []
+
+[[block]]
+id = "minecraft:redstone_wire"
+class = "RedStoneWireBlock"
+reads = ["Player.getAbilities"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:repeater"
+class = "RepeaterBlock"
+reads = ["Player.getAbilities"]
+axes = ["no_build"]
+unknown = []
+
+[[block]]
+id = "minecraft:spruce_fence_gate"
+class = "FenceGateBlock"
+reads = ["Player.getDirection"]
+axes = ["adjacent_south", "facing_east", "facing_north", "facing_west"]
+unknown = []
+
+[[block]]
+id = "minecraft:warped_fence_gate"
+class = "FenceGateBlock"
+reads = ["Player.getDirection"]
+axes = ["adjacent_south", "facing_east", "facing_north", "facing_west"]
+unknown = []
+
+# The seven below entered the table on 2026-08-18, when `TableLevel` started
+# answering `getBlockEntity` with the real block entity instead of `null`.
+# Every one of them opens with `if (!(level.getBlockEntity(pos) instanceof
+# XBlockEntity)) return PASS`, so with a null they returned `PASS` before
+# reaching anything and had no row at all - not a refusal, no row. With a real
+# block entity they reach `player.canUseGameMasterBlocks()`, which is
+# `abilities.instabuild && permissions().hasPermission(GAMEMASTER)`, and that is
+# a reading of the probe. They are probe-dependent because they were always
+# probe-dependent; the harness could not see it until the ask was answered.
+
+[[block]]
+id = "minecraft:chain_command_block"
+class = "CommandBlock"
+reads = ["Player.canUseGameMasterBlocks"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:command_block"
+class = "CommandBlock"
+reads = ["Player.canUseGameMasterBlocks"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:jigsaw"
+class = "JigsawBlock"
+reads = ["Player.canUseGameMasterBlocks"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:repeating_command_block"
+class = "CommandBlock"
+reads = ["Player.canUseGameMasterBlocks"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:structure_block"
+class = "StructureBlock"
+reads = ["Player.canUseGameMasterBlocks"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:test_block"
+class = "TestBlock"
+reads = ["Player.canUseGameMasterBlocks"]
+axes = ["game_master"]
+unknown = []
+
+[[block]]
+id = "minecraft:test_instance_block"
+class = "TestInstanceBlock"
+reads = ["Player.canUseGameMasterBlocks"]
+axes = ["game_master"]
+unknown = []
+
+# The eighteen below entered the table on 2026-08-18 with the `hungry` and
+# `invulnerable` stances. `CakeBlock.eat` is `if (!player.canEat(false)) return
+# PASS` and `CandleCakeBlock` calls straight into it, so a full-fed, vulnerable
+# probe made every cake in the game inert. They keep no cells under `base` —
+# `base` genuinely cannot eat — and the `axes` list is what says the row is an
+# absence of appetite rather than an absence of behaviour.
+
+[[block]]
+id = "minecraft:black_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:blue_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:brown_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:cake"
+class = "CakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:cyan_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:gray_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:green_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:light_blue_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:light_gray_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:lime_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:magenta_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:orange_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:pink_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:purple_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:red_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:white_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []
+
+[[block]]
+id = "minecraft:yellow_candle_cake"
+class = "CandleCakeBlock"
+reads = ["Player.canEat"]
+axes = ["hungry", "invulnerable"]
+unknown = []

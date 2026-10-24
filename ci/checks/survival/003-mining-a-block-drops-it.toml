@@ -1,0 +1,42 @@
+name = "mining-a-block-drops-it"
+about = """
+A survival dig spawns the block's drop; a creative one does not
+(`ServerPlayerGameMode.destroyBlock` offsets 189-200: `preventsBlockDrops()`
+is `abilities.instabuild`, and it returns above `playerDestroy` at 269).
+Grass dug bare-handed for a second and then STOPped — past 0.7, so it breaks
+at STOP — rolls `minecraft:blocks/grass_block`, which is dirt without Silk
+Touch, and `Block.popResource` spawns it. The item is graded by what it is,
+not where it lands: `popResource` jitters the position by
+`Mth.nextDouble(level.random, -0.25, 0.25)` per axis and the entity draws its
+own velocity, so `add_entity` differs between two vanilla runs; the
+`set_entity_data` carrying `ItemEntity.DATA_ITEM` (a dirt stack of one) does
+not, and vanilla sends it twice — in the pairing bundle and again on the
+first tracker tick, because `setItem` left it dirty.
+
+This file used to dig and wait with no STOP, which never breaks the block in
+vanilla (`tick()` displays progress and does not destroy), so the reference
+was silent and the check vacuous. What would make it fail now: no item, the
+wrong item, or one data packet where vanilla sends two.
+"""
+observe_from = "both"
+observe = ["set_entity_data", "block_update"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[step]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 1000
+
+[[step]]
+do = "finish_dig"
+at = [1, -1, 0]
+face = "up"

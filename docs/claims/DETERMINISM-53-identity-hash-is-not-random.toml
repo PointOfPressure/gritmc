@@ -1,0 +1,6 @@
+doc    = "DETERMINISM"
+number = 53
+slug   = "identity-hash-is-not-random"
+title  = "An identity hash is not a random number, and an order keyed on one is stable exactly when its insertions are"
+branch = "entid-alloc-order"
+status = "written"

@@ -1,0 +1,83 @@
+name = "container-click-with-an-out-of-range-slot-changes-nothing"
+about = "a slot index past the end of an open 63-slot chest menu — javap -p -c -constants on ServerGamePacketListenerImpl.handleContainerClick (offsets 108..179) calls AbstractContainerMenu.isValidSlotIndex before AbstractContainerMenu.clicked is ever reached, logs a debug line, and returns with no packet sent at all when it fails. 561 names this as one of two silent branches handleContainerClick has and leaves it unclaimed because 561 itself only exercises the other one (an in-range slot with nothing in it). What would make this fail: a server that indexes its own slot table without checking bounds first either panics — visible here as a lost connection instead of vanilla's silence — or clamps/wraps to some other slot and answers with a correction vanilla never sends."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot"]
+settle_ms = 1000
+
+# THE MEASURED STEP ASSERTS A SILENCE, AND SAYS SO.
+#
+# This check's point is that the last `[[step]]` provokes nothing. Its
+# measured step — step 2 — therefore contributes zero declared
+# observations on both sides, and `compare` would otherwise report
+# `mute`: exactly the shape of `607` passing by comparing two silences.
+#
+# Measured, not assumed, and on two independent recordings so that a
+# single run's phase cannot be what is being read: the corpus traces in
+# `work-blueice` (2026-08-08 21:26, 86 scenarios) and `rustmc-cov2`
+# (2026-08-10 13:16, 93 scenarios) both put zero declared observations at
+# this step on both sides. What raw traffic lands there is *not* stable
+# between those two runs — the lid timer's repeat count, an idle-player
+# rebroadcast, a stray `entity_position` — and all of it is either
+# outside this check's `observe` list or deleted by the projection, which
+# is why the declared reading is the one worth writing down.
+#
+# The silence is still compared. A subject that spoke at this step would
+# `Diverge`, which is what this check is for; the declaration suppresses
+# `mute` and nothing else.
+#
+# The distinction is not in the actions — `608`'s measured click and
+# `607`'s are the same `container_click` on the same rig — it is in what
+# the check claims, and only this file knows that. Absent, the field
+# means "must speak", so a check that forgets it goes red rather than
+# quietly green.
+measured_step = "silent"
+
+# The chest lid repeats on a free-running 5-tick timer for as long as the chest
+# is open — `ContainerOpenersCounter.recheckOpeners` re-arms unconditionally
+# (offsets 178-186 call `Level.scheduleTick(pos, block, 5)`) and calls
+# `openerCountChanged` on both paths (offset 84's `if_icmpeq 167` lands on the
+# call itself), and `ChestBlockEntity.signalOpenCount` offsets 0-13 turn that
+# into `level.blockEvent(pos, block, 1, newCount)`. So the same `block_event`
+# goes out every 250 ms, forever.
+#
+# This check does not observe `block_event` and so never saw them declared.
+# It sees them under `strict`, where **how many arrived and which step each
+# was stamped with are set by where a free-running timer's edges fell against
+# this window** — measured on the 2026-08-07 07:10 subset pair, six of the
+# seven scenarios that leave a chest open disagreed on step attribution while
+# agreeing on the total.
+#
+# What stops being tested here: the repeat count and the step attribution of
+# `block_event`. What is still tested: that the lid opens at all, at the right
+# position, with the right viewer count, on the right stream — and the cadence
+# itself, in `rustmc_server::containers::tests::
+# the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`, which measures
+# the gap rather than the count.
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# `isValidSlotIndex`, javap -p -c -constants on the pinned jar: true for -1
+# and -999 outright (the two sentinels `doClick` special-cases), otherwise
+# true unless `index >= slots.size()`. A 63-slot chest menu's size is 63, so
+# 999 lands in the one branch that returns false.
+[[step]]
+do = "container_click"
+slot = 999

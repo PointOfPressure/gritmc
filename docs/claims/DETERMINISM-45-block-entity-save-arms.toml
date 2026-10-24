@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 45
+slug   = "block-entity-save-arms"
+title  = "The nine remaining block-entity classes are arms of one save, not nine ports — the four containers land together"
+branch = "worldgen-be-save-arms"

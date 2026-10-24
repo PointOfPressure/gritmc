@@ -1,0 +1,29 @@
+name = "console-stopsound-tells-only-its-target"
+about = """
+`stopsound oracle block minecraft:block.note_block.bell` then `stopsound
+oracle_eye` from the console send the actor one `stop_sound` naming both
+the `block` source and the sound, and the observer one naming neither — and
+neither player the other's
+
+`StopSoundCommand.stopSound` builds one `ClientboundStopSoundPacket(name,
+category)` and sends it to each target; the packet's flag byte says which of
+the two follow (1 source, 2 name), so the bare form — null category, null
+name — is a flag of 0 and nothing else. A server that sent the second command's packet
+with a source, or sent either packet to both players, moves the observation.
+The replies are the console's log.
+
+The restore sets `send_command_feedback` to the value it already has: a
+console step must declare one, and stopping sounds leaves no state.
+"""
+console_restore = ["gamerule send_command_feedback true"]
+observe_from = "both"
+observe = ["stop_sound", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "stopsound oracle block minecraft:block.note_block.bell"
+
+[[step]]
+do = "console"
+text = "stopsound oracle_eye"

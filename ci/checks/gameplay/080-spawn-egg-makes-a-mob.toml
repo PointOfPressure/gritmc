@@ -1,0 +1,13 @@
+name = "spawn-egg-makes-a-mob"
+about = "a spawn egg used on the ground puts a mob in the world — the smallest possible check that entities exist at all, and the first thing an entity system makes go green"
+observe = ["add_entity", "set_entity_data"]
+settle_ms = 3000
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

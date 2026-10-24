@@ -1,0 +1,81 @@
+name = "container-click-throw-drops-the-whole-stack"
+about = "the same click as 605 with button 1 instead of 0 — the same bytecode arm reads button != 0 as 'take Slot.getItem().getCount()', the whole stack, instead of one. Vanilla empties the chest slot entirely and spawns one item entity of two, where 605 spawns one item entity of one and leaves one stone behind. What would make this fail: a server that hardcodes 'throw everything' would pass this and fail 605, and one that hardcodes 'throw exactly one' would pass 605 and fail this — the pair pins the branch rather than either side of it alone."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot", "add_entity"]
+settle_ms = 1500
+
+# The chest lid repeats on a free-running 5-tick timer for as long as the chest
+# is open — `ContainerOpenersCounter.recheckOpeners` re-arms unconditionally
+# (offsets 178-186 call `Level.scheduleTick(pos, block, 5)`) and calls
+# `openerCountChanged` on both paths (offset 84's `if_icmpeq 167` lands on the
+# call itself), and `ChestBlockEntity.signalOpenCount` offsets 0-13 turn that
+# into `level.blockEvent(pos, block, 1, newCount)`. So the same `block_event`
+# goes out every 250 ms, forever.
+#
+# This check does not observe `block_event` and so never saw them declared.
+# It sees them under `strict`, where **how many arrived and which step each
+# was stamped with are set by where a free-running timer's edges fell against
+# this window** — measured on the 2026-08-07 07:10 subset pair, six of the
+# seven scenarios that leave a chest open disagreed on step attribution while
+# agreeing on the total.
+#
+# What stops being tested here: the repeat count and the step attribution of
+# `block_event`. What is still tested: that the lid opens at all, at the right
+# position, with the right viewer count, on the right stream — and the cadence
+# itself, in `rustmc_server::containers::tests::
+# the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`, which measures
+# the gap rather than the count.
+collapse_repeats = ["block_event"]
+
+# IDENTICAL RIG TO 605. See its comment for why the two stone are given their
+# own hotbar slots instead of one slot refilled mid-sequence.
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+slot = 2
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 56
+
+[[step]]
+do = "container_click"
+slot = 0
+
+# THE ONLY DIFFERENCE FROM 605: `button = 1`.
+[[step]]
+do = "container_click"
+slot = 0
+button = 1
+input = "throw"

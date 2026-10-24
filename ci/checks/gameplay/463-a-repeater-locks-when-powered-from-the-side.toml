@@ -1,0 +1,41 @@
+name = "a-repeater-locks-when-powered-from-the-side"
+about = "`RepeaterBlock.updateShape` rewrites LOCKED from `isLocked` on every shape update across the repeater's axis — when the east-facing repeater beside it turns on (its tick writes `powered=true` with flags 2, whose shape updates reach the neighbour), the north-facing one shows `locked=true` on the wire in the same tick"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 2000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# Yaw 0 looks south: this repeater faces north, axis Z.
+[[setup]]
+do = "hold"
+item = "minecraft:repeater"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Yaw 90 looks west: this one faces EAST, input at [3, 0, 0], output west
+# into the first repeater's east side — a diode's FACING is its input side.
+[[setup]]
+do = "look"
+yaw = 90.0
+pitch = 0.0
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_block"
+
+[[step]]
+do = "place"
+on = [3, -1, 0]
+face = "up"

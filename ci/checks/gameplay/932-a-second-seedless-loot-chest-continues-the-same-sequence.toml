@@ -1,0 +1,48 @@
+name = "a-second-seedless-loot-chest-continues-the-same-sequence"
+about = "a second seedless chest of the same table, opened after 931, rolls the NEXT stretch of that table's random sequence rather than the first one again — the sequence is server state, created once and advanced by every roll (RandomSequences.get is computeIfAbsent), so a server that re-created it per roll repeats 931's contents here"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_event"]
+settle_ms = 1000
+
+# The lid repeats every 5 ticks while the chest is open, and how many repeats
+# land inside settle_ms is this harness's sampling — see 090's header, which
+# measured it. Collapsed for the same reason.
+collapse_repeats = ["block_event"]
+
+# The only route a client has to a chest that carries a loot table:
+# `block_entity_data` on the held stack, which `BlockItem.place` loads through
+# `updateCustomBlockEntityTag` (offset 143). `container_loot` would be the
+# natural component and is `persistent` only — no stream codec, so no client
+# can send it. `LootTableSeed` must be a LONG: `tryLoadLootTable` reads it with
+# `getLongOr`, so an int would arrive as seed 0 and roll from the random
+# sequence instead.
+#
+# No `LootTableSeed`, so `withOptionalRandomSeed(0)` leaves the generator to
+# `create(randomSequence)`: `MinecraftServer.getRandomSequence(
+# minecraft:chests/village/village_weaponsmith)`, created on first use from
+# the world seed (`GAMEPLAY_SEED`, which both servers are booted with) and then
+# advanced for the life of the world. 931 made the first roll on that sequence
+# and this check makes the second, so it is ORDER-DEPENDENT BY DESIGN: run
+# alone, it would roll 931's contents. That is the property it measures.
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+components = [
+    { type = "minecraft:block_entity_data", block_entity = "minecraft:chest", strings = { LootTable = "minecraft:chests/village/village_weaponsmith" } },
+]
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Overwrite the component-bearing stack, so the inventory half of the content
+# packet holds nothing this server does not echo.
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

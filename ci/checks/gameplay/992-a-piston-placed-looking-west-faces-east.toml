@@ -1,0 +1,42 @@
+name = "a-piston-placed-looking-west-faces-east"
+about = """
+`PistonBaseBlock.getStateForPlacement` is
+`FACING = context.getNearestLookingDirection().getOpposite()`, and
+`getNearestLookingDirection()` is `Direction.orderedByNearest(player)[0]` —
+the player's LOOK, pitch included, not the clicked face. Looking west (yaw
+90, level) the nearest direction is WEST and the piston faces EAST, back at
+the player. Every other piston check in this corpus looks south, where the
+answer is NORTH — which is also the piston's default state, so a server
+that ignored the look entirely (this one did: `placement.json` flags the
+ten look-facing blocks `pitchSensitive` and `crate::placement` answered
+them with their default) passed all of them. The same rule, derived per
+class, covers the sticky piston, dispenser, dropper, barrel and command
+blocks (`getOpposite`), the observer (the looking direction itself) and the
+crafter (`FrontAndTop`). What would make it fail: a piston facing north, or
+facing west (the look direction without `getOpposite`). The piston goes
+two blocks west, not one: `[-1, 0, 0]` overlaps the player standing on the
+anchor's corner and vanilla refuses it (`isUnobstructed`) — measured
+2026-10-01, where this server, which has no entity sweep, placed it. And two
+blocks SOUTH (z + 2), not on the row the player stands in: workspaces march
+west along z = 0 (`tools/oracle-runner/src/record.rs`), so a piston at
+[-2, 0, 0] stood in the next scenario's walk and both servers refused the
+move into it — on train-g's first corpus run the five scenarios after this
+one in its shard could not be reached, on vanilla and here alike. The look,
+not the position, is what this check grades.
+"""
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "look"
+yaw = 90.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:piston"
+
+[[step]]
+do = "place"
+on = [-2, -1, 2]
+face = "up"

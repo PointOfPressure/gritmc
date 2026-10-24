@@ -1,0 +1,24 @@
+name = "placing-a-shelf-carries-two-keys-in-vanillas-own-order"
+about = "the only new block entity whose update tag has more than one key: `Items` then `align_items_to_bottom`, written in that order by `ShelfBlockEntity.getUpdateTag` and put on the wire in neither that order nor a sorted one, because `CompoundTag.write` iterates a `java.util.HashMap`'s `keySet()` — so this check fails a server whose NBT writer sorts, which every other new type is blind to"
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_shelf"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

@@ -1,0 +1,46 @@
+name = "mining-a-block-reports-its-progress"
+about = """
+The crack overlay, on the one path where its whole sequence is the server's
+own arithmetic. START on grass, a STOP ~350 ms in — the dig step's own 250 ms wait plus 100 — (below the 0.7 at
+`handleBlockBreakAction` offset 561, so it only arms `hasDelayedDestroy`),
+then nothing: `ServerPlayerGameMode.tick` offsets 10-78 keep calling
+`incrementDestroyProgress` against `delayedTickStart` and destroy the block
+on the tick the server's progress reaches 1 — tick 17 for bare hands,
+`18 / 0.6 / 30`. Every stage from 0 to 10 goes to the observer, one at a
+time, then the 2001 and the block_update. The digger never sees a stage:
+`ServerLevel.destroyBlockProgress` offsets 48-57 skip the breaker's id.
+`collapse_repeats` on block_destruction compares each stage once and drops
+which step it fell in, because the early stages land either side of the
+step boundaries depending on the harness's clock.
+
+This file used to observe the ACTOR and wait 1.5 s with no STOP, on the
+reading that `tick()` destroys the block when progress reaches 1. It does
+not: the `isDestroyingBlock` arm only displays progress, the stage climbs
+with no cap (vanilla's observer stream reached 48 by the end of the window,
+2026-09-30), and the actor's projection held nothing the dig caused — the
+check was inert. What would make it fail now: no overlay, a stage skipped,
+an overlay on the digger's own stream, or the block never breaking.
+"""
+observe_from = "observer"
+observe = ["block_destruction", "level_event", "block_update"]
+collapse_repeats = ["block_destruction"]
+settle_ms = 2500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[step]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 100
+
+[[step]]
+do = "finish_dig"
+at = [1, -1, 0]
+face = "up"

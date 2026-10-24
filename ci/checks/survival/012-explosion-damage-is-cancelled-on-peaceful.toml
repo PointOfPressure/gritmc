@@ -1,0 +1,33 @@
+name = "explosion-damage-is-cancelled-on-peaceful"
+about = """
+`/damage oracle 4 minecraft:explosion`, then `/damage oracle 1
+minecraft:generic` 100 ms later. The substrate is peaceful, and
+`explosion`'s `"scaling"` is `"always"`, so `DamageSource.scalesWithDifficulty`
+is true and `Player.hurtServer` zeroes the damage (offsets 51..69) and then
+returns false for a zero (108..115) — BEFORE `LivingEntity.hurtServer` is
+reached. Nothing is sent, no cooldown starts, `lastHurt` is not written.
+
+The generic hit that follows is what makes the silence measurable: it is a
+FULL hit on vanilla (one `damage_event`, health 20 -> 19), because the explosion
+never started a cooldown.
+
+What would make it fail: a server with no difficulty scaling deals the 4 and
+ends at 15 or 16; one that scales to zero but lets a zero hit through
+`LivingEntity.hurtServer` sends a `damage_event` for the explosion, starts the
+cooldown with `lastHurt = 0`, and then lands the generic hit as a silent
+difference — one `damage_event` at the wrong type, and no hurt sound for the
+hit that did the damage.
+"""
+console_restore = ["effect give oracle minecraft:instant_health 1 4 true"]
+observe_from = "both"
+observe = ["damage_event", "set_health", "set_entity_motion", "set_entity_data", "sound", "entity_event"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "damage oracle 4 minecraft:explosion"
+settle_ms = 100
+
+[[step]]
+do = "console"
+text = "damage oracle 1 minecraft:generic"

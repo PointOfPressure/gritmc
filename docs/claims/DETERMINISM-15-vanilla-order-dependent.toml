@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 15
+slug   = "vanilla-order-dependent"
+title  = "Vanilla is the order-dependent one, and the r=16 residual was a control nobody set"
+branch = "backfill"

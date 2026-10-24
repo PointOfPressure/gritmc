@@ -1,0 +1,306 @@
+# corpus-shard-equivalence.toml — does RUSTMC_CORPUS_SHARDS change what T2 measures?
+#
+# Written by `ci/corpus-shard-equivalence.py compare` over three recordings of one
+# scenario set in one tree: a serial run, a second serial run (the CONTROL — vanilla's
+# own floor at N=2), and a sharded run. A scenario is a shard effect only if it
+# disagrees sharded-vs-serial and NOT serial-vs-serial, under the recorder's own
+# projection in both directions, per side, and in the report verdicts; declared
+# vanilla-unstable scenarios are excused on the vanilla/verdict sides only.
+# `--check` (T0) refuses a SHARDS default with no controlled EQUIVALENT run here over
+# >= 50 scenarios. Pairs are [sharded-vs-serial, control-vs-serial].
+# Box: sayer-desktop, Threadripper 1920X, 24 threads; trees ~/rustmc-cpar-a and -b.
+# The full-corpus sharded runs recorded while ANOTHER full serial run was recording
+# in the other tree, so they are also the pool's concurrency test.
+
+[[run]]
+id = "s23-shard4-1-20260924"
+shards = 4
+scenarios = 23
+controlled = true
+verdict = "RED"
+commit = "5698acbce"
+serial_wall_s = 625.5
+control_wall_s = 612.6
+sharded_wall_s = 128.0
+run_rc = [0, 0, 0]
+rustmc_disagree = [1, 0]
+vanilla_disagree = [3, 2]
+verdict_flips = [0, 0]
+shard_effect = ["a-daylight-detector-inverts-when-right-clicked"]
+excused = []
+
+[[run]]
+id = "s23-shard8-1-20260924"
+shards = 8
+scenarios = 23
+controlled = true
+verdict = "EQUIVALENT"
+commit = "5698acbce"
+serial_wall_s = 625.5
+control_wall_s = 612.6
+sharded_wall_s = 113.4
+run_rc = [0, 0, 0]
+rustmc_disagree = [0, 0]
+vanilla_disagree = [2, 2]
+verdict_flips = [0, 0]
+shard_effect = []
+excused = []
+
+[[run]]
+id = "full-shard4-1-20260924"
+shards = 4
+scenarios = 111
+controlled = true
+verdict = "RED"
+commit = "5698acbce"
+serial_wall_s = 2755.8
+control_wall_s = 2740.2
+sharded_wall_s = 402.8
+run_rc = [0, 0, 0]
+rustmc_disagree = [4, 0]
+vanilla_disagree = [11, 7]
+verdict_flips = [1, 1]
+shard_effect = ["a-chest-is-in-its-chunks-payload-when-the-chunk-returns", "a-daylight-detector-inverts-when-right-clicked", "a-furnace-opens-a-screen-a-chest-does-not", "a-player-that-leaves-the-ground-is-resynced", "container-click-pickup-all-gathers-matching-stacks", "walking-away-drops-a-standing-player-from-view"]
+excused = ["a-player-that-leaves-the-ground-is-resynced"]
+
+[[run]]
+id = "full-shard8-1-20260924"
+shards = 8
+scenarios = 111
+controlled = true
+verdict = "RED"
+commit = "5698acbce"
+serial_wall_s = 2755.8
+control_wall_s = 2740.2
+sharded_wall_s = 259.3
+run_rc = [0, 0, 0]
+rustmc_disagree = [3, 0]
+vanilla_disagree = [12, 7]
+verdict_flips = [1, 1]
+shard_effect = ["a-chest-is-in-its-chunks-payload-when-the-chunk-returns", "a-furnace-opens-a-screen-a-chest-does-not", "a-player-that-leaves-the-ground-is-resynced", "container-click-pickup-all-gathers-matching-stacks", "walking-away-drops-a-standing-player-from-view"]
+excused = ["a-player-that-leaves-the-ground-is-resynced"]
+
+# ---- 2026-09-30/10-01, branch `shard-equivalence`, sayer-desktop, box trees
+# ~/rustmc-sheq (all six) — walls are seconds from `corpus lock: acquired` to
+# the run's last line, i.e. the lock hold, read off each run's stamped t2.log
+# (~/grit/shard-eq-results/{base,fix1}/<run>/t2.log). Serial controls are N=2.
+#
+# `main` = 606551b54. `isolated` = 0ec801e1f: the per-scenario player reset
+# (f3e1c6f8a), `container_set_data` and waypoint decoded (fec6e199d,
+# cea35d077), 710's setup wait (0ec801e1f). On main every full-corpus effect is
+# OUTSIDE the first shard — history; isolated, every one is INSIDE it, where
+# the predecessors and coordinates are the serial run's own, and all of them
+# are the 080-089 mob cluster, whose verdicts flap between serial runs too
+# (083 and 084 differ across the four serial runs). The proof stays RED
+# because an N=2 control cannot bound that cluster; the default stays 1.
+
+[[run]]
+id = "sub-shard4-main-20260930"
+shards = 4
+scenarios = 26
+controlled = true
+verdict = "RED"
+commit = "606551b54"
+serial_wall_s = 794
+control_wall_s = 721
+sharded_wall_s = 142
+run_rc = [0, 0, 0]
+rustmc_disagree = [2, 0]
+vanilla_disagree = [6, 5]
+verdict_flips = [0, 0]
+shard_effect = ["a-player-that-leaves-the-ground-is-resynced", "walking-away-drops-a-standing-player-from-view"]
+excused = ["a-player-that-leaves-the-ground-is-resynced"]
+
+[[run]]
+id = "sub-shard8-main-20260930"
+shards = 8
+scenarios = 26
+controlled = true
+verdict = "RED"
+commit = "606551b54"
+serial_wall_s = 794
+control_wall_s = 721
+sharded_wall_s = 139
+run_rc = [0, 0, 0]
+rustmc_disagree = [3, 0]
+vanilla_disagree = [6, 5]
+verdict_flips = [0, 0]
+shard_effect = ["a-chest-is-in-its-chunks-payload-when-the-chunk-returns", "a-player-that-leaves-the-ground-is-resynced", "walking-away-drops-a-standing-player-from-view"]
+excused = ["a-player-that-leaves-the-ground-is-resynced"]
+
+[[run]]
+id = "full-shard8-main-20260930"
+shards = 8
+scenarios = 179
+controlled = true
+verdict = "RED"
+commit = "606551b54"
+serial_wall_s = 4798
+control_wall_s = 4825
+sharded_wall_s = 486
+run_rc = [1, 0, 1]
+rustmc_disagree = [20, 9]
+vanilla_disagree = [34, 19]
+verdict_flips = [4, 5]
+shard_effect = ["a-beacon-opens-a-menu-with-one-payment-slot", "a-blast-furnace-is-not-a-furnace", "a-brewing-stand-opens-a-menu-with-its-own-slot-shape", "a-chest-is-in-its-chunks-payload-when-the-chunk-returns", "a-crafter-opens-a-three-by-three-menu-that-is-not-crafting", "a-fed-furnace-lights-on-the-next-tick", "a-furnace-opens-a-screen-a-chest-does-not", "a-lectern-with-a-book-opens-a-menu-with-no-inventory", "a-loom-opens-a-menu", "a-new-item-reaches-the-cursor-and-the-census", "a-player-that-leaves-the-ground-is-resynced", "a-second-new-item-moves-the-census-again", "a-smithing-table-opens-a-menu", "a-smoker-is-not-a-furnace", "a-stonecutter-opens-a-menu", "an-anvil-opens-a-container-that-is-not-a-container", "an-armor-stand-is-placed-as-a-living-entity", "an-enchanting-table-opens-a-menu-with-ten-data-slots", "walking-away-drops-a-standing-player-from-view"]
+excused = ["a-player-that-leaves-the-ground-is-resynced"]
+effects_in_first_shard = []
+
+[[run]]
+id = "full-shard4-main-20260930"
+shards = 4
+scenarios = 179
+controlled = true
+verdict = "RED"
+commit = "606551b54"
+serial_wall_s = 4798
+control_wall_s = 4825
+sharded_wall_s = 724
+run_rc = [1, 0, 1]
+rustmc_disagree = [18, 9]
+vanilla_disagree = [33, 19]
+verdict_flips = [2, 5]
+shard_effect = ["a-beacon-opens-a-menu-with-one-payment-slot", "a-blast-furnace-is-not-a-furnace", "a-brewing-stand-opens-a-menu-with-its-own-slot-shape", "a-chest-is-in-its-chunks-payload-when-the-chunk-returns", "a-crafter-opens-a-three-by-three-menu-that-is-not-crafting", "a-fed-furnace-lights-on-the-next-tick", "a-furnace-opens-a-screen-a-chest-does-not", "a-lectern-with-a-book-opens-a-menu-with-no-inventory", "a-loom-opens-a-menu", "a-player-that-leaves-the-ground-is-resynced", "a-smithing-table-opens-a-menu", "a-smoker-is-not-a-furnace", "a-stonecutter-opens-a-menu", "an-anvil-opens-a-container-that-is-not-a-container", "an-enchanting-table-opens-a-menu-with-ten-data-slots", "walking-away-drops-a-standing-player-from-view"]
+excused = ["a-daylight-detector-inverts-when-right-clicked", "a-player-that-leaves-the-ground-is-resynced"]
+effects_in_first_shard = []
+
+[[run]]
+id = "full-shard8-isolated-20261001"
+shards = 8
+scenarios = 179
+controlled = true
+verdict = "RED"
+commit = "0ec801e1f"
+serial_wall_s = 5031
+control_wall_s = 4976
+sharded_wall_s = 499
+run_rc = [0, 1, 1]
+rustmc_disagree = [13, 11]
+vanilla_disagree = [18, 22]
+verdict_flips = [6, 3]
+shard_effect = ["a-bat-hatched-under-glass-takes-off-at-once", "a-pig-nine-blocks-away-is-still-tempted", "a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put", "a-tempted-pig-in-a-pit-turns-its-head-after-the-player"]
+excused = []
+effects_in_first_shard = ["a-bat-hatched-under-glass-takes-off-at-once", "a-pig-nine-blocks-away-is-still-tempted", "a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put", "a-tempted-pig-in-a-pit-turns-its-head-after-the-player"]
+
+[[run]]
+id = "full-shard4-isolated-20261001"
+shards = 4
+scenarios = 179
+controlled = true
+verdict = "RED"
+commit = "0ec801e1f"
+serial_wall_s = 5031
+control_wall_s = 4976
+sharded_wall_s = 745
+run_rc = [0, 1, 1]
+rustmc_disagree = [12, 11]
+vanilla_disagree = [20, 22]
+verdict_flips = [4, 3]
+shard_effect = ["a-pig-nine-blocks-away-is-still-tempted", "a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put"]
+excused = []
+effects_in_first_shard = ["a-pig-nine-blocks-away-is-still-tempted", "a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put"]
+
+# ---- 2026-10-01, the third serial control (full-C, 67aa6fb6b, recorder identical
+# to 0ec801e1f) and a fresh 8-shard run (full-S8b), both under one corpus-lock
+# hold in ~/rustmc-sheq (walls: seconds from the lock being held or inherited to
+# the run's last line); every isolated sharded run re-scored against TWO serial
+# controls (the floor is their union). One effect is left at every count, in
+# the first shard: `084-a-pig-tempted-from-outside-its-pit-turns-its-head-and-
+# stays-put`. Its strict verdict follows whether a pig ambient `sound` lands in
+# the window on EITHER side — vanilla 3 and ours 2 of the ten full recordings
+# here; every serial run had one on exactly one side, no sharded run had one on
+# either. `Mob.baseTick`'s roll (`nextInt(1000) < ambientSoundTime++`, from 0
+# at spawn) gives it ~30% per side in this window, so this is chance, not load
+# (corrected; the first reading said 3/3 vs 0/3 on our side), and no window
+# placement removes it. Still a verdict a sharded gate could read differently. RED; the default stays 1. A vanilla floor over
+# full-A/B/C (ci/corpus-floor.sh, N=3) does not list 084 as unstable either, so
+# `gameplay-floor.toml` would not excuse it and was not rewritten.
+
+[[run]]
+id = "full-shard8b-isolated-3serial-20261001"
+shards = 8
+scenarios = 179
+controlled = true
+controls = 2
+verdict = "RED"
+commit = "0ec801e1f"
+serial_wall_s = 5031
+control_wall_s = 4976
+control2_wall_s = 5008
+sharded_wall_s = 521
+run_rc = [0, 1, 1, 1]
+rustmc_disagree = [12, 13]
+vanilla_disagree = [19, 23]
+verdict_flips = [4, 4]
+shard_effect = ["a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put"]
+excused = []
+effects_in_first_shard = ["a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put"]
+
+[[run]]
+id = "full-shard8-isolated-3serial-20261001"
+shards = 8
+scenarios = 179
+controlled = true
+controls = 2
+verdict = "RED"
+commit = "0ec801e1f"
+serial_wall_s = 5031
+control_wall_s = 4976
+control2_wall_s = 5008
+sharded_wall_s = 499
+run_rc = [0, 1, 1, 1]
+rustmc_disagree = [13, 13]
+vanilla_disagree = [18, 23]
+verdict_flips = [6, 4]
+shard_effect = ["a-bat-hatched-under-glass-takes-off-at-once", "a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put"]
+excused = []
+effects_in_first_shard = ["a-bat-hatched-under-glass-takes-off-at-once", "a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put"]
+
+[[run]]
+id = "full-shard4-isolated-3serial-20261001"
+shards = 4
+scenarios = 179
+controlled = true
+controls = 2
+verdict = "RED"
+commit = "0ec801e1f"
+serial_wall_s = 5031
+control_wall_s = 4976
+control2_wall_s = 5008
+sharded_wall_s = 745
+run_rc = [0, 1, 1, 1]
+rustmc_disagree = [12, 13]
+vanilla_disagree = [20, 23]
+verdict_flips = [4, 4]
+shard_effect = ["a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put"]
+excused = []
+effects_in_first_shard = ["a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put"]
+
+# ---- 2026-10-01, the first EQUIVALENT full run. 084 made deterministic (its pig
+# spawns `Silent` from the egg's `minecraft:entity_data`, which this server now
+# honours; a3047fa1a). Serial A/B/C are the 0ec801e1f recordings with 084's
+# scenario replaced by three serial runs of 010..084 at a3047fa1a (084's exact
+# serial predecessors; ~/grit/shard-eq-results/silent/pre-{1,2,3}) — the change
+# touches only that component and that one check, so the other 178 recordings
+# stand; the sharded run is a fresh full corpus at a3047fa1a, recorded as a gate
+# would (role gate, alone on the box). No shard effect on either side or in any
+# verdict, against two serial controls. This licenses RUSTMC_CORPUS_SHARDS=8.
+[[run]]
+id = "full-shard8c-silent084-3serial-20261001"
+shards = 8
+scenarios = 179
+controlled = true
+controls = 2
+verdict = "EQUIVALENT"
+commit = "a3047fa1a"
+serial_wall_s = 5031
+control_wall_s = 4976
+control2_wall_s = 5008
+sharded_wall_s = 516
+run_rc = [0, 1, 1, 0]
+rustmc_disagree = [12, 12]
+vanilla_disagree = [19, 22]
+verdict_flips = [3, 4]
+shard_effect = []
+excused = []
+effects_in_first_shard = []

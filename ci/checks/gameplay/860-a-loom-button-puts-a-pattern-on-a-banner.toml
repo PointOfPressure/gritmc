@@ -1,0 +1,64 @@
+name = "a-loom-button-puts-a-pattern-on-a-banner"
+about = "a white banner and a red dye leave the loom's selection at -1 until a button is pressed; button 3 is `square_top_right`, and `setupResultSlot` copies the banner with `BANNER_PATTERNS` one layer longer — that pattern in `DyeColor.RED` (14) — so the press is answered with the result slot and the selection; the component's bytes, holder id + 1 and dye id, are compared whole"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1000
+
+# LoomMenu: banner 0, dye 1, pattern 2, result 3, then the 36 — hotbar 0 is
+# 4 + 27 = 31. One data slot, `selectedBannerPatternIndex`. With the pattern
+# slot empty the buttons index `#minecraft:no_item_required` in its tag
+# file's order: 3 is square_top_right, 13 is cross.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:loom"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:white_banner"
+
+[[setup]]
+do = "hold"
+item = "minecraft:red_dye"
+slot = 1
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 31
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 32
+
+[[step]]
+do = "container_click"
+slot = 1
+
+[[step]]
+do = "container_button_click"
+button = 3
+

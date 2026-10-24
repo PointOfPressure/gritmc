@@ -1,0 +1,34 @@
+name = "a-second-start-resends-the-first-block"
+about = """
+`handleBlockBreakAction` offsets 379-426: a START that arrives while
+`isDestroyingBlock` is still set sends the digger a block_update for the OLD
+`destroyPos` — "abort destroying since another started" — before it starts
+the new dig. So the actor's stream is ack, block_update(first block, still
+grass), ack. Vanilla's own survival recording of 2026-09-30 shows the same
+packet crossing scenarios (`003` opens with `002`'s block); this check makes
+it happen inside one workspace, where the projection can see it. What would
+make it fail: a server that keeps no dig state (no resend at all), or one
+that resends the NEW position, or one that broke the first block.
+"""
+observe_from = "actor"
+observe = ["block_update", "block_changed_ack"]
+settle_ms = 1000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[step]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 200
+
+[[step]]
+do = "dig"
+at = [2, -1, 0]
+face = "up"

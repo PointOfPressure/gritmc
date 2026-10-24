@@ -1,0 +1,44 @@
+name = "closing-a-crafting-table-returns-the-grid-contents"
+about = "closing a crafting table with an unconsumed log still in the grid hands it back rather than losing it — javap -p -c -constants on the pinned jar: CraftingMenu.removed(Player) calls AbstractCraftingMenu.removed, which reaches a clearContainer(player, container) call (confirmed via CraftingMenu's own lambda in its `removed` implementation) that gives each remaining stack back to the player instead of dropping or discarding it. Every other check that opens a menu relies on record.rs's own per-scenario reset to send close_container; this is the first to name it in a scenario on purpose, because what it does is itself the thing being measured. What would make this fail: a server that treats close as a bare acknowledgement — clearing its menu state without walking the grid — would either vanish the log or leave it stuck in a slot nothing can reach again, neither of which matches vanilla handing it back to the hotbar slot it can be seen leaving from."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot"]
+settle_ms = 1500
+
+[[setup]]
+do = "hold"
+item = "minecraft:crafting_table"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_log"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# The 562 pattern: pick the log off the hotbar (menu slot 37) and drop it
+# into the grid (menu slot 1). Shapeless, one ingredient, so this also fills
+# the result slot the way 562 measures — incidental here, not the point.
+[[step]]
+do = "container_click"
+slot = 37
+
+[[step]]
+do = "container_click"
+slot = 1
+
+# THE MEASURED STEP. The log is still in the grid; nothing has taken it back
+# out via a click. Closing is what has to return it.
+[[step]]
+do = "close_container"

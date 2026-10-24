@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 79
+slug   = "decorator-features"
+title  = "The features a decorator places: huge mushrooms land, glow_lichen was never the bug, and the draw table cannot see why"
+branch = "feat-decor"
+status = "written"

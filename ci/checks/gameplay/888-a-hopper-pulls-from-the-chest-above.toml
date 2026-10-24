@@ -1,0 +1,78 @@
+name = "a-hopper-pulls-from-the-chest-above"
+about = "a chest on a hopper that a lever has locked: the coal clicked into the chest stays there until the lever goes off, `checkPoweredState` writes `enabled=true`, and the hopper's next `pushItemsTick` runs `suckInItems` on the chest's DOWN-face slots — the open chest menu's per-tick `broadcastChanges` then corrects chest slot 0 to empty. The hopper points down into grass, so this is the suck half alone. A server with no hopper transfer never empties the slot; one that ignores `ENABLED` empties it at the click. Chest menu slot 54 is hotbar 0"
+observe_from = "actor"
+observe = ["container_set_slot", "block_update", "section_blocks_update"]
+settle_ms = 1500
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:hopper"
+
+[[setup]]
+do = "place"
+on = [2, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "sneak"
+on = true
+
+[[setup]]
+do = "place"
+on = [2, 0, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [2, 0, 1]
+face = "east"
+
+[[setup]]
+do = "sneak"
+on = false
+
+[[setup]]
+do = "hold"
+item = "minecraft:coal"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[setup]]
+do = "place"
+on = [3, 0, 1]
+face = "up"
+
+[[step]]
+do = "place"
+on = [2, 1, 1]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "place"
+on = [3, 0, 1]
+face = "up"

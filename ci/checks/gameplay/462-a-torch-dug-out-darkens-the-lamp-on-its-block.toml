@@ -1,0 +1,56 @@
+name = "a-torch-dug-out-darkens-the-lamp-on-its-block"
+about = "`RedstoneTorchBlock.affectNeighborsAfterRemoval` is `notifyNeighbors`, the six-direction sweep of the torch's neighbours' neighbours — a torch under a block powers it strongly upward, a lamp on top of that block is lit by it and two positions from it, and digging the torch reaches the lamp only through that sweep"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 2000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# A pillar at x=3 to hang the rig off, so nothing is placed by clicking a
+# torch.
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [3, -1, 0]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [3, 0, 0]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [3, 1, 0]
+face = "west"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_lamp"
+
+[[setup]]
+do = "place"
+on = [2, 1, 0]
+face = "up"
+
+# The torch goes in last, under the stone at [2, 1, 0]: `onPlace` runs the
+# same six-direction sweep and the lamp at [2, 2, 0] lights in setup.
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_torch"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[step]]
+do = "dig"
+at = [2, 0, 0]
+face = "up"

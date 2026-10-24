@@ -1,0 +1,46 @@
+name = "typing-on-a-sign-you-placed-sets-its-text"
+about = "closing a sign's edit screen sends `sign_update`, and vanilla writes the text into the block entity and re-broadcasts it — the text a player typed is carried in `block_entity_data`'s NBT, which this projection digests, so the check is exact about the words and not only about the packet arriving"
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+# 460's rig, one step further on. 460 stops at the placement and asks whether
+# the editor opens; this carries on and asks whether what was typed lands.
+# They share a trigger and measure different halves, in the same way 270 and
+# 460 do.
+#
+# **The placement is not decoration and cannot be dropped.**
+# `SignBlockEntity.updateSignText` refuses any edit from a player who is not
+# `getPlayerWhoMayEdit()`, and the only thing that ever sets that is
+# `SignBlock.openTextEdit` from inside `setPlacedBy`. A scenario that sent
+# `sign_update` at a sign it had not placed would be refused **silently** — one
+# `LOGGER.warn` and no packet — and would then record this server's silence as
+# agreement.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_sign"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# The sign is at [1,0,0] — one **above** the block that was clicked. Naming
+# [1,-1,0] here would name the dirt, find no `SignBlockEntity`, and be dropped
+# without a reply.
+[[step]]
+do = "sign_update"
+pos = [1, 0, 0]
+front = true
+lines = ["hello", "", "", ""]

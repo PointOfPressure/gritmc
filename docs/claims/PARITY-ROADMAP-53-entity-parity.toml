@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 53
+slug   = "entity-parity"
+title  = "Entity parity: what the corpus can say, what it cannot, and which of the four disputed `add_entity` fields is right — 2026-08-18, branch `entity-parity`"
+branch = "entity-parity"

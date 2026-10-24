@@ -1,0 +1,83 @@
+name = "a-bowl-on-a-mooshroom-adds-mushroom-stew"
+about = "a bowl used on an adult mooshroom adds a mushroom stew to a creative player's inventory every time — MushroomCow.mobInteract calls createFilledResult with limitCreativeStackSize false, so no contains test guards it — and leaves the bowl in hand"
+observe_from = "actor"
+observe = ["container_set_slot"]
+within = 576
+settle_ms = 1500
+
+# THE MECHANISM:
+#
+#   MushroomCow.mobInteract      6-20  stack.is(BOWL) && !isBaby()
+#                               26-79  stewEffects == null -> new ItemStack(
+#                                      MUSHROOM_STEW)
+#                               81-95  createFilledResult(stack, player, stew,
+#                                      false); setItemInHand
+#                              98-121  this.playSound(MOOSHROOM_MILK, 1F, 1F) —
+#                                      Entity.playSound, refused for a silent
+#                                      mob, so not observed here (the
+#                                      `mob_in_world` test asserts it)
+#   ItemUtils.createFilledResult 37-70 not the creative-limited arm: consume
+#                                      (no shrink for infinite materials), the
+#                                      stack is not empty, inventory.add(stew)
+#
+# One container_set_slot with a mushroom stew; no contains test, so a second
+# bowl would add a second stew.
+#
+# THE RIG. `083`'s pit: digging [1,-1] and [1,-2] leaves a 1x1 shaft two deep
+# whose floor has no walkable neighbour, so the mob hatched at its bottom never
+# moves — its unseeded stroll and look goals reach nothing observed here. The
+# rig sits +560 blocks out on z, perpendicular to the line the workspaces are
+# laid along (`-(n+1) * 32` on x), alternating sign with its neighbours in this
+# block and 80 further out every pair (640/641 at +-480 ... 652/653 at +-960),
+# so the nearest same-side rig is 64 blocks away on x and 80 on z: nothing it
+# leaves is tracked from another scenario and nothing another leaves is
+# tracked from it — the actor tracks to 64 blocks at view-distance 4. The mob is SILENT
+# (`minecraft:entity_data` `Silent` on the egg, applied by
+# `EntityType.updateCustomEntityTag` through `Entity.load`), because
+# `Mob.baseTick`'s ambient roll (`nextInt(1000) < ambientSoundTime++`, unseeded)
+# can land in any window; `Entity.playSound` refuses every sound of a silent
+# entity and the roll still happens, so its random stream is unchanged.
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 560.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, 561]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, 561]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:mooshroom_spawn_egg"
+components = [{ type = "minecraft:entity_data", entity = "minecraft:mooshroom", silent = true }]
+
+[[setup]]
+do = "place"
+on = [1, -3, 561]
+face = "up"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, 560.95]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "hold"
+item = "minecraft:bowl"
+
+[[step]]
+do = "interact"
+target = "minecraft:mooshroom"

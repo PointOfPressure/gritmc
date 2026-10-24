@@ -1,0 +1,32 @@
+name = "lever-attaches-to-a-floor-or-a-wall"
+about = "the same lever item becomes face=floor on the ground and face=wall on the side of a block — FaceAttachedHorizontalDirectionalBlock reads the clicked face into a THREE-valued property and the horizontal direction into another, and a torch's two-block trick cannot express it because a lever is one block in every attachment"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "place"
+on = [2, 0, 0]
+face = "north"

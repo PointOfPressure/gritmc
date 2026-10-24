@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 50
+slug   = "projection-id-is-not-a-recorder-id"
+title  = "A projection id is not a recorder id — 2026-08-09, branch `corpus-recorder-vocabulary`"
+branch = "corpus-recorder-vocabulary"

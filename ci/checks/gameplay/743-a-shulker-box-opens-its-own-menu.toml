@@ -1,0 +1,43 @@
+name = "a-shulker-box-opens-its-own-menu"
+about = "a shulker box is a chest-shaped container with its own registry entry, `MenuType.SHULKER_BOX`, and its own ShulkerBoxMenu -- ShulkerBoxBlock.useWithoutItem also gates on canOpen, a collision test against the lid's swept box, which nothing else in the corpus exercises"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content"]
+settle_ms = 1500
+
+# `ShulkerBoxBlockEntity` drives the same `ContainerOpenersCounter` a chest
+# does and calls `level.blockEvent` from its own `signalOpenCount`, so its lid
+# repeats on the same 5-tick re-arm. Declared for the reason 090's comment
+# gives and without observing it, as 560 and 601-608 do; the cadence stays
+# covered by 090, 490 and `rustmc_server::containers::tests::the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`.
+collapse_repeats = ["block_event"]
+
+# `open_screen` decodes the `minecraft:menu` **registry id** as its own field
+# and digests the rest of the body, which is the menu's title component. The
+# `container_set_content` that `initMenu` sends immediately after it digests
+# the whole slot list. So this check pins three independent things about the
+# menu — which registry entry, which title, and how many slots — and a server
+# that answered with a chest here would miss on all three.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:shulker_box"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

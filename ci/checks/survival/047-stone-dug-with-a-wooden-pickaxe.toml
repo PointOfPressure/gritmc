@@ -1,0 +1,70 @@
+name = "stone-dug-with-a-wooden-pickaxe"
+about = """
+Tool tier, the correct-tool divisor, durability and the drop in one dig.
+Stone (destroy time 1.5, needs a tool) with a wooden pickaxe (speed 2 for
+`#mineable/pickaxe`, correct for drops): `2 / 1.5 / 30` = 0.0444 a tick. The
+STOP goes ~350 ms in (the dig step waits 250 ms, then 100 more), at ~0.36 — below 0.7, so the server finishes the dig on its own
+clock (`tick()` offsets 10-78) at tick 22 — 1.1 s — and the observer sees the
+overlay climb stage by stage from 0 to 10 before the 2001. `collapse_repeats`
+on block_destruction compares each stage once and not which step it fell in:
+the stage sequence is the server's arithmetic, its phase against the step
+boundaries is the harness's clock. Then `Item.mineBlock` -> `hurtAndBreak(1)`
+puts `minecraft:damage` 1 on the pickaxe — a container_set_slot for hotbar
+slot 36 — and `playerDestroy` drops cobblestone (`blocks/stone` without Silk
+Touch). By hand this would be `/ 100` and 7.5 s; `043`'s airborne penalty is
+the other divisor. What would make it fail: /100 instead of /30 (no break in
+the window), no durability, the wrong drop, or a stage skipped.
+"""
+# The console gave this rig its items; `clear` takes them back so the
+# next scenario starts empty-handed, on both servers.
+console_restore = ["clear oracle"]
+# Three blocks out: the drop lands beyond the digger's pickup box
+# (player AABB inflated by 1 horizontally), so the check grades the dig and
+# not item pickup, which this server does not have — at [1, 0, 0] vanilla
+# picked the cobblestone up into slot 37 450 ms after the break, and at
+# [2, 0, 0] it still did in one of two runs (2026-10-01): the item's own
+# random velocity carries it most of a block.
+observe_from = "both"
+observe = ["block_destruction", "level_event", "set_entity_data", "container_set_slot", "block_update", "block_changed_ack"]
+collapse_repeats = ["block_destruction"]
+settle_ms = 2500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "console"
+text = "clear oracle"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [3, -1, 0]
+face = "up"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:wooden_pickaxe"
+
+[[setup]]
+do = "wait"
+ms = 300
+
+[[step]]
+do = "dig"
+at = [3, 0, 0]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 100
+
+[[step]]
+do = "finish_dig"
+at = [3, 0, 0]
+face = "up"

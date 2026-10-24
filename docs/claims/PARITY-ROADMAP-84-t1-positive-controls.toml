@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 84
+slug   = "t1-positive-controls"
+title  = "Every T1 binary given a positive control, or named as unforceable"
+branch = "t1-positive-controls"
+status = "written"

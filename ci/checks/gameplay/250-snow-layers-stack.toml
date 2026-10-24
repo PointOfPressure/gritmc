@@ -1,0 +1,23 @@
+name = "snow-layers-stack"
+about = "snow placed on snow deepens it instead of stacking a second block on top — SnowLayerBlock counts up an eight-valued `layers` property in place, which is the same replace-what-you-clicked rule as a double slab reaching a different answer"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:snow"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

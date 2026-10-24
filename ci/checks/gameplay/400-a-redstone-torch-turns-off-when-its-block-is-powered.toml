@@ -1,0 +1,58 @@
+name = "a-redstone-torch-turns-off-when-its-block-is-powered"
+about = "the inverter, which is the primitive every redstone circuit is built out of — a wall torch goes dark when the block it hangs on is powered, and it does so on a scheduled tick rather than immediately, so the observation arrives after the step that caused it has finished"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 2500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# A wall torch at [2, 0, 0] with `facing = east`, hung on the stone's east
+# face. `RedstoneWallTorchBlock.hasNeighborSignal` reads
+# `level.hasSignal(pos.relative(facing.getOpposite()), ...)`, which is the
+# stone.
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_torch"
+
+[[setup]]
+do = "place"
+on = [1, 0, 0]
+face = "east"
+
+# A floor lever on top of the stone. `LeverBlock.getDirectSignal` returns 15
+# only when `getConnectedDirection(state)` equals the direction asked for,
+# and `Level.getDirectSignalTo` asks the block above with `UP` — which is
+# exactly a FLOOR lever's connected direction. So this lever *strongly*
+# powers the stone, and weak power would not turn the torch off.
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+# Flipping the lever is the measured step. The torch going dark is two
+# positions away from anything this step touches, so it cannot be mistaken
+# for the step's own resync.
+[[step]]
+do = "place"
+on = [1, 1, 0]
+face = "up"

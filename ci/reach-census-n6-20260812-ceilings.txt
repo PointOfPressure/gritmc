@@ -1,0 +1,106 @@
+pinned jar   oracle-work/vanilla-26.2/versions/26.2/server-26.2.jar
+recordings   6 vanilla runs, 93 scenarios, from /home/sayer/rustmc-cov2/oracle-work/gameplay-selfcheck/r[0-9]*.json
+corpus       106 checks under ci/checks/gameplay
+STAMP        jar=183c0499c5f8 recordings=a9dff28db35c(n=6) census=c5b521321ac9 corpus=106
+world        advance_time=false, advance_weather=false, random_tick_speed=0, spawn_mobs=false
+             difficulty=peaceful, gamemode=creative, generate-structures=false, spawn-monsters=false, spawn-radius=0
+
+== UNIT 1 — clientbound play packet types (denominator: GameProtocols) ==
+    141  registered in the protocol
+    141  CEILING, vanilla's — types an unmodified server can construct  (0 excluded)
+    129  CEILING, OURS — minus the 12 `trace::is_housekeeping` drops before any decoder
+     36  vanilla EMITTED during the corpus
+     31  named by >= 1 check
+     29  emitted AND named
+  -> 31/129/141 = 24.0% of the reachable ceiling, 22.0% of the protocol
+  -> 29/36 = 80.6% of what the corpus provokes
+  -> the vanilla rule (never constructed in the jar) excludes 0: every reduction on this unit is ours
+
+== UNIT 2 — vanilla's own per-tick sections (denominator: the jar's profiler) ==
+    120  named sections reachable from MinecraftServer.tickServer
+      5  push sites with a non-constant name (excluded, not counted above)
+      7  PROVABLY OFF — vanilla's own game-rule gate, shut by this harness
+     33  PROVABLY UNPOPULATED — per-mob, and no recording ever held that mob
+     80  unclassified — UNKNOWN, not covered
+  -> 40/120 = 33.3% of vanilla's tick is provably never run
+  -> observed: not measured (no server is booted). Of the 40 provably dead, 40 are OURS (7 game-rule, 33 spawn configuration) and 0 are vanilla's.
+  -> so the harness ceiling on live sections is 80/120, and vanilla's ceiling is the whole 120.
+
+     off   customSpawners               gamerule spawn_mobs=false
+     off   filteringSpawningChunks      gamerule spawn_mobs=false
+     off   naturalSpawnCount            gamerule spawn_mobs=false
+     off   shuffleSpawningChunks        gamerule spawn_mobs=false
+     off   spawner                      gamerule spawn_mobs=false
+     off   tickSpawningChunks           gamerule spawn_mobs=false
+     off   weather                      gamerule advance_weather=false
+     LIT   randomTick                   gamerule random_tick_speed=1000 for 780-random-ticks-turn-covered-grass-to-dirt.toml
+     -- asserted gate pairs that did NOT verify against the jar, and are not counted:
+        thunder                      advance_weather      section does not reference GameRules.ADVANCE_WEATHER
+
+== UNIT 3 — vanilla's registries (denominator: reports/registries.json) ==
+  registry             observed  ceiling registry  of ceil  of reg  owner
+  sound_event                29      256     1968   11.33%   1.47%  ours
+  block                      43        ?     1196        —   3.60%  unknown
+  entity_type                 4        ?      158        —   2.53%  unknown
+  block_entity_type           1       20       49    5.00%   2.04%  ours
+  menu                        3       20       25   15.00%  12.00%  jar+ours
+  block_state                87        ?    32366        —   0.27%  unknown
+  item                       —        ?     1537        —      —   not legible: ItemStack is inside `rest`
+
+== CEILINGS — the rule for each row, and whose ceiling it is ==
+  A `jar` ceiling is a fact about vanilla and is nobody's to spend money on.
+  An `ours` ceiling is work, and usually cheaper work than a scenario.
+  A `?` is UNKNOWN: the registry size is an upper bound and nothing better is known.
+  sound_event             256  ours      cited ROADMAP §27.1, branch `gameplay-sound-coverage`, 2026-08-12; vanilla's own is UNKNOWN
+  block                     ?  unknown   no jar rule found — see --explain for the two that were tried
+  entity_type               ?  unknown   no jar rule caps it; >= 91 are one hotbar slot away (spawn eggs)
+  block_entity_type        20  ours      per channel: block_entity_data(BLOCK_ENTITY_DATA)=20, chunk_payload(LEVEL_CHUNK_WITH_LIGHT DROPPED)=49; live union 20, vanilla's 49; the 29 gap is OURS — LEVEL_CHUNK_WITH_LIGHT is not decoded
+  menu                     20  jar+ours  vanilla's is 21 (4 have no opener anywhere in the jar); this harness's is 20, 1 more needing a mob (ours)
+  block_state               ?  unknown   no jar rule found; inherits the block row's
+  clientbound packet      129  ours      0 unbuildable in the jar (vanilla's), 12 dropped by trace::is_housekeeping (ours)
+  tick section             80  ours      all 40 provably-dead sections are shut by ci/t2-gameplay.sh, none by vanilla
+
+     block entity — reachable on a LIVE channel (20): banner, beacon, brushable_block, campfire, conduit, copper_golem_statue, creaking_heart, decorated_pot, end_gateway, hanging_sign, jigsaw, mob_spawner, shelf, sign, skull, structure_block, test_block, test_instance_block, trial_spawner, vault
+     block entity — vanilla's own ceiling is 49, NOT 20: the 29 that inherit a null
+                    getUpdatePacket are still carried in the chunk payload, as BlockEntityInfo, unfiltered.
+                    channel `chunk_payload` (LEVEL_CHUNK_WITH_LIGHT) is not decoded by trace.rs, so it is dark — dropped by is_housekeeping.
+                    The 29-type shortfall is therefore OURS and one decoder arm buys all of it (§25.2, §29.4).
+     menu — no opener anywhere in the jar (4): generic_9x1, generic_9x2, generic_9x4, generic_9x5
+     menu — an opener, but only an entity's (1): merchant  — spawn_mobs=false, difficulty=peaceful
+
+== reproducibility — the same census, one recording at a time ==
+  sound_event          per-run 27..28   pooled 29
+  block                per-run 43..43   pooled 43
+  entity_type          per-run 4..4   pooled 4
+  block_entity_type    per-run 1..1   pooled 1
+  menu                 per-run 3..3   pooled 3
+
+== SENSITIVITY — the same corpus, five units ==
+   80.56%       29 / 36      clientbound types the corpus provokes, named by a check
+   21.99%       31 / 141     clientbound types in the protocol, named by a check
+   66.67%       80 / 120     vanilla tick sections not provably dead
+    2.53%        4 / 158     entity types ever present
+    3.60%       43 / 1196    blocks ever seen change
+    1.47%       29 / 1968    sound events ever heard
+  -> the answer moves 55x between the most and least flattering unit
+  -- and against the CEILING instead of the registry, where one is known:
+   24.03%       31 / 129     clientbound types in the protocol, named by a check
+   66.67%       80 / 120     vanilla tick sections not provably dead
+    5.00%        1 / 20      block entity types ever observed
+   15.00%        3 / 20      menu types ever opened
+   11.33%       29 / 256     sound events ever heard
+  -> 13x on the rows that have a ceiling. The spread survives the correction; what changes is which rows are catastrophic.
+
+== RANKED — the largest systems with zero corpus evidence ==
+  Ranked by the gap to the CEILING, with the gap to the registry beside it.
+  A row whose two numbers differ is a row whose old rank was measuring the registry.
+  A `?` row is PLACED by its registry gap because it has no ceiling; the placement
+  of those rows is not a measurement and they may be anywhere in this list.
+   1. block behaviour                       ? of   1153 blocks           32279 block states unseen; no jar rule caps it
+   2. sound emission                      227 of   1939 sound events     ceiling is OUR emitter (§27.1); vanilla's is unknown
+   3. mob AI and mob behaviour              ? of    154 entity types     33 per-mob tick sections provably never ran; ceiling unknown, spawning is OURS
+   4. block entities                       19 of     48 block entity types 29 unreachable on any channel trace.rs decodes (§25, §29.4)
+   5. container menus                      17 of     22 menu types       5 have no opener a block can reach (§28)
+   6. natural + custom spawning             6 of      6 tick sections    gamerule spawn_mobs=false — OURS
+   7. weather and thunder                   1 of      1 tick sections    gamerule advance_weather=false — OURS
+

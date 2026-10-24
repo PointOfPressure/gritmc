@@ -1,0 +1,29 @@
+name = "a-console-difficulty-reaches-every-client"
+about = """
+`difficulty easy` from the console sends `change_difficulty` to EVERY player —
+id 1, unlocked — and nothing else on the chat channel
+
+`DifficultyCommand.setDifficulty` calls `MinecraftServer.setDifficulty(d,
+true)`, which ends `getPlayers().forEach(this::sendDifficultyUpdate)`: one
+packet per player, the varint id and `isDifficultyLocked`. Observed from both
+players, because a server that answered only the source — or, from the
+console, nobody — would put the packet on one side and not the other.
+
+The success line is `sendSuccess(..., true)`: to the console's own log, and to
+every op other than the source. The corpus's players are not ops, so `chat`
+must stay silent on both, and observing it is what makes a server that
+broadcast the reply to everybody a red here.
+
+Level 2, so it goes through the console — see `scenario::Step::Console`.
+`difficulty peaceful` puts the substrate back: `ci/gameplay-difficulty.sh`
+pins `peaceful`, and a world left on easy would hand every later scenario
+whatever a hostile spawn does to it.
+"""
+console_restore = ["difficulty peaceful"]
+observe_from = "both"
+observe = ["change_difficulty", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "difficulty easy"

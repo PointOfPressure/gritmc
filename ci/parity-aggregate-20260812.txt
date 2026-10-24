@@ -1,0 +1,122 @@
+# ci/parity-aggregate.py, 2026-08-12, branch `corpus-parity-aggregate`.
+#
+# Reproduce (static — no vanilla booted, no build, the box-wide corpus lock
+# never taken; the census is ~7 s of javap and json, the composition is ms):
+#
+#   ci/vanilla-reach-census.py --json /tmp/census.json     # needs a tree whose
+#                                                          # census emits `ceiling`
+#   ci/parity-aggregate.py --census /tmp/census.json \
+#       --report ~/rustmc-pot/oracle-work/gameplay/report.json \
+#       --binary ~/rustmc-pot/target/release/oracle-runner
+#
+# The census was taken in a worktree at origin/corpus-reach-ceilings 32314f60,
+# because `ceiling` is not on main yet and this script REFUSES [NO-CEILINGS]
+# without it. The report is the newest corpus score on the box coherent with
+# the standing floor: ~/rustmc-stack's 81/93 is newer and larger and is refused
+# [STALE-PROJECTION], its comparator having moved to proj:f7fbb29926074663.
+#
+# AS OF, not CURRENT: the live corpus holds 93 scenarios and this figure is
+# stamped at 92. Exit 3. See section 6 of the script header.
+== inputs, and the stamp this figure carries ==
+== inputs, and the stamp this figure carries ==
+  jar          oracle-work/vanilla-26.2/versions/26.2/server-26.2.jar
+  ensemble     coverage92-selfcheck-n6-20260811, N = 6 recordings, 15 pairwise
+  projection   proj:7cefde0fb56d9f3e  (floor and score, verified equal)
+  match        strict 71/92 = 77.17%
+  floor        4/92 scenarios two vanilla runs do not reproduce (4 vanilla's, 0 the harness's)
+  LOWER BOUND  at N = 6 a scenario flapping less than 39.3% of the time still shows 6 identical runs (alpha 0.05)
+  NOT CURRENT  the live corpus holds 93 scenarios and this figure is stamped at 92
+
+== reach, per unit, against the CEILING and against the registry ==
+  unit                   observed  ceiling    reach     owner  registry
+  clientbound packet           36      129   27.91%      ours  36/141 = 25.53%
+  block_entity_type             1       20    5.00%       jar  1/49 = 2.04%
+  menu                          3       20   15.00%  jar+ours  3/25 = 12.00%
+  sound_event                  29      256   11.33%      ours  29/1968 = 1.47%
+  tick section           EXCLUDED — NO NUMERATOR
+        ceiling 79 of 120 is known, but no server is booted by this census, so what fraction of it RAN is not measured. 79 sections are unclassified, which is unknown and is not evidence in either direction (21.4).
+  block                  EXCLUDED — UNKNOWN CEILING
+        43 of 1196 registered; no jar rule found — see --explain for the two that were tried
+  block_state            EXCLUDED — UNKNOWN CEILING
+        87 of 32366 registered; no jar rule found; inherits the block row's
+  entity_type            EXCLUDED — UNKNOWN CEILING
+        4 of 158 registered; no jar rule caps it; >= 91 are one hotbar slot away (spawn eggs)
+  worldgen               EXCLUDED — NO REACH DENOMINATOR
+        worldgen carries match figures (DETERMINISM 17: 99.935277% at seed 12345, floor 2,577..4,835 at N=5) and no reach census exists for it at all. There is no denominator to divide by, so the product is undefined rather than small. It is a separate axis and this headline does not cover it.
+
+== the composite ==
+  parity = reach x match, over 4 units with a known ceiling
+
+  estimator     value       drop-one range   swing
+  median       10.16%      8.74..  11.58%    27.9% of value <-- headline
+  mean         11.43%      8.06..  13.95%    51.6% of value
+  pooled       12.53%      8.60..  18.27%    77.1% of value
+
+  SPREAD       3.86% .. 21.54%  (5.6x across units)
+  same, vs the REGISTRY instead of the ceiling: 1.14% .. 19.70% (17.3x)
+  -> the ceiling correction takes the spread 17.3x -> 5.6x. It does not remove it.
+
+  BAND         9.86% .. 10.73%
+    low  = reach at the census's per-run minimum (its only stand-in for a floor, 21.4)
+           clientbound packet report NO per-run spread, so they enter the low band
+           at their pooled value. The low band is therefore an UNDER-statement of the
+           uncertainty, not an over-statement.
+    high = match with the floor's 4 unreproducible scenarios admitted (71+4)/92 — an annotation on the denominator, never subtracted
+
+  PRESENCE DISCOUNT (21.4)
+    two-factor   reach x match                 10.16%
+    three-factor reach x read x match          8.18%   read = 29/36 = 80.56%
+    `read` is measured on the packet unit ONLY; extending it to the other units is an assumption.
+    The honest reading is the pair: 8.2% .. 10.2%.
+
+== ranked levers — what would move the composite most ==
+  headline 10.16%; ranked by the MARGINAL move, per one more item observed
+  unit                      gap     owner   per item  if closed
+  menu                       17  jar+ours    +1.929%     15.14%
+  sound_event               227      ours    +0.151%     16.56%
+  block_entity_type          19       jar    +0.000%     16.56%
+  clientbound packet         93      ours    +0.000%     10.16%
+  under `pooled` instead the order is sound_event > clientbound packet > block_entity_type > menu — the estimators disagree
+  an `ours` owner is spendable work; a `jar` owner is a fact about vanilla.
+  MARGINAL ZERO: block_entity_type, clientbound packet — a median is insensitive to its ends by
+  construction, so these rows have open gaps that the next item of work does
+  not move at all. That is a cost of the estimator, not a fact about them.
+  rows with no ceiling are absent from this ranking BECAUSE they have no ceiling,
+  not because they are small — `block` alone is 1,153 untouched blocks (21.5 ranks it 1st).
+
+PARITY-AGGREGATE AS OF  strict 10.16%  band 9.86..10.73%  spread 3.86..21.54%  units 4  ensemble coverage92-selfcheck-n6-20260811  proj:7cefde0fb56d9f3e
+
+############ the same inputs on the declared basis ############
+
+  same, vs the REGISTRY instead of the ceiling: 1.20% .. 20.81% (17.3x)
+  -> the ceiling correction takes the spread 17.3x -> 5.6x. It does not remove it.
+
+  BAND         10.41% .. 11.30%
+    low  = reach at the census's per-run minimum (its only stand-in for a floor, 21.4)
+           clientbound packet report NO per-run spread, so they enter the low band
+           at their pooled value. The low band is therefore an UNDER-statement of the
+           uncertainty, not an over-statement.
+    high = match with the floor's 4 unreproducible scenarios admitted (75+4)/92 — an annotation on the denominator, never subtracted
+
+  PRESENCE DISCOUNT (21.4)
+    two-factor   reach x match                 10.73%
+    three-factor reach x read x match          8.64%   read = 29/36 = 80.56%
+    `read` is measured on the packet unit ONLY; extending it to the other units is an assumption.
+    The honest reading is the pair: 8.6% .. 10.7%.
+
+== ranked levers — what would move the composite most ==
+  headline 10.73%; ranked by the MARGINAL move, per one more item observed
+  unit                      gap     owner   per item  if closed
+  menu                       17  jar+ours    +2.038%     15.99%
+  sound_event               227      ours    +0.159%     17.49%
+  block_entity_type          19       jar    +0.000%     17.49%
+  clientbound packet         93      ours    +0.000%     10.73%
+  under `pooled` instead the order is sound_event > clientbound packet > block_entity_type > menu — the estimators disagree
+  an `ours` owner is spendable work; a `jar` owner is a fact about vanilla.
+  MARGINAL ZERO: block_entity_type, clientbound packet — a median is insensitive to its ends by
+  construction, so these rows have open gaps that the next item of work does
+  not move at all. That is a cost of the estimator, not a fact about them.
+  rows with no ceiling are absent from this ranking BECAUSE they have no ceiling,
+  not because they are small — `block` alone is 1,153 untouched blocks (21.5 ranks it 1st).
+
+PARITY-AGGREGATE AS OF  declared 10.73%  band 10.41..11.30%  spread 4.08..22.75%  units 4  ensemble coverage92-selfcheck-n6-20260811  proj:7cefde0fb56d9f3e

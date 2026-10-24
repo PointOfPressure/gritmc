@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 61
+slug   = "gamerules-console-closes-grass-dirt"
+title  = "Game rules and a console close `random-ticks-turn-covered-grass-to-dirt` — 2026-08-17, branch `gamerules-console`"
+branch = "gamerules-console"

@@ -1,0 +1,163 @@
+# FIXTURE, NOT A LEDGER — `ci/never-recorded-falsify.sh` reads this; nothing
+# else does. It is the twelve-row ledger exactly as it stood on main at 3611,
+# kept because every jar-side case of the falsifier (a `vacant` kind gaining a
+# sender, a renamed class, a wrong jar) needs rows to act on, and the real
+# ledger (`ci/checks/never-recorded.toml`) has none: since 2026-09-24
+# `recorder-housekeeping` drops nothing at record time. The falsifier puts the
+# twelve drops back into a scratch copy of `trace::observe` so this file and
+# that copy agree, then breaks one of them per case.
+#
+# The twelve packet kinds that never enter a recording, and what each costs.
+#
+# Written and checked by `ci/never-recorded.py`. Read that file's header for the
+# distinction this file turns on: `ci/checks/projection-drops.toml` enumerates
+# dropped *fields*, which leave an observation with a hole in it, while
+# `trace::is_housekeeping` returns `None` before `decode` runs and leaves no
+# observation at all. Not even the `packet:0xNN` fallback that catches every
+# other unknown id.
+#
+# `verdict` is the column the file exists for:
+#
+#   * `vacant`      — no class in the pinned jar builds the packet. A vanilla
+#                     server cannot send it and the refusal costs nothing.
+#   * `clock`       — sent, payload is a clock, so no two runs agree and no
+#                     value comparison is possible.
+#   * `recoverable` — sent, payload decided by what the server did. **A check
+#                     could compare this if the recorder stopped refusing it.**
+#   * `elsewhere`   — the chunk-send path, ranked on `origin/chunk-send-path`.
+#
+# `sent_by` is re-derived from the jar on every run and the check refuses a row
+# that disagrees, the same discipline `observed_by` gets in the projection
+# ledger and for the same reason: this is a property of a 24 MB binary that a
+# version bump changes, so it cannot be a memory. A `vacant` row that gains a
+# sender is refused by name.
+#
+# Read from the pinned jar with `javap` and a constant-pool scan, 26.2,
+# 2026-08-19. Nothing here comes from an older version or another
+# implementation.
+
+# ---------------------------------------------------------------------------
+# VACANT — vanilla cannot send these, so the refusal costs nothing.
+#
+# Both are fully plumbed and never built. `ClientGamePacketListener` declares
+# the handler, `GamePacketTypes` holds the id and `GameProtocols` registers the
+# codec — three references apiece, all inside the protocol package, none of
+# them a construction. A tab-list header is a thing plugins set; vanilla has no
+# path that sends one, and `ClientboundPingPacket` is a transport probe the
+# server half never initiates.
+
+[[kind]]
+name = "PING"
+class = "net.minecraft.network.protocol.common.ClientboundPingPacket"
+verdict = "vacant"
+wire = "one int, `id`"
+why = "no class outside `net/minecraft/network/protocol/` so much as names the type — the server never builds one"
+sent_by = []
+
+[[kind]]
+name = "TAB_LIST"
+class = "net.minecraft.network.protocol.game.ClientboundTabListPacket"
+verdict = "vacant"
+wire = "two `Component`s, `header` and `footer`"
+why = "the same: plumbed, handled, registered, never constructed. The tab list header and footer are a plugin surface and vanilla sets neither"
+sent_by = []
+
+# ---------------------------------------------------------------------------
+# CLOCK — sent, and the payload is a reading of a clock.
+#
+# These are the `player_chat.timestamp` class one level up: the packet carries
+# real traffic and its content is a number that two runs of one scenario
+# against one jar cannot agree on. Recording them would put a guaranteed
+# mismatch into every comparison that saw one.
+
+[[kind]]
+name = "KEEP_ALIVE"
+class = "net.minecraft.network.protocol.common.ClientboundKeepAlivePacket"
+verdict = "clock"
+wire = "one long, `id`"
+why = "`ServerCommonPacketListenerImpl.keepConnectionAlive` sets `keepAliveChallenge = Util.getMillis()` and sends that — a wall clock, and the packet's whole payload"
+sent_by = ["net.minecraft.server.network.ServerCommonPacketListenerImpl"]
+
+[[kind]]
+name = "SET_TIME"
+class = "net.minecraft.network.protocol.game.ClientboundSetTimePacket"
+verdict = "clock"
+wire = "one long `gameTime`, then a map of `WorldClock` holder to `ClockNetworkState`"
+why = "`MinecraftServer`'s periodic broadcast builds it from `overworld().getGameTime()` with `Map.of()` for the clocks, and `ServerClockManager.createFullSyncPacket` from `getGameTime()` likewise. A tick counter rather than a wall clock, but a clock: two cold runs reach a given step at different tick counts because login and chunk loading do not take the same time twice"
+sent_by = ["net.minecraft.server.MinecraftServer", "net.minecraft.server.players.PlayerList", "net.minecraft.world.clock.ServerClockManager"]
+
+# ---------------------------------------------------------------------------
+# RECOVERABLE — sent, and the payload is decided by what the server did.
+#
+# **These two are what the refusal is costing.** Both carry a state change that
+# a scenario causes on purpose, and both are as reproducible as any
+# `block_update`. Nothing in the corpus can observe either, and — unlike a
+# dropped field — nothing records that they were ever on the wire.
+
+[[kind]]
+name = "PLAYER_INFO_UPDATE"
+class = "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket"
+verdict = "recoverable"
+wire = "an `EnumSet<Action>` then one entry per player, the entry's shape decided by the action set"
+why = "`ServerPlayerGameMode.setGameModeForPlayer` reaches `PlayerList.broadcastAll` with `Action.UPDATE_GAME_MODE` for the player whose mode changed (offsets 74-84) — **a broadcast to every connected client, not merely a construction** — which is a deterministic consequence of a `/gamemode` a scenario ran. `PlayerList` also sends `createPlayerInitializing` on join and a periodic `UPDATE_LATENCY`; the latency figure is a measured round trip and is the one field of the three that cannot be compared"
+sent_by = ["net.minecraft.server.level.ServerPlayerGameMode", "net.minecraft.server.network.ServerGamePacketListenerImpl", "net.minecraft.server.players.PlayerList"]
+
+[[kind]]
+name = "UPDATE_ADVANCEMENTS"
+class = "net.minecraft.network.protocol.game.ClientboundUpdateAdvancementsPacket"
+verdict = "recoverable"
+wire = "a `reset` boolean, added advancements, removed ids, a progress map, and a `showAdvancements` boolean"
+why = "`PlayerAdvancements.flushDirty` builds it and hands it straight to `ServerGamePacketListenerImpl.send` (offsets 244-247) when the dirty set is non-empty, so it is the direct wire consequence of a criterion being met. Doing the same thing twice earns the same advancement twice; there is no draw and no clock anywhere in the payload"
+sent_by = ["net.minecraft.server.PlayerAdvancements"]
+
+# ---------------------------------------------------------------------------
+# ELSEWHERE — the chunk-send path.
+#
+# Five of the eleven since 2026-09-23, when main's b286f2697 put
+# `LEVEL_CHUNK_WITH_LIGHT` back through `decode` as `chunk_block_entities`
+# and its row here went stale (`ci/never-recorded.py` refused it). They are one
+# subsystem rather than five decisions: `PlayerChunkSender` builds three of them, `ChunkHolder` the light update and
+# `ChunkMap` the cache centre. Ranked on `origin/chunk-send-path`, which owns
+# the question of what a chunk-stream comparison would have to look like.
+# Listed here so that the eleven add up and so that a seventh cannot be added
+# to the chunk family without a row.
+
+[[kind]]
+name = "CHUNK_BATCH_START"
+class = "net.minecraft.network.protocol.game.ClientboundChunkBatchStartPacket"
+verdict = "elsewhere"
+wire = "empty"
+why = "the chunk-send path — `origin/chunk-send-path` owns it"
+sent_by = ["net.minecraft.server.network.PlayerChunkSender"]
+
+[[kind]]
+name = "CHUNK_BATCH_FINISHED"
+class = "net.minecraft.network.protocol.game.ClientboundChunkBatchFinishedPacket"
+verdict = "elsewhere"
+wire = "one varint, the batch size"
+why = "the chunk-send path — `origin/chunk-send-path` owns it"
+sent_by = ["net.minecraft.server.network.PlayerChunkSender"]
+
+[[kind]]
+name = "FORGET_LEVEL_CHUNK"
+class = "net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket"
+verdict = "elsewhere"
+wire = "one packed chunk position"
+why = "the chunk-send path — `origin/chunk-send-path` owns it"
+sent_by = ["net.minecraft.server.network.PlayerChunkSender"]
+
+[[kind]]
+name = "LIGHT_UPDATE"
+class = "net.minecraft.network.protocol.game.ClientboundLightUpdatePacket"
+verdict = "elsewhere"
+wire = "a chunk position and the sky and block light bitsets"
+why = "the chunk-send path — built by `ChunkHolder` rather than `PlayerChunkSender`, and ranked with the family it belongs to"
+sent_by = ["net.minecraft.server.level.ChunkHolder"]
+
+[[kind]]
+name = "SET_CHUNK_CACHE_CENTER"
+class = "net.minecraft.network.protocol.game.ClientboundSetChunkCacheCenterPacket"
+verdict = "elsewhere"
+wire = "two varints, the centre chunk x and z"
+why = "the chunk-send path — built by `ChunkMap` as the player's view moves, and ranked with the family it belongs to"
+sent_by = ["net.minecraft.server.level.ChunkMap"]

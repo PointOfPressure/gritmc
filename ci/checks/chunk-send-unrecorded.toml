@@ -1,0 +1,43 @@
+# The chunk-send path, kind by kind: what a recording can see and what it cannot.
+#
+# Written and checked by `ci/chunk-send-unrecorded.py`. This is the kind-level
+# companion to `ci/checks/projection-drops.toml`, which is field-level. The two
+# are different failures and the distinction is the point:
+#
+#   * a **drop** is a field the decoder read and did not emit. The packet is in
+#     the recording; one of its fields is not.
+#   * an **unrecorded kind** never reaches the recording at all, because
+#     `trace::observe` returns `None` for it (it was `trace::is_housekeeping`
+#     until 2026-09-24). No check can observe it, no
+#     check can be written to observe it, and `ci/corpus-falsifiable.py` cannot
+#     tell a scenario that depends on it from one that measures nothing —
+#     because from the corpus's side those are the same scenario.
+#
+# `impact` has the same three values `projection-drops.toml` uses:
+#
+#   * `decides` — a live check turns on behaviour this kind carries, and cannot
+#     see it. Its green is not evidence.
+#   * `armed`   — the kind carries real server behaviour that no check turns on
+#     today. The next check that wants it will find nothing and no failure to
+#     say so.
+#   * `note`    — the kind carries no behaviour a comparison could ever decide
+#     on. The drop is free.
+#
+# PARITY-ROADMAP §70. Six of the twelve kinds in
+# `cited-audits.toml::projection-unrecorded-kinds-20260818` are this path.
+#
+# **THERE ARE NO ROWS, AND THAT IS THE MEASUREMENT — 2026-09-24.** Five did
+# stand here: CHUNK_BATCH_START, CHUNK_BATCH_FINISHED, FORGET_LEVEL_CHUNK,
+# LIGHT_UPDATE and SET_CHUNK_CACHE_CENTER. `recorder-housekeeping` deleted
+# `is_housekeeping`, so all five are recorded and every row became a STALE-ROW
+# refusal of this guard's own. Their classification is now a `trace::FAMILIES`
+# row each, backed by `ci/checks/ambient-families.toml`: FORGET_LEVEL_CHUNK and
+# SET_CHUNK_CACHE_CENTER are GRADED (`547`, `546`), the batch pair and
+# LIGHT_UPDATE ambient with a measured reason. What the old rows said about
+# the server — pacing constants no check compares, 0 of 26 light sections sent
+# — is still true and is in git history (3e8a75b63); it is no longer a
+# statement about what a recording can see.
+
+# LEVEL_CHUNK_WITH_LIGHT was the first kind retired, by `world-send-chunk-
+# block-entities`; `ci/chunk-send-unrecorded-falsify.sh` still reconstructs its
+# re-drop, now as an early `return None` in `trace::observe`.

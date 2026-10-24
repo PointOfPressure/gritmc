@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 32
+slug   = "world-chunk-block-entities"
+title  = "`World::chunk` sent every chunk with no block-entity list at all — 2026-08-12, branch `world-send-chunk-block-entities`"
+branch = "world-send-chunk-block-entities"

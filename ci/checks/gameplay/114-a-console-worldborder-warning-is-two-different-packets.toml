@@ -1,0 +1,41 @@
+name = "console-worldborder-warning-is-two-different-packets"
+about = """
+`warning distance` and `warning time` are two packets whose names cross over:
+`set_border_warning_delay` carries `warningTime` and
+`set_border_warning_distance` carries `warningBlocks`
+
+Both are one varint, so the only thing separating a correct port from one that
+swapped them is which packet id each arrives on — which is exactly what a
+digest of a single-varint body cannot tell you and what this check does.
+
+The two values are deliberately different (9 and 37) and neither is the other's
+default (5 and 15, `new WorldBorder()`'s field initialisers rather than
+`Settings.DEFAULT`'s), so a swap moves both fields and not just their order.
+
+**The restore's two values are declared and one of them may be wrong in a way
+this corpus cannot see.** 5 and 15 are the constructor's field initialisers,
+gated against `golden/world_border.json`'s `fresh` state; a dedicated server
+also runs `worldBorder.applyInitialSettings(levelData.getWorldBorder())` at
+boot, and `WorldBorderSettings.DEFAULT` carries a different warning time. If
+that is what vanilla starts from, this restore puts the warnings back to the
+wrong numbers — and nothing downstream can tell, because no later scenario
+observes a border packet and neither warning value gates any interaction. The
+SIZE is the one that does, and `113` restores that exactly. Said here rather
+than left to be discovered, and the day a scenario observes a border packet
+after this one it becomes measurable.
+"""
+console_restore = [
+    "worldborder warning distance 5",
+    "worldborder warning time 15",
+]
+observe_from = "actor"
+observe = ["set_border_warning_distance", "set_border_warning_delay"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "worldborder warning distance 9"
+
+[[step]]
+do = "console"
+text = "worldborder warning time 37"

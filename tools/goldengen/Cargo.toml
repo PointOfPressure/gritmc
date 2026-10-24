@@ -1,0 +1,19 @@
+[package]
+name = "goldengen"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+
+# Dev-only, and it is the assertion rather than a convenience: `game_version`
+# scrapes `GAME_VERSION` out of rustmc-proto's source as *text*, and the test
+# below compares that scrape against the constant the compiler actually sees.
+# Without a second, independent route to the same value the test would be the
+# scraper checking its own output.
+[dev-dependencies]
+rustmc-proto = { workspace = true }
+
+[lints]
+workspace = true

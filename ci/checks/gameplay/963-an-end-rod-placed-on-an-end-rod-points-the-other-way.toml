@@ -1,0 +1,95 @@
+name = "an-end-rod-placed-on-an-end-rod-points-the-other-way"
+about = "an end rod normally takes the clicked face, but a rod placed against a rod already pointing that way is INVERTED — `EndRodBlock.getStateForPlacement` reads the neighbour's own `facing` before deciding, and no other block in the corpus does"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 1500
+
+# THE SCHEMA THIS TOUCHES, AND WHY IT IS THE ONE WORTH TAKING.
+#
+# Plain six-value `facing` is **18 blocks** — the sixteen shulker boxes,
+# `shulker_box` itself, and `end_rod` — and the corpus has never observed one
+# state of it (`ci/block-schema-queue.py`, `~/rustmc-stackdec`, N=6,
+# 2026-08-12). It is the largest untouched schema that is not walls.
+#
+# The obvious way in is a shulker box, and it is refused on purpose: opening
+# one projects `window`, which is `ServerPlayer.containerCounter` — a
+# per-player counter with no reset, shared down the corpus's one connection in
+# corpus order. `end_rod` is in the same schema, is not a block entity, opens
+# nothing, and has the better rule anyway.
+#
+# FROM THE JAR. `javap -p -c -constants` on
+# `net/minecraft/world/level/block/EndRodBlock`, `getStateForPlacement`, whole
+# method:
+#
+#    0: BlockPlaceContext.getClickedFace()            -> face
+#    5: getLevel(); getClickedPos(); face.getOpposite()
+#   17: BlockPos.relative(..)                         -> behind
+#   20: Level.getBlockState(behind)                   -> neighbour
+#   24: neighbour.is(this)          ifeq 61
+#   32: neighbour.getValue(FACING)
+#   39: if_acmpne 61                                  -> == face ?
+#   43:   default.setValue(FACING, face.getOpposite())  <- THE FLIP
+#   61:   default.setValue(FACING, face)                <- the ordinary arm
+#
+# `behind` is the block the new rod is being placed AGAINST, and the flip
+# fires only when that block is another end rod whose `facing` already equals
+# the clicked face. Two conditions, both on the neighbour's own state.
+#
+# WHY THIS IS NOT ANOTHER PLACEMENT CHECK. Every other placement in this
+# corpus computes the new state from the CONTEXT — the clicked face, the
+# player's yaw, the clicked position. This one reads a **property of the block
+# already there** and inverts on it. `732`-shaped accumulation is the nearest
+# thing and it is not the same: a candle counts, this branches on a
+# neighbour's enum.
+#
+# THE ARITHMETIC. Both steps click `face = "up"`.
+#
+#   step 1  behind = the superflat surface, not an end rod
+#           -> ordinary arm, rod at [1,0,1] is `facing=up`
+#   step 2  behind = the rod from step 1, whose facing IS `up` = the clicked
+#           face -> flip, rod at [1,1,1] is `facing=DOWN`
+#
+# Two states of the schema from two identical actions, and the difference is
+# entirely the neighbour. Wrong models and what happens to them:
+#
+#   * `facing <- clickedFace`, the natural `DirectionalBlock` rule — passes
+#     step 1, answers `up` to step 2, fails. This is the model a one-rod check
+#     would have rewarded, and it is why step 1 alone is not enough.
+#   * flip tested on `is(this)` but not on the neighbour's facing — passes
+#     both here; NOT covered, and said so rather than claimed. Catching it
+#     needs a third rod placed on the SIDE of a vertical one, which is a
+#     different rig and belongs to whoever takes the shulker half of this
+#     schema.
+#   * flip on the wrong neighbour (the clicked block rather than the block
+#     behind the new position) — at step 2 those are the same block, so this
+#     is not distinguished either. Also not claimed.
+#
+# STEP 1 IS THE CONTROL AND IS DELIBERATELY A STEP, NOT SETUP. If step 1 is
+# hidden in `setup` then step 2 producing `facing=down` is unfalsifiable from
+# the recording alone — nothing shows what the first rod's facing was, so a
+# server that answered `down` to BOTH would look correct. Both placements are
+# recorded so the pair is legible in the trace.
+#
+# RIG AT z = +1 for the README's chunk-boundary rule, and it is one column, so
+# nothing here can reach another workspace.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:end_rod"
+
+# Step 1 — the control. Rod on the ground at [1,0,1], must be `facing=up`.
+[[step]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+# Step 2 — the check. Same click, on top of the rod just placed. The new rod
+# at [1,1,1] must be `facing=down`.
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "up"

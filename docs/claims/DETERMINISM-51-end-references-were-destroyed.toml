@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 51
+slug   = "end-references-were-destroyed"
+title  = "Every reference §6 names was destroyed, and the End's floor is 127 rather than 252 — 2026-08-18, branch `end-biome-census`"
+branch = "end-biome-census"

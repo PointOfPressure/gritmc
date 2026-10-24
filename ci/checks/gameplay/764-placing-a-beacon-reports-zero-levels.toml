@@ -1,0 +1,24 @@
+name = "placing-a-beacon-reports-zero-levels"
+about = "`BeaconBlockEntity.getUpdateTag` is `saveCustomOnly()`, which for a beacon with no name and no effects is the single int `Levels` — zero with no pyramid under it; the value is recomputed by the beacon's ticker, so this pins the payload's shape and deliberately not its arithmetic"
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:beacon"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

@@ -1,0 +1,86 @@
+name = "a-daylight-detector-inverts-when-right-clicked"
+about = "right-clicking a daylight detector cycles `inverted` and then recomputes `power` from the sky — `DaylightDetectorBlock.useWithoutItem`, which is the only uncovered implementation of that method that both changes a redstone signal and opens no menu, so it is the cheapest new block-behaviour check in the corpus"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 1500
+
+# FROM THE JAR — AND NOTE WHAT IS *NOT* IN IT.
+#
+#   DaylightDetectorBlock.useWithoutItem
+#      0: player.mayBuild() : ifne 20 -> else super.useWithoutItem (a menu)
+#     20: level.isClientSide : ifne 70
+#     27: state.cycle(INVERTED)
+#     39: Level.setBlock(pos, newState, 2)
+#     48: Level.gameEvent(BLOCK_CHANGE, pos, ...)
+#     67: updateSignalStrength(newState, level, pos)   <- static, same class
+#     70: return InteractionResult.SUCCESS
+#
+# `mayBuild()` is the first gate and the substrate satisfies it — the harness's
+# player is in creative — so the interesting branch is the one that runs. That
+# matters: the *other* branch opens a menu, and a check that fell into it would
+# be entangled with the per-player window counter that makes the four existing
+# menu checks one indivisible item. This one is not, which is most of why it
+# is ranked where it is.
+#
+# **THAT RANKING ARGUMENT IS DEAD — 2026-08-12.** The window counter couples
+# nothing: `compare::rebase_session_counters` rebases it onto the scenario and
+# `ci/window-coupling.py` moved a whole vanilla recording's counter by up to
+# +99 without moving a verdict (`docs/PARITY-ROADMAP.md` §42). Falling into the
+# menu branch would not have entangled this check with anything, so nothing
+# here should be read as a reason to prefer a non-menu interaction. The rest of
+# the paragraph — which branch this check exercises and why — is unaffected.
+#
+# `setBlock` flag is **2**, not 3: UPDATE_CLIENTS without UPDATE_NEIGHBORS. The
+# neighbour half is done separately by `updateSignalStrength`, which writes
+# POWER with flag 3 only when the computed strength differs from the current
+# one. So the wire answer here is one or two `block_update`s at the detector's
+# own position and nothing anywhere else — there is deliberately no
+# redstone-responsive block beside it, because a lamp would make this check a
+# second copy of `360` and the point is the `inverted` cycle.
+#
+# WHY THE SKY DOES NOT MAKE THIS UNSTABLE. `updateSignalStrength` reads
+# `level.getBrightness(SKY, pos)` and the time of day. `ci/t2-gameplay.sh`
+# turns `advance_time` off through `gamerule_or_die`, so the sun does not move
+# for the whole run and the same click lands at the same sun angle in every
+# recording. That is an argument, not a measurement, and the measurement is
+# the one that counts: this check's stability was established by recording it
+# against vanilla and is reported in docs/PARITY-ROADMAP.md with its run count.
+#
+# Everything at relative z = 0.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:daylight_detector"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# **Wait out the detector's first periodic update before the window opens.**
+# A placed detector is `power=0`; `DaylightDetectorBlock.tickEntity` (javap
+# offsets 0..16) recomputes it only when `getGameTime() % 20 == 0`, so the
+# `power=15` it settles to lands up to a second after the place. The rest of
+# setup and its 250 ms quiet settle take well under that, so WHICH side of the
+# window it fell on was the tick phase at the place: measured on the
+# 2026-09-24 recordings, the serial run absorbed it in setup and the 4-shard
+# run opened its window on `inverted=false,power=15` before the click — on
+# rustmc, whose serial runs agree with each other. 1100 ms is 22 ticks, so the
+# update is always setup's, whatever the phase.
+[[setup]]
+do = "wait"
+ms = 1100
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

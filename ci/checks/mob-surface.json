@@ -1,0 +1,30 @@
+{
+ "_about": "Figures ci/mob-tick-census.py derives from the pinned 26.2 jar and from crates/rustmc-server/src/entities.rs. `--check` refuses if any of them moves. Re-pin deliberately: a figure that moved is either a jar change (impossible, it is pinned) or a real change in this workspace, and both deserve a commit message.",
+ "_derived_from": "oracle-work/vanilla-26.2/versions/26.2/server-26.2.jar",
+ "_expected_to_move": "`our_entity_kinds`, `our_mob_kinds` and `transcription_disagreements` are the only figures here that can move without the jar pin moving. The first two are SUPPOSED to move as work lands and re-pinning them belongs in the same commit as the port; `transcription_disagreements` moving is a defect in crates/rustmc-entity/src/tick.rs and is not a figure to re-pin. Everything else is jar-derived against a pinned jar.",
+ "_pinned_on": "2026-08-19",
+ "_the_point": "ci/unported-inventory.py --open reports 1 entity-behaviour gap. hierarchy_declarations is the size of what that one row stands for.",
+ "_transcription": "`transcription_disagreements` must stay 0. It compares MobCategory's despawn distances and getNoDespawnDistance as written in crates/rustmc-entity/src/tick.rs against the same values read from the pinned jar. A non-zero here is a real defect in the crate, not a pin that needs moving.",
+ "_yaw": "`entitytype_nextfloat_sites` is pinned as a LIST, not a count. It is `create@103` \u2014 the spawn yaw, drawn from an unseeded generator, and the single cause behind 080's 15/15 floor flap, spawn_mobs measuring as a null, and the standing 4-of-92 corpus floor being entirely entity scenarios. If a second site ever appears, `the spawn yaw draw` stops being a definite article and every sentence built on it has to be re-read.",
+ "figures": {
+  "check_despawn_overriders": 4,
+  "entity_types": 158,
+  "entitytype_nextfloat_sites": [
+   "create@103"
+  ],
+  "hierarchy_classes": 115,
+  "hierarchy_declarations": 3870,
+  "hierarchy_overridden": 371,
+  "hierarchy_signatures": 1548,
+  "misc_category_types": 72,
+  "mob_category_types": 86,
+  "mob_subtypes": 114,
+  "our_entity_kinds": 47,
+  "our_mob_kinds": 14,
+  "tick_reach_ai_classes": 240,
+  "tick_reach_ai_methods": 1754,
+  "tick_reach_pathfinder_classes": 14,
+  "tick_reach_pathfinder_methods": 164,
+  "transcription_disagreements": 0
+ }
+}

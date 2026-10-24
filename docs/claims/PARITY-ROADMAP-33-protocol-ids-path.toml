@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 33
+slug   = "protocol-ids-path"
+title  = "`protocol_ids::shared()` resolved relative to cwd, so `cargo test` never saw it — 2026-08-12, branch `server-protocol-ids-path`"
+branch = "server-protocol-ids-path"

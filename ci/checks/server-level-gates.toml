@@ -1,0 +1,548 @@
+# Every probe rule gated on `instanceof ServerLevel`, what the gate hides, and
+# whether this project can take the branch.
+#
+# Derived by `ci/server-level-gates.py`; `--check` refuses if the jar and this
+# file disagree. `hides` and `columns` are **derived, not declared** — they are
+# here so a change in the jar has to be acknowledged, not so a human can assert
+# them. `verdict`, `guard` and the prose are the only judgements.
+#
+# WHAT MAKES THIS DIFFERENT FROM THE OTHER TWO LEDGERS
+#
+#   ci/refusal-ledger.py    what the generators said they could not answer
+#   ci/probe-absences.py    what they never said anything about
+#   this                    what they said CONFIDENTLY AND WRONGLY, because the
+#                           harness is not a ServerLevel and the rule returned
+#                           a plausible value without running
+#
+# `instanceof` is answered by the JVM against the object's class. A `Level`
+# subclass cannot observe the question, so six of these rows look exactly like
+# a block that genuinely does nothing. `SignBlock` is the only one vanilla
+# announces, via `Util.pauseInIde`, and it is the only one already refused.
+
+[meta]
+# Refused if any of these moves. Derived by `--check`; see `## 87.` in
+# docs/PARITY-ROADMAP.md for what each one means.
+# **Two blocks, and the smaller one is checked in every tree.**
+#
+# `[meta.totals]` is `setPlacedBy` and `useWithoutItem`, the two probes every
+# tree with `data/vanilla` can measure. `[meta.totals_full]` adds `useItemOn`,
+# whose table most trees never build, and is checked only where it was. So the
+# subtotal cannot quietly rot in a tree that has all three, and a tree that has
+# two is not asked to reproduce a number it has no way to reach.
+[meta.totals]
+rules = 8
+blocks = 82
+silent_rules = 7
+silent_blocks = 34
+# Cells carrying a row that is FALSE in a column the table has. This is the
+# number to quote: not an absence and not a refusal, but a row a consumer
+# reads as a fact about the block.
+#
+# Counted over the cells the **guard admits**, not over every recorded cell of
+# the rule. The two are the same for all eight rules here and differ for four
+# of the seven below, because a `use_item_on.json` cell is a (state, item)
+# pair and five of those rules branch on the item first.
+false_cells = 404
+false_blocks = 34
+
+[meta.totals_full]
+rules = 15
+blocks = 138
+silent_rules = 14
+silent_blocks = 90
+#     404   the two required probes
+#   3,197   with `useItemOn`: +2,784 SignBlock, +8 BeehiveBlock, +1 PumpkinBlock
+#
+# 2,784 of the 2,793 new ones are signs, and they are new only because
+# `SignBlock.useItemOn` does not call `Util.pauseInIde` while
+# `SignBlock.useWithoutItem` does — the same 48 blocks are 1,344 refusals on
+# one half of the click and 2,784 silent false cells on the other.
+false_cells = 3197
+false_blocks = 85
+
+# ---------------------------------------------------------------------------
+# `menu` is a column (`opens`) and this server implements it, so all four of
+# these rows are false in the same way and for the same reason: `openMenu` is
+# on the far side of the gate.
+# ---------------------------------------------------------------------------
+
+[[gate]]
+probe = "useWithoutItem"
+class = "ChestBlock"
+announces = false
+guard = "no-branch"
+hides = ["entity-ai", "menu", "stat"]
+columns = ["opens"]
+blocks = 10
+rows = 10
+live = 240
+verdict = "reachable"
+note = """
+`if (level instanceof ServerLevel serverLevel)` is the first instruction of the
+body, so every one of the 240 recorded cells took the false branch and returned
+`SUCCESS` having done nothing. `crates/rustmc-server/src/menu.rs` implements
+`ServerPlayer.openMenu` and its two packets and `containers.rs` implements
+`ContainerOpenersCounter`, so the branch is not hypothetical here — this server
+can open a chest today, and the table says the click opened nothing.
+"""
+
+[[gate]]
+probe = "useWithoutItem"
+class = "ShulkerBoxBlock"
+announces = false
+guard = "no-branch"
+hides = ["entity-ai", "menu", "stat"]
+columns = ["opens"]
+blocks = 17
+rows = 17
+live = 102
+verdict = "reachable"
+note = """
+Same shape as `ChestBlock`, over the 17 dyed shulker boxes. `canOpen` — the
+check that the box has room to open — is itself inside the gate, so the table
+cannot even say the click was refused for want of space.
+"""
+
+[[gate]]
+probe = "useWithoutItem"
+class = "BarrelBlock"
+announces = false
+guard = "no-branch"
+hides = ["entity-ai", "menu", "stat"]
+columns = ["opens"]
+blocks = 1
+rows = 1
+live = 12
+verdict = "reachable"
+note = """
+Same shape as `ChestBlock`. 12 cells, `facing` x `open`.
+"""
+
+[[gate]]
+probe = "useWithoutItem"
+class = "EnderChestBlock"
+announces = false
+guard = "all-states"
+guard_why = """
+Two conditions precede the gate and neither depends on the block state in this
+harness. The block-entity ask now answers a real `EnderChestBlockEntity` — that
+is what `probe-answering-environment` changed — and `pos.above()` holds air, so
+`isRedstoneConductor` is false. All 8 cells reach the gate.
+"""
+hides = ["entity-ai", "menu", "stat"]
+columns = ["opens"]
+blocks = 1
+rows = 1
+live = 8
+verdict = "reachable"
+note = """
+**The case that makes the shape obvious, and the reason this ledger exists.**
+`minecraft:ender_chest` is one of the fifteen rows `probe-answering-environment`
+changed. It gained `reads: ["air-world"]`, for the `isRedstoneConductor` check
+above the gate, and it did **not** gain `opens`, because `openMenu` is below it.
+So the same row simultaneously documents one limitation of this harness and
+hides another, and the only difference between them was that a column existed
+for the first.
+"""
+
+# ---------------------------------------------------------------------------
+# The one where the false column is one the SERVER MODULE READS.
+# ---------------------------------------------------------------------------
+
+[[gate]]
+probe = "useWithoutItem"
+class = "SweetBerryBushBlock"
+announces = false
+guard = "age>1"
+hides = ["block-state", "game-event", "loot", "random", "sound"]
+columns = ["random", "sound", "writes"]
+blocks = 1
+rows = 1
+live = 2
+verdict = "reachable"
+note = """
+**The only one of the eight that is a live bug in this server rather than a gap
+in a table.** Vanilla, for `age > 1`, drops berries, plays a sound, and
+`setBlock(pos, state.setValue(AGE, 1), 2)`. Every one of those is inside the
+gate; the `return SUCCESS` is outside it. So the row reads
+`consumes: true, writes: []` and `crate::useblock` — which filters on exactly
+`consumes == true` and then applies `writes` — eats the right-click and leaves
+the bush at `age=3`. Picking berries does nothing and the bush never resets.
+
+It is two cells, and two cells is the whole of it: `age=0` and `age=1` never
+reach the gate, which is why `guard` is a predicate and not `no-branch`.
+
+Reachable three times over: `setBlock` is what this server is built on,
+`crates/rustmc-server/src/sounds.rs` implements `Level.playSound`, and the RNG
+draw behind the sound's pitch is the `random` column. The only mention of
+`minecraft:sweet_berry_bush` anywhere under `crates/` is the contact-damage
+list in `rustmc-behavior/src/survival.rs`, so nothing else covers the harvest.
+
+**Ported 2026-10-01, branch `random-ticks`, all but the loot:**
+`crate::world_send::use_without_item_step` answers the two cells before the
+table does — the sound with its `level.getRandom()` pitch draw, then
+`setBlock(AGE=1, 2)`. `dropFromBlockInteractLootTable` is not ported; this
+server has no loot-table path from a block interaction.
+"""
+
+# ---------------------------------------------------------------------------
+# Gated on a subsystem this project has none of. Naming it IS the deliverable;
+# these are not completable now and should not be costed as if they were.
+# ---------------------------------------------------------------------------
+
+[[gate]]
+probe = "useWithoutItem"
+class = "RespawnAnchorBlock"
+announces = false
+guard = "charges>0"
+hides = ["explosion", "player-respawn", "sound"]
+columns = ["sound"]
+blocks = 1
+rows = 1
+live = 4
+verdict = "needs-subsystem"
+note = """
+`sound` is a column, so the 4 cells (`charges=1..4`; `charges=0` returns before
+the gate) are false in it. But *which way* they are false cannot be settled
+here: past the gate the rule splits on `canSetSpawn`, which reads the dimension,
+and then on `instanceof ServerPlayer`. In the nether it sets the respawn point
+and plays `RESPAWN_ANCHOR_SET_SPAWN`; anywhere else it calls `explode`. Nothing
+under `crates/` sets a respawn position and nothing implements an explosion, so
+the honest record is that the column is wrong and cannot be made right yet.
+"""
+
+[[gate]]
+probe = "setPlacedBy"
+class = "CommandBlock"
+announces = false
+guard = "all-states"
+guard_why = """
+The block-entity ask precedes the gate and now answers a real
+`CommandBlockEntity`, so it no longer decides anything. No condition before the
+gate reads the block state.
+"""
+hides = ["block-entity-write", "block-state", "game-rules", "redstone"]
+columns = ["blockEntityWritten", "writes"]
+blocks = 3
+rows = 3
+live = 36
+verdict = "needs-subsystem"
+note = """
+**This was the last remaining `environment` verdict in
+`ci/checks/probe-absences.toml`, and stamping the gate closed it.** It was an
+absence rather than a false row because the *whole* body is inside the gate, so
+the probe found nothing to record at all — `setPlacedBy` returns `void`, so
+unlike the seven `useWithoutItem` rules there is no `consumes` to be right by
+coincidence about, and the silence was total.
+
+Three rows and 36 cells now, carrying no measurement and saying so: the same
+shape as the `probeOnly` and `faceOnly` rows, which is that "this block has a
+rule and the probe cannot see it" is strictly more than nothing and strictly
+less than a port. **Nothing was ported to achieve that** — the rule is as
+unreachable as it was this morning. What changed is that the table stopped
+being unable to say so.
+
+`hasNeighborSignal` exists (`crates/rustmc-server/src/power.rs:768`), but the
+gate also hides a gamerule read and two writes to a `CommandBlockEntity`, and
+this project has neither a gamerule store nor command block entities — the only
+mention of a command block under `crates/` is in `power.rs`. Three blocks, and
+the cheapest of the eight to leave alone.
+"""
+
+# ---------------------------------------------------------------------------
+# Already loud. Kept in the ledger so that vanilla dropping the alarm turns
+# 1,344 refusals back into rows and fails here instead of passing quietly.
+# ---------------------------------------------------------------------------
+
+[[gate]]
+probe = "useWithoutItem"
+class = "SignBlock"
+announces = true
+guard = "all-states"
+guard_why = """
+The block-entity ask precedes the gate and answers a real `SignBlockEntity` for
+every sign, so every state reaches the gate — and refuses.
+"""
+hides = ["block-entity-read", "block-entity-write", "menu", "player-permission",
+         "sound"]
+columns = ["blockEntityWritten", "opens", "sound"]
+blocks = 48
+rows = 48
+live = 0
+verdict = "announced"
+note = """
+The control. Vanilla hands `Util.pauseInIde` an `IllegalStateException` whose
+message says what went wrong; `SharedConstants.IS_RUNNING_IN_IDE` is a non-final
+`public static boolean` beside a public `Util.setPause`, so `UseGolden` arms both
+and the branch becomes a refusal — 1,344 cells, `live = 0`.
+
+`announces` is checked against the jar on every run. If a future version drops
+the `pauseInIde` call, those 1,344 refusals silently become rows that say
+`consumes: true, writes: []`, and this arm is the only thing in the tree that
+would notice.
+"""
+
+# ===========================================================================
+# `useItemOn` — the other half of the right-click, and the seven rules on it.
+#
+# `docs/cold-start/server-level-gate.md` measured this population with
+# `--census` and swept none of it. It is swept now. Two things about it are
+# not true of the eight above and both change how a row has to be read.
+#
+# **`SignBlock.useItemOn` does not announce.** Only `useWithoutItem` calls
+# `Util.pauseInIde`, and that one call is the whole reason 1,344 sign cells in
+# `use_without_item.json` are refusals rather than rows. The same class, on
+# the same block, through the other half of the same click, is as silent as
+# the chests — and it is the largest population here by two orders of
+# magnitude. "SignBlock is the one vanilla tells you about" is true of one
+# method, not of a class.
+#
+# **A cell is a (state, item) pair.** Five of the seven branch on the item
+# before they reach the gate, so a state-only guard would have to answer
+# `all-states` and stamp the whole grid. See the guard grammar in
+# `ci/server-level-gates.py`.
+# ===========================================================================
+
+[[gate]]
+probe = "useItemOn"
+class = "PumpkinBlock"
+announces = false
+guard = "item=minecraft:shears"
+hides = ["block-state", "entity-spawn", "game-event", "item-damaged", "loot",
+         "random", "sound", "stat"]
+columns = ["random", "sound", "stackAfter", "writes"]
+blocks = 1
+rows = 1
+live = 2
+verdict = "reachable"
+note = """
+**The berry bush of this half, and the same shape exactly.** `setBlock` is
+inside the gate and the `return SUCCESS` outside it:
+
+    if (!stack.is(Items.SHEARS)) return super.useItemOn(...);   //   0-25
+    if (!(level instanceof ServerLevel)) return SUCCESS;        //  26-45
+    ...loot, playSound(PUMPKIN_CARVE), setBlock(CARVED_PUMPKIN, 11),
+       hurtAndBreak, gameEvent(SHEAR), awardStat                //  46-186
+
+So the recorded cell is
+
+    minecraft:pumpkin + minecraft:shears
+      -> {"result": "SUCCESS", "consumes": true, "sound": false, "writes": []}
+
+and every one of those four fields except `result` is false. Vanilla carves
+the pumpkin, drops the seeds, plays a sound and damages the shears; the row
+says the click was taken and nothing happened.
+
+**It is one cell, and that is the whole population.** The block has a single
+state and one item reaches the branch, so this is the smallest of the seven
+and the only one whose false column is `writes`.
+
+**`reachable` is about the branch, and this one is not uniform inside itself.**
+`Level.setBlock` and `Level.playSound` are what this server is built on, so the
+carve and its sound are debt that could be paid today. The seeds are not: the
+drop goes through a lambda that constructs an `ItemEntity` and calls
+`Level.addFreshEntity`, and this server spawns item entities only from a
+player's own throw — the same gap `crate::itemuse` names for
+`Block.popResourceFromFace` on rooted dirt. The verdict is the branch's, and
+the split is here so a porter does not read it as all four columns being
+equally close.
+"""
+
+[[gate]]
+probe = "useItemOn"
+class = "TntBlock"
+announces = false
+guard = "item=minecraft:flint_and_steel,minecraft:fire_charge"
+hides = ["game-rules", "player-message"]
+columns = []
+blocks = 1
+rows = 1
+live = 4
+verdict = "needs-subsystem"
+[gate.via."TntBlock.prime"]
+hides = ["entity-spawn", "game-event", "game-rules", "sound"]
+why = """
+**The gate that decides this row is not the one in this rule.** The
+`instanceof` above hides a game-rule read and an overlay message, neither of
+which is a column, and on that reading `minecraft:tnt` is merely incomplete.
+
+`TntBlock.prime` is itself `instanceof ServerLevel` at its own offset 0 and
+returns `false` when it is not one. The rule calls it at 41 and branches on the
+answer at 44, so `level.setBlock(pos, AIR, 11)` at 47 — the removal of the TNT
+block — is unreachable here, and it sits on the caller's **fall-through**, 69
+bytes before the gate the walk finds. `prime` is called before the branch, so
+it is reachable from both sides of the gate and cancels in the subtraction,
+correctly, by the same rule that makes the join work.
+
+`hides` above is what `prime` performs itself. What the *caller* loses on the
+strength of a constant `false` — the `setBlock`, the `consume`/`hurtAndBreak`,
+the stat — is a dataflow question and nothing in the walk answers it, which is
+why this is prose.
+"""
+
+[[gate]]
+probe = "useItemOn"
+class = "SignBlock"
+announces = false
+guard = "all-states"
+guard_why = """
+Four branches precede the gate and none of them is a state or item test that
+can fail here. The block entity is a real `SignBlockEntity` — that is what
+`probe-answering-environment` supplied — so the `instanceof` at 13 falls
+through for every sign. `instanceof SignApplicator` at 41 and `mayBuild` at 66
+only compute a local that is read *after* the gate. So every recorded cell of
+every sign reaches it.
+"""
+hides = ["block-entity-read", "block-entity-write", "game-event",
+         "item-consumed", "stat"]
+columns = ["stackAfter"]
+blocks = 48
+rows = 48
+live = 2784
+verdict = "reachable"
+note = """
+**The correction this branch owes the whole area.** `SignBlock.useWithoutItem`
+calls `Util.pauseInIde` and is the one gate vanilla announces; 1,344 cells of
+`use_without_item.json` are refusals because of it. `SignBlock.useItemOn` has
+no such call. The same class, the same 48 blocks, the other half of the same
+click, and this half is silent — 2,784 cells, the largest population on either
+side of the gate.
+
+What the branch not taken produces is a plain answer, not an alarm:
+
+     95-117  if (!(applicator != null && mayBuild) || waxed) SUCCESS else CONSUME
+
+so `minecraft:oak_sign` reads `CONSUME` by default and `SUCCESS` for the
+sixteen dyes, the ink sac and the glow ink sac — right in `result`, and false
+in `stackAfter`, because `SignApplicator.tryApplyToSign` and the
+`ItemStack.consume` after it are both on the far side.
+
+`crates/rustmc-server/src/sign.rs` and `blockentity.rs` hold sign text today,
+so applying a dye is a block-entity write this server could make — reachable,
+not hypothetical.
+"""
+
+[[gate]]
+probe = "useItemOn"
+class = "VaultBlock"
+announces = false
+guard = "vault_state=active && item-any"
+hides = ["block-entity-read", "block-entity-write"]
+columns = []
+blocks = 1
+rows = 1
+live = 16
+verdict = "needs-subsystem"
+note = """
+`if (stack.isEmpty() || state.getValue(STATE) != ACTIVE) return
+TRY_WITH_EMPTY_HAND` is the whole guard, and all eight recorded states are
+`vault_state=active` — the inactive ones answer the same thing for every item
+and were never interesting enough to record.
+
+The gate hides `VaultBlockEntity$Server.tryInsertKey`, which is the entire
+mechanic: it consumes the key, ejects the reward and moves the vault's state.
+`result` is `SUCCESS_SERVER` on both sides of the branch, so the row is right
+about the one field a consumer would check first and says nothing about any of
+the rest. `columns` is empty because `use_item_on.json` has no
+`blockEntityWritten` field — see the per-probe COLUMNS note.
+
+Needs a vault block entity, a trial-chamber loot table and an ejection, none
+of which exist here.
+"""
+
+[[gate]]
+probe = "useItemOn"
+class = "BeehiveBlock"
+announces = false
+guard = "honey_level>4 && item=minecraft:shears"
+hides = ["game-event", "item-damaged", "loot", "sound"]
+columns = ["sound", "stackAfter"]
+blocks = 2
+rows = 2
+live = 24
+verdict = "needs-subsystem"
+note = """
+**The one whose cell existed only once it was stamped.** The gate is not a false cell here; it
+is a missing one. `honey_level >= 5` reaches it, the shears branch is *inside*
+it and the glass-bottle branch *outside*, so the bottle path runs correctly in
+this harness and the shears path does nothing at all — and a cell that does
+nothing is exactly the row's default. `UseItemOnGolden` names an item only
+where its answer differs from the default — so before the stamp existed,
+`minecraft:shears` had no group at all and the beehive's 16 recorded cells
+contained no shears cell.
+
+**The stamp is what brought it into being.** `gated` is part of `cellJson`, so
+a stamped cell no longer equals the default it would have merged into: the
+table went 44,078 (state, item) cells to 44,086, and the eight are exactly
+`minecraft:shears` on the four honey-full states of each of the two hives.
+That is the column doing the one thing a `reads`-style annotation cannot —
+recovering a cell rather than qualifying one.
+
+The contrast sits inside one row and is the clearest statement of what the
+gate costs. Same block, same state, two items:
+
+    minecraft:glass_bottle -> SUCCESS, sound, honey_level=0, honey bottle
+    minecraft:shears       -> (the default) TRY_WITH_EMPTY_HAND, nothing
+
+Vanilla drops three honeycomb, plays `BEEHIVE_SHEAR`, damages the shears and
+resets the honey level for the second one too.
+
+Needs bees: `releaseBeesAndResetHoneyLevel` and `angerNearbyBees` have no
+counterpart in this server, and neither does a honeycomb drop.
+"""
+
+[[gate]]
+probe = "useItemOn"
+class = "CampfireBlock"
+announces = false
+guard = "item-unknown"
+guard_why = """
+The branch above the gate is
+`level.recipeAccess().propertySet(CAMPFIRE_INPUT).test(stack)`, and this
+harness refuses `recipeAccess` outright — all 64 campfire states are refusals
+rather than rows. So which items reach the gate is unanswerable from the
+table's own strings, `item-unknown` stamps nothing, and a refused cell is
+never stamped anyway. The two agree, which is the point of saying it: the zero
+is arrived at from both sides rather than being true by accident of the
+refusal.
+"""
+hides = ["block-entity-write", "stat"]
+columns = []
+blocks = 2
+rows = 2
+live = 0
+verdict = "needs-subsystem"
+note = """
+`CampfireBlockEntity.placeFood` is the whole cooking mechanic and it is behind
+the gate; the branch not taken returns `CONSUME` where the gated one returns
+`SUCCESS_SERVER`. Both are `InteractionResult$Success` so `consumes` is right
+either way, which is the coincidence this ledger exists to record.
+
+Nothing is stamped and nothing can be: every cell of both campfires is a
+refusal on `recipeAccess`. This entry is here so the rule is ledgered rather
+than absent, and so a harness that one day answers `recipeAccess` turns 64
+refusals into 64 rows with the gate already described.
+"""
+
+[[gate]]
+probe = "useItemOn"
+class = "DecoratedPotBlock"
+announces = false
+guard = "item-any"
+hides = ["particles"]
+columns = []
+blocks = 1
+rows = 1
+live = 16
+verdict = "needs-subsystem"
+note = """
+The smallest finding of the seven and worth stating as such: the gate hides
+`ServerLevel.sendParticles` and nothing else. `setChanged` and the game event
+are *after* the join and run on both paths. So the row is incomplete in a way
+no column of any of the three tables records, and it is not false anywhere.
+
+It stamps nothing for a second reason as well. The pot's default cell — every
+non-empty stack, which is what `item-any` admits — is refused on
+`getChunkSource`, and only the 16 empty-hand cells survive, which the guard
+rejects. Two independent reasons for the same zero.
+"""

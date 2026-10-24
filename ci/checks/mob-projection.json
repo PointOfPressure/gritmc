@@ -1,0 +1,42 @@
+{
+ "_about": "Whether vanilla agrees with ITSELF under each candidate projection of 080-spawn-egg-makes-a-mob, over the recordings on this box. Written by ci/mob-projection-search.py.",
+ "_cache_note": "Confirmed first-hand 2026-08-19: a full T2 was run on this branch with RUSTMC_REFERENCE_CACHE=1, the run logged `reference-cache: HIT`, and the file count went 21 -> 22 while distinct recordings stayed at 17. With the cache on, taking a recording adds NOTHING to the reference-side N.",
+ "_draws": "Five unseeded draws a spawned pig makes, from the jar: spawn yaw (EntityType.create@103) -> add_entity; sound variant (Pig.finalizeSpawn -> PigSoundVariants.pickRandomSoundVariant) , left-handed (Mob.finalizeSpawn -> setLeftHanded) and age (AgeableMob.finalizeSpawn -> setAge) -> set_entity_data; and the follow-range bonus (Mob.finalizeSpawn -> RandomSource.triangle on FOLLOW_RANGE) -> update_attributes, which is the one that does NOT reach a client. Attributes registers FLYING_SPEED via setSyncable(true) and FOLLOW_RANGE with no setSyncable call at all, so isClientSyncable() is false and update_attributes is 120/120 exact.",
+ "_gated_on": "`--check` gates the SHAPE of each result \u2014 never / sometimes / always \u2014 and deliberately not the fraction. The fraction moves whenever a tree is made or deleted on this box, and a gate that reddens on housekeeping is a gate somebody turns off.",
+ "_method": "De-duplicated by sha256 of the scenario's recorded block, because the reference cache serves one recording to several trees. Recorder schema held constant: one recording uses an older add_entity decoder and mixing it in makes every projection read 74% stable when the truth is 0% or 100%.",
+ "_pinned_on": "2026-08-19",
+ "current_schema_recordings": 16,
+ "distinct_recordings": 17,
+ "files": 22,
+ "pairs": 120,
+ "results": {
+  "observe as declared": [
+   0,
+   120
+  ],
+  "observe, minus y_rot + y_head_rot": [
+   34,
+   120
+  ],
+  "observe, minus y_rot + y_head_rot + rest": [
+   120,
+   120
+  ],
+  "{add_entity} alone": [
+   1,
+   120
+  ],
+  "{add_entity} minus y_rot + y_head_rot": [
+   120,
+   120
+  ],
+  "{set_entity_data} alone": [
+   34,
+   120
+  ],
+  "{update_attributes} alone": [
+   120,
+   120
+  ]
+ }
+}

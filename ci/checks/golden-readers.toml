@@ -1,0 +1,49 @@
+# Golden fixtures no Rust source opens, each with the reason it is kept.
+#
+# `ci/check-golden-readers.py` reads this and compares it to the tree EXACTLY
+# in both directions: an undeclared orphan is red because a gate stopped
+# running, and a declared orphan that has gained a reader is red because this
+# file is now stale.
+#
+# The reader corpus is Rust only, deliberately. A `ci/*.sh` that names a
+# golden is usually its **producer**, and counting a producer as a reader is
+# how a file comes to look gated by the thing that wrote it. The one fixture
+# that really is reached through a shell script is declared below and says so.
+#
+# MEASURED 2026-08-18 on `main` (f82b2ebbf).
+
+[orphans]
+
+# Reached by `ci/t1.sh`, which sets `RUSTMC_DECORATE_GOLDEN` to this path
+# before running `--test golden_decorate`; the test opens the env var, so the
+# name never appears in Rust. This is the override dump that exists because
+# `decorate_vectors.json` declines every iceberg it meets — it is the most
+# load-bearing golden in T1 and the only one this check cannot see directly.
+"crates/rustmc-worldgen/golden/decorate_vectors_iceberg.json" = "read via RUSTMC_DECORATE_GOLDEN in ci/t1.sh"
+
+# Dumped by `tools/goldengen/vanilla/GoldenDump.java` and consulted by nothing.
+# The aquifer's centre selection is gated indirectly through the noise-chunk
+# and carver goldens; these raw centres were never wired to an assertion.
+"crates/rustmc-worldgen/golden/aquifer_centre_vectors.json" = "dumped by GoldenDump.java, no assertion ever consumed it"
+
+# Written by `ci/village-pieces.sh`. `golden_village_start.rs` reads
+# `village_31415926.json` and only that one; these two savanna captures at
+# seed 20260722 have never been opened.
+"crates/rustmc-worldgen/golden/village_savanna_20260722_c4677.json" = "written by ci/village-pieces.sh, golden_village_start reads village_31415926.json only"
+"crates/rustmc-worldgen/golden/village_savanna_20260722_c8177.json" = "written by ci/village-pieces.sh, golden_village_start reads village_31415926.json only"
+
+# The six exported from Minecom, the predecessor project, in c9fbab10c
+# (2026-07-21) as "golden vectors from the JVM oracle (19 files, verified
+# three ways)". Their READMEs give a regeneration recipe that runs against
+# `~/minecom`, and the functions they pin — Difficulty.effective,
+# Enchants.tableCosts, Beacons.validateEffects, Conduits.effectRange,
+# map_colors, sulfur_archetypes — have **no port in this workspace**, so there
+# is nothing here for them to be a gate over. They are kept because they are
+# correct and expensive to reproduce; they are declared because a directory
+# called `golden/` otherwise makes a live gate and a dead one look identical.
+"crates/rustmc-behavior/golden/beacon_effects.json" = "no Rust port of Beacons.validateEffects exists to gate"
+"crates/rustmc-behavior/golden/conduit_range.json" = "no Rust port of Conduits.effectRange exists to gate"
+"crates/rustmc-behavior/golden/difficulty_vectors.json" = "no Rust port of Difficulty.effective exists to gate"
+"crates/rustmc-behavior/golden/enchant_table_costs.json" = "no Rust port of Enchants.tableCosts exists to gate"
+"crates/rustmc-data/golden/map_colors.json" = "no Rust port of the map colour table exists to gate"
+"crates/rustmc-data/golden/sulfur_archetypes.json" = "no Rust port of the sulfur archetype table exists to gate"

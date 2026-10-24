@@ -1,0 +1,45 @@
+name = "a-water-bucket-fills-a-cauldron-and-an-empty-one-takes-it-back"
+about = "a water bucket clicked on an empty cauldron fills it to level 3, and an empty bucket clicked on the full cauldron empties it again — AbstractCauldronBlock.useItemOn through CauldronInteractions: fillWaterInteraction -> emptyBucket, then WATER's BUCKET entry -> fillBucket (predicate level == 3), each setBlockAndUpdate plus a BLOCKS sound played to EVERYONE (playSound(null, ...))"
+observe = ["block_update", "section_blocks_update", "block_changed_ack", "sound"]
+settle_ms = 1000
+# Both clients, because the sound's audience is half the claim: the cauldron
+# plays through `level.playSound(null, pos, ...)`, so the user hears it — where
+# a bucket emptied on the ground plays through `playEmptySound(entity, ...)` and
+# the user does not (163, 167). A server that reused one rule for both gets
+# one of the two scenarios wrong.
+#
+# Unlike the ground, a cauldron is reached by `use_item_on`: the cauldron's
+# `useItemOn` answers first (`ServerPlayerGameMode.useItemOn` offset 145) and
+# consumes the action, so the item's own `use` never runs.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:cauldron"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:water_bucket"
+
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "up"
+
+[[step]]
+do = "hold"
+item = "minecraft:bucket"
+
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "up"

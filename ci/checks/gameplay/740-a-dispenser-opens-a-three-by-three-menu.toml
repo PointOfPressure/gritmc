@@ -1,0 +1,36 @@
+name = "a-dispenser-opens-a-three-by-three-menu"
+about = "right-clicking a dispenser opens `MenuType.GENERIC_3x3` through DispenserMenu, which no row count reaches -- ChestMenu's six sizes are all 9 wide and this one is 3 by 3, so a chest-shaped implementation cannot arrive at it by changing a number"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content"]
+settle_ms = 1500
+
+# `open_screen` decodes the `minecraft:menu` **registry id** as its own field
+# and digests the rest of the body, which is the menu's title component. The
+# `container_set_content` that `initMenu` sends immediately after it digests
+# the whole slot list. So this check pins three independent things about the
+# menu — which registry entry, which title, and how many slots — and a server
+# that answered with a chest here would miss on all three.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:dispenser"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

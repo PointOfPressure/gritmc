@@ -1,0 +1,62 @@
+name = "random-ticks-return-bare-farmland-to-grass"
+about = "bare dry farmland left under random ticks turns to dirt and the grass around it then spreads back over it, read back by digging the block: the observer's `level_event` 2001 names `grass_block[snowy=false]` — two random-tick bodies chained, of which only the end state is a property of vanilla"
+observe = ["level_event", "block_update"]
+settle_ms = 1500
+console_restore = ["gamerule random_tick_speed 0"]
+
+# `FarmlandBlock.randomTick` (javap -p -c -constants, 26.2):
+#
+#   17: isNearWater(level, pos)   -> betweenClosed(-4,0,-4 .. 4,1,4), any FluidTags.WATER
+#   28: level.isRainingAt(pos.above())
+#   66: else if moisture > 0  -> setBlock(moisture - 1, 2)
+#   98: else if !shouldMaintainFarmland (above in MAINTAINS_FARMLAND) -> turnToDirt
+#
+# A freshly hoed block has moisture 0, no water is within four blocks and
+# the substrate's weather is clear, so the first random tick on it turns it
+# to dirt with no draw. `SpreadingSnowyBlock.randomTick` then lets any of
+# the eight grass blocks around it, light >= 9 above, spread onto that dirt
+# (four attempts of three draws each, a 3x5x3 box): it is the only dirt in
+# reach with air above it.
+#
+# WHY THIS IS A PROBE AND NOT A WINDOW. The first subset recording
+# (2026-10-01, `rt-sub2`) asked for the window and vanilla answered with ONE
+# `block_update`, `grass_block` — the farmland went to dirt and a neighbour
+# spread onto it in the same tick, so the two writes coalesced. At 4096 a
+# grass neighbour reaches the new dirt with probability about 8 x 4 / 45 per
+# tick, so whether the intermediate `dirt` reaches a client is a coin flip
+# and no check may grade it. The end state is not: grass, `snowy=false`.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_hoe"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "console"
+text = "gamerule random_tick_speed 4096"
+
+[[setup]]
+do = "wait"
+ms = 10000
+
+[[setup]]
+do = "console"
+text = "gamerule random_tick_speed 0"
+
+[[setup]]
+do = "wait"
+ms = 500
+
+[[step]]
+do = "dig"
+at = [1, -1, 1]
+face = "up"

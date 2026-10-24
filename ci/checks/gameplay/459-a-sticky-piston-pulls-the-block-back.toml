@@ -1,0 +1,61 @@
+name = "a-sticky-piston-pulls-the-block-back"
+about = "a sticky piston retracting takes the block in front of its head with it — `triggerEvent`'s sticky arm calls `moveBlocks(pos, dir, false)`, whose resolver starts two blocks out and pushes towards the piston, so the stone leaves [1, 0, 1] at once (flags 82) and lands at [1, 0, 2] two ticks later in the same tick the base becomes `sticky_piston[extended=false]`"
+
+# **THE RIG SITS THREE BLOCKS SOUTH OF THE WORKSPACE, SO EVERY BLOCK IT
+# OBSERVES IS IN ONE CHUNK.** Until 2026-09-30 the base was at z = 0 and the
+# head and stone at z = -1 and -2: two chunks, since the workspace sits on
+# z = 0. The retract changes the base and the stone in the SAME tick, vanilla
+# sends one packet per chunk, and `ServerChunkCache.broadcastChangedChunks`
+# walks `chunkHoldersToBroadcast`, a `ReferenceOpenHashSet` (javap,
+# constructor offset 48) — identity-hash order, different per JVM. The two
+# updates arrived base-first in one vanilla run and stone-first in another
+# (2 of 3 pairs of fresh vanilla runs disagreed on the old rig, 2026-09-30),
+# and the check reddened train-b's gate at T2 for nothing. The same rig moved
+# +3 in z — base [1,0,3], head [1,0,2], stone [1,0,1], redstone [2,0,3] — is
+# all in the workspace's chunk (x 1..2, z 1..3; workspace x is a multiple of
+# 32), and the retract is then one `section_blocks_update`, whose order is
+# the section's own `ShortOpenHashSet` and a function of position alone.
+# The piston still faces north, as the player (yaw 0) sees it: facing it the
+# other way was tried first and found rustmc placing it north regardless.
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_event", "block_changed_ack"]
+settle_ms = 2000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 2]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:sticky_piston"
+
+[[setup]]
+do = "place"
+on = [1, -1, 3]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_block"
+
+# Extends in setup: the stone is pushed to [1, 0, 1] and the sticky head
+# sits at [1, 0, 2] before the step begins.
+[[setup]]
+do = "place"
+on = [2, -1, 3]
+face = "up"
+
+[[step]]
+do = "dig"
+at = [2, 0, 3]
+face = "up"

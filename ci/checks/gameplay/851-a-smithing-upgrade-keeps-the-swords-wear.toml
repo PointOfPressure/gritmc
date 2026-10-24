@@ -1,0 +1,73 @@
+name = "a-smithing-upgrade-keeps-the-swords-wear"
+about = "the same upgrade as 850 with the diamond sword at damage 500: `createWithOriginalComponents` applies the base's `DataComponentPatch` to the new netherite sword, so the result carries `minecraft:damage` 500 — a server that built the result from the recipe's template alone would hand back a fresh sword"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1000
+
+# SmithingMenu: template 0, base 1, addition 2, result 3, then the 36 —
+# hotbar 0 is 4 + 27 = 31. One data slot, `hasRecipeError`, set to 0 in the
+# constructor and to 1 only when all three inputs are full and nothing
+# matched.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:smithing_table"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:netherite_upgrade_smithing_template"
+
+[[setup]]
+do = "hold"
+item = "minecraft:diamond_sword"
+slot = 1
+components = [{ type = "minecraft:damage", varint = 500 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:netherite_ingot"
+slot = 2
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 31
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 32
+
+[[step]]
+do = "container_click"
+slot = 1
+
+[[step]]
+do = "container_click"
+slot = 33
+
+[[step]]
+do = "container_click"
+slot = 2

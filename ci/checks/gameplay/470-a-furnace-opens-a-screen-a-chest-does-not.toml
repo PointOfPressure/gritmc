@@ -1,0 +1,34 @@
+name = "a-furnace-opens-a-screen-a-chest-does-not"
+about = "right-clicking a furnace opens a furnace menu, which is a different menu type and a different slot count from the chest in check 090 — a server that hardcodes one container behind `open_screen` passes that check and fails this one"
+observe_from = "actor"
+observe = [
+    "open_screen",
+    "container_set_content",
+    "block_entity_data",
+    "block_event",
+]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:furnace"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

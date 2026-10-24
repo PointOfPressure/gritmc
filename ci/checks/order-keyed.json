@@ -1,0 +1,140 @@
+{
+  "on_the_wire_by_order_class": {
+    "IDENTITY": 3,
+    "INSERTION": 4,
+    "KEYHASH": 2,
+    "SORTED": 2
+  },
+  "sites": [
+    {
+      "container": "Int2ObjectOpenHashMap",
+      "field": "entityMap",
+      "iterated_in": "ChunkMap.tick",
+      "keytype_overrides_hashcode": null,
+      "order": "KEYHASH",
+      "owner": "ChunkMap",
+      "reaches": "every per-entity broadcast in a tick, in this order",
+      "wire": true
+    },
+    {
+      "container": "Int2ObjectLinkedOpenHashMap",
+      "field": "active",
+      "iterated_in": "EntityTickList.forEach",
+      "keytype_overrides_hashcode": null,
+      "order": "INSERTION",
+      "owner": "EntityTickList",
+      "reaches": "the entity tick order",
+      "wire": true
+    },
+    {
+      "container": "Int2ObjectLinkedOpenHashMap",
+      "field": "byId",
+      "iterated_in": "EntityLookup.getAllEntities",
+      "keytype_overrides_hashcode": null,
+      "order": "INSERTION",
+      "owner": "EntityLookup",
+      "reaches": "any full sweep of the level's entities",
+      "wire": true
+    },
+    {
+      "container": "LongAVLTreeSet",
+      "field": "sectionIds",
+      "iterated_in": "EntitySectionStorage.forEachAccessibleNonEmptySection",
+      "keytype_overrides_hashcode": null,
+      "order": "SORTED",
+      "owner": "EntitySectionStorage",
+      "reaches": "the section order of every AABB entity query \u2014 x numerically ascending, then z and y as UNSIGNED masked fields, so the non-negative sections come before the negative ones and a natural nested loop is wrong for any box straddling 0",
+      "wire": true
+    },
+    {
+      "container": "Long2ObjectOpenHashMap",
+      "field": "sections",
+      "iterated_in": null,
+      "keytype_overrides_hashcode": null,
+      "order": "KEYHASH",
+      "owner": "EntitySectionStorage",
+      "reaches": "not iterated \u2014 reached by key through sectionIds",
+      "wire": false
+    },
+    {
+      "container": "Object2ObjectOpenHashMap",
+      "field": "attributes",
+      "iterated_in": "AttributeMap.getSyncableAttributes",
+      "keytype_overrides_hashcode": false,
+      "order": "IDENTITY",
+      "owner": "AttributeMap",
+      "reaches": "the attribute order inside the spawn-time update_attributes",
+      "wire": true
+    },
+    {
+      "container": "ObjectOpenHashSet",
+      "field": "attributesToSync",
+      "iterated_in": "ServerEntity.sendChanges",
+      "keytype_overrides_hashcode": false,
+      "order": "IDENTITY",
+      "owner": "AttributeMap",
+      "reaches": "the attribute order inside an incremental update_attributes",
+      "wire": true
+    },
+    {
+      "container": "EnumMap",
+      "field": "modifiersByOperation",
+      "iterated_in": null,
+      "keytype_overrides_hashcode": null,
+      "order": "SORTED",
+      "owner": "AttributeInstance",
+      "reaches": "not iterated for order \u2014 calculateValue names the three operations itself, and the container is an EnumMap anyway",
+      "wire": false
+    },
+    {
+      "container": "Object2ObjectArrayMap",
+      "field": "modifierById",
+      "iterated_in": "AttributeInstance.getModifiersOrEmpty",
+      "keytype_overrides_hashcode": null,
+      "order": "INSERTION",
+      "owner": "AttributeInstance",
+      "reaches": "the summation order inside calculateValue, and double addition is not associative",
+      "wire": true
+    },
+    {
+      "container": "Object2BooleanOpenHashMap",
+      "field": "players",
+      "iterated_in": "PlayerMap.getAllPlayers, walked by ChunkMap.tick into updateChunkTracking",
+      "keytype_overrides_hashcode": true,
+      "order": "KEYHASH",
+      "owner": "PlayerMap",
+      "reaches": "the order players are considered for CHUNK TRACKING, once per tick \u2014 and `Entity.hashCode` returns `getId()`, so this is the entity ids again rather than an object hash. NOT the entity broadcast: `TrackedEntity.updatePlayers` is handed `ServerLevel.players()`, which is a `java.util.List`",
+      "wire": true
+    },
+    {
+      "container": "ArrayList",
+      "field": "allInstances",
+      "iterated_in": "EntitySection.getEntities",
+      "keytype_overrides_hashcode": null,
+      "order": "INSERTION",
+      "owner": "ClassInstanceMultiMap",
+      "reaches": "the within-section order of every AABB entity query \u2014 the minor key under EntitySectionStorage.sectionIds, and the order target selection and collision resolution see",
+      "wire": true
+    },
+    {
+      "container": "<array>",
+      "field": "itemsById",
+      "iterated_in": "SynchedEntityData.packDirty",
+      "keytype_overrides_hashcode": null,
+      "order": "SORTED",
+      "owner": "SynchedEntityData",
+      "reaches": "the field order inside every set_entity_data \u2014 the biggest entity packet there is, and vanilla walks a flat array by index so the order is the accessor ids and nothing else",
+      "wire": true
+    },
+    {
+      "container": "ReferenceOpenHashSet",
+      "field": "chunkHoldersToBroadcast",
+      "iterated_in": "ServerChunkCache.broadcastChangedChunks",
+      "keytype_overrides_hashcode": null,
+      "order": "IDENTITY",
+      "owner": "ServerChunkCache",
+      "reaches": "the order changed chunks are broadcast in",
+      "wire": true
+    }
+  ]
+}

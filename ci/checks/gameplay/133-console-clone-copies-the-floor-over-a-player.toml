@@ -1,0 +1,25 @@
+name = "console-clone-copies-the-floor-over-a-player"
+about = """
+`execute at oracle_eye run clone ~ ~-1 ~ ~ ~-1 ~ ~ ~3 ~` from the console
+copies the block under the observer's feet to three blocks above its head,
+and both players are told the new block in one `block_update`
+
+`CloneCommands.clone` files the source block (a full block, so `full` and
+`deque.addLast`), writes a barrier into the destination first (flags
+`2 | 816`, which sends nothing), then the block with flags 2, then runs
+`updateNeighboursOnBlockSet` against what was there before. The barrier is
+overwritten inside the same tick, so the tick's broadcast carries only the
+final block. A server that broadcast the barrier, copied the wrong block,
+or resolved `~` against the console's own position moves the observation.
+The success count is in the console's log; chat stays silent.
+
+Level 2, through the console. The restore puts air back at the destination.
+"""
+console_restore = ["execute at oracle_eye run setblock ~ ~3 ~ minecraft:air"]
+observe_from = "both"
+observe = ["block_update", "section_blocks_update", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "execute at oracle_eye run clone ~ ~-1 ~ ~ ~-1 ~ ~ ~3 ~"

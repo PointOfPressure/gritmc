@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 4.5
+slug   = "other-dimensions-cost"
+title  = "What the other dimensions cost, at 70 s a reference"
+branch = "backfill"

@@ -1,0 +1,374 @@
+# Every entity type a check in `ci/checks/gameplay/` puts in the world.
+#
+# Read `ci/entity-reach.py`'s header first. The short version is that the
+# interesting column is **`rotation`**, not the type:
+#
+#   * `chosen` — the route passes a rotation the server decided. The four
+#     rotation bytes of `add_entity` are then comparable and the type is
+#     GRADEABLE.
+#   * `drawn`  — the route draws the rotation from an unseeded `RandomSource`,
+#     so vanilla cannot reproduce it against itself and neither can anything
+#     else. The type is reachable and UNGRADEABLE on those bytes, whatever the
+#     server does.
+#
+# `drawn` is not a defect and it is not a work item. It is a property of the
+# jar, and the only honest responses to it are a declaration in
+# `ci/checks/gameplay-unstable.toml` (which is where `080-spawn-egg-makes-a-mob`
+# and the two item-drop checks already are) or a narrower comparison that
+# removes exactly the drawn field and nothing else (which is what
+# `compare::project`'s `y_rot` arm does for `minecraft:item`).
+#
+# `ci/entity-reach.py --check` re-derives both directions against the check
+# files: a row naming a type the jar does not have, a row naming a check that
+# is gone, and a check that observes `add_entity` and is not named here. The
+# third is the one that matters — it is the same failure `ci/checks/
+# projection-drops.toml` exists to prevent for fields, which is a loss nobody
+# wrote down.
+#
+# `route` is a bytecode site on the pinned jar, `javap -p -c -constants`,
+# 26.2. Nothing here is inferred from a decompiler or from another server.
+#
+# ===========================================================================
+# `residue` — WHAT THE CHECK LEAVES IN THE WORLD, WHICH IS A FACT ABOUT THE
+# CHECKS AFTER IT
+# ===========================================================================
+#
+# A corpus run is ONE server and ONE session, so an entity a check spawns is
+# still there when the next check runs. `ci/checks/gameplay/README.md` has a
+# rule for this and the rule is narrower than the class: it is written for a
+# golem that WALKS, and `ci/entity-leak-audit.py` measured, over 61 vanilla
+# recordings, that five of the six leaking scenarios drop an ITEM. An item does
+# not walk. It does not need to — it lives for five minutes and
+# `EntityType.ITEM.trackDeltas()` is true, so it emits a `set_entity_motion`
+# every time its velocity changes for the whole of that.
+#
+#   `session`   a player. Present for every scenario by design; not a leak.
+#   `resolves`  the entity is gone before the window closes — a falling block
+#               lands and becomes a block.
+#   `persists`  it stays in the world and emits nothing more. Stationary
+#               furniture: an item frame, an end crystal, a parked minecart.
+#               Safe, and safe for a stated reason rather than by hope.
+#   `drifts`    an item entity. Positionless packets for its whole despawn
+#               timer.
+#   `walks`     a mob with AI. The same, plus it changes chunk.
+#
+# **`drifts` and `walks` are both UNBOUNDED, and that is the finding this
+# column exists to carry.** `compare::near` is named as the mitigation and
+# cannot act on any of it: 0 of 4,496 leaked observations over 61 recordings
+# carried a position, because `set_entity_motion`, `move_entity`,
+# `rotate_head` and `move_entity_heartbeat` do not have one and `near` fails
+# open on an observation it cannot place. Scenario ORDER is the whole
+# mitigation and not a backstop.
+#
+# So a new check with `residue = "drifts"` or `"walks"` is a check about every
+# check after it. `ci/entity-reach.py --check` requires the column, which is
+# the cheap half; the expensive half is that the number in `residue_why` has to
+# have been measured, at a stated N, by `ci/entity-leak-audit.py`. A margin
+# measured once is not a bound — `ci/checks/gameplay/README.md` records what
+# that cost at N = 2.
+
+# ---------------------------------------------------------------------------
+# ROUTE: item-placed. `useOn` builds the entity and hands it a rotation taken
+# from the placement, so two runs of one server agree and two servers can be
+# compared. This is the whole of the gradeable half of the corpus's entity
+# surface, and it is why `773`-`777` exist.
+# ---------------------------------------------------------------------------
+
+[[spawns]]
+type = "minecraft:item_frame"
+check = "an-item-frame-hangs-on-a-blocks-side"
+residue = "persists"
+residue_why = "an item frame is stationary furniture: it never moves and emits nothing after its spawn. Measured absent from every leak row in ~/grit/logs/entity-leak-audit-20260818.log"
+route = "item-placed"
+rotation = "chosen"
+site = "HangingEntityItem.useOn — the direction comes off the clicked face"
+
+[[spawns]]
+type = "minecraft:end_crystal"
+check = "an-end-crystal-sits-on-obsidian"
+residue = "persists"
+residue_why = "stationary; no leak row over 61 recordings"
+route = "item-placed"
+rotation = "chosen"
+site = "EndCrystalItem.useOn"
+
+[[spawns]]
+type = "minecraft:minecart"
+check = "a-minecart-sits-on-a-rail"
+residue = "persists"
+residue_why = "stationary on a level rail; no leak row over 61 recordings"
+route = "item-placed"
+rotation = "chosen"
+site = "MinecartItem.useOn — the rail's shape decides the facing"
+
+[[spawns]]
+type = "minecraft:oak_boat"
+check = "a-boat-is-placed-by-right-clicking-the-world"
+residue = "persists"
+residue_why = "stationary on land; no leak row over 61 recordings"
+route = "item-placed"
+rotation = "chosen"
+site = "BoatItem.use — yRot from the placing player"
+
+[[spawns]]
+type = "minecraft:armor_stand"
+check = "an-armor-stand-is-placed-as-a-living-entity"
+residue = "persists"
+residue_why = "a LivingEntity with no AI goals; no leak row over 61 recordings"
+route = "item-placed"
+rotation = "chosen"
+site = "ArmorStandItem.useOn — yRot quantised from the player's"
+
+# ---------------------------------------------------------------------------
+# ROUTE: carved pumpkin. The second of the two `Mob` routes in this jar, and
+# the only one that puts a MOB in the world with a rotation anything can
+# compare. Verified on the pinned jar 2026-08-18:
+#
+#   CarvedPumpkinBlock.spawnGolemInWorld(Level, BlockPatternMatch, Entity, BlockPos)
+#      2  invokestatic  clearPatternBlocks
+#     33  fconst_0
+#     34  fconst_0
+#     35  invokevirtual Entity.snapTo:(DDDFF)V      <- literal zero yaw, zero pitch
+#     40  invokevirtual Level.addFreshEntity
+#   and no `finalizeSpawn` call anywhere in the method.
+# ---------------------------------------------------------------------------
+
+[[spawns]]
+type = "minecraft:copper_golem"
+check = "a-carved-pumpkin-on-copper-makes-a-copper-golem"
+residue = "walks"
+residue_why = "a live wandering mob. UNBOUNDED by `within` — every kind it emits is positionless. Mitigated by ORDER alone: numbered 788, the last checks before 790. docs/PARITY-ROADMAP.md §30.4"
+route = "carved-pumpkin"
+rotation = "chosen"
+site = "CarvedPumpkinBlock.spawnGolemInWorld offsets 33-35"
+
+[[spawns]]
+type = "minecraft:iron_golem"
+check = "a-carved-pumpkin-on-iron-makes-an-iron-golem"
+residue = "walks"
+residue_why = "a live wandering mob, same disposition as 788, numbered 789"
+route = "carved-pumpkin"
+rotation = "chosen"
+site = "CarvedPumpkinBlock.spawnGolemInWorld offsets 33-35"
+
+# ---------------------------------------------------------------------------
+# ROUTE: gravity. `FallingBlockEntity` is not a `Mob`, takes neither route
+# above, and carries no rotation anything draws. Measured rather than argued:
+# `sand-falls-when-unsupported` is NOT one of the four names in
+# `ci/checks/gameplay-floor.toml`, so six cold vanilla servers produced the
+# same projection of it in all fifteen pairs.
+# ---------------------------------------------------------------------------
+
+[[spawns]]
+type = "minecraft:falling_block"
+check = "sand-falls-when-unsupported"
+residue = "resolves"
+residue_why = "a FallingBlockEntity lands and becomes a block inside the window; no leak row over 61 recordings"
+route = "gravity"
+rotation = "chosen"
+site = "FallingBlockEntity.fall — no rotation draw; corroborated by the floor"
+
+# ---------------------------------------------------------------------------
+# ROUTE: console summon. `SummonCommand.createEntity` builds the entity with
+# `EntityType.create` — for an orb the two-argument constructor
+# `ExperienceOrb(EntityType, Level)`, which draws only `Entity.<init>`'s uuid —
+# loads the tag, and `snapTo(x, y, z, getYRot(), getXRot())` keeps the zero
+# rotation it was built with. So the four rotation bytes and the movement are
+# deterministic. (`ExperienceOrb.award`'s orbs go through the four-argument
+# constructor, which draws a yaw and a velocity at offsets 20-102; no check
+# here observes one.) The orb is picked up inside each window — vanilla's own
+# recording carries the `remove_entities` in all three, `xp-orbs` run r2.
+# ---------------------------------------------------------------------------
+
+[[spawns]]
+type = "minecraft:experience_orb"
+check = "an-orb-beside-a-player-is-picked-up"
+residue = "resolves"
+residue_why = "touched on the actor's next doTick and discarded; vanilla's recording carries the remove_entities inside the window (xp-orbs r2, 2026-10-01)"
+route = "summon"
+rotation = "chosen"
+site = "SummonCommand.createEntity -> ExperienceOrb(EntityType, Level): no yaw or velocity draw; snapTo keeps yRot 0"
+
+[[spawns]]
+type = "minecraft:experience_orb"
+check = "an-orb-four-blocks-away-creeps-to-the-player"
+residue = "resolves"
+residue_why = "follows the actor and is taken about 2 s in; vanilla's recording carries the remove_entities inside the 8 s window (xp-orbs r2, 2026-10-01)"
+route = "summon"
+rotation = "chosen"
+site = "SummonCommand.createEntity -> ExperienceOrb(EntityType, Level): no yaw or velocity draw; snapTo keeps yRot 0"
+
+[[spawns]]
+type = "minecraft:experience_orb"
+check = "an-orb-of-count-two-is-taken-twice"
+residue = "resolves"
+residue_why = "taken twice two ticks apart and discarded at count 0; vanilla's recording carries the remove_entities inside the window (xp-orbs r2, 2026-10-01)"
+route = "summon"
+rotation = "chosen"
+site = "SummonCommand.createEntity -> ExperienceOrb(EntityType, Level): no yaw or velocity draw; snapTo keeps yRot 0"
+
+# ---------------------------------------------------------------------------
+# ROUTE: dropped item. `drawn`, and this is the one drawn route the corpus has
+# a narrow answer for.
+#
+#   ItemEntity(EntityType, Level) offsets 39-52
+#     setYRot(this.random.nextFloat() * 360.0F)      <- unseeded RandomSource
+#
+# `compare::project` removes `y_rot` and ONLY `y_rot`, and only when `kind_id`
+# resolves to `minecraft:item`, leaving `x_rot`, `y_head_rot` and `data` under
+# comparison — all three are a constant 0 for every item vanilla has spawned.
+# `ci/checks/projection-drops.toml` carries the row as
+# `add_entity.y_rot_of_an_item`.
+#
+# The exemption does not rescue the whole packet. `350` and `500` are two of
+# the four names in the standing floor, and their first difference is not the
+# yaw: it is `at` (the spawn position) for `350` and `set_entity_motion.v` for
+# `500`, which are four further unseeded draws that no projection removes.
+# ---------------------------------------------------------------------------
+
+[[spawns]]
+type = "minecraft:item"
+check = "a-dropped-item-goes-into-your-inventory"
+residue = "drifts"
+residue_why = "448 leaked observations over 61 recordings, 0 placeable. The pickup is the point of the check and it happens, so what leaks is the item between spawn and pickup"
+route = "dropped-item"
+rotation = "drawn"
+site = "ItemEntity(EntityType, Level) offsets 39-52"
+
+[[spawns]]
+type = "minecraft:item"
+check = "dropping-an-item-throws-it-on-the-floor"
+residue = "drifts"
+residue_why = "912 leaked observations over 61 recordings, 0 placeable. Nothing picks this item up; it lives its full despawn timer"
+route = "dropped-item"
+rotation = "drawn"
+site = "ItemEntity(EntityType, Level) offsets 39-52"
+
+[[spawns]]
+type = "minecraft:item"
+check = "container-click-throw-drops-one-item"
+residue = "drifts"
+residue_why = "148 leaked observations over 61 recordings, 0 placeable"
+route = "dropped-item"
+rotation = "drawn"
+site = "ItemEntity(EntityType, Level) offsets 39-52"
+
+[[spawns]]
+type = "minecraft:item"
+check = "container-click-throw-drops-the-whole-stack"
+residue = "drifts"
+residue_why = "816 leaked observations over 61 recordings, 0 placeable"
+route = "dropped-item"
+rotation = "drawn"
+site = "ItemEntity(EntityType, Level) offsets 39-52"
+
+[[spawns]]
+type = "minecraft:item"
+check = "shears-shear-a-sheep"
+residue = "drifts"
+residue_why = "0 leaked observations over 2 recordings (pm-rec3 runs 1 and 2, the 640-659 subset, ci/entity-leak-audit.py), 0 placeable: the one to three wool items fall into the pit at z -641, out of every later rig's view. Measured on a subset, not a corpus order"
+route = "dropped-item"
+rotation = "drawn"
+site = "Sheep.lambda$shear$0 -> spawnAtLocation -> ItemEntity(EntityType, Level) offsets 39-52"
+
+[[spawns]]
+type = "minecraft:item"
+check = "torch-falls-with-its-support"
+residue = "drifts"
+residue_why = "**the largest leak source in the corpus** — 1308 leaked observations over 61 recordings, 0 placeable, all of them into `coral-dries-out-unprompted` in 34 of 61. The check does not declare that it drops an item at all"
+route = "dropped-item"
+rotation = "drawn"
+site = "the torch's own drop; measured in the recordings, not declared by the check"
+
+# ---------------------------------------------------------------------------
+# ROUTE: spawn egg. `drawn`, and the reason 88 more entity types being one
+# `hold` away is a warning rather than a queue.
+#
+#   EntityType.create(ServerLevel, PostSpawnProcessor, BlockPos,
+#                     EntitySpawnReason, boolean, boolean)
+#     103  invokeinterface RandomSource.nextFloat:()F
+#     111  invokestatic    Mth.wrapDegrees:(F)F
+#     115  invokevirtual   Entity.snapTo:(DDDFF)V
+#     168  invokevirtual   Mob.finalizeSpawn:(...)
+#
+# `080-spawn-egg-makes-a-mob` is declared in `ci/checks/gameplay-unstable.toml`
+# at 25 flaps in 25 comparisons over N = 26 cold vanilla servers, and is one of
+# the four names in the standing floor.
+# ---------------------------------------------------------------------------
+
+[[spawns]]
+type = "minecraft:pig"
+check = "spawn-egg-makes-a-mob"
+residue = "walks"
+residue_why = "864 leaked observations over 61 recordings, 0 placeable, reaching `chest-opens-a-screen` in 40 of 61 and `redstone-torch-powers-wire` in 17 of 61. A live wandering mob at check 80 of 115, which the live-mob ordering rule does not cover and cannot: 080 predates the rule and moving it would renumber a third of the corpus"
+route = "spawn-egg"
+rotation = "drawn"
+site = "EntityType.create offsets 103-115"
+
+[[spawns]]
+type = "minecraft:bat"
+check = "a-bat-left-far-away-despawns-and-a-pig-does-not"
+residue = "resolves"
+residue_why = "the check's own mechanism: the bat is 150 blocks from both players and `Mob.checkDespawn` discards it (Bat inherits `Mob.removeWhenFarAway`, iconst_1) before the actor walks back, so it is gone before the window closes. Rowed when `mob-in-world` was rebased onto 3611 and this gate found 082 undeclared"
+route = "spawn-egg"
+rotation = "drawn"
+site = "EntityType.create offsets 103-115"
+
+[[spawns]]
+type = "minecraft:pig"
+check = "a-bat-left-far-away-despawns-and-a-pig-does-not"
+residue = "walks"
+residue_why = "`Animal.removeWhenFarAway` is iconst_0, so the pig survives the despawn the check measures and is re-announced on the last step; it is a live wandering mob for every check after 082, like 080's. Unmeasured: no leak audit has been taken over a recording that carries 082"
+route = "spawn-egg"
+rotation = "drawn"
+site = "EntityType.create offsets 103-115"
+
+# ---------------------------------------------------------------------------
+# ROUTE: login. The player entity, which is the type the corpus has by far the
+# most evidence about and the one nobody counts as an entity.
+# ---------------------------------------------------------------------------
+
+[[spawns]]
+type = "minecraft:player"
+check = "other-player-is-an-entity"
+residue = "session"
+residue_why = "a session participant, present for every scenario by design"
+route = "login"
+rotation = "chosen"
+site = "PlayerList.placeNewPlayer"
+
+[[spawns]]
+type = "minecraft:player"
+check = "walking-away-drops-a-standing-player-from-view"
+residue = "session"
+residue_why = "a session participant, present for every scenario by design"
+route = "login"
+rotation = "chosen"
+site = "PlayerList.placeNewPlayer"
+
+[[spawns]]
+type = "minecraft:item"
+check = "a-powered-dropper-drops-its-item"
+residue = "drifts"
+residue_why = "a dispensed ItemEntity: unseeded velocity (DefaultDispenseItemBehavior.spawnItem's three triangle draws), lands within a block or two of the dropper and lies there; this server does not move it at all. Positionless kinds after it are not observed by the check"
+route = "dispensed"
+rotation = "drawn"
+site = "DefaultDispenseItemBehavior.spawnItem — ItemEntity's ctor draws the yaw"
+
+[[spawns]]
+type = "minecraft:item"
+check = "a-hopper-catches-what-a-dropper-drops"
+residue = "resolves"
+residue_why = "the dispensed item spawns inside Hopper.SUCK_AABB and is absorbed and discarded by the hopper's next pushItemsTick, in the same tick on both servers; nothing is left"
+route = "dispensed"
+rotation = "drawn"
+site = "DefaultDispenseItemBehavior.spawnItem, then HopperBlockEntity.addItem(Container, ItemEntity) discards it"
+
+[[spawns]]
+type = "minecraft:item"
+check = "a-powered-crafter-makes-planks"
+residue = "drifts"
+residue_why = "the crafter's result, spawned by the same DefaultDispenseItemBehavior.spawnItem with unseeded velocity; lies in front of the crafter afterwards"
+route = "dispensed"
+rotation = "drawn"
+site = "CrafterBlock.dispenseItem -> DefaultDispenseItemBehavior.spawnItem"

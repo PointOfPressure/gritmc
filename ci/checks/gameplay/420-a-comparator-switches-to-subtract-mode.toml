@@ -1,0 +1,61 @@
+name = "a-comparator-switches-to-subtract-mode"
+about = "right-clicking a comparator cycles MODE and clicks, and the player who clicked it is the one player who does not hear it — `ComparatorBlock.useWithoutItem` passes the interacting player to `Level.playSound`, whose first argument `PlayerList.broadcast` skips, so the sound is evidence only on the bystander's stream"
+# **Deliberately not `actor`, and the reason is the check.**
+# `PlayerList.broadcast(Player except, ...)` compares each player in the list
+# against its first argument and skips it on a match (`if_acmpne`), and
+# `ComparatorBlock` passes the interacting player, because a client predicts
+# its own interaction sound. Read from the actor alone this check would be
+# **inert**: the only other thing it produces is a `block_update` at the
+# position the step clicked, and `informative` subtracts exactly that.
+observe = ["block_update", "section_blocks_update", "sound", "block_changed_ack"]
+settle_ms = 1500
+
+# **WHY THIS CHECK WAS UNFALSIFIABLE UNTIL 2026-08-17, AND WHAT MADE IT SO.**
+#
+# `corpus-projection-audit`, `docs/PARITY-ROADMAP.md` §51. Two lines in two
+# different files, neither wrong on its own, met here.
+#
+# The step is a `place`, so `compare::informative` subtracts one `block_update`
+# per position the step was always going to change — the right thing to do,
+# since a placed block is evidence the step ran and not evidence about the
+# claim. But the one it subtracts is the comparator's own, carrying
+# `mode=subtract`. `block_changed_ack` is subtracted too, as a receipt. So
+# after `informative` this check had **exactly one observation left: the
+# sound**, which is what the note above already says in its own words.
+#
+# And `569323e` had dropped `sound.pitch` — for a good reason, since
+# `ChestBlockEntity.playSound` draws `nextFloat() * 0.1f + 0.9f` and one event
+# gave five different pitches in a single corpus run.
+# `ComparatorBlock.useWithoutItem` writes `this.mode == SUBTRACT ? 0.55F : 0.5F`,
+# a literal either way, and it is **the only field that differs between the two
+# modes**. So this check's single informative observation read identically
+# whichever way the comparator went, and it reported `match` for a state it
+# could not distinguish.
+#
+# `pitch.rs` grades per call site rather than per float: a literal compares
+# exactly, a drawn one compares as its range, an unclassified one is still
+# dropped and that is the default, so nothing green can redden for want of a
+# table entry. This check is the one that entry was written for.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:comparator"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 35
+slug   = "delivered-once-never-written-again"
+title  = "A chunk, once delivered, is never written again: one canvas per world, grown a ring at a time — 2026-08-12, branch `worldgen-deliver-once`"
+branch = "worldgen-deliver-once"

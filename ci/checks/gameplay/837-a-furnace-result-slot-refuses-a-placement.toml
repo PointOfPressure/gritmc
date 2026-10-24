@@ -1,0 +1,45 @@
+name = "a-furnace-result-slot-refuses-a-placement"
+about = "coal picked up from the hotbar and clicked onto an open furnace's result slot. FurnaceResultSlot.mayPlace is iconst_0; ireturn, so the click places nothing and the measured step is silent on container_set_slot — while 836's fuel slot would have taken this same coal. A server whose result slot is plain storage puts the coal there"
+observe_from = "actor"
+observe = ["container_set_slot"]
+settle_ms = 1500
+measured_step = "silent"
+
+# THE MEASURED STEP ASSERTS A SILENCE — see 836. Coal and not stone, so
+# that the refusal cannot be the fuel rule's.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:furnace"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:coal"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+
+[[step]]
+do = "container_click"
+slot = 2

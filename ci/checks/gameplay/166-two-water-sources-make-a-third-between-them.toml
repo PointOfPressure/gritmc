@@ -1,0 +1,61 @@
+name = "two-water-sources-make-a-third-between-them"
+about = "flowing water with a water source on two sides and solid ground beneath becomes a source itself on its next tick — infinite water: FlowingFluid.getNewLiquid's sources >= 2 && canConvertToSource (water_source_conversion) && below.isSolid(), woken by LiquidBlock.updateShape's source-neighbour tick"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 1500
+# The conversion happens on the middle cell's NEXT fluid tick — 5 ticks after
+# the second source lands — so the delay is compared: 250 ms, the bucket that
+# separates "on the next water tick" from "in the same tick" and from "never".
+timing = { bucket = { ms = 250 } }
+#
+# # The rig — an L, because only two columns are reachable
+#
+# Cells dug at (0, -1, 1), (1, -1, 1) and (1, -1, 0): the corner (1, 1) has
+# the other two as its west and north neighbours. Water poured into (0, 1) in
+# setup (yaw -15.5, pitch 54.5 meets the floor at (0.499, -1, 1.801)) flows
+# into the corner at level 1 and on into (1, 0) at level 2. The step pours a
+# second source into (1, 0) (yaw -74.5, pitch 54.5); the corner now has two
+# source neighbours and dirt under it.
+#
+# A ray into a one-deep hole has to cross y = 0 inside the hole's own column,
+# at 1.62/2.62 of the way to the floor, so only the two columns nearest the
+# eye on each axis can be filled from the anchor. That is why the rig bends.
+
+[[setup]]
+do = "dig"
+at = [0, -1, 1]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "look"
+yaw = -15.5
+pitch = 54.5
+
+[[setup]]
+do = "hold"
+item = "minecraft:water_bucket"
+
+[[setup]]
+do = "use_item"
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "look"
+yaw = -74.5
+pitch = 54.5
+
+[[step]]
+do = "use_item"

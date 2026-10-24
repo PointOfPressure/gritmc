@@ -1,0 +1,125 @@
+name = "a-repeater-delays-the-signal-it-passes-on"
+about = "a repeater set to two ticks still passes the signal, just later — the delay is cycled by right-clicking it and then the signal is fed into the repeater's BACK, so the check covers both `RepeaterBlock.useWithoutItem` cycling DELAY and the scheduled tick that carries the output to the wire in front"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 2500
+
+# **This rig was inverted, and for as long as it was the check could not see
+# its own subject.**
+#
+# It fed the redstone block into the side the repeater outputs on and put the
+# wire on the side it reads from, so vanilla never powered the repeater at
+# all. Measured, on vanilla against itself, 2026-08-03: across the whole
+# scenario the repeater stayed `powered=false` and no `block_update` was ever
+# recorded at the wire's position — in either run. The check rested entirely
+# on the resyncs from its two `place` steps plus the one broadcast that
+# cycling DELAY produces.
+#
+# That is why `ci/checks/gameplay-baseline.toml` recorded this check as
+# having "falsified the prediction" that it needed redstone propagation. It
+# did not falsify it. It never ran it.
+#
+# Which side is which comes from the bytecode and is the opposite of the
+# obvious reading. `DiodeBlock.getStateForPlacement` is
+# `FACING = context.getHorizontalDirection().getOpposite()`, so FACING points
+# back at the player who placed it — and `DiodeBlock.getInputSignal` reads
+# `level.getSignal(pos.relative(FACING), FACING)`. **The block a repeater's
+# FACING names is its INPUT**, not its output; the output is at
+# `FACING.getOpposite()`, which is the direction the arrow visibly points.
+# `DiodeBlock.getSignal` confirms the other half: it returns `ownSignal` only
+# when the queried direction equals FACING, i.e. only into the neighbour that
+# lies opposite the block it is powering.
+#
+# At yaw 0 the player faces south, so FACING is north: a repeater at
+# [1, 0, z] takes its input from [1, 0, z-1] and drives [1, 0, z+1].
+#
+# **And the whole rig is offset one block on +z so that none of it sits at
+# negative z.** The workspace origin is *on* a chunk boundary — workspaces are
+# at absolute `(-(n+1) * 32, spawn_y, 0)` — so relative z = -1 is a different
+# chunk from z = 0, and a scenario writing on both sides measures vanilla's
+# inter-chunk send order rather than its own mechanic. That is what made check
+# 235 a coin flip and check 360 after it. The first version of this fix put the
+# power source at [1, 0, -1] and the wire at [1, 0, 1] and would have been the
+# third. With the offset the repeater is at [1, 0, 1], its input at [1, 0, 0]
+# and its output at [1, 0, 2] — chunk z 0 for all three.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:repeater"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+# The wire goes on the OUTPUT side, [1, 0, 2]. It is the thing that lights up
+# late, and it is at a position no step touches, so `informative` cannot
+# subtract it.
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 2]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_block"
+slot = 1
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 0
+
+# Right-click the repeater: DELAY cycles 1 -> 2. On its own this would be
+# inert, because `informative` subtracts a `block_update` at the position a
+# step clicked — which is why the signal is fed in afterwards rather than
+# this being a check about the property alone.
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "up"
+
+[[step]]
+do = "hold"
+item = "minecraft:redstone_block"
+slot = 1
+
+# Power the INPUT side, [1, 0, 0]. The wire at [1, 0, 2] lighting up is two
+# repeater ticks late and at a position no step touched.
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# No `timing` here, and that is a measured decision rather than an oversight.
+# The pair 330/335 gets a 500 ms bucket because the difference it must detect
+# is 500 ms. A repeater at DELAY 2 is four game ticks, 200 ms, so the widest
+# bucket that separates "200 ms late" from "immediate" is 200 ms, and a
+# 200 ms bucket leaves 100 ms of margin either side.
+#
+# That is not enough here, and it is measured rather than argued. With the
+# rig corrected but not yet offset, the interval from the redstone block
+# landing to the wire lighting was 182, 134, 133 and 181 ms across two vanilla
+# runs on both streams — a 49 ms spread about a 200 ms nominal, the 50 ms tick grid aliasing
+# against arrival timestamps. Bucketed at 200 ms those four samples come out
+# **3, 2, 3, 3**: the bucket already disagrees with itself inside a single run,
+# before any server is compared to another.
+#
+# The jitter to beat is not the one measured on the button, which is a
+# second-long delay observed at leisure. It is the jitter on a fast redstone
+# edge, and check 440 measures the same thing independently: gaps of 116, 84,
+# 132 and 68 ms for a two-tick pulse.
+#
+# The change that would make this timeable is cycling DELAY to 4 — eight game
+# ticks, 400 ms — where a 400 ms bucket carries 200 ms of margin against the
+# same 49 ms. That is a different check from this one and belongs in its own
+# entry rather than being smuggled into this one's rig.

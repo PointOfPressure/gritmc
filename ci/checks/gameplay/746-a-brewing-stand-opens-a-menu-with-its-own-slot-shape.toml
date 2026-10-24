@@ -1,0 +1,36 @@
+name = "a-brewing-stand-opens-a-menu-with-its-own-slot-shape"
+about = "a brewing stand opens `MenuType.BREWING_STAND` -- five container slots, three bottles, an ingredient and a fuel, which is a slot count no other menu in the corpus has, plus a data-slot pair for brew time and fuel"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content"]
+settle_ms = 1500
+
+# `open_screen` decodes the `minecraft:menu` **registry id** as its own field
+# and digests the rest of the body, which is the menu's title component. The
+# `container_set_content` that `initMenu` sends immediately after it digests
+# the whole slot list. So this check pins three independent things about the
+# menu — which registry entry, which title, and how many slots — and a server
+# that answered with a chest here would miss on all three.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:brewing_stand"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

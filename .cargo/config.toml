@@ -1,0 +1,22 @@
+# Build configuration.
+#
+# `x86-64-v2` is a named micro-architecture level (SSE4.2 and POPCNT on top of
+# baseline x86-64), supported by essentially every x86 CPU since 2009 and now
+# the default floor for several distributions.
+#
+# It is here for one instruction. `Mth.floor` is `(int) Math.floor(v)`, and
+# the HotSpot JIT compiles `Math.floor` to a single `roundsd` because it
+# targets the CPU it is running on. Rust's default target is baseline
+# x86-64, which has no rounding instruction, so `f64::floor` becomes a
+# **call into libm** — and worldgen calls it three times per noise sample.
+# A profile put `floor` plus unattributed `libc.so.6` frames at roughly 10%
+# of total chunk-generation time.
+#
+# This cannot change a value: `roundsd` in floor mode is exactly IEEE-754
+# roundToIntegralTowardNegative, which is what libm's `floor` computes. The
+# parity gate confirms it rather than taking it on trust.
+#
+# Scoped to the target rather than set globally, so cross-compiling to a
+# non-x86 host is unaffected.
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["-C", "target-cpu=x86-64-v2"]

@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 9
+slug   = "r1-r3-measured"
+title  = "What R1-R3 measured once they were built — 2026-08-07, branch `oracle-instrument-fixes`"
+branch = "oracle-instrument-fixes"

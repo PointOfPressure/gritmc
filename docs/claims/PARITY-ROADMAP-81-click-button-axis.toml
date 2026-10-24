@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 81
+slug   = "click-button-axis"
+title  = "The click button axis: what doClick accepts and what the corpus asks"
+branch = "gameplay-click-button-axis"
+status = "written"

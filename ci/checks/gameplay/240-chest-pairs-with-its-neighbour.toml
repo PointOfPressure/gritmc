@@ -1,0 +1,23 @@
+name = "chest-pairs-with-its-neighbour"
+about = "a chest placed beside another turns both of them into halves of one double chest — ChestBlock.getStateForPlacement picks a `type` by looking at what is already there, and the block that changes is the one nobody clicked"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "place"
+on = [2, -1, 0]
+face = "up"

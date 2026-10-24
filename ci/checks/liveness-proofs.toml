@@ -1,0 +1,589 @@
+# liveness-proofs.toml — every place the harness treats output as evidence
+# that a subject is alive, and the log each one must REJECT.
+#
+# Read by `ci/liveness-proofs.py --check`, which runs in `ci/t0.sh`. The
+# `negative` fixture is not documentation: it is fed to `predicate` through a
+# real `bash -c`, and a predicate that calls it ready is refused by name.
+#
+# ADDING A PROOF: `ci/liveness-proofs.py --discover` lists every wait loop in
+# `ci/*.sh`. Anything it lists and this file does not is a T0 refusal.
+#
+# # 2026-08-13 — the three unsound entries are gone, and so is the allowance
+#
+# They waited on the bare string `listening on`, which
+# `crates/rustmc-server/src/main.rs` printed *before* calling `status::listen`
+# and therefore before the bind. No log containing that string is rejected by
+# `grep -q 'listening on'`, so `unsound = true` was a statement of fact.
+#
+# Both halves are repaired on branch `ci-readiness-proofs`
+# (`docs/PARITY-ROADMAP.md` §28):
+#
+#   * the server no longer says it before it is true. `status::listen` calls
+#     back past the bind, from immediately before the first `accept`, with
+#     `listener.local_addr()` — so the line carries the address the kernel
+#     gave, and a bind that failed produces no such line at all;
+#   * the proofs no longer stop at a string. Each matches the port it asked
+#     for, and then asks the kernel whose LISTEN socket is on it
+#     (`ready_socket_owner`); the two subset scripts also complete a status
+#     exchange through the recorder's own client stack
+#     (`ready_speaks_status`). See `ci/server-ready.sh` for why the arms
+#     differ per site.
+#
+# `MAX_UNSOUND` in `ci/liveness-proofs.py` is **0**. A fourth is now a code
+# change with a reviewer.
+#
+# # The fixtures below are transcripts, not prose
+#
+# Every one of them is the output of a real `rustmc-server` boot, taken by
+# `ci/readiness-falsify.sh` on the Threadripper. That script boots the real
+# binary into each of these states, runs every predicate in this file against
+# the logs it actually produced, and additionally runs the pre-repair
+# predicate against the not-ready log to confirm it still accepts it — which
+# is the red-when-broken evidence for the repair, both directions, on the
+# instrument itself. `positive` lines for vanilla are copied from
+# `~/rustmc-dark/oracle-work/gameplay/dark-probe/vanilla/server.log`.
+#
+# The three rustmc entries carry *different* negatives on purpose. They are
+# the three distinguishable ways to be not-ready, one each, so the file as a
+# whole covers all three: bind refused, still starting, and bound to another
+# port. `ci/readiness-falsify.sh` crosses them — every predicate against every
+# negative — because this gate only ever runs each predicate against its own.
+#
+# `OUR_PORT` is set inside each predicate because `ci/liveness-proofs.py` runs
+# it with nothing in the environment but `LOG` and `PATH`. That is the point:
+# the port a proof matches has to come from somewhere, and a proof that
+# matches any port is back to matching a string.
+
+# --------------------------------------------------------------------------
+# The full gameplay gate. Two arms — the post-bind line naming this port, and
+# the kernel's word that the socket is ours. No status handshake: this is the
+# script every branch runs under the box-wide corpus lock, and pricing a new
+# connection to the subject would cost a forty-minute corpus run.
+# --------------------------------------------------------------------------
+
+[[proof]]
+script = "ci/t2-gameplay.sh"
+contract = "rustmc-ready"
+what = "rustmc-server is bound on the port we asked for, and the socket is ours, before the corpus records"
+source_line = "grep -q \"listening on 0.0.0.0:$OUR_PORT[ ,]\" \"$WORK/rustmc.log\" 2>/dev/null && ready_socket_owner \"$OUR_PORT\" \"$RUSTMC_PID\" && { RUSTMC_READY=1; break; }"
+predicate = "OUR_PORT=26783; grep -q \"listening on 0.0.0.0:$OUR_PORT[ ,]\" \"$LOG\""
+positive = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+rustmc 26.2 listening on 0.0.0.0:26783 (not saving: pass --world <dir> to persist)
+"""
+# NOT READY, shape 1 of 3 — the bind was refused. This is the failure the
+# whole item is named after, and the line the old predicate broke out on is
+# absent from it now: the repaired server prints nothing between the spawn
+# tile and the error.
+negative = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+listen: Address already in use (os error 98)
+"""
+
+# --------------------------------------------------------------------------
+# The named-subset runs. Three arms each: nothing downstream of them checks
+# the recording the way `assert_recording` checks the gate's, so the readiness
+# proof is the only thing between them and a silently thin result. Both also
+# run on a fixed default port, which is what makes `Address already in use` a
+# routine event here rather than a hypothesis.
+# --------------------------------------------------------------------------
+
+[[proof]]
+script = "ci/t2-gameplay-subset.sh"
+contract = "rustmc-ready"
+what = "rustmc-server is bound on our port, the socket is ours, and it answers a status request"
+source_line = "grep -q \"listening on 0.0.0.0:$OUR_PORT[ ,]\" \"$WORK/rustmc.log\" 2>/dev/null && ready_socket_owner \"$OUR_PORT\" \"$RUSTMC_PID\" && ready_speaks_status \"$BIN\" \"127.0.0.1:$OUR_PORT\" && { RUSTMC_READY=1; break; }"
+predicate = "OUR_PORT=26783; grep -q \"listening on 0.0.0.0:$OUR_PORT[ ,]\" \"$LOG\""
+positive = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+rustmc 26.2 listening on 0.0.0.0:26783 (not saving: pass --world <dir> to persist)
+"""
+# NOT READY, shape 2 of 3 — still starting. The world is built and the bind
+# has not been reached. This is the state the old sixty-second loop fell out
+# of and recorded anyway; the loop now refuses instead.
+negative = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+"""
+
+[[proof]]
+script = "ci/block-entity-subset.sh"
+contract = "rustmc-ready"
+what = "rustmc-server is bound on our port, the socket is ours, and it answers a status request"
+source_line = "grep -q \"listening on 0.0.0.0:$OUR_PORT[ ,]\" \"$WORK/rustmc.log\" 2>/dev/null && ready_socket_owner \"$OUR_PORT\" \"$RUSTMC_PID\" && ready_speaks_status \"$BIN\" \"127.0.0.1:$OUR_PORT\" && { RUSTMC_READY=1; break; }"
+predicate = "OUR_PORT=26783; grep -q \"listening on 0.0.0.0:$OUR_PORT[ ,]\" \"$LOG\""
+positive = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+rustmc 26.2 listening on 0.0.0.0:26783 (not saving: pass --world <dir> to persist)
+"""
+# NOT READY, shape 3 of 3 — bound, alive, answering, and on the wrong port.
+# A proof that stops at the string `listening on` passes this, and so does
+# every proof that connects to a port without asking which one the subject
+# says it took. This is the shape that only the repaired server can be
+# checked for at all: the port in the line is `local_addr()`, so it is what
+# was bound rather than what was requested.
+negative = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+rustmc 26.2 listening on 0.0.0.0:25893 (not saving: pass --world <dir> to persist)
+"""
+
+# --------------------------------------------------------------------------
+# The two that were sound before this branch and are untouched by it. Vanilla
+# prints `Done (…)! For help, type "help"` from `MinecraftServer.runServer`
+# only after `ServerConnectionListener.startTcpServerListener` has returned; a
+# bind failure prints `**** FAILED TO BIND TO PORT!` and never reaches it.
+# --------------------------------------------------------------------------
+
+[[proof]]
+script = "ci/vanilla-server.sh"
+what = "the vanilla reference server has finished starting and is bound"
+source_line = "grep -q 'Done (' \"$dir/server.log\" 2>/dev/null && { echo \"vanilla up on :$port ($dir)\"; return 0; }"
+predicate = "grep -q 'Done (' \"$LOG\""
+positive = """
+[07:48:14] [Server thread/INFO]: Starting minecraft server version 26.2
+[07:48:15] [Server thread/INFO]: Done (0.551s)! For help, type "help"
+"""
+negative = """
+[07:48:14] [Server thread/INFO]: Starting minecraft server version 26.2
+[07:48:14] [Server thread/WARN]: **** FAILED TO BIND TO PORT!
+[07:48:14] [Server thread/WARN]: The exception was: java.net.BindException: Address already in use
+[07:48:14] [Server thread/WARN]: Perhaps a server is already running on that port?
+"""
+
+[[proof]]
+script = "ci/bench-servers.sh"
+what = "a benched server has finished starting and is bound"
+source_line = "grep -q 'Done (' \"$dir/server.log\" 2>/dev/null && return 0"
+predicate = "grep -q 'Done (' \"$LOG\""
+positive = """
+[07:48:15] [Server thread/INFO]: Done (0.551s)! For help, type "help"
+"""
+negative = """
+[07:48:14] [Server thread/WARN]: **** FAILED TO BIND TO PORT!
+[07:48:14] [Server thread/WARN]: The exception was: java.net.BindException: Address already in use
+"""
+
+# `ci/corpus-positive-control.sh` — the corpus positive-control run: one
+# server, ours, carrying `crates/rustmc-server/src/sabotage.rs`'s controls.
+#
+# The same two arms and the same predicate as `ci/t2-gameplay.sh`, because
+# it boots the same binary and the failure it must not walk past is the same
+# one — our bind refused and another tree's server holding the port are
+# indistinguishable from the log alone.
+#
+# **Both fixtures are the producer's own output**, taken on 2026-08-18 by
+# running that binary once on a free port and once on a port already bound.
+# Not typed from the pattern: a fixture written to match the predicate is a
+# fixture that tests the predicate against itself, which is how `REGRESSED`
+# came to match its emitter in 0 of 45 lines.
+#
+# The predicate names 27921 because that is the port the positive fixture
+# was actually recorded on. The script's own default is 27914 and it is
+# overridable; pinning the predicate to the fixture keeps the pair exact.
+[[proof]]
+script = "ci/corpus-positive-control.sh"
+what = "the sabotaged rustmc-server is bound on the port we asked for and the socket is ours, before anything is recorded"
+source_line = "grep -q \"listening on 0.0.0.0:$PORT[ ,]\" \"$OUT/server.log\" 2>/dev/null && ready_socket_owner \"$PORT\" \"$SRV_PID\" && { ready=1; break; }"
+predicate = "PORT=27921; grep -q \"listening on 0.0.0.0:$PORT[ ,]\" \"$LOG\""
+positive = """
+spawn tile: 25 chunks (81 with the margin) in 0.6s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks; the canvas carries no block entities, so a chest from decoration arrives with no contents and no loot table; a placed one gets both halves; light is empty masks; the client lights the chunk itself; a tile a player walks into takes seconds to generate; until then it is void; a chunk is only as finished as DECORATION_MARGIN makes it, and no margin width converges: a tile's rim always sits DECORATION_MARGIN rings inside the outermost chunk it decorated (docs/DETERMINISM.md 31). Seed 20260722 is unaffected in practice; seeds 0 and 12345 are not
+rustmc 26.2 listening on 0.0.0.0:27921 (not saving: pass --world <dir> to persist)
+"""
+# NOT READY — the bind was refused, so another process holds the port and
+# everything recorded afterwards would be a measurement of somebody else.
+negative = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks; the canvas carries no block entities, so a chest from decoration arrives with no contents and no loot table; a placed one gets both halves; light is empty masks; the client lights the chunk itself; a tile a player walks into takes seconds to generate; until then it is void; a chunk is only as finished as DECORATION_MARGIN makes it, and no margin width converges: a tile's rim always sits DECORATION_MARGIN rings inside the outermost chunk it decorated (docs/DETERMINISM.md 31). Seed 20260722 is unaffected in practice; seeds 0 and 12345 are not
+listen: Address already in use (os error 98)
+"""
+
+# --------------------------------------------------------------------------
+# 2026-09-05 — THE FOUR DISCOVERY COULD NOT SEE
+#
+# `ci/liveness-proofs.py --discover` said 6/6 until the regexes were widened,
+# and the 6 were the loops whose FORMATTING it matched. Four more were in
+# `ci/*.sh` the whole time. Registering them is the point of widening it: the
+# count is coverage only if discovery can see everything there is to count.
+#
+# Two of the four are readiness proofs for a rustmc-server boot and take the
+# same predicate as the three above, because they wait on the same line from
+# the same binary. The other two wait on a detached payload's sentinel, which
+# is a different subject and needs its own not-ready shape.
+# --------------------------------------------------------------------------
+
+# The survival pass's ONLY readiness proof, and it was invisible because the
+# probe and its `break` are two physical lines apart across a backslash
+# continuation. `ci/t2-gameplay-survival.sh` boots the same binary with
+# `--gamemode survival` and records the four survival scenarios against it;
+# nothing downstream re-checks that the recording is thick, so this proof is
+# all that stands between the survival pass and a silently empty result.
+[[proof]]
+script = "ci/t2-gameplay-survival.sh"
+contract = "rustmc-ready"
+what = "rustmc-server is bound on our port in SURVIVAL, the socket is ours, and it answers a status request"
+source_line = "grep -q \"listening on 0.0.0.0:$OUR_PORT[ ,]\" \"$WORK/rustmc.log\" 2>/dev/null && ready_socket_owner \"$OUR_PORT\" \"$RUSTMC_PID\" && ready_speaks_status \"$BIN\" \"127.0.0.1:$OUR_PORT\" && { RUSTMC_READY=1; break; }"
+predicate = "OUR_PORT=26783; grep -q \"listening on 0.0.0.0:$OUR_PORT[ ,]\" \"$LOG\""
+positive = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+rustmc 26.2 listening on 0.0.0.0:26783 (not saving: pass --world <dir> to persist)
+"""
+# NOT READY — the bind was refused. The survival pass runs on fixed default
+# ports (25898/25899) beside a creative pass on 25896/25897, so a second run
+# meeting a first is the routine event here, not the hypothesis.
+negative = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+listen: Address already in use (os error 98)
+"""
+
+# The boot wait inside the falsifier for THIS gate, written as a multi-line
+# `if … then` / `break` / `fi` and therefore invisible to a discovery that
+# wanted the `break` beside the grep. `ci/readiness-falsify.sh` is where every
+# fixture in this file was taken; a proof it cannot see is a proof its own
+# transcripts were taken past.
+[[proof]]
+script = "ci/readiness-falsify.sh"
+what = "the freshly booted rustmc-server announced on the port this falsifier asked for, before any state is captured from it"
+source_line = "if grep -q \"listening on 0.0.0.0:$READY_PORT[ ,]\" \"$W/ready/rustmc.log\" 2>/dev/null; then break; fi"
+# NOT cross-examined by ci/readiness-falsify.sh's boot-and-cross-run pass, and
+# this field says so rather than the proof being quietly absent from a list
+# inside that script. `--check` refuses a proof naming rustmc.log that declares
+# neither `contract` nor this.
+why_no_contract = """
+This is that script's OWN boot wait, not a harness proof of a subject the
+harness then measures, and it is outside the `rustmc-ready` contract in three
+ways: it reads $W/ready rather than $WORK, matches $READY_PORT rather than
+$OUR_PORT, and it signals with `break` rather than RUSTMC_READY=1.
+
+It is also circular. `$W/starting` is DEFINED as the log at the last moment
+before this very loop's predicate went true, so this loop refusing it would be
+true by construction and not by measurement, and `$W/ready` is the capture this
+loop is what waits for. A proof cannot be cross-examined against captures its
+own loop produced.
+
+Registered with a negative fixture like every other, because `--check` still
+runs its predicate against a log a not-ready subject produces, which is the
+claim that matters. Only the boot-and-cross-run pass is skipped.
+"""
+predicate = "READY_PORT=26783; grep -q \"listening on 0.0.0.0:$READY_PORT[ ,]\" \"$LOG\""
+positive = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+rustmc 26.2 listening on 0.0.0.0:26783 (not saving: pass --world <dir> to persist)
+"""
+# NOT READY — still starting. This is the exact capture the loop below the
+# probe writes into `$W/starting/`, so the negative here is the artefact the
+# proof's own body produces one line later.
+negative = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+"""
+
+# The two sentinel waits in `ci/run-detached-falsify.sh`. A different subject
+# from a booting server, so a different not-ready shape: the payload is not
+# "starting", it is DEAD without ever having written `DETACHED-DONE`.
+#
+# `grep -qa` is why these two were invisible — `-q\b` cannot match `-qa`,
+# because `\b` after `q` needs a non-word character and `a` is a word
+# character. `-a` is there because the wrapper's log is whatever the payload
+# printed, and one NUL byte from a cargo progress line makes `grep` call the
+# file binary and print nothing while exiting 1: without `-a` this predicate
+# would call a FINISHED payload not-ready, which is the sound direction to
+# fail in but still wrong.
+#
+# **Both fixtures are the wrapper's own output, taken on the Threadripper on
+# 2026-09-05.** The positive is `~/.rustmc-detached/corpus-boxsetup.log` after
+# a real payload returned; the negative is `corpus-killme2.log`, from a
+# payload started under this same wrapper and `kill -9`ed four seconds in —
+# `./ci/run-detached.sh --status` calls that one DETACHED-DIED, and a proof
+# that reads it as done would have a suite pass on a payload that never ran.
+[[proof]]
+script = "ci/run-detached-falsify.sh"
+what = "the detached payload wrote its own completion sentinel, not somebody else's and not none"
+source_line = "grep -qa \"^DETACHED-DONE $name \" \"$log\" 2>/dev/null && return 0"
+predicate = "name=corpus-boxsetup; grep -qa \"^DETACHED-DONE $name \" \"$LOG\""
+positive = """
+DETACHED-DONE corpus-boxsetup rc=0 2026-09-05T14:02:23+01:00
+"""
+negative = """
+payload started: pretending to be a gate
+"""
+
+# The death-race recheck, one line down: `kill -0` has already said the
+# wrapper is gone, and this asks once more whether the sentinel landed in the
+# window between the payload's last write and its exit. Same predicate; the
+# negative is the one that matters, because reaching this line at all means
+# something ended and the only question left is whether it finished.
+[[proof]]
+script = "ci/run-detached-falsify.sh"
+what = "the sentinel landed in the race between the payload's last write and the wrapper's exit — and if it did not, the payload DIED"
+source_line = "kill -0 \"$(cat \"$pidf\" 2>/dev/null || echo 0)\" 2>/dev/null || { sleep 0.3; grep -qa \"^DETACHED-DONE $name \" \"$log\" 2>/dev/null && return 0; return 1; }"
+predicate = "name=corpus-boxsetup; grep -qa \"^DETACHED-DONE $name \" \"$LOG\""
+positive = """
+DETACHED-DONE corpus-boxsetup rc=0 2026-09-05T14:02:23+01:00
+"""
+negative = """
+payload started: pretending to be a gate
+"""
+
+# --- 2026-09-05, branch `persistence` ---------------------------------------
+#
+# This lane found a hole in the discovery regex rather than three new scripts.
+# `PROBE` was `\bgrep\s+-q\b`, which does not match `grep -qa`, `-qE`, `-qP`
+# or `-qF` because a letter is a word character: it found 6 of the 9 wait loops
+# in `ci/*.sh` and missed **both of `ci/run-detached-falsify.sh`'s**, which are
+# the waits on the sentinel of the detached runner every agent is told to use.
+#
+# **Two lanes found that independently and both registered those two loops.**
+# The pair above, on `corpus-boxsetup`, is the one that landed on main; this
+# lane's duplicates were dropped on the rebase. Only the entry below is this
+# lane's, and the two after it belong to `ci/t2-sigterm-saves.sh`.
+#
+# Both of `run-detached-falsify`'s loops wait on the same sentinel, written by
+# the wrapper and carrying the payload's exit status, so a payload that dies
+# without printing anything still produces a line — which is the property that
+# makes the sentinel sound and the reason the pair is registered rather than
+# rewritten. They are two entries because they are two source lines: the
+# second is the re-read after the pid has gone, and a proof that only covered
+# the first would leave the race arm unregistered.
+
+[[proof]]
+script = "ci/t2-vanilla-opens-our-world.sh"
+what = "the running vanilla server has answered the `seed` command, so the number about to be read is a real answer"
+source_line = "grep -q -P 'Seed: \\[-?[0-9]+\\]' \"$RUN/server.log\" 2>/dev/null && { SEEN=1; break; }"
+predicate = "grep -q -P 'Seed: \\[-?[0-9]+\\]' \"$LOG\""
+positive = """
+[13:20:41] [Server thread/INFO]: Done (11.402s)! For help, type "help"
+[13:20:43] [Server thread/INFO]: Seed: [20260722]
+"""
+# NOT READY — vanilla is up and the console write has not been answered (a
+# fifo with no reader, a command typo, or simply not yet). The gate reads the
+# seed with a second grep immediately after this loop, so a predicate that
+# accepted this log would hand the comparison an EMPTY string — and `[ "" =
+# "$SEED" ]` is false, which would report "vanilla is on seed , not 20260722"
+# and read as a format defect rather than as a dead console.
+negative = """
+[13:20:41] [Server thread/INFO]: Done (11.402s)! For help, type "help"
+"""
+
+# --------------------------------------------------------------------------
+# 2026-09-23 — ci/schema-check-falsify.sh, registered when stack-gameplay was
+# landed on f1e6babbb. Its boot loop waited on the bare `listening on`, the
+# string the 2026-08-13 header above retired; it now matches this port, as the
+# other rustmc proofs do, and keeps its pid-owns-the-socket arm. Discovery
+# reports the loop twice (the bind-refused guard rejoined with the ready arm,
+# and the ready arm alone), so it is registered twice. The predicate names
+# 25971 because that is the script's default port.
+# --------------------------------------------------------------------------
+[[proof]]
+script = "ci/schema-check-falsify.sh"
+what = "the rustmc-server the schema falsifier records against did not refuse its bind, and is bound on the port asked for"
+why_no_contract = "it boots rustmc-server for ci/schema-check-falsify.sh alone and signals with `return 0` from its own boot function, not RUSTMC_READY=1 on $OUR_PORT/$RUSTMC_PID, so ci/readiness-falsify.sh cannot run it; its second arm is the kernel's word that the LISTEN socket on $PORT belongs to $PID, via port_holder"
+source_line = "if grep -q 'Address already in use' \"$WORK/rustmc.log\" 2>/dev/null; then echo \"rustmc could not bind :$PORT:\"; tail -5 \"$WORK/rustmc.log\"; exit 1; fi; if grep -q \"listening on 0.0.0.0:$PORT[ ,]\" \"$WORK/rustmc.log\" 2>/dev/null && port_holder | grep -c \"pid=$PID,\" >/dev/null; then return 0; fi"
+predicate = "PORT=25971; ! grep -q 'Address already in use' \"$LOG\" && grep -q \"listening on 0.0.0.0:$PORT[ ,]\" \"$LOG\""
+positive = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+rustmc 26.2 listening on 0.0.0.0:25971 (not saving: pass --world <dir> to persist)
+"""
+negative = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+listen: Address already in use (os error 98)
+"""
+
+[[proof]]
+script = "ci/schema-check-falsify.sh"
+what = "the rustmc-server the schema falsifier records against is bound on the port asked for, and the socket is its own"
+why_no_contract = "it boots rustmc-server for ci/schema-check-falsify.sh alone and signals with `return 0` from its own boot function, not RUSTMC_READY=1 on $OUR_PORT/$RUSTMC_PID, so ci/readiness-falsify.sh cannot run it; its second arm is the kernel's word that the LISTEN socket on $PORT belongs to $PID, via port_holder"
+source_line = "if grep -q \"listening on 0.0.0.0:$PORT[ ,]\" \"$WORK/rustmc.log\" 2>/dev/null && port_holder | grep -c \"pid=$PID,\" >/dev/null; then return 0; fi"
+predicate = "PORT=25971; grep -q \"listening on 0.0.0.0:$PORT[ ,]\" \"$LOG\""
+positive = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+rustmc 26.2 listening on 0.0.0.0:25971 (not saving: pass --world <dir> to persist)
+"""
+negative = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+listen: Address already in use (os error 98)
+"""
+
+[[proof]]
+script = "ci/t2-player-survives-a-restart.sh"
+what = "rustmc-server is bound on the port we asked for and the LISTEN socket belongs to the pid we started, before either run of the rejoin probe"
+source_line = "grep -q \"listening on 0.0.0.0:$PORT[ ,]\" \"$log\" 2>/dev/null && ready_socket_owner \"$PORT\" \"$SRV_PID\" && { ready=1; break; }"
+predicate = "PORT=26787; grep -q \"listening on 0.0.0.0:$PORT[ ,]\" \"$LOG\""
+positive = """
+spawn tile: 9 chunks (49 with the margin) in 3.1s; more are generated as players walk into them. not generated: no structures
+rustmc 26.2 listening on 0.0.0.0:26787, saving to /home/sayer/rustmc-persist/oracle-work/t2-player-survives-a-restart/world every 40 ticks (2s at 20 Hz)
+"""
+# NOT READY — the second boot of this gate is the case that matters and it is
+# the one that races: the first server's socket may still be in TIME_WAIT and
+# the second may be mid-generation. This is that log, and the predicate must
+# refuse it. The `[ ,]` at the end of the pattern is load-bearing here in a way
+# it is not elsewhere: this gate runs on :26787 and `ci/t2-gameplay.sh` runs on
+# :26783, so a pattern without it would match a stale log from a boot on
+# :267870 or :26787X.
+negative = """
+spawn tile: 9 chunks (49 with the margin) in 3.1s; more are generated as players walk into them. not generated: no structures
+"""
+
+[[proof]]
+script = "ci/t2-sigterm-saves.sh"
+what = "rustmc-server is bound on the port we asked for, before the probe joins — the same proof `ci/t2-player-survives-a-restart.sh` uses, on this gate's own port and its own log variable"
+source_line = "grep -q \"listening on 0.0.0.0:$PORT[ ,]\" \"$LOG\" 2>/dev/null && ready_socket_owner \"$PORT\" \"$SRV_PID\" && { ready=1; break; }"
+predicate = "PORT=26791; grep -q \"listening on 0.0.0.0:$PORT[ ,]\" \"$LOG\""
+positive = """
+spawn tile: 9 chunks (49 with the margin) in 3.1s; more are generated as players walk into them. not generated: no structures
+shutdown: SIGTERM and SIGINT save before exiting (10s grace)
+rustmc 26.2 listening on 0.0.0.0:26791, saving to /home/sayer/rustmc-persist2/oracle-work/t2-sigterm-saves/world every 72000 ticks (3600s at 20 Hz)
+"""
+# NOT READY — the server has armed its hook and is still generating the spawn
+# tile. This is the exact log this gate sees for the first several seconds of
+# every run, and a predicate that accepted it would send the probe at a port
+# nothing is listening on. The `[ ,]` is load-bearing here for the reason it is
+# in the restart gate's proof: :26791 must not be matched by a boot on :267910.
+negative = """
+spawn tile: 9 chunks (49 with the margin) in 3.1s; more are generated as players walk into them. not generated: no structures
+shutdown: SIGTERM and SIGINT save before exiting (10s grace)
+"""
+
+[[proof]]
+script = "ci/t2-sigterm-saves.sh"
+what = "the probe has joined, finished its walk, and is now HOLDING the connection open — which is the only moment at which the signal this gate is about may be sent"
+source_line = "grep -q '^STAYING ' \"$PLOG\" 2>/dev/null && { staying=1; break; }"
+predicate = "grep -q '^STAYING ' \"$LOG\""
+positive = """
+REJOIN-SPAWN x=8.5 y=101.0 z=8.5
+REJOIN-WALKED x=14.5 y=101.0 z=8.5
+STAYING for 45.0s
+"""
+# NOT READY — the probe has joined and walked and has NOT yet reached the hold.
+# This is the case that matters and it is not hypothetical: `walk_east` ends
+# with a one-second drain, so there is a real window in which both position
+# lines are printed and the socket is about to be closed rather than held.
+# Signalling the server here would still produce a saved player file — through
+# the DISCONNECT path — and the gate would go green having measured the one
+# thing it exists to rule out.
+negative = """
+REJOIN-SPAWN x=8.5 y=101.0 z=8.5
+REJOIN-WALKED x=14.5 y=101.0 z=8.5
+"""
+
+# --------------------------------------------------------------------------
+# `ci/ambient-census.sh` — 2026-09-06. Same three-arm contract as
+# `ci/block-entity-subset.sh` above, deliberately verbatim rather than
+# reworded: the census boots this server on its own port right after stopping
+# two vanilla servers, so "the port answers" and "the port is OURS" have to
+# stay different statements while a previous occupant is still shutting down.
+#
+# The negative below is the shape only a repaired proof can be checked for:
+# bound, alive, answering, and on the WRONG port. `ci/ambient-census.sh` uses
+# :25895 and the log says :25893, which is `ci/block-entity-subset.sh`'s port —
+# a real collision on this box, not a synthetic one.
+# --------------------------------------------------------------------------
+[[proof]]
+script = "ci/ambient-census.sh"
+contract = "rustmc-ready"
+what = "rustmc-server is bound on our port, the socket is ours, and it answers a status request"
+source_line = "grep -q \"listening on 0.0.0.0:$OUR_PORT[ ,]\" \"$WORK/rustmc.log\" 2>/dev/null && ready_socket_owner \"$OUR_PORT\" \"$RUSTMC_PID\" && ready_speaks_status \"$BIN\" \"127.0.0.1:$OUR_PORT\" && { RUSTMC_READY=1; break; }"
+predicate = "OUR_PORT=25895; grep -q \"listening on 0.0.0.0:$OUR_PORT[ ,]\" \"$LOG\""
+positive = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+rustmc 26.2 listening on 0.0.0.0:25895 (not saving: pass --world <dir> to persist)
+"""
+negative = """
+spawn tile: 25 chunks (81 with the margin) in 0.5s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+rustmc 26.2 listening on 0.0.0.0:25893 (not saving: pass --world <dir> to persist)
+"""
+
+# The chunk-streaming probe. Two arms, the same pair `ci/t2-gameplay.sh` uses
+# and for the same reason: this boots one server and then counts packets on a
+# socket, so "our bind failed and the neighbour answered" would report a chunk
+# count for somebody else's world. No status handshake — the probe's very
+# next act is a full login, which is a stronger exchange than the handshake
+# would be and would only be paying for it twice.
+#
+# The negative is shape 3 of the three in this file: bound, but to a
+# different port. It is the one this proof is most exposed to, because the
+# probe runs on a fixed default port (:25699) rather than a probed-free one,
+# so a second copy of it is a routine event.
+# --------------------------------------------------------------------------
+[[proof]]
+script = "ci/chunk-stream-probe.sh"
+contract = "rustmc-ready"
+what = "rustmc-server is bound on the port the probe asked for, and the socket is ours, before any chunk is counted"
+source_line = "grep -q \"listening on 0.0.0.0:$OUR_PORT[ ,]\" \"$WORK/rustmc.log\" 2>/dev/null && ready_socket_owner \"$OUR_PORT\" \"$RUSTMC_PID\" && { RUSTMC_READY=1; break; }"
+predicate = "OUR_PORT=25699; grep -q \"listening on 0.0.0.0:$OUR_PORT[ ,]\" \"$LOG\""
+positive = """
+spawn tile: 25 chunks (81 with the margin) in 0.6s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+rustmc 26.2 listening on 0.0.0.0:25699 (not saving: pass --world <dir> to persist)
+"""
+# NOT READY, shape 3 of 3 — bound, but somewhere else. The probe asked for
+# :25699 and this server has :25698, so every chunk counted against it would
+# be another world's.
+negative = """
+spawn tile: 25 chunks (81 with the margin) in 0.6s; more are generated as players walk into them. not generated: no structures: no villages, strongholds or shipwrecks
+rustmc 26.2 listening on 0.0.0.0:25698 (not saving: pass --world <dir> to persist)
+"""
+
+# --------------------------------------------------------------------------
+# The gate's console confirmation (`console_confirm`, 2026-10-04,
+# `fix-flappers`). Not a boot proof but the same shape: a wait that ends on a
+# log line, here the jar-derived confirmation of one substrate command. It
+# replaced a `sleep 1` and a single grep, which refused three of eight
+# reference shards on a loaded box whose console had not been drained yet
+# (gate-structure-mobs-20261003-230031.log:1545-1579). The negative is that
+# refusal's own log: vanilla `Done`, then its initial chunk save — which on
+# an idle box takes the same second (02:10:09 below) and on that loaded one
+# was still running two seconds later — and the command not yet answered,
+# because the console is only drained once the server ticks.
+# The positive is a real 26.2 transcript (`~/rustmc-flappers/oracle-work/
+# gameplay/subset/vanilla/logs/latest.log`, 2026-10-04 02:10:09). The
+# predicate is the string `lang_re commands.gamerule.set advance_time false`
+# derives, as that gate log printed it.
+[[proof]]
+script = "ci/t2-gameplay.sh"
+what = "vanilla has applied one substrate console command (gamerule / time set), read from its own confirmation"
+why_no_contract = "it waits on vanilla's latest.log for a command's confirmation, not on rustmc readiness"
+source_line = "grep -qE \"$re\" \"$dir/logs/latest.log\" 2>/dev/null && return 0"
+predicate = "re='Gamerule\\ advance_time\\ is\\ now\\ set\\ to:\\ false'; grep -qE \"$re\" \"$LOG\""
+positive = """
+[02:10:09] [Server thread/INFO]: Done (0.541s)! For help, type "help"
+[02:10:09] [Server thread/INFO]: Gamerule advance_time is now set to: false
+"""
+negative = """
+[01:07:02] [Server thread/INFO]: Time elapsed: 1760 ms
+[01:07:02] [Server thread/INFO]: Done (2.338s)! For help, type "help"
+[01:07:02] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[01:07:03] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[01:07:04] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+"""
+
+# --------------------------------------------------------------------------
+# `ci/harvest-end-podium.sh` (branch `end-parity`, 2026-10-04): two waits on
+# the vanilla server's own log, after `vanilla-server.sh` has already proved
+# the bind. The first is the offline client's login (`PlayerList.placeNewPlayer`
+# prints it once the player is in a level); the second is
+# `EnderDragonFight.scanState`, which runs only once that player is in the
+# End and is the whole reason the script exists. Fixtures are lines from a
+# real run's `logs/latest.log` (seed 12345, port 25922); each negative is the
+# same log stopped one event earlier.
+# --------------------------------------------------------------------------
+[[proof]]
+script = "ci/harvest-end-podium.sh"
+what = "the offline client named podium is logged in"
+source_line = "grep -q 'podium joined the game' \"$DIR/logs/latest.log\" 2>/dev/null && break"
+predicate = "grep -q 'podium joined the game' \"$LOG\""
+positive = """
+[12:40:57] [Server thread/INFO]: Done (8.686s)! For help, type "help"
+[12:41:14] [Server thread/INFO]: podium joined the game
+"""
+negative = """
+[12:40:57] [Server thread/INFO]: Done (8.686s)! For help, type "help"
+"""
+
+[[proof]]
+script = "ci/harvest-end-podium.sh"
+what = "the dragon fight has scanned the arena (and so built the exit portal)"
+source_line = "grep -q 'Found that the dragon has not yet been killed' \"$DIR/logs/latest.log\" 2>/dev/null && break"
+predicate = "grep -q 'Found that the dragon has not yet been killed' \"$LOG\""
+positive = """
+[12:41:14] [Server thread/INFO]: podium joined the game
+[12:41:15] [Server thread/INFO]: Found that the dragon has not yet been killed in this world.
+"""
+negative = """
+[12:41:14] [Server thread/INFO]: podium joined the game
+"""

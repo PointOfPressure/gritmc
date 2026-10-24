@@ -1,0 +1,96 @@
+name = "a-stack-carrying-a-data-component-reaches-the-cursor"
+about = "781 with one thing changed: the stack in slot 0 carries `minecraft:damage = 5`, so the `ItemStack` vanilla puts in the cursor has a non-empty `DataComponentPatch`. This is the first scenario in this corpus that can reach `trace::read_item_stack`'s opaque arm at all, and it exists to turn `0 of 539 opaque` from a guarantee into a measurement"
+
+# WHAT `0 OPAQUE` MEANT BEFORE THIS FILE, AND WHY IT WAS NOT A READING OF
+# VANILLA
+#
+# `trace-itemstack-legible` decoded the head of every `ItemStack` and stopped
+# at the first ADDED data component, because a component's payload carries no
+# length and can only be skipped by running that type's own stream codec. It
+# then measured `0 of 539 stacks stopped at a data component with no codec`
+# and read that as the deliberate stop never having fired.
+#
+# It could not have fired. `Step::Hold` sends `set_creative_mode_slot` and
+# wrote a literal `0` added components, and that packet is the ONLY route an
+# item has into a harness player's inventory: `Step::Command` cannot run
+# `/give`, which is permission level 2, and `ci/t2-gameplay.sh`'s players are
+# not operators. Every stack in every recording was componentless by
+# construction, so `0 of 539` was a property of the harness at that column and
+# said nothing whatever about the decoder. That is the same shape as the
+# `gamerule randomTickSpeed` that vanilla refused for a week — an instrument
+# reporting cleanly because it had stopped being able to ask.
+#
+# `Step::Hold` takes `components` now. This file is the first caller.
+#
+# WHAT WOULD MAKE THIS COME BACK GREEN WITHOUT MEASURING ANYTHING
+#
+# Two things, and both are checked rather than hoped for:
+#
+#   * **vanilla dropping the patch.** If `handleSetCreativeModeSlot` did not
+#     preserve it, the cursor stack would be a plain diamond sword and this
+#     file would be a duplicate of 781 — which is exactly why 781 exists and
+#     why the two must be compared rather than this one read alone. Identical
+#     recordings for 781 and 783 is the signature of that failure.
+#   * **the harness writing a malformed patch**, which vanilla would throw on
+#     inside the packet read, disconnecting the client. That arrives as a
+#     reference that stopped answering rather than as a divergence, and
+#     `ci/t2-gameplay.sh` already refuses a recording whose vanilla died.
+#
+# `minecraft:damage` is protocol id 3 in the pinned jar's
+# `minecraft:data_component_type` registry, and its network form is
+# `ByteBufCodecs.VAR_INT` — `DataComponents.lambda$static$3`, `getstatic
+# ByteBufCodecs.VAR_INT` at offset 10 into `networkSynchronized` at 13. 5 is
+# well inside a diamond sword's durability, so `ItemStack.validateComponents`
+# has nothing to clamp and the value that comes back is the value sent.
+#
+# EXPECT `diverge`, AND THE DIVERGENCE IS A REAL FINDING RATHER THAN A GAP IN
+# THIS FILE. `crates/rustmc-server/src/player.rs`'s `creative_slot_item` reads
+# the slot, the count and the item id and stops — this server does not parse a
+# `DataComponentPatch` at all, so the stack it puts in the cursor cannot carry
+# one. That is a parity gap this check now names; it is not this item's to
+# close, and a check that could not see it is why nobody had.
+
+observe_from = "actor"
+observe = [
+    "open_screen",
+    "container_set_content",
+    "container_set_slot",
+    "set_cursor_item",
+]
+settle_ms = 1000
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# The one line that separates this file from 781.
+[[setup]]
+do = "hold"
+item = "minecraft:diamond_sword"
+slot = 0
+components = [{ type = "minecraft:damage", varint = 5 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 54

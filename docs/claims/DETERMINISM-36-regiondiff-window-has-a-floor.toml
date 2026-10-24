@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 36
+slug   = "regiondiff-window-has-a-floor"
+title  = "The t2-regiondiff window has a floor and the 100.000000% was a lucky pair — 0..536 blocks over 28 pairs at N=8, 2026-08-16, branch `regiondiff-live-fixture`"
+branch = "regiondiff-live-fixture"

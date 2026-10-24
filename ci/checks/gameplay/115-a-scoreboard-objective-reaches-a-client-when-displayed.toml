@@ -1,0 +1,43 @@
+name = "scoreboard-objective-reaches-a-client-when-displayed"
+about = """
+adding a scoreboard objective sends NOTHING, and the `set_objective` a client
+receives arrives with the `setdisplay` that first tracks it — in that order,
+`set_objective` before `set_display_objective`
+
+`ServerScoreboard.onObjectiveAdded` is `super` then `setDirty()` and
+broadcasts no packet. Everything goes through `trackedObjectives`:
+`setDisplayObjective` on an untracked objective calls
+`startTrackingObjective`, whose `getStartTrackingPackets` builds
+`set_objective` METHOD_ADD first and then one `set_display_objective` per slot
+already showing it.
+
+So a port that answered `add` with a `set_objective` sends a packet vanilla
+does not, and one that sent only the display packet leaves a client rendering
+a sidebar for an objective it was never told about. Both are visible here and
+in no unit test, because both are about which server-side call reaches the
+socket.
+
+The two steps are separate so that the first one's silence is measured rather
+than assumed: an `add` that spoke would put a `set_objective` in the window
+before the `setdisplay` does, and the recorded order would say so.
+
+Level 2, so it goes through the console — see `scenario::Step::Console`.
+
+One restore line, not two: `Scoreboard.removeObjective` nulls every display
+slot the objective occupied before the removal broadcast, so removing it also
+clears the sidebar. A `setdisplay` left standing would leave every later
+scenario's client rendering a sidebar, which is state nobody declared even
+though no check observes it.
+"""
+console_restore = ["scoreboard objectives remove kills"]
+observe_from = "actor"
+observe = ["set_objective", "set_display_objective"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "scoreboard objectives add kills dummy"
+
+[[step]]
+do = "console"
+text = "scoreboard objectives setdisplay sidebar kills"

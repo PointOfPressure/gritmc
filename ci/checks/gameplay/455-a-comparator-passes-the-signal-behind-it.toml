@@ -1,0 +1,44 @@
+name = "a-comparator-passes-the-signal-behind-it"
+about = "a comparator in compare mode with nothing on its sides is a two-tick repeater of whatever is behind it — `ComparatorBlock.calculateOutputSignal` returns the input when no side input exceeds it, `checkTickOnNeighbor` books the tick, and the tick's `refreshOutputState` writes `powered=true` with flags 2 and tells the dust in front through `updateNeighborsInFront`"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 2000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# `DiodeBlock.getStateForPlacement`: FACING is the player's horizontal
+# direction reversed, and FACING names the diode's INPUT side. At yaw 0 the
+# player looks south, so the comparator faces north: it reads [1, 0, -1] and
+# drives [1, 0, 1].
+[[setup]]
+do = "hold"
+item = "minecraft:comparator"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_block"
+
+# The input arrives last. Placing it tells the comparator through the
+# six-neighbour sweep; the comparator answers two ticks later, and the dust
+# in front lights at 15 in the same tick as the comparator's `powered=true`.
+[[step]]
+do = "place"
+on = [1, -1, -1]
+face = "up"

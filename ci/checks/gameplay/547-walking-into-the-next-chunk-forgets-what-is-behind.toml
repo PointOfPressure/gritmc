@@ -1,0 +1,72 @@
+name = "walking-into-the-next-chunk-forgets-what-is-behind"
+about = "the same walk as 546, watching the other half of `ChunkMap.applyChunkTrackingView`: the chunks that leave the tracked set are dropped by name, so this is the first corpus check on WHICH chunks a client holds"
+observe_from = "actor"
+observe = ["forget_level_chunk"]
+# The packet carries no world position — it carries a CHUNK coordinate — so
+# there is nothing for `compare::near` to bound and the check says so rather
+# than relying on `bound == None` passing by default. `580`/`581`/`582` use
+# the same declaration for the same reason.
+within = -1
+settle_ms = 3000
+
+# WHY THIS IS A SECOND CHECK AND NOT TWO KINDS IN 546
+#
+# `applyChunkTrackingView` does two separable things and this server is
+# expected to get one of them right and the other wrong, so putting both in
+# one scenario would bury the passing claim under the failing one.
+#
+# ```java
+#   if (centre changed) send(new ClientboundSetChunkCacheCenterPacket(...));   // 546
+#   ChunkTrackingView.difference(old, now, markSent, dropChunk);              // this
+# ```
+#
+# The second limb is the tracked SET, and the tracked set is
+# `ChunkTrackingView$Positioned.isWithinDistance` — a Euclidean disc padded by
+# two inside a bounding box of `viewDistance + 1`:
+#
+# ```java
+#   int pad = 2;
+#   long dx = Math.max(0, Math.abs(x - cx) - pad);
+#   long dz = Math.max(0, Math.abs(z - cz) - pad);
+#   return dx * dx + dz * dz < (long) (viewDistance * viewDistance);
+# ```
+#
+# `crates/rustmc-server/src/world_send.rs`'s `ChunkView` walks a Chebyshev
+# SQUARE, and the two sets are not nested in either direction: at view
+# distance 4 the disc holds 117 chunks and the square 81. So this check is
+# expected to diverge on `main` and to be the first thing in this corpus that
+# can see the difference at all.
+#
+# WHY IT IS GRADEABLE WHERE THE BATCH PACKETS ARE NOT
+#
+# Measured, not argued — `ci/checks/ambient-families.toml`, two independent
+# vanilla runs over eighteen scenarios:
+#
+# ```text
+#   forget_level_chunk     187 and 187 observations, 18/18 scenarios agree
+#                          on values AND on the step each landed after
+#   chunk_batch_start       25 and  24,              17/18
+#   chunk_batch_finished    25 and  24,              17/18
+# ```
+#
+# `difference` is a set difference over two views that are pure functions of
+# position, and a drop is not queued behind a send, so both the membership and
+# the order are determined. The batch packets are split by
+# `PlayerChunkSender.batchQuota`, which is the client's own reported
+# milliseconds-per-chunk, and they flap once in eighteen.
+#
+# WHAT EACH SERVER SHOULD SAY
+#
+# One crossing each way. Vanilla drops the rank leaving the padded disc:
+# eleven chunks on the way out and eleven on the way back at view-distance 4,
+# ordered by `ChunkTrackingView.difference` (x-major, both axes ascending),
+# which is the shape `551` already shows in a recording — `(-5, 5)`, then
+# `(-4, 6)` through `(4, 6)`, then `(5, 5)`.
+
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 20.0]
+
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 0.0]

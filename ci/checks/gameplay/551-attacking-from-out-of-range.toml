@@ -1,0 +1,154 @@
+name = "attacking-from-out-of-range"
+about = "one scenario that attacks twice, once from far away and once from close, so vanilla's answer is exactly ONE attack sound and not two — a server that acts on the attack packet the moment it arrives, with no reach test, produces two and is identical to vanilla in `550`"
+observe_from = "actor"
+observe = ["sound", "damage_event", "set_health", "entity_event"]
+settle_ms = 2500
+
+# **WHAT THIS CHECK'S GREEN IS ABOUT, MEASURED — 2026-08-18, `corpus-projection-audit`.**
+#
+# `ci/observe-coverage.py` over the 17 Aug pair: **three of the four kinds
+# declared above never appear on either side.** Vanilla emits no
+# `damage_event`, no `set_health` and no `entity_event` for a player hitting a
+# player in this scenario, and neither do we, so those three declarations are
+# one-sided guards — live if this server ever starts emitting one, silent
+# otherwise. They are not what makes this check green.
+#
+# What makes it green is **`sound`, and nothing else**: `measured_reference_obs`
+# is 1. So the claim this file can currently support is "the attack sound is
+# played, at the right place, from the right source, at the right volume", plus
+# the reach test `551` adds by counting how many of them there are.
+#
+# **It is not about damage**, whatever the name says, and no server change that
+# got damage wrong while still playing the sound could redden it. Closing that
+# needs vanilla to emit one of the three — which for a player-on-player hit in
+# creative it does not — or a different observable. Named here rather than left
+# for the next reader to re-derive: `docs/PARITY-ROADMAP.md` §51.
+
+# TWO OF THE FOUR KINDS ABOVE CARRY NO REFERENCE SIGNAL, AND THIS FILE IS NOT
+# EVIDENCE THAT DAMAGE IS MODELLED.
+#
+# `damage_event` and `set_health` are **empty on the vanilla side here and in
+# every other check**: zero appearances across 89 vanilla recordings on this
+# box, deduped by sha256. That is not a gap in this server. It is
+# `Player.hurtServer`, which reads `Abilities.invulnerable` at offset 15 and
+# returns false at 31-32, and `GameType.CREATIVE` is what sets that field. The
+# corpus substrate is creative by construction, so **no work on any server
+# could have produced either kind for this check to compare**.
+#
+# What that means for reading a green here: this file grades the attack SOUND —
+# its event id, its volume, its position, and the COUNT — one sound and not two, which is the reach test and is
+# the real falsifiable content of this file. Read it as
+# "the attack packet is answered with the right sound in the right place",
+# never as "combat is ported". `docs/PARITY-ROADMAP.md` §63 is the audit that
+# separates this class from a porting gap, and
+# `ci/checks/survival/001-attacking-a-player-who-can-be-hurt.toml` is the same
+# attack with the gate open.
+#
+# **THEY ARE DELIBERATELY NOT REMOVED FROM `observe`.** `observe` filters both
+# sides symmetrically, so declaring a kind vanilla never sends is not dead
+# weight — it is the only thing that would catch THIS server emitting a
+# `damage_event` on a substrate where vanilla emits none. Stripping them would
+# turn a silent-but-armed declaration into no declaration at all, and that is
+# a strictly worse trade than the misreading this comment fixes.
+
+# THIS FILE'S FIRST VERSION WAS VACUOUS IN THE GATE AND ABSENT IN A CHAIN DIR,
+# AND THE REASON IS A HAZARD THIS REPO HAD ALREADY WRITTEN DOWN.
+#
+# It stood the actor 15 blocks out, attacked once, and observed
+# `["animate", "entity_event", "damage_event", "set_health", "sound"]` from
+# both clients. Vanilla's whole trace was **one observation**: the `animate`
+# broadcast to the observer, from the swing the attack verb sends. The attack
+# itself is refused at the reach test and produces nothing, which is the point
+# of the check — so its only positive content was an incidental packet.
+#
+# One packet is not a margin. `ChunkMap$TrackedEntity.updatePlayer` decides who
+# receives an entity broadcast with a three-way conjunction, from
+# `javap -p -c -constants` on the pinned jar, offsets 75..130:
+#
+#     dx² + dz² <= min(getEffectiveRange(), getPlayerViewDistance()*16)²
+#       &&  entity.broadcastToPlayer(player)
+#       &&  chunkMap.isChunkTracked(player, entity.chunkPosition().x(),
+#                                           entity.chunkPosition().z())
+#
+# and `isChunkTracked` is `getChunkTrackingView().contains(x, z) &&
+# !chunkSender.isPending(x, z)`. The workspace origin is chunk z 0 and z = 20
+# is **chunk z 1**, so whether the observer heard that swing depended on
+# whether it had finished streaming a chunk it had no other reason to want.
+# Deep into a 67-scenario run it had not; in a two-scenario subset it had.
+#
+# `scenario.rs`'s own `From` documentation already says this about block
+# broadcasts — "a chunk still queued for delivery is a chunk whose block
+# changes are withheld from that client" — and the same filter turns out to
+# gate entity packets. The first version of this check was built on the
+# fragile side of a hazard the project had already paid to learn.
+#
+# WHAT THE REWRITE CHANGES, AND WHY IT CANNOT GO VACUOUS AGAIN
+#
+#   * **Two attacks in one scenario, not one.** The near attack always sounds —
+#     it is the same event `550` measures, and `550` produced it in both
+#     environments. So vanilla's trace is non-empty *by construction*, and the
+#     far attack's silence is measured against it rather than being the whole
+#     of it. This check can now only be vacuous if `550` is also broken.
+#   * **`observe_from = "actor"`.** The observation is the actor's own attack
+#     sound at the actor's own position, so the chunk in the conjunction above
+#     is the chunk the actor is standing in — which it necessarily tracks. No
+#     broadcast to a third party is load-bearing any more.
+#   * **`animate` is dropped from `observe`.** It is exactly the fragile
+#     packet, it is not what this check is about, and `Step::Swing` exists for
+#     covering it deliberately rather than incidentally.
+#
+# THE GATE'S OWN LOG CONTAINS THE CONTROLLED COMPARISON, which is better
+# evidence than the derivation above and was sitting there the whole time:
+# in the same failing run, **`550` was `absent` and this check was `vacuous`.**
+# `absent` means vanilla's projected trace was non-empty — so the actor-side
+# attack sound *did* arrive in the environment that starved the observer-side
+# `animate`. Same server, same run, same second. The rewrite rests this check
+# on exactly the signal that demonstrably survived there.
+#
+# AND `observe_from = "actor"` IS DOING A SECOND JOB, found by reading the
+# trace rather than by reasoning: the walk between the two attacks emits **five
+# footstep sounds** (id 759, at z = 16, 12, 8, 4, 3) onto the *observer's*
+# stream, and how many land depends on hop timing. Vanilla does not send a
+# player its own step sounds — the client predicts them — so the actor's stream
+# has none. Observing from both would have replaced a chunk-tracking flap with
+# a footstep-count flap and looked like a fix.
+#
+# WHAT VANILLA ANSWERS, and what each wrong server answers:
+#
+#     vanilla                     one sound, at the third step
+#     no reach test at all        two sounds
+#     attack not implemented      no sounds  (absent — where we are today)
+#
+# The count is the content, which is why both attacks are in one scenario: as
+# two files, "one sound here and none there" is two verdicts that can drift
+# apart, and one of them is an assertion of absence with nothing beside it.
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+# Out to 15 blocks. Not a derived cutoff — `handleAttack`'s literal `3.0d` is a
+# padding added to the `ENTITY_INTERACTION_RANGE` attribute rather than the
+# reach itself (see `550`), and five blocks was measured to be *inside* it. So
+# this stands far enough out that no reading of the attribute plus its padding
+# reaches, and stays well inside player tracking range so the target still
+# resolves.
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 20.0]
+
+[[step]]
+do = "attack"
+target = "minecraft:player"
+
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 3.0]
+
+[[step]]
+do = "attack"
+target = "minecraft:player"

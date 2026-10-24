@@ -1,0 +1,60 @@
+name = "a-dropped-item-goes-into-your-inventory"
+about = "a block knocked loose drops as an ITEM ENTITY and the player walking over it picks it up — take_item_entity plus the container slot that changes, which is the first inventory behaviour this corpus can reach without survival, because the drop comes from the cascade rather than from the dig"
+observe_from = "actor"
+# **A candidate blindness in this check was raised and does not survive.**
+#
+# The claim was that an `ItemEntity`'s material rides `SET_ENTITY_DATA`, which
+# this projection does not name, so a drop of the wrong item would be
+# invisible here. It would not. `container_set_slot` is projected, and a stack
+# that differs by so much as its item id makes this check diverge.
+#
+# **How that is true changed on 2026-08-12 and the conclusion did not.** Until
+# then `crate::trace` decoded only `window`, `state` and `slot` out of this
+# packet and the ItemStack stayed in the body, digested into `rest`; measured
+# on the reference recording of 2026-08-03, vanilla's `container_set_slot`
+# here carried `rest = d2fbb5fb1fa81421` where an empty body digests to
+# `cbf29ce484222325`, so the stack was demonstrably in there. Branch
+# `trace-itemstack-legible` now decodes the stack into an `item` field, so
+# **that digest is stale and is not to be quoted forward** — the same
+# difference is now visible as `item.item` and `item.count` rather than as a
+# changed hash, and `compare::project` copies `fields` whole either way.
+#
+# What this check genuinely cannot see is narrower, and worth naming so the
+# next sweep does not re-raise the wide version: the item entity's **metadata
+# while it is lying on the ground**. Vanilla sends two `set_entity_data` for
+# it and neither is compared, so what the drop *rendered as* before pickup is
+# unobserved even though what *arrived in the slot* is not. The `level_event`
+# 2001 that announces the break effect is unobserved for the same reason.
+observe = ["add_entity", "take_item_entity", "container_set_slot", "container_set_content", "remove_entities"]
+settle_ms = 3000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:torch"
+
+[[setup]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# Breaking the support makes the torch pop off. A creative dig drops nothing
+# itself, but the cascade is not a player break and `dropResources` runs, so
+# the torch becomes an item the player is standing next to.
+[[step]]
+do = "dig"
+at = [1, 0, 0]
+face = "up"

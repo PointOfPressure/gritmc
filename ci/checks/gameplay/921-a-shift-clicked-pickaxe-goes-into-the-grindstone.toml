@@ -1,0 +1,39 @@
+name = "a-shift-clicked-pickaxe-goes-into-the-grindstone"
+about = "a worn pickaxe shift-clicked from the hotbar takes `GrindstoneMenu.quickMoveStack`'s player arm: one input is empty, so `moveItemStackTo(stack, 0, 2, false)` puts it in slot 0 — answered with the hotbar slot emptying and slot 0 filling; a server that shuffled it into the main inventory moves it to slot 3"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:grindstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_pickaxe"
+components = [{ type = "minecraft:damage", varint = 200 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+input = "quick_move"

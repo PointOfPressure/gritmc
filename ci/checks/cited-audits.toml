@@ -1,0 +1,62 @@
+# FIGURES THIS TREE PUBLISHES AND DID NOT MEASURE.
+#
+# Checked by `ci/check-cited-audits.py`, which runs in `ci/t0.sh`.
+#
+# A lane that finishes an audit leaves its numbers on its own branch, and the
+# figure ledger is on main. Between those two moments the number is either
+# absent from the ledger — which is how five refuted figures got published in
+# two days — or copied into it by hand, which is how a number and its evidence
+# come apart. This file is the third option: the figure is registered now, the
+# measurement stays where it was taken, and the citation is re-verified against
+# that branch on every run.
+#
+# **A citation is not a measurement and this file does not pretend otherwise.**
+# `ci/figures.toml` entries citing these rows carry the branch in their
+# `provenance` and are quotable only in the sense that the branch's own gate
+# made them quotable. What is checked here is the narrow, mechanical thing: the
+# number in the ledger is still the number on the branch. If the branch moves
+# and the finding changes, this goes red rather than the ledger quietly
+# describing a measurement that no longer exists.
+#
+# `witness` is a string that must still appear in `<sha>:<path>`. It is pinned
+# to a SHA and not to a branch name on purpose: a branch tip moves, and a
+# citation that follows the tip is a citation to whatever the lane does next.
+# When the branch lands, the citation is replaced by an ordinary `artefact`
+# pointing at the merged file and the row is deleted from here.
+
+[[cited]]
+id = "projection-drops-20260818"
+branch = "corpus-projection-audit"
+sha = "43e328ae"
+path = "ci/checks/projection-drops.toml"
+value = 16
+witness = "[[drop]]"
+witness_count = 16
+what = "fields the corpus projection removes before the comparison"
+
+[[cited]]
+id = "projection-unrecorded-kinds-20260818"
+branch = "corpus-projection-audit"
+sha = "43e328ae"
+path = "docs/cold-start/corpus-projection-audit.md"
+value = 12
+witness = "| packet kinds never recorded at all | **12** |"
+what = "packet kinds `decode` can emit that never enter a recording at all, of 37 emittable"
+
+[[cited]]
+id = "server-unported-gaps-20260818"
+branch = "server-unported-audit"
+sha = "ea41a847"
+path = "docs/cold-start/server-unported-audit.md"
+value = 47
+witness = "**47 distinct gaps.**"
+what = "distinct unported gaps in crates/rustmc-server, counted as gaps and not as markers"
+
+[[cited]]
+id = "server-unported-unreached-20260818"
+branch = "server-unported-audit"
+sha = "ea41a847"
+path = "docs/cold-start/server-unported-audit.md"
+value = 41
+witness = "**41 of 47 gaps are reached by no scenario.**"
+what = "of those 47, the ones no scenario reaches — unported paths sitting behind a green corpus"

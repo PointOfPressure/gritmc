@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 4.2
+slug   = "standing-claim-tested"
+title  = "§4's standing claim, tested rather than repeated"
+branch = "backfill"

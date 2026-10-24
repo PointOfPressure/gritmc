@@ -1,0 +1,28 @@
+name = "xp-points-cross-a-level"
+about = """
+ten experience points given from the console to a player at level 0 carry it
+through level 0's seven and three into level 1's nine, and the player's own
+client is told with one `set_experience` on its next `doTick`
+
+`Player.giveExperiencePoints` adds `10 / 7` to the progress in single
+precision, then loops `(progress - 1) * 7`, `giveExperienceLevels(1)`,
+`/ 9` — so the packet's float is that exact sequence, not 1/3. The total and
+the level are the other two fields (`ClientboundSetExperiencePacket` writes
+progress, then level, then total). `ServerPlayer.doTick` sends only when
+`totalExperience != lastSentExp`, and the console runs after the connection
+tick (`DedicatedServer.tickConnection`), so the packet is one tick behind the
+line.
+
+`console_restore` adds minus a million levels: `giveExperienceLevels` below
+zero is the one branch that zeroes level, progress AND total, so the next
+scenario starts from nothing. Its own `set_experience` lands in the next
+scenario's quiet settle.
+"""
+console_restore = ["xp add oracle -1000000 levels"]
+observe_from = "actor"
+observe = ["set_experience"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "xp add oracle 10"

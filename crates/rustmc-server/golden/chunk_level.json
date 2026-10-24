@@ -1,0 +1,34 @@
+{
+  "full_chunk_level": 33,
+  "block_ticking_level": 32,
+  "entity_ticking_level": 31,
+  "radius_around_full_chunk": 11,
+  "max_level": 44,
+  "by_status": [
+    {"status": "INACCESSIBLE", "ordinal": 0, "level": 44},
+    {"status": "FULL", "ordinal": 1, "level": 33},
+    {"status": "BLOCK_TICKING", "ordinal": 2, "level": 32},
+    {"status": "ENTITY_TICKING", "ordinal": 3, "level": 31}
+  ],
+  "levels": [
+    {"level": 28, "full_status": "ENTITY_TICKING", "entity_ticking": true, "block_ticking": true, "loaded": true},
+    {"level": 29, "full_status": "ENTITY_TICKING", "entity_ticking": true, "block_ticking": true, "loaded": true},
+    {"level": 30, "full_status": "ENTITY_TICKING", "entity_ticking": true, "block_ticking": true, "loaded": true},
+    {"level": 31, "full_status": "ENTITY_TICKING", "entity_ticking": true, "block_ticking": true, "loaded": true},
+    {"level": 32, "full_status": "BLOCK_TICKING", "entity_ticking": false, "block_ticking": true, "loaded": true},
+    {"level": 33, "full_status": "FULL", "entity_ticking": false, "block_ticking": false, "loaded": true},
+    {"level": 34, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": true},
+    {"level": 35, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": true},
+    {"level": 36, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": true},
+    {"level": 37, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": true},
+    {"level": 38, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": true},
+    {"level": 39, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": true},
+    {"level": 40, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": true},
+    {"level": 41, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": true},
+    {"level": 42, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": true},
+    {"level": 43, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": true},
+    {"level": 44, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": true},
+    {"level": 45, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": false},
+    {"level": 46, "full_status": "INACCESSIBLE", "entity_ticking": false, "block_ticking": false, "loaded": false}
+  ]
+}

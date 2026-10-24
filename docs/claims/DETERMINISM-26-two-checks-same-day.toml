@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 26
+slug   = "two-checks-same-day"
+title  = "Two checks that could not fail, found the same day (2026-08-10)"
+branch = "backfill"

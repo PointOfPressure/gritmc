@@ -1,0 +1,44 @@
+name = "a-water-bucket-waterlogs-a-slab-instead-of-replacing-it"
+about = "a water bucket aimed at a bottom slab waterlogs the slab in place rather than filling the space beside it — BucketItem.use's LiquidBlockContainer target (the clicked position, not the face's neighbour), SimpleWaterloggedBlock.placeLiquid (waterlogged=true, flags 3, a WATER tick at 5), and the slab's own outline under the ray"
+observe = ["block_update", "section_blocks_update", "block_changed_ack", "sound"]
+settle_ms = 1500
+# # The rig
+#
+# A bottom slab is placed into a one-deep hole at (1, -1, 0), so the water the
+# slab now holds has grass on every side and nowhere to flow: what is graded
+# is the waterlogging write and nothing downstream of it. (yaw -74.5,
+# pitch 48.5) crosses y = 0 at (1.381, 0.383) and meets the slab's top face —
+# half a block up — at (1.807, -0.5, 0.501); a ray that clipped the full cell
+# would hit at y = 0 and still pick the slab, but one that ignored the slab
+# would land on the dirt beneath it.
+
+[[setup]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_slab"
+
+[[setup]]
+do = "place"
+on = [1, -2, 0]
+face = "up"
+
+[[setup]]
+do = "look"
+yaw = -74.5
+pitch = 48.5
+
+[[setup]]
+do = "hold"
+item = "minecraft:water_bucket"
+
+[[step]]
+do = "use_item"

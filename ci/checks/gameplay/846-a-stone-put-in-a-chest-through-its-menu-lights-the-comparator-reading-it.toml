@@ -1,0 +1,68 @@
+name = "a-stone-put-in-a-chest-through-its-menu-lights-the-comparator-reading-it"
+about = "one stone clicked into an empty chest behind a comparator. The click ends in Slot.setChanged -> ChestBlockEntity.setChanged -> BlockEntity.setChanged(level, pos, state), whose offsets 5-18 are Level.updateNeighbourForOutputSignal: the comparator is asked again, reads getRedstoneSignalFromContainer = lerpDiscrete(1/64/27) = 1, books its two-tick delay and lights the dust in front at power 1. A server whose menu writes never reach the comparator leaves the dust dark; one that reads the chest as 0 does too"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 2000
+
+# The 456 layout: facing south, the comparator at (1, 0, 0) faces NORTH, so
+# what it reads stands behind it at (1, 0, -1) and the dust it lights is in
+# front at (1, 0, 1). The container is placed empty, so its own placement —
+# a `Level.setBlock` with an analog state, which already reached the
+# comparator through `updateNeighbourForOutputSignal` — reads 0 and books
+# nothing. Only the step below can light the dust.
+# A 3-row chest menu is the chest's 27 slots and then the player's 36, so
+# hotbar 0 is menu slot 54 (see 560).
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:comparator"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, -1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, -1]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0

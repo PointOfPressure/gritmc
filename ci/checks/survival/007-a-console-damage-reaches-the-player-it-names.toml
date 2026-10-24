@@ -1,0 +1,57 @@
+name = "a-console-damage-reaches-the-player-it-names"
+about = """
+`/damage oracle 2 minecraft:generic`, from the server's own console — the
+first check in either corpus that deals damage to a player through a verb both
+servers run identically.
+
+Why the console and not an attack: `Step::Attack` cannot target its own actor
+(the actor is never sent an `add_entity` for itself), and the one entity it can
+hit is `oracle_eye`, whose damage is graded by `001` and `005`. `/damage` is
+permission level 2, so `do = "command"` cannot reach it on either server; the
+console can (`MinecraftServer.createCommandSourceStack()` carries full
+permission). `DamageCommand.lambda$register$1` builds
+`new DamageSource(Holder<DamageType>)` — no causing entity, no direct entity,
+no position — and calls `Entity.hurtServer` with it (`damage`, offsets 2..10).
+
+What vanilla puts on the wire, from the jar:
+
+* `damage_event` to the actor and the observer —
+  `ServerLevel.broadcastDamageEvent`, `LivingEntity.hurtServer` offset 324.
+  `source` is the `minecraft:damage_type` registry id, which is the index of
+  `generic` in the `registry_data` the client was sent, and `cause`/`direct`
+  are absent (wire 0);
+* `set_health` 18.0 to the actor on the next `ServerPlayer.doTick` (every
+  damage check starts at 20.0: the one before it ends with the Instant Health
+  restore);
+* `set_entity_motion` for the actor to both, from `markHurt` at offset 349 and
+  `ServerEntity.sendChanges` offsets 1202..1235 — `generic` is in
+  `minecraft:no_knockback`, so the velocity is the actor's own, unchanged;
+* `entity.player.hurt` to the OBSERVER only — `Player.playSound` passes the
+  player itself as the excluded listener (offsets 0..24), because a client
+  plays its own hurt sound locally.
+
+What would make it fail: a server with no `/damage` on its console, or with
+one that does not reach the hurt path, reports every one of the four kinds
+missing; a server that numbers the damage type by anything but the registry
+the client holds reports a `damage_event` with the wrong `source`.
+
+`console_restore` gives Instant Health IV, the restore for damage: health is
+not settable from a console, and `HealOrHarmMobEffect.applyEffectTick` heals
+`4 << 4` on the effect's one tick, capped at max health. It runs after the
+window; its `update_mob_effect`, `set_health` and `remove_mob_effect` land in
+the next scenario's settle. The hurt cooldown needs no restore — it is ten
+ticks, and the next window opens seconds later.
+
+A `kill` + respawn restore was tried first and refused by the recording
+(2026-09-30): a respawned player is back at the world spawn, the next rig is
+over 200 blocks away, and walking there starved the observer's keep-alive —
+vanilla timed it out.
+"""
+console_restore = ["effect give oracle minecraft:instant_health 1 4 true"]
+observe_from = "both"
+observe = ["damage_event", "set_health", "set_entity_motion", "set_entity_data", "sound", "entity_event"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "damage oracle 2 minecraft:generic"

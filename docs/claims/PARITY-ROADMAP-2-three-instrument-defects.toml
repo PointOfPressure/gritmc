@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 2
+slug   = "three-instrument-defects"
+title  = "The three instrument defects, ranked first because they are cheapest and because two of them will re-break what just landed"
+branch = "backfill"

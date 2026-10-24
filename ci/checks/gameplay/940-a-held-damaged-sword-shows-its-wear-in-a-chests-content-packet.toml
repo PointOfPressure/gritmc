@@ -1,0 +1,34 @@
+name = "a-held-damaged-sword-shows-its-wear-in-a-chests-content-packet"
+about = "a creative client puts a diamond sword carrying minecraft:damage 5 in its hotbar, then opens a chest with it; the inventory half of container_set_content carries the sword's DataComponentPatch back (added 1, damage, 5) — a server that keeps only the item id sends a fresh sword"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_event"]
+settle_ms = 1000
+
+# The lid repeats every 5 ticks while the chest is open; collapsed as in 090.
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# `ServerboundSetCreativeModeSlotPacket` reads the stack through
+# `OPTIONAL_UNTRUSTED_STREAM_CODEC` (the delimited patch); the content packet
+# writes it through `OPTIONAL_STREAM_CODEC` (the trusted one). The value
+# between them is `ByteBufCodecs.VAR_INT` either way. The sword is the first
+# component-bearing stack in the packet, so `trace::read_item_stack` stops
+# there and the rest of the packet is compared as its digest.
+[[setup]]
+do = "hold"
+item = "minecraft:diamond_sword"
+slot = 1
+components = [{ type = "minecraft:damage", varint = 5 }]
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

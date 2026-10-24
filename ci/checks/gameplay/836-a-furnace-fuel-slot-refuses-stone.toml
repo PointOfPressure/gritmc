@@ -1,0 +1,48 @@
+name = "a-furnace-fuel-slot-refuses-stone"
+about = "stone picked up from the hotbar and clicked onto an open furnace's fuel slot. FurnaceFuelSlot.mayPlace is menu.isFuel(stack) || isBucket(stack) and stone is neither, so Slot.safeInsert hands the whole stack back, nothing in the menu moves and broadcastChanges has no container slot to correct: the measured click is silent on container_set_slot. A server whose furnace slots are plain storage takes the stone and answers with a correction for slot 1"
+observe_from = "actor"
+observe = ["container_set_slot"]
+settle_ms = 1500
+measured_step = "silent"
+
+# THE MEASURED STEP ASSERTS A SILENCE. The first click takes the stone onto
+# the cursor and is answered; the second is the claim, and its answer is
+# nothing on `container_set_slot`. `set_cursor_item` is deliberately not
+# observed: the harness's click carries an empty predicted cursor, so both
+# servers may restate the cursor, and that is not what this check is about.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:furnace"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+
+[[step]]
+do = "container_click"
+slot = 1

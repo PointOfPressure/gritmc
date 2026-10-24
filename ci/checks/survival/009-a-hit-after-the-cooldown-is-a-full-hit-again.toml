@@ -1,0 +1,29 @@
+name = "a-hit-after-the-cooldown-is-a-full-hit-again"
+about = """
+two equal console hits 700 ms apart. A full hit sets `invulnerableTime = 20`
+(`LivingEntity.hurtServer` offset 246) and `ServerPlayer.tick` decrements it
+once a tick; the cooldown arm is taken only while it is `> 10.0f`. Fourteen
+ticks later it is 6, so the second hit takes the full arm again: TWO
+`damage_event`s, two knock-free `set_entity_motion`s, two hurt sounds, and
+health 20 -> 19 -> 18.
+
+This is `008`'s counterpart and the reason it is not redundant: `008` alone is
+satisfied by a server that refuses every hit for twenty ticks, or one that
+runs `LivingEntity.baseTick`'s decrement AND `ServerPlayer.tick`'s and so
+halves the window — `crate::playertick`'s header names that double-count as a
+five-tick cooldown. Such a server answers here exactly as vanilla does in
+`008` and differently here, or the reverse.
+"""
+console_restore = ["effect give oracle minecraft:instant_health 1 4 true"]
+observe_from = "both"
+observe = ["damage_event", "set_health", "set_entity_motion", "set_entity_data", "sound", "entity_event"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "damage oracle 1 minecraft:generic"
+settle_ms = 700
+
+[[step]]
+do = "console"
+text = "damage oracle 1 minecraft:generic"

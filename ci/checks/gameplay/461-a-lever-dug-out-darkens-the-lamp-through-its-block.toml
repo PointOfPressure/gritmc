@@ -1,0 +1,54 @@
+name = "a-lever-dug-out-darkens-the-lamp-through-its-block"
+about = "`LeverBlock.affectNeighborsAfterRemoval` — a powered lever leaving tells the neighbours of the block it was attached to, not only its own, so a lamp beside that block (two positions from the lever, which `Level.setBlock`'s own flag-1 sweep never reaches) books its 4-tick lamp tick and goes dark"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 2000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_lamp"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+# A floor lever on top of the stone: its connected direction is UP, so it
+# powers the stone strongly and the lamp beside the stone lights when it is
+# flipped — all in setup.
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[setup]]
+do = "place"
+on = [1, 1, 0]
+face = "up"
+
+[[step]]
+do = "dig"
+at = [1, 1, 0]
+face = "up"

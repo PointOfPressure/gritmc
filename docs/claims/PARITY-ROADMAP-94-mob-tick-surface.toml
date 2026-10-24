@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 94
+slug   = "mob-tick-surface"
+title  = "What a mob does on a tick, and what the inventory could not see"
+branch = "mobs-tick-surface"
+status = "written"

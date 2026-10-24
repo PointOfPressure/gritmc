@@ -1,0 +1,61 @@
+name = "an-armor-stand-is-placed-as-a-living-entity"
+about = "an armor stand is the corpus's first placed LivingEntity — it arrives with synched entity data and an attribute map, not just a position"
+observe = ["set_entity_data", "update_attributes", "sound", "block_update", "section_blocks_update"]
+settle_ms = 1500
+
+# ============================================================================
+# THIS CHECK DELIBERATELY DOES NOT OBSERVE `add_entity`, AND 788-789 DO NOT
+# EITHER. THE REASON IS ONE BYTE AND IT IS VANILLA'S, NOT OURS.
+# ============================================================================
+#
+# 773's header has the bytecode. In one line: `add_entity.y_head_rot` is
+# `LivingEntity.<init>`'s `this.random.nextFloat() * 6.2831855F` — an unseeded
+# draw in [0, 6.2832) **degrees**, i.e. wire bytes 0..4 — and no spawn path
+# that merely *positions* a living entity overwrites it, because
+# `Entity.snapTo(DDDFF)` writes `yRot` and `xRot` only. Two cold vanilla runs
+# of `ci/entity-spawn-probe.sh` recorded this stand at `y_head_rot` 3 and then
+# 2, with every other field of the same packet — including `y_rot`, which is
+# `Mth.floor((Mth.wrapDegrees(ctx.getRotation() - 180) + 22.5) / 45) * 45` and
+# came back -128 both times — byte-identical.
+#
+# So observing `add_entity` here would put this check in
+# `ci/checks/gameplay-unstable.toml` for ever, for a field no implementation
+# can match, vanilla included. That file's own header says to prefer removing
+# the cause. **The cause is removable and this branch did not remove it**:
+# `compare::exempt_item_spawn_yaw` already drops `add_entity.y_rot` for
+# `minecraft:item` on exactly this argument, and the same treatment of
+# `y_head_rot` for every non-player `LivingEntity` would let 777, 788 and 789 observe
+# `add_entity` like 773-776 do. It was left undone because it moves the
+# projection digest that `ci/checks/gameplay-floor.toml` is stamped with, and
+# that stamp belongs to another item. See `docs/PARITY-ROADMAP.md` §30.
+#
+# WHAT REPLACES IT, so this is a narrowing and not a hole:
+#
+#   * `update_attributes` is emitted by `ServerEntity`'s pairing data for a
+#     `LivingEntity` and for nothing else, and its payload is the entity's
+#     whole attribute map — which is *type-specific*. A server that spawned
+#     the wrong entity, or a non-living one, or none, cannot produce this
+#     digest.
+#   * `set_entity_data` is the synched data map, likewise type-specific.
+#   * `sound` is `SoundEvents.ARMOR_STAND_PLACE` at volume 0.75, played by
+#     `ArmorStandItem.useOn` offsets 235-245 and by nothing else here.
+#   * the two `block_update`s pin that the grass under the stand is untouched
+#     and that the stand did **not** become a block.
+#
+# What genuinely stops being measured is the 45-degree yaw snap, and that is
+# recorded rather than assumed closed: no check in this corpus pins
+# `ArmorStandItem`'s rotation arithmetic today.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:armor_stand"
+
+[[step]]
+do = "place"
+on = [1, -1, -1]
+face = "up"

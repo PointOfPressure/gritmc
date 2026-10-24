@@ -1,0 +1,59 @@
+name = "taking-an-anvil-result-uses-up-both-inputs"
+about = "taking the repaired pickaxe runs `AnvilMenu.onTake`: the ingot is consumed by `repairItemCountCost`, `cost` goes back to 0, the left slot is emptied, and for a player with infinite materials `lambda$onTake$0` is `levelEvent(1030)` with no chance of damaging the anvil — so the click is answered with level event 1030, three slots, the cursor and the cost"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data", "set_cursor_item", "level_event"]
+settle_ms = 1000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:anvil"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_pickaxe"
+components = [{ type = "minecraft:damage", varint = 200 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_ingot"
+slot = 1
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 31
+
+[[step]]
+do = "container_click"
+slot = 1
+
+[[step]]
+do = "container_click"
+slot = 2

@@ -1,0 +1,50 @@
+name = "silk-touch-lifts-the-grass-itself"
+about = """
+`minecraft:blocks/grass_block` is an `alternatives` entry whose first child
+is conditioned on `match_tool` with `minecraft:enchantments` Silk Touch at
+level 1 or more: with it the block drops itself, without it the second
+child drops dirt (`003`). A diamond shovel with Silk Touch: shovel speed 8
+on `#mineable/shovel` gives `8 / 0.6 / 30` = 0.444 a tick, so the STOP 250 ms
+in is past 0.7 and breaks the block at once; the loot roll sees the tool
+copied before `mineBlock` (`destroyBlock` offsets 201-212), the drop is
+grass_block, and the shovel's container_set_slot carries its enchantments and
+one point of damage. What would make it fail: a loot roll that does not see
+the tool's enchantments drops dirt; one that sees the tool AFTER a break
+would lose Silk Touch on a shovel's last block.
+"""
+# The console gave this rig its items; `clear` takes them back so the
+# next scenario starts empty-handed, on both servers.
+console_restore = ["clear oracle"]
+# Three blocks out: at [1, -1, 0] vanilla picked the grass block up into
+# slot 37 in one of two runs (2026-10-01) — the item pops up 0.2 a tick from
+# the hole and into the digger's pickup box — and this server has no pickup.
+observe_from = "both"
+observe = ["set_entity_data", "container_set_slot", "block_update", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "console"
+text = "clear oracle"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:diamond_shovel[enchantments={silk_touch:1}]"
+
+[[setup]]
+do = "wait"
+ms = 300
+
+[[step]]
+do = "dig"
+at = [3, -1, 0]
+face = "up"
+
+[[step]]
+do = "finish_dig"
+at = [3, -1, 0]
+face = "up"

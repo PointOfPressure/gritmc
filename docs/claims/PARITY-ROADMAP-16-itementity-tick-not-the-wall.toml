@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 16
+slug   = "itementity-tick-not-the-wall"
+title  = "`ItemEntity.tick` is not the wall, and 605/606 cannot see it — 2026-08-09, branch `item-entity-tick`"
+branch = "item-entity-tick"

@@ -1,0 +1,61 @@
+name = "a-grindstone-merges-two-worn-pickaxes"
+about = "two iron pickaxes at damage 200 and 100 in a grindstone are `GrindstoneMenu.mergeItems`: 50 + 150 of durability plus `250 * 5 / 100` = 12 of bonus is 212, so the result is the top pickaxe's copy at damage 38 — five percent where the anvil gives twelve, and no level cost because the grindstone has no data slot"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1000
+
+# GrindstoneMenu: two inputs, the result at 2, then the 36 — hotbar 0 is 30.
+# `GrindstoneMenu$2`/`$3.mayPlace` admit only damageable or enchanted
+# stacks, which an iron pickaxe is.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:grindstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_pickaxe"
+components = [{ type = "minecraft:damage", varint = 200 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_pickaxe"
+slot = 1
+components = [{ type = "minecraft:damage", varint = 100 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 31
+
+[[step]]
+do = "container_click"
+slot = 1
+

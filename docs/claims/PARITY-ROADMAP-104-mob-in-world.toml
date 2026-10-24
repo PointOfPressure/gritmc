@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 104
+slug   = "mob-in-world"
+title  = "A mob in the world: the pig and the bat stand, move, are seen and despawn in this server"
+branch = "mob-in-world"
+status = "written"

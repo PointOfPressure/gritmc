@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 14
+slug   = "container-throw-exemption"
+title  = "The container throw, and an exemption one byte wide — 2026-08-09, branch `gameplay-container-throw`"
+branch = "gameplay-container-throw"

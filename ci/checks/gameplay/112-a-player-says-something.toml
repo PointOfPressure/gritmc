@@ -1,0 +1,9 @@
+name = "a-player-says-something"
+about = "a chat message reaches the other player — the serverbound chat packet exists and broadcasts"
+observe_from = "observer"
+observe = ["player_chat"]
+settle_ms = 1500
+
+[[step]]
+do = "say"
+text = "hello from the corpus"

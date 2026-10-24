@@ -1,0 +1,27 @@
+name = "torch-falls-with-its-support"
+about = "breaking the block under a torch takes the torch with it — updateNeighbourShapes, the half of a block update that is not redstone"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:torch"
+
+[[setup]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "dig"
+at = [1, 0, 0]
+face = "up"

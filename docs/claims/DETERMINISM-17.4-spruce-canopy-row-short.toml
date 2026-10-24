@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 17.4
+slug   = "spruce-canopy-row-short"
+title  = "The spruce canopy was one row short on two thirds of every spruce tree — 7,490 -> 4,111, and the floor of zero it was briefed against was a missed lookup (2026-08-10)"
+branch = "worldgen-spruce-leaves"

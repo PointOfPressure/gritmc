@@ -1,0 +1,30 @@
+name = "console-xp-points-carry-into-a-level"
+about = """
+`xp add oracle 10` from the console reaches the target as ONE
+`set_experience`: level 1, total 10, progress 3/9 — the first seven points
+fill level 0 and the next three are a third of level 1
+
+`ExperienceCommand.addExperience` calls `ServerPlayer.giveExperiencePoints`,
+which runs `Player.giveExperiencePoints`' carry loop and sets
+`lastSentExp = -1`; the packet itself goes out from `ServerPlayer.doTick`
+(`totalExperience != lastSentExp`). `getXpNeededForNextLevel` is `7 + 2 *
+level` below 15, so a server with the wrong curve, one that sent the points
+as levels, or one that reported the total in the level field, moves the
+three numbers. Level 1 is not a fifth level, so no `player.levelup` sound:
+`sound` is observed so that a server playing one anyway is a red.
+
+The reply goes to the console's log only, so `chat` is silent on both.
+
+Level 2, through the console. The restore puts the level and the progress
+back to zero; the TOTAL stays at 10 on both servers, because
+`setExperiencePoints` and `setExperienceLevels` never touch
+`totalExperience`, and vanilla offers no command that does.
+"""
+console_restore = ["xp set oracle 0 levels", "xp set oracle 0 points"]
+observe_from = "both"
+observe = ["set_experience", "sound", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "xp add oracle 10"

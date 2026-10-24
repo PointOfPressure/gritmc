@@ -1,0 +1,65 @@
+name = "an-egg-thrown-at-the-ground-breaks"
+about = "an egg thrown straight down from a standing player breaks on the ground under it on its second tick: entity event 3 on the egg, then its removal"
+observe_from = "actor"
+observe = ["entity_event", "remove_entities"]
+within = 1056
+settle_ms = 1500
+
+# THE MECHANISM, read from the pinned jar (`javap -p -c -constants`):
+#
+#   EggItem.use             7-47  playSound(null, player xyz, EGG_THROW, PLAYERS,
+#                                 0.5F, 0.4F / (level.random.nextFloat() * 0.4F
+#                                 + 0.8F)) — a drawn pitch, not observed here
+#                          63-77  spawnProjectileFromRotation(ThrownEgg::new, level,
+#                                 stack, player, 0F, 1.5F, 1F): the egg at
+#                                 (x, eyeY - 0.1, z), shootFromRotation — 1.5
+#                                 along the look plus three triangle(0, 0.0172)
+#                                 draws on the egg's own unseeded random
+#   ThrowableProjectile.tick      gravity (0.03), drag (0.99), the hit test along
+#                                 the new velocity, setPos
+#   tick 1                        from eyeY - 0.1 = 1.52 down ~1.515: ends ~0.005
+#                                 above the ground, no block crossed; the owner
+#                                 is not hittable until the egg has left its box
+#   tick 2                        the segment crosses y = 0: the clip hits the
+#                                 ground block's top
+#   ThrownEgg.onHit        15-162 nextInt(8) == 0 -> a chick (nextInt(32) == 0
+#                                 -> four) — the egg's own unseeded random, so a
+#                                 chick hatches in about one run in eight, its
+#                                 add_entity not observed here
+#                         168-178 broadcastEntityEvent(this, 3); discard()
+#
+# What every run agrees on is the break: entity event 3 on the egg and the
+# egg's removal, two ticks after it was thrown. The egg's add_entity is NOT
+# observed — its rotation bytes and velocity come from the triangle draws.
+#
+# THE RIG. Thrown straight down (pitch 90) so the inaccuracy (under a degree)
+# cannot carry it off the block under the player. 1040 blocks out on z,
+# beyond every other rig in 640-654, because a hatched chick WALKS, and it is
+# the last check of this block for the same reason (README, "A check that
+# leaves a live mob behind is a check about the checks after it"). A chick
+# hatches in about one run in eight; how far it strays in the rest of a
+# corpus run has not been measured.
+
+[[setup]]
+do = "walk"
+to = [0.5, 0.0, -1040.5]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 90.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:egg"
+
+[[setup]]
+do = "wait"
+ms = 500
+
+[[step]]
+do = "use_item"

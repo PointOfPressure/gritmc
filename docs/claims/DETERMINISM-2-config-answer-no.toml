@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 2
+slug   = "config-answer-no"
+title  = "The configuration answer is NO, and this is the record of it"
+branch = "backfill"

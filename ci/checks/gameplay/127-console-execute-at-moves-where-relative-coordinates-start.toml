@@ -1,0 +1,29 @@
+name = "console-execute-at-moves-where-relative-coordinates-start"
+about = """
+`execute at oracle_eye run tp oracle ~ ~ ~` from the console sends the actor
+one `player_position` whose coordinates are RELATIVE — the delta from the
+actor to the observer — with all eight position, delta and rotation bits of
+the relative mask set
+
+`execute at` moves the source's position (and rotation and level) to the
+entity's, so `~ ~ ~` resolves to the observer's feet. `TeleportCommand.
+teleportToPos` with no rotation hands `performTeleport` the target's own
+rotation and `getRelatives` sets X, Y, Z, their three DELTA bits and
+`Relative.ROTATION`, so the packet's position fields are `observer - actor`
+and its angles are zero. A server that resolved `~` against the console's own
+position (the level spawn) sends a different delta; one that ignored the
+relative bits sends absolute coordinates. Both move the `at` field, which
+this harness reports relative to the rig, and the rest of the body is
+digested.
+
+Level 2, through the console. The restore teleports the actor onto itself:
+the next scenario walks both players to its own rig.
+"""
+console_restore = ["tp oracle oracle"]
+observe_from = "actor"
+observe = ["player_position", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "execute at oracle_eye run tp oracle ~ ~ ~"

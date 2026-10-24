@@ -1,0 +1,13 @@
+name = "place-block"
+about = "a held block placed on the ground comes back as that block"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

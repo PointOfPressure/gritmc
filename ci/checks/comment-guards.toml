@@ -1,0 +1,123 @@
+# Comments that claim a guard the code does not have.
+#
+# A RATCHET, in the shape of `t1-known-red.toml`, not a pass list.
+# `ci/check-comment-guards.py` reads this. A branch may LOWER `total` by
+# repairing an instance; raising it means adding a line below that says which
+# comment is wrong and why it is being left. A declared instance that stops
+# being found is as red as a new one — the same two-way exactness
+# `t1-known-red.toml` uses, and for the same reason: a stale declaration reads
+# as authoritative and is worse than none.
+#
+# # WHY THIS FILE EXISTS
+#
+# `docs/PARITY-ROADMAP.md` §73.8 tabulated four comments in this repo that
+# named a guard the code did not have, and recorded as the finding that **none
+# was found by a check — all four were found by reading.** A comment is the one
+# artefact here that nothing is run against, and it is the artefact a reader
+# trusts most, because it is the only one that says what the code is *for*.
+#
+# Three of the four were repaired on `t1-audit` by rewriting the prose. That
+# closed the instances and not the class: nothing stopped a fifth being
+# written the next day. `ci/check-comment-guards.py` is the class check, and
+# `ci/comment-guards-falsify.sh` re-introduces all four originals to
+# demonstrate it catches each one by name.
+#
+# MEASURED 2026-08-18 on `t1-positive-controls` (base `t1-audit`, 825b327c9)
+# by `ci/check-comment-guards.py --emit`. Two stood.
+#
+# RE-MEASURED 2026-08-19 on `work-method`, against `main`, when this checker
+# was brought onto `main` from that branch. Four became two, and neither
+# movement was a repair to a comment:
+#
+# * `ci/handoff.sh`'s dead skip guard is GONE, because the guard was repaired
+#   rather than the comment. `$SKIPS` is structurally 0 — the tree's only two
+#   literal shell emitters are called by nothing, and the paragraph claiming
+#   `ci/dump-flat-preset.sh` was a live emitter was wrong twice over: that
+#   script prints a different string and then exits 1. The counter stays as a
+#   cheap arm that would fire the day somebody adds an emitter; what has gone
+#   is the literal words "0 skips" from the GREEN and MERGED verdicts, which
+#   told every reader of every merge that the gate had checked something it
+#   structurally could not check.
+# * `crates/rustmc-worldgen/tests/probe_placement_vs_servers.rs` moved 62 -> 63.
+#   The tree moved under the declaration, not the defect.
+#
+# One new instance appeared and was a FALSE POSITIVE, which is recorded here
+# because it changed the checker rather than this file:
+# `ci/plugin-hook-cost.sh:70` greps a Rust SOURCE file to assert a control
+# worktree does not already carry the hook. No log is involved and cargo's
+# output capture is irrelevant, so the rule now declines a grep whose target
+# names a source file. That is the second narrowing of this rule and it was
+# found the same way as the first — by the rule reporting something.
+
+total = 4
+
+[allowed]
+
+# §73.8's fourth instance, and the only one of the four still live. §73.7 had
+# to count it as one of "2 binaries carrying a control in the file" and then
+# write "and only one of them is real". Left rather than repaired because the
+# repair is a judgement about what the probe should assert, and this lane's
+# §84.6 makes it; the entry moves out when that lands.
+"crates/rustmc-worldgen/tests/probe_placement_vs_servers.rs:62" = "CLAIM-WITHOUT-ASSERTION: `shipwreck_is_the_control` names itself a check and its body asserts nothing"
+
+# NOT one of §73.8's four. Found by this check on its first run over the tree,
+# which is the argument for the check: the doc promises a panic on a poisoned
+# lock and the body is
+#
+#     tick_mutex().lock().unwrap_or_else(std::sync::PoisonError::into_inner)
+#
+# — which is the line you write precisely so that it does NOT panic. A caller
+# reading the doc would wrap it in `catch_unwind` for an event that cannot
+# happen. Declared rather than fixed in the same commit as the checker, so
+# that the checker's first run is recorded against the tree as it was found.
+"crates/rustmc-server/src/broadcast.rs:173" = "DOCUMENTED-PANIC-WITHOUT-PANIC: `# Panics` over `pub fn tick_lock() -> MutexGuard<'static, ()> {` whose body has no panicking path"
+
+# A FALSE POSITIVE, declared on train-c (2026-09-30): light-engine-2's
+# `light_region` documents `# Panics` on non-convergence, and it does panic —
+# through `light_region_dimension` -> `drain`, whose `assert!(guard <=
+# MAX_DRAIN, ...)` is two calls down. The rule reads only the documented
+# function's own body. The doc is true; the reader is shallow.
+"crates/rustmc-server/src/light_incremental.rs:1631" = "DOCUMENTED-PANIC-WITHOUT-PANIC: `# Panics` over `pub fn light_region(region: &Region, props: &LightProps) -> ` whose body has no panicking path"
+
+# A FALSE POSITIVE, declared on train-c over main 3953: `Reader::slice` is
+# `&self.string[from..to]`, and string slicing panics off a char boundary —
+# exactly what its `# Panics` says. The rule does not count indexing as a
+# panicking path.
+"crates/rustmc-server/src/cmdreader.rs:174" = "DOCUMENTED-PANIC-WITHOUT-PANIC: `# Panics` over `pub fn slice(&self, from: usize, to: usize) -> &'a str {` whose body has no panicking path"
+
+# **The live merge gate's copy of the dead skip guard — STILL HERE on the
+# landing tree, 2026-09-04.** The ledger this stack folds (work-method,
+# 2026-08-19) dropped this entry because that branch repaired the guard; main
+# meanwhile kept `$SKIPS` on purpose and wrote the paragraph at
+# `ci/handoff.sh:1555-1612` saying why ("left computed and left in the verdict
+# ... it would start working the day a shell stage prints the line"). The
+# stack keeps main's decision, so the instance is back in the ledger with the
+# evidence: `SKIPS=$(grep -c "skipping: no vanilla" "$LOG")` over a log written
+# by `ci/t0.sh`; two Rust `println!`s write that string and both are in tests,
+# so cargo discards them; the tree's only shell emitters,
+# `ci/village-pieces.sh` and `ci/village-oracle.sh`, are called by nothing.
+# **The line number was 1547 and the site is at 1639** — stale on 2dc2e0776
+# before this landing pass touched `ci/handoff.sh` at all, verified by
+# `git show 2dc2e0776:ci/handoff.sh | grep -n "skipping: no vanilla"`, which
+# also says 1639. So the entry was written against a `handoff.sh` that has
+# since grown 92 lines above the guard, and nothing noticed because every T0
+# on this stack reddened before reaching `ci/check-comment-guards.py`. A
+# ledger keyed by line number goes stale on any edit above its site; this one
+# is checked in both directions — a declaration not found is as red as an
+# undeclared guard — which is the only reason it is recoverable at all.
+
+# **A grep of the process table, not of a log — declared, 2026-09-04.**
+# `ci/corpus-healthy-baseline.sh:80` is `pgrep -f "oracle-runner record"`:
+# the pattern is a COMMAND LINE the recorder runs under, and the producer is
+# the process itself, which is why cargo's capture of a passing test's stdout
+# has nothing to say about it. The class check cannot tell `pgrep` from
+# `grep`; it is right that 'oracle-runner record' is also a Rust print string,
+# and wrong about what is being grepped. Came in with `excl2`
+# (ci/corpus-healthy-baseline.sh, 2026-08-19); left as-is because the line is
+# correct, and this entry is what says so.
+
+# RETIRED ON train-c (2026-09-30): `ci/handoff.sh:1639` (the `skipping: no
+# vanilla` counter, now at :1710 after main's stage 7) and
+# `ci/corpus-healthy-baseline.sh:80` (`pgrep -f "oracle-runner record"`) are
+# no longer reported by the GREP-PATTERN-ONLY-CAPTURED-PRODUCER rule at all
+# (`--emit` lists neither), so their declarations were stale. total 4 -> 3.

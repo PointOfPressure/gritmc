@@ -1,0 +1,24 @@
+name = "digging-a-tall-flower-takes-both-halves"
+about = "breaking the bottom of a sunflower removes the top as well — the third double-block family and the one whose `updateShape` the *table* can hold, because DoublePlantBlock's only non-self answer is air; so this check is the one that says setPlacedBy and the extracted shape table work together rather than either alone, and it fails for a server that placed only the lower half just as loudly as for one that never cascaded"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:sunflower"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "dig"
+at = [1, 0, 0]
+face = "up"

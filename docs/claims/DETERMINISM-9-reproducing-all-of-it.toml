@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 9
+slug   = "reproducing-all-of-it"
+title  = "Reproducing all of it"
+branch = "backfill"

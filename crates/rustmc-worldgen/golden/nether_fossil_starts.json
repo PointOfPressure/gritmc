@@ -1,0 +1,666 @@
+{
+ "seed": 20260722,
+ "source": "vanilla chunk NBT structures.starts.nether_fossil.Children[]",
+ "starts": [
+  {
+   "chunk": [
+    56,
+    56
+   ],
+   "template": "nether_fossils/fossil_12",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    910,
+    60,
+    908
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    907,
+    60,
+    906,
+    910,
+    63,
+    908
+   ]
+  },
+  {
+   "chunk": [
+    56,
+    58
+   ],
+   "template": "nether_fossils/fossil_13",
+   "rotation": "COUNTERCLOCKWISE_90",
+   "pos": [
+    896,
+    61,
+    940
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    896,
+    61,
+    937,
+    901,
+    65,
+    940
+   ]
+  },
+  {
+   "chunk": [
+    56,
+    60
+   ],
+   "template": "nether_fossils/fossil_10",
+   "rotation": "COUNTERCLOCKWISE_90",
+   "pos": [
+    905,
+    86,
+    969
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    905,
+    86,
+    967,
+    905,
+    92,
+    969
+   ]
+  },
+  {
+   "chunk": [
+    56,
+    64
+   ],
+   "template": "nether_fossils/fossil_12",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    911,
+    64,
+    1032
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    908,
+    64,
+    1030,
+    911,
+    67,
+    1032
+   ]
+  },
+  {
+   "chunk": [
+    56,
+    72
+   ],
+   "template": "nether_fossils/fossil_8",
+   "rotation": "NONE",
+   "pos": [
+    907,
+    51,
+    1166
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    907,
+    51,
+    1166,
+    909,
+    55,
+    1166
+   ]
+  },
+  {
+   "chunk": [
+    58,
+    56
+   ],
+   "template": "nether_fossils/fossil_1",
+   "rotation": "COUNTERCLOCKWISE_90",
+   "pos": [
+    930,
+    93,
+    897
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    930,
+    93,
+    894,
+    934,
+    96,
+    897
+   ]
+  },
+  {
+   "chunk": [
+    58,
+    64
+   ],
+   "template": "nether_fossils/fossil_11",
+   "rotation": "NONE",
+   "pos": [
+    928,
+    70,
+    1026
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    928,
+    70,
+    1026,
+    932,
+    74,
+    1032
+   ]
+  },
+  {
+   "chunk": [
+    58,
+    68
+   ],
+   "template": "nether_fossils/fossil_11",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    939,
+    96,
+    1091
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    935,
+    96,
+    1085,
+    939,
+    100,
+    1091
+   ]
+  },
+  {
+   "chunk": [
+    58,
+    70
+   ],
+   "template": "nether_fossils/fossil_7",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    942,
+    38,
+    1127
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    939,
+    38,
+    1123,
+    942,
+    43,
+    1127
+   ]
+  },
+  {
+   "chunk": [
+    60,
+    56
+   ],
+   "template": "nether_fossils/fossil_13",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    975,
+    79,
+    905
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    972,
+    79,
+    900,
+    975,
+    83,
+    905
+   ]
+  },
+  {
+   "chunk": [
+    60,
+    62
+   ],
+   "template": "nether_fossils/fossil_1",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    973,
+    57,
+    998
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    970,
+    57,
+    994,
+    973,
+    60,
+    998
+   ]
+  },
+  {
+   "chunk": [
+    60,
+    66
+   ],
+   "template": "nether_fossils/fossil_6",
+   "rotation": "COUNTERCLOCKWISE_90",
+   "pos": [
+    960,
+    79,
+    1069
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    960,
+    79,
+    1063,
+    964,
+    83,
+    1069
+   ]
+  },
+  {
+   "chunk": [
+    62,
+    60
+   ],
+   "template": "nether_fossils/fossil_8",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    996,
+    100,
+    962
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    994,
+    100,
+    962,
+    996,
+    104,
+    962
+   ]
+  },
+  {
+   "chunk": [
+    64,
+    64
+   ],
+   "template": "nether_fossils/fossil_14",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    1037,
+    55,
+    1037
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1031,
+    55,
+    1032,
+    1037,
+    61,
+    1037
+   ]
+  },
+  {
+   "chunk": [
+    64,
+    66
+   ],
+   "template": "nether_fossils/fossil_13",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    1027,
+    93,
+    1061
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1024,
+    93,
+    1056,
+    1027,
+    97,
+    1061
+   ]
+  },
+  {
+   "chunk": [
+    64,
+    68
+   ],
+   "template": "nether_fossils/fossil_14",
+   "rotation": "COUNTERCLOCKWISE_90",
+   "pos": [
+    1032,
+    85,
+    1089
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1032,
+    85,
+    1083,
+    1037,
+    91,
+    1089
+   ]
+  },
+  {
+   "chunk": [
+    64,
+    72
+   ],
+   "template": "nether_fossils/fossil_10",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    1032,
+    83,
+    1167
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1030,
+    83,
+    1167,
+    1032,
+    89,
+    1167
+   ]
+  },
+  {
+   "chunk": [
+    66,
+    56
+   ],
+   "template": "nether_fossils/fossil_2",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    1062,
+    44,
+    909
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1058,
+    44,
+    905,
+    1062,
+    44,
+    909
+   ]
+  },
+  {
+   "chunk": [
+    66,
+    58
+   ],
+   "template": "nether_fossils/fossil_12",
+   "rotation": "CLOCKWISE_90",
+   "pos": [
+    1071,
+    79,
+    931
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1069,
+    79,
+    931,
+    1071,
+    82,
+    934
+   ]
+  },
+  {
+   "chunk": [
+    66,
+    60
+   ],
+   "template": "nether_fossils/fossil_11",
+   "rotation": "CLOCKWISE_90",
+   "pos": [
+    1071,
+    73,
+    964
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1065,
+    73,
+    964,
+    1071,
+    77,
+    968
+   ]
+  },
+  {
+   "chunk": [
+    66,
+    62
+   ],
+   "template": "nether_fossils/fossil_3",
+   "rotation": "NONE",
+   "pos": [
+    1066,
+    77,
+    1007
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1066,
+    77,
+    1007,
+    1068,
+    80,
+    1008
+   ]
+  },
+  {
+   "chunk": [
+    66,
+    64
+   ],
+   "template": "nether_fossils/fossil_2",
+   "rotation": "COUNTERCLOCKWISE_90",
+   "pos": [
+    1058,
+    79,
+    1026
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1058,
+    79,
+    1022,
+    1062,
+    79,
+    1026
+   ]
+  },
+  {
+   "chunk": [
+    66,
+    70
+   ],
+   "template": "nether_fossils/fossil_5",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    1067,
+    94,
+    1125
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1066,
+    94,
+    1125,
+    1067,
+    98,
+    1125
+   ]
+  },
+  {
+   "chunk": [
+    68,
+    60
+   ],
+   "template": "nether_fossils/fossil_9",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    1090,
+    78,
+    973
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1088,
+    78,
+    969,
+    1090,
+    82,
+    973
+   ]
+  },
+  {
+   "chunk": [
+    68,
+    62
+   ],
+   "template": "nether_fossils/fossil_1",
+   "rotation": "NONE",
+   "pos": [
+    1098,
+    73,
+    1000
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1098,
+    73,
+    1000,
+    1101,
+    76,
+    1004
+   ]
+  },
+  {
+   "chunk": [
+    68,
+    64
+   ],
+   "template": "nether_fossils/fossil_10",
+   "rotation": "COUNTERCLOCKWISE_90",
+   "pos": [
+    1091,
+    82,
+    1026
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1091,
+    82,
+    1024,
+    1091,
+    88,
+    1026
+   ]
+  },
+  {
+   "chunk": [
+    70,
+    56
+   ],
+   "template": "nether_fossils/fossil_6",
+   "rotation": "NONE",
+   "pos": [
+    1129,
+    44,
+    907
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1129,
+    44,
+    907,
+    1135,
+    48,
+    911
+   ]
+  },
+  {
+   "chunk": [
+    70,
+    68
+   ],
+   "template": "nether_fossils/fossil_5",
+   "rotation": "NONE",
+   "pos": [
+    1130,
+    78,
+    1094
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1130,
+    78,
+    1094,
+    1131,
+    82,
+    1094
+   ]
+  },
+  {
+   "chunk": [
+    70,
+    70
+   ],
+   "template": "nether_fossils/fossil_7",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    1131,
+    36,
+    1120
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1128,
+    36,
+    1116,
+    1131,
+    41,
+    1120
+   ]
+  },
+  {
+   "chunk": [
+    72,
+    66
+   ],
+   "template": "nether_fossils/fossil_10",
+   "rotation": "CLOCKWISE_180",
+   "pos": [
+    1158,
+    72,
+    1064
+   ],
+   "ground_level_delta": 0,
+   "bbox": [
+    1156,
+    72,
+    1064,
+    1158,
+    78,
+    1064
+   ]
+  }
+ ]
+}

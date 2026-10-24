@@ -1,0 +1,9 @@
+name = "server-answers-list-uuids"
+about = "a subcommand is its own node with its own answer — the registry is a tree, not a string match"
+observe_from = "actor"
+observe = ["chat"]
+settle_ms = 1500
+
+[[step]]
+do = "command"
+text = "list uuids"

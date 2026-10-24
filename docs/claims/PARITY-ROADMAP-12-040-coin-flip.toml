@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 12
+slug   = "040-coin-flip"
+title  = "`040`'s step attribution was a coin flip, and the window is where it lived — 2026-08-09, branch `chat-commands`"
+branch = "chat-commands"

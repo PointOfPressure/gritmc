@@ -1,0 +1,36 @@
+name = "a-looted-enchanted-book-shift-clicked-out-keeps-its-enchantment"
+about = "934's seeded dungeon chest (simple_dungeon, LootTableSeed 7: an enchanted book storing projectile_protection II in chest slot 2), then a shift-click on that book. ChestMenu.quickMoveStack moves it with moveItemStackTo(stack, 27, 63, true) into the player's inventory, and broadcastChanges sends a container_set_slot for the inventory slot carrying the whole stack — ItemStack.OPTIONAL_STREAM_CODEC, so minecraft:stored_enchantments travels with it. What would make this fail: a click handler that rebuilds the moved stack from its item and count (ItemStack::new) instead of splitting it sends a blank enchanted book into the inventory, and 934 alone cannot see that because it never moves the stack."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot"]
+settle_ms = 1000
+
+# The lid repeats every 5 ticks while the chest is open; collapsed as in 090.
+collapse_repeats = ["block_event"]
+
+# 934's chest exactly: `block_entity_data` on the held chest (see 930).
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+components = [
+    { type = "minecraft:block_entity_data", block_entity = "minecraft:chest", strings = { LootTable = "minecraft:chests/simple_dungeon" }, longs = { LootTableSeed = 7 } },
+]
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# THE MEASURED STEP: chest slot 2 holds the book.
+[[step]]
+do = "container_click"
+slot = 2
+input = "quick_move"

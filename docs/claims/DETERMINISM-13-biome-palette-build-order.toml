@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 13
+slug   = "biome-palette-build-order"
+title  = "A determinism hazard that was not one: the biome palette's build order"
+branch = "backfill"

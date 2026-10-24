@@ -1,0 +1,13 @@
+name = "tall-grass-places-both-halves"
+about = "placing tall grass puts down two blocks — and the class that does it is `DoublePlantBlock` itself, not the `TallFlowerBlock` subclass 237 and 238 exercise. `set_placed_by.json` lists seven classes whose `setPlacedBy` writes a block at an offset other than its own, and before this check the corpus placement-tested two of them (`DoorBlock` at 130, `BedBlock` at 230). This is the third, and it is the base class of the double-plant family rather than a leaf of it, so a rule keyed on the leaf gets it wrong"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:tall_grass"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

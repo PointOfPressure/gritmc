@@ -1,0 +1,32 @@
+name = "console-rotate-turns-each-target-to-the-angles-given"
+about = """
+`rotate oracle 90 -30` then `rotate oracle_eye -45 10` from the console send
+each target one `player_rotation` carrying the two absolute angles with both
+relative flags clear, and each observer sees the other's head turn
+
+`RotateCommand.rotate` resolves the rotation against the SOURCE and calls
+`Entity.forceSetRotation(yRot, yRelative, xRot, xRelative)`, which
+`ServerPlayer` overrides to send `ClientboundPlayerRotationPacket` — not a
+`player_position`, so no teleport id is spent. The entity's new yaw then
+reaches the other player through the tracker as a `move_entity_rot` and a
+`rotate_head`. A server that answered `/rotate` with a teleport, swapped the
+angles, sent a relative flag for an absolute angle, or never moved the
+tracked rotation, moves the observation. The success lines are the
+console's log, so `chat` is silent.
+
+Level 2, through the console. The harness resets both players' facing before
+every scenario, so the restore only needs to be declared: it sets
+`send_command_feedback` to the value it already has.
+"""
+console_restore = ["gamerule send_command_feedback true"]
+observe_from = "both"
+observe = ["player_rotation", "player_position", "move_entity_rot", "rotate_head", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "rotate oracle 90 -30"
+
+[[step]]
+do = "console"
+text = "rotate oracle_eye -45 10"

@@ -1,0 +1,513 @@
+# ci/checks/mob-blind.toml — what each mob-bearing check can and
+# cannot see, measured, with its N.
+#
+# Written by `ci/mob-observability.py --ledger`. `--check` refuses if a
+# mob-bearing check in ci/checks/gameplay/ has no entry here, which is
+# the state that would let a new mob check observe two announcement
+# kinds, go green, and be read as mob parity.
+#
+# `runs` is DISTINCT recordings and `files` is how many files hold
+# them. They differ because the reference cache serves one recording
+# to several trees and copied trees carry older ones. Quote `runs`.
+#
+# `compared` is stable and `emitted` is not, and that IS the finding:
+# the check is stable because it cannot see the mob. Do not read the
+# emitted range as a divergence — it is one server disagreeing with
+# itself across runs, which is why `spawn-egg-makes-a-mob` sits in
+# ci/checks/gameplay-floor.toml as well.
+
+[[blind]]
+name = "spawn-egg-makes-a-mob"
+file = "080-spawn-egg-makes-a-mob.toml"
+observe = ["add_entity", "set_entity_data"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [6, 6]
+emitted = [37, 37]
+emitted_distinct = 1
+behaviour_emitted = [10, 10]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+reports = 47
+declared_verdicts = { absent = 35, diverge = 12 }
+strict_verdicts = { diverge = 47 }
+reference_obs = [6]
+subject_obs = [0, 6]
+# What is red is the ANNOUNCEMENT. `observe` carries no
+# behaviour channel, so no verdict on this check is about
+# per-kind behaviour, which is what entities.rs:19 names.
+
+[[blind]]
+name = "a-spawned-pig-syncs-its-movement-speed-a-tick-later"
+file = "081-a-spawned-pig-syncs-its-movement-speed-a-tick-later.toml"
+observe = ["update_attributes"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [2, 2]
+emitted = [51, 51]
+emitted_distinct = 1
+behaviour_emitted = [25, 25]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+reports = 12
+declared_verdicts = { match = 12 }
+strict_verdicts = { diverge = 12 }
+reference_obs = [2]
+subject_obs = [2]
+# What is red is the ANNOUNCEMENT. `observe` carries no
+# behaviour channel, so no verdict on this check is about
+# per-kind behaviour, which is what entities.rs:19 names.
+
+[[blind]]
+name = "a-bat-left-far-away-despawns-and-a-pig-does-not"
+file = "082-a-bat-left-far-away-despawns-and-a-pig-does-not.toml"
+observe = ["update_attributes"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [406, 406]
+emitted_distinct = 1
+behaviour_emitted = [72, 72]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+reports = 12
+declared_verdicts = { diverge = 9, match = 3 }
+strict_verdicts = { diverge = 12 }
+reference_obs = [1, 2, 3]
+subject_obs = [1, 2]
+# What is red is the ANNOUNCEMENT. `observe` carries no
+# behaviour channel, so no verdict on this check is about
+# per-kind behaviour, which is what entities.rs:19 names.
+
+[[blind]]
+name = "a-tempted-pig-in-a-pit-turns-its-head-after-the-player"
+file = "083-a-tempted-pig-in-a-pit-turns-its-head-after-the-player.toml"
+observe = ["rotate_head", "move_entity"]
+observes_behaviour = true
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [7, 7]
+emitted_distinct = 1
+behaviour_emitted = [2, 2]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+reports = 9
+declared_verdicts = { diverge = 1, match = 8 }
+strict_verdicts = { diverge = 2, match = 7 }
+reference_obs = [1, 30]
+subject_obs = [1]
+# What is red is the ANNOUNCEMENT. `observe` carries no
+# behaviour channel, so no verdict on this check is about
+# per-kind behaviour, which is what entities.rs:19 names.
+
+[[blind]]
+name = "a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put"
+file = "084-a-pig-tempted-from-outside-its-pit-turns-its-head-and-stays-put.toml"
+observe = ["rotate_head", "move_entity"]
+observes_behaviour = true
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [9, 9]
+emitted_distinct = 1
+behaviour_emitted = [2, 2]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+reports = 9
+declared_verdicts = { match = 9 }
+strict_verdicts = { diverge = 3, match = 6 }
+reference_obs = [1]
+subject_obs = [1]
+# What is red is the ANNOUNCEMENT. `observe` carries no
+# behaviour channel, so no verdict on this check is about
+# per-kind behaviour, which is what entities.rs:19 names.
+
+[[blind]]
+name = "a-carrot-on-a-stick-tempts-a-pig-through-its-own-goal"
+file = "085-a-carrot-on-a-stick-tempts-a-pig-through-its-own-goal.toml"
+observe = ["rotate_head", "move_entity"]
+observes_behaviour = true
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [7, 7]
+emitted_distinct = 1
+behaviour_emitted = [2, 2]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+reports = 9
+declared_verdicts = { match = 9 }
+strict_verdicts = { diverge = 3, match = 6 }
+reference_obs = [1]
+subject_obs = [1]
+# What is red is the ANNOUNCEMENT. `observe` carries no
+# behaviour channel, so no verdict on this check is about
+# per-kind behaviour, which is what entities.rs:19 names.
+
+[[blind]]
+name = "a-bat-hatched-under-glass-takes-off-at-once"
+file = "086-a-bat-hatched-under-glass-takes-off-at-once.toml"
+observe = ["level_event", "set_entity_data"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [4, 4]
+emitted = [23, 23]
+emitted_distinct = 1
+behaviour_emitted = [7, 7]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+reports = 9
+declared_verdicts = { diverge = 1, match = 8 }
+strict_verdicts = { diverge = 9 }
+reference_obs = [4]
+subject_obs = [4]
+# What is red is the ANNOUNCEMENT. `observe` carries no
+# behaviour channel, so no verdict on this check is about
+# per-kind behaviour, which is what entities.rs:19 names.
+
+[[blind]]
+name = "a-roosting-bat-sleeps-through-a-player-four-and-a-half-blocks-away"
+file = "087-a-roosting-bat-sleeps-through-a-player-four-and-a-half-blocks-away.toml"
+observe = ["level_event", "set_entity_data"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [2, 2]
+emitted = [16, 16]
+emitted_distinct = 1
+behaviour_emitted = [2, 2]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+reports = 9
+declared_verdicts = { diverge = 1, match = 8 }
+strict_verdicts = { diverge = 9 }
+reference_obs = [2]
+subject_obs = [2]
+# What is red is the ANNOUNCEMENT. `observe` carries no
+# behaviour channel, so no verdict on this check is about
+# per-kind behaviour, which is what entities.rs:19 names.
+
+[[blind]]
+name = "a-roosting-bat-wakes-when-a-player-comes-within-four-blocks"
+file = "088-a-roosting-bat-wakes-when-a-player-comes-within-four-blocks.toml"
+observe = ["level_event"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [22, 22]
+emitted_distinct = 1
+behaviour_emitted = [15, 15]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+reports = 9
+declared_verdicts = { match = 9 }
+strict_verdicts = { diverge = 9 }
+reference_obs = [1]
+subject_obs = [1]
+# What is red is the ANNOUNCEMENT. `observe` carries no
+# behaviour channel, so no verdict on this check is about
+# per-kind behaviour, which is what entities.rs:19 names.
+
+[[blind]]
+name = "a-pig-nine-blocks-away-is-still-tempted"
+file = "089-a-pig-nine-blocks-away-is-still-tempted.toml"
+observe = ["rotate_head", "move_entity"]
+observes_behaviour = true
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [7, 7]
+emitted_distinct = 1
+behaviour_emitted = [2, 2]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+reports = 9
+declared_verdicts = { match = 9 }
+strict_verdicts = { diverge = 3, match = 6 }
+reference_obs = [1]
+subject_obs = [1]
+# What is red is the ANNOUNCEMENT. `observe` carries no
+# behaviour channel, so no verdict on this check is about
+# per-kind behaviour, which is what entities.rs:19 names.
+
+[[blind]]
+name = "feeding-a-pig-its-food-puts-it-in-love"
+file = "091-feeding-a-pig-its-food-puts-it-in-love.toml"
+observe = ["entity_event", "animate"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [2, 2]
+emitted = [8, 8]
+emitted_distinct = 1
+behaviour_emitted = [1, 1]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-pig-already-in-love-will-not-eat-again"
+file = "092-a-pig-already-in-love-will-not-eat-again.toml"
+observe = ["entity_event", "animate"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [2, 2]
+emitted = [9, 9]
+emitted_distinct = 1
+behaviour_emitted = [1, 1]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-pig-spawn-egg-used-on-a-pig-hatches-a-baby"
+file = "093-a-pig-spawn-egg-used-on-a-pig-hatches-a-baby.toml"
+observe = ["set_entity_data", "animate"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [3, 3]
+emitted = [17, 17]
+emitted_distinct = 1
+behaviour_emitted = [5, 5]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-golden-dandelion-locks-a-baby-pigs-age"
+file = "094-a-golden-dandelion-locks-a-baby-pigs-age.toml"
+observe = ["set_entity_data", "animate"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [10, 10]
+emitted_distinct = 1
+behaviour_emitted = [3, 3]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-second-golden-dandelion-after-the-cooldown-unlocks-the-age"
+file = "095-a-second-golden-dandelion-after-the-cooldown-unlocks-the-age.toml"
+observe = ["set_entity_data", "animate"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [2, 2]
+emitted = [21, 21]
+emitted_distinct = 1
+behaviour_emitted = [5, 5]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-lead-used-on-a-pig-ties-it-to-the-player"
+file = "097-a-lead-used-on-a-pig-ties-it-to-the-player.toml"
+observe = ["set_entity_link", "animate"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [2, 2]
+emitted = [8, 8]
+emitted_distinct = 1
+behaviour_emitted = [1, 1]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-lead-used-again-on-its-pig-unties-it"
+file = "098-a-lead-used-again-on-its-pig-unties-it.toml"
+observe = ["set_entity_link", "animate"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [3, 3]
+emitted = [16, 16]
+emitted_distinct = 1
+behaviour_emitted = [7, 7]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "two-pigs-in-love-two-blocks-apart-make-a-baby"
+file = "099-two-pigs-in-love-two-blocks-apart-make-a-baby.toml"
+observe = ["set_entity_data"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [2, 2]
+emitted = [63, 63]
+emitted_distinct = 1
+behaviour_emitted = [26, 26]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "two-pigs-in-love-four-blocks-apart-never-breed"
+file = "101-two-pigs-in-love-four-blocks-apart-never-breed.toml"
+observe = ["set_entity_data", "entity_event"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [2, 2]
+emitted = [34, 34]
+emitted_distinct = 1
+behaviour_emitted = [11, 11]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-bucket-milks-a-cow-into-the-inventory"
+file = "640-a-bucket-milks-a-cow-into-the-inventory.toml"
+observe = ["container_set_slot"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [9, 9]
+emitted_distinct = 1
+behaviour_emitted = [4, 4]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-bowl-on-a-mooshroom-adds-mushroom-stew"
+file = "642-a-bowl-on-a-mooshroom-adds-mushroom-stew.toml"
+observe = ["container_set_slot"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [9, 9]
+emitted_distinct = 1
+behaviour_emitted = [2, 2]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "shears-turn-a-mooshroom-into-a-cow"
+file = "643-shears-turn-a-mooshroom-into-a-cow.toml"
+observe = ["sound"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [68, 68]
+emitted_distinct = 1
+behaviour_emitted = [15, 15]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-dye-colours-a-sheep"
+file = "644-a-dye-colours-a-sheep.toml"
+observe = ["set_entity_data"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [6, 6]
+emitted_distinct = 1
+behaviour_emitted = [1, 1]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "shears-shear-a-sheep"
+file = "645-shears-shear-a-sheep.toml"
+observe = ["sound", "add_entity"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [4, 4]
+emitted = [37, 37]
+emitted_distinct = 1
+behaviour_emitted = [12, 12]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "feeding-a-cow-its-food-puts-it-in-love"
+file = "647-feeding-a-cow-its-food-puts-it-in-love.toml"
+observe = ["entity_event", "animate"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [2, 2]
+emitted = [6, 6]
+emitted_distinct = 1
+behaviour_emitted = [1, 1]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "feeding-a-sheep-its-food-puts-it-in-love"
+file = "648-feeding-a-sheep-its-food-puts-it-in-love.toml"
+observe = ["entity_event", "animate"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [2, 2]
+emitted = [7, 7]
+emitted_distinct = 1
+behaviour_emitted = [1, 1]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "feeding-a-chicken-its-food-puts-it-in-love"
+file = "649-feeding-a-chicken-its-food-puts-it-in-love.toml"
+observe = ["entity_event", "animate"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [2, 2]
+emitted = [8, 8]
+emitted_distinct = 1
+behaviour_emitted = [1, 1]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-spawned-cow-syncs-its-movement-speed-a-tick-later"
+file = "650-a-spawned-cow-syncs-its-movement-speed-a-tick-later.toml"
+observe = ["update_attributes"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [22, 22]
+emitted_distinct = 1
+behaviour_emitted = [7, 7]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-spawned-mooshroom-syncs-its-movement-speed-a-tick-later"
+file = "651-a-spawned-mooshroom-syncs-its-movement-speed-a-tick-later.toml"
+observe = ["update_attributes"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [25, 25]
+emitted_distinct = 1
+behaviour_emitted = [10, 10]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-spawned-sheep-syncs-its-movement-speed-a-tick-later"
+file = "652-a-spawned-sheep-syncs-its-movement-speed-a-tick-later.toml"
+observe = ["update_attributes"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [20, 20]
+emitted_distinct = 1
+behaviour_emitted = [4, 4]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "a-spawned-chicken-syncs-its-movement-speed-a-tick-later"
+file = "653-a-spawned-chicken-syncs-its-movement-speed-a-tick-later.toml"
+observe = ["update_attributes"]
+observes_behaviour = false
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [1, 1]
+emitted = [27, 27]
+emitted_distinct = 1
+behaviour_emitted = [9, 9]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"
+
+[[blind]]
+name = "an-orb-four-blocks-away-creeps-to-the-player"
+file = "683-an-orb-four-blocks-away-creeps-to-the-player.toml"
+observe = ["add_entity", "move_entity", "entity_position", "set_entity_motion", "take_item_entity", "remove_entities", "set_experience"]
+observes_behaviour = true
+runs = 1   # DISTINCT recordings
+files = 1  # vanilla.json files carrying the scenario
+compared = [12, 12]
+emitted = [48, 48]
+emitted_distinct = 1
+behaviour_emitted = [13, 13]
+measured_on = "sayer-desktop, every oracle-work/gameplay*/vanilla.json"

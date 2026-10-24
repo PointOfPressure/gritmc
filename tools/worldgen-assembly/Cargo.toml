@@ -1,0 +1,23 @@
+[package]
+name = "worldgen-assembly"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+# The generator this assembles. One direction only: the library defines the
+# traits and this crate answers them from the vanilla extract, which is why
+# the extract loaders live out here rather than in `rustmc-worldgen` — that
+# crate is data-free on purpose (see its Cargo.toml).
+rustmc-worldgen.workspace = true
+rustmc-world.workspace = true
+flate2.workspace = true
+rustmc-behavior.workspace = true
+# For `fixture::available`: this crate owns `have_extract`, which twenty
+# gates across two crates ask before deciding whether to compare anything.
+rustmc-data.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

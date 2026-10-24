@@ -1,0 +1,38 @@
+name = "a-buried-treasure-potion-carries-its-potion-contents"
+about = "a seeded chests/buried_treasure chest rolls a potion through set_potion, and the content packet carries minecraft:potion_contents with the water_breathing potion present and the colour, effects and name absent; a server that sends the item id alone sends an uncraftable potion"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_event"]
+settle_ms = 1000
+
+# The lid repeats every 5 ticks while the chest is open; collapsed as in 090.
+collapse_repeats = ["block_event"]
+
+# A seeded loot chest, placed the one way a client can: `block_entity_data`
+# on the held chest (see 930). `LootTableSeed` is a LONG.
+#
+# Seed 3: one minecraft:potion, water_breathing, in slot 24 — the last stack
+# of the fill but one. PotionContents.STREAM_CODEC is four fields: optional
+# potion (bool + holderRegistry id), optional INT colour, a list of effects,
+# optional name.
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+components = [
+    { type = "minecraft:block_entity_data", block_entity = "minecraft:chest", strings = { LootTable = "minecraft:chests/buried_treasure" }, longs = { LootTableSeed = 3 } },
+]
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Overwrite the component-bearing chest, so the inventory half of the content
+# packet holds nothing but a stick.
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

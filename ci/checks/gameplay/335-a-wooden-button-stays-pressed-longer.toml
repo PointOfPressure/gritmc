@@ -1,0 +1,43 @@
+name = "a-wooden-button-stays-pressed-longer"
+about = "the same press as check 330 on an oak button instead of a stone one — ButtonBlock.ticksToStayPressed is a constructor argument, 20 for stone and polished blackstone and 30 for the other TWELVE — oak, spruce, birch, jungle, acacia, cherry, dark oak, pale oak, mangrove, bamboo, crimson and warped — with nothing connecting it to the block's name; 330 alone passes for a server that hard-codes 20, so this is the check that says the delay is read per block rather than written down once"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 4000
+# **Without this the check reproduced the hole it was written to close.**
+# Its `about` says 330 alone passes for a server that hard-codes 20; this one
+# observed only block updates with `timing` unset, so the projection nulled
+# `at_ms` and a server that un-pressed an oak button after 20 ticks produced a
+# byte-identical sequence to one that waited 30. The check written to close
+# 330's hole had the same hole, and the corpus had no check that set `timing`
+# at all.
+#
+# Same 500 ms bucket as 330, which is the difference between them. Measured
+# un-press arrivals, Threadripper 2026-08-03, two selfcheck runs on both
+# streams: 1495, 1500, 1511, 1516 ms — a spread of 21 ms, rounding to 1500
+# with 250 ms of margin, against 330's four samples rounding to 1000.
+timing = { bucket = { ms = 500 } }
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_button"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# A stick is not a BlockItem, so the click falls through to the block's own
+# `useWithoutItem` instead of trying to place anything.
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

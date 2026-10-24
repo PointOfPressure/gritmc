@@ -1,0 +1,34 @@
+{
+ "_about": "The substrate ci/t2-gameplay.sh boots, and what the pinned jar says it removes. `ci/mob-substrate.py --check` refuses if any of it moves, because every mob finding on this branch is conditional on it.",
+ "_do_not": "Do not re-pin to make a gate green. Re-read what the new substrate hides first.",
+ "_pinned_on": "2026-08-19",
+ "substrate": {
+  "entity_types": 158,
+  "gamerules": [
+   "advance_time=false",
+   "advance_weather=false",
+   "random_tick_speed=0",
+   "spawn_mobs=false"
+  ],
+  "monster_allowed_in_peaceful": [
+   "minecraft:camel_husk",
+   "minecraft:ender_dragon",
+   "minecraft:piglin",
+   "minecraft:shulker",
+   "minecraft:sulfur_cube",
+   "minecraft:zombie_horse",
+   "minecraft:zombie_nautilus"
+  ],
+  "monster_types": 45,
+  "not_in_peaceful": 38,
+  "properties": [
+   "difficulty=peaceful",
+   "gamemode=creative",
+   "generate-structures=false",
+   "spawn-monsters=false",
+   "spawn-radius=0"
+  ],
+  "spawning_category_types": 86,
+  "world_preset": "minecraft:flat"
+ }
+}

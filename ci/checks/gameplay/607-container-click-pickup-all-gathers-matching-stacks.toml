@@ -1,0 +1,169 @@
+name = "container-click-pickup-all-gathers-matching-stacks"
+about = "double-clicking gathers every matching stack in the menu onto the cursor — javap -p -c -constants on AbstractContainerMenu.doClick's ContainerInput.PICKUP_ALL arm (offsets 1611 onward). The arm's entry condition is three tests and the middle one is the whole of this check's history: 1641 bails if the carried stack is empty; 1649 `slot.hasItem()` jumps STRAIGHT TO THE SWEEP at 1667 when the clicked slot is empty; 1657-1664 bail when it has an item that `mayPickup` allows. So the sweep runs on a clicked slot that is EMPTY, which is what a real double-click produces — the client sends PICKUP first, emptying the slot into the cursor, and PICKUP_ALL against the slot it has just emptied. The gather itself is offsets 1667-1867: two passes (1700-1703), forward from 0 when the button is 0 and backward from size-1 otherwise (1667-1695). What would make this fail: a server that maps every ContainerInput it does not specifically implement onto a plain PICKUP puts the cursor's stone INTO the empty slot instead of draining the other two out of the menu — the opposite direction, and both the cursor and the two donor slots end up at different values either way."
+observe_from = "actor"
+
+# **THIS CHECK'S GREENS HAVE A START DATE, AND IT IS NOT THE DATE OF THE FILE.**
+#
+# 2026-08-18, `corpus-projection-audit`. What this check is *about* is which
+# stacks end up where, and until `7bd75872` (2026-08-12, `trace: decode
+# ItemStack, and refuse where vanilla throws`) the recorder could not read a
+# stack at all: `container_set_slot` and `container_set_content` carried a
+# window, a state and an opaque digest, and the item was inside the digest with
+# everything else. `e0167f31` (2026-08-13) corrected the component patch codec
+# on top of it. The projection went **12 -> 17 observations** across that pair.
+#
+# So a green recorded before 2026-08-12 says the *bytes* matched, which is a
+# real thing and a weaker one, and it says nothing this file's `about` claims
+# about stacks. **Greens from before that date are not citable for this claim**
+# and nothing said so at the time — it was found by accident, months later,
+# which is why it is written at the point of use rather than only in a roadmap
+# section nobody opens while reading a check.
+#
+# The general rule this is an instance of: **a check is only as old as the
+# decoder that makes it informative.** `ci/trace_vocabulary.py` compares the
+# `(kind, field)` vocabulary of two ensembles for exactly this reason, and
+# `docs/PARITY-ROADMAP.md` §51 enumerates what the projection still cannot see.
+observe = [
+    "open_screen",
+    "container_set_content",
+    "container_set_slot",
+    # **The cursor, and this check does not work without it.**
+    #
+    # `set_cursor_item` is `ClientboundSetCursorItemPacket`, id 96 in
+    # `crates/rustmc-proto/src/ids.rs`. `javap -p` on it says it is a record
+    # with exactly one component — `ItemStack contents` — and no window id,
+    # no state id and no sequence number, so it is a pure function of what is
+    # on the cursor. That is what makes it safe to observe: there is no
+    # counter in it to flap, and a cursor holding three stone reads
+    # differently from a cursor holding one.
+    #
+    # It was missing until 2026-08-10 and its absence is why this scenario
+    # spent its whole life unable to fail. The gather's most direct evidence
+    # is the cursor going from one stone to three, and this check could not
+    # see the cursor at all.
+    #
+    # **It was `packet:0x60` until 2026-08-12 and is now decoded**, on branch
+    # `trace-itemstack-legible`. The digest of a cursor holding three stone is
+    # now `{"count": 3, "item": "minecraft:stone", ...}` and the comparison is
+    # the same one — every byte the arm consumes it also names, and every byte
+    # it does not is still in `rest`. What changed is that a failure here now
+    # says which item and how many, instead of two hex strings.
+    "set_cursor_item",
+]
+settle_ms = 1500
+
+# The chest lid repeats on a free-running 5-tick timer for as long as the chest
+# is open — `ContainerOpenersCounter.recheckOpeners` re-arms unconditionally
+# (offsets 178-186 call `Level.scheduleTick(pos, block, 5)`) and calls
+# `openerCountChanged` on both paths (offset 84's `if_icmpeq 167` lands on the
+# call itself), and `ChestBlockEntity.signalOpenCount` offsets 0-13 turn that
+# into `level.blockEvent(pos, block, 1, newCount)`. So the same `block_event`
+# goes out every 250 ms, forever.
+#
+# This check does not observe `block_event` and so never saw them declared.
+# It sees them under `strict`, where **how many arrived and which step each
+# was stamped with are set by where a free-running timer's edges fell against
+# this window** — measured on the 2026-08-07 07:10 subset pair, six of the
+# seven scenarios that leave a chest open disagreed on step attribution while
+# agreeing on the total.
+#
+# What stops being tested here: the repeat count and the step attribution of
+# `block_event`. What is still tested: that the lid opens at all, at the right
+# position, with the right viewer count, on the right stream — and the cadence
+# itself, in `rustmc_server::containers::tests::
+# the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`, which measures
+# the gap rather than the count.
+collapse_repeats = ["block_event"]
+
+# THREE STONE IN THREE SEPARATE HOTBAR SLOTS, PER 605's REASON: `[[setup]]` and
+# `[[step]]` are collected as two separate arrays, so nothing here can be
+# handed to the player a second time mid-sequence.
+#
+# Three and not two, because the sweep has to be seen *gathering across
+# slots*. One donor cannot distinguish a gather from a single ordinary pickup,
+# and the previous shape of this file — one on the cursor, one in a slot —
+# could not have told them apart even if vanilla had swept.
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+slot = 2
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+slot = 3
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# The three stone go into three DIFFERENT chest slots (0, 1 and 2). Menu slot
+# 54 is hotbar 0, 56 is hotbar 2 and 57 is hotbar 3 in a 63-slot chest menu.
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 56
+
+[[step]]
+do = "container_click"
+slot = 1
+
+[[step]]
+do = "container_click"
+slot = 57
+
+[[step]]
+do = "container_click"
+slot = 2
+
+# **The step that makes the difference, and the one the old file was missing.**
+#
+# A plain PICKUP on chest slot 0 lifts that stone onto the cursor and leaves
+# slot 0 EMPTY. That is the state offset 1649 wants: carried non-empty, clicked
+# slot without an item. It is also exactly what a real client sends as the
+# first half of a double-click.
+#
+# The old file clicked a slot that still HELD a matching stone, so 1651's
+# `hasItem` was true, 1661's `mayPickup` was true, and 1664 jumped to 1873 —
+# out of the arm, doing nothing. Vanilla answered with one
+# `ClientboundSetCursorItemPacket` whose payload was byte-identical to the one
+# it had sent at the previous step (digest `67414a774c80560f` on both, corpus
+# recording of 2026-08-10 13:16), which is a server resyncing a cursor it did
+# not change.
+[[step]]
+do = "container_click"
+slot = 0
+
+# THE MEASURED STEP. Cursor holds one stone; slot 0 is empty; slots 1 and 2
+# each hold a matching stone. Vanilla sweeps both into the cursor, leaving it
+# at three and both donor slots empty.
+[[step]]
+do = "container_click"
+slot = 0
+input = "pickup_all"

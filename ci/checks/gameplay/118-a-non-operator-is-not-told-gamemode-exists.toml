@@ -1,0 +1,20 @@
+name = "a-non-operator-is-not-told-gamemode-exists"
+about = """
+a permission-level-0 player typing `/gamemode survival` is answered with
+`command.unknown.command` and the context line, and its game mode does not
+change
+
+`GameModeCommand` requires `COMMANDS_GAMEMASTER`. Brigadier prunes a node
+whose `requires` fails out of the parse rather than reporting it forbidden, so
+the reply is the one every typo gets — `Commands.finishParsing`'s two red
+lines — and NOT a permission message. A server that ran the command, or that
+answered with anything permission-shaped, moves `chat`; one that ran it moves
+`game_event` and `player_abilities` too.
+"""
+observe_from = "actor"
+observe = ["chat", "game_event", "player_abilities"]
+settle_ms = 1500
+
+[[step]]
+do = "command"
+text = "gamemode survival"

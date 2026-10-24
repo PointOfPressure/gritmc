@@ -1,0 +1,138 @@
+name = "attacking-another-player"
+about = "the first check in this corpus that hits something — 33 mechanics had zero coverage and the top of that list was combat, which was not an unwritten check but an unwritten verb, so nothing could observe damage_event, entity_event, animate or set_health no matter what a server did with them"
+observe_from = "actor"
+observe = ["sound", "damage_event", "set_health", "entity_event"]
+settle_ms = 2000
+
+# **WHAT THIS CHECK'S GREEN IS ABOUT, MEASURED — 2026-08-18, `corpus-projection-audit`.**
+#
+# `ci/observe-coverage.py` over the 17 Aug pair: **three of the four kinds
+# declared above never appear on either side.** Vanilla emits no
+# `damage_event`, no `set_health` and no `entity_event` for a player hitting a
+# player in this scenario, and neither do we, so those three declarations are
+# one-sided guards — live if this server ever starts emitting one, silent
+# otherwise. They are not what makes this check green.
+#
+# What makes it green is **`sound`, and nothing else**: `measured_reference_obs`
+# is 1. So the claim this file can currently support is "the attack sound is
+# played, at the right place, from the right source, at the right volume", plus
+# the reach test `551` adds by counting how many of them there are.
+#
+# **It is not about damage**, whatever the name says, and no server change that
+# got damage wrong while still playing the sound could redden it. Closing that
+# needs vanilla to emit one of the three — which for a player-on-player hit in
+# creative it does not — or a different observable. Named here rather than left
+# for the next reader to re-derive: `docs/PARITY-ROADMAP.md` §51.
+
+# TWO OF THE FOUR KINDS ABOVE CARRY NO REFERENCE SIGNAL, AND THIS FILE IS NOT
+# EVIDENCE THAT DAMAGE IS MODELLED.
+#
+# `damage_event` and `set_health` are **empty on the vanilla side here and in
+# every other check**: zero appearances across 89 vanilla recordings on this
+# box, deduped by sha256. That is not a gap in this server. It is
+# `Player.hurtServer`, which reads `Abilities.invulnerable` at offset 15 and
+# returns false at 31-32, and `GameType.CREATIVE` is what sets that field. The
+# corpus substrate is creative by construction, so **no work on any server
+# could have produced either kind for this check to compare**.
+#
+# What that means for reading a green here: this file grades the attack SOUND —
+# its event id, its volume, its position, and nothing else. Read it as
+# "the attack packet is answered with the right sound in the right place",
+# never as "combat is ported". `docs/PARITY-ROADMAP.md` §63 is the audit that
+# separates this class from a porting gap, and
+# `ci/checks/survival/001-attacking-a-player-who-can-be-hurt.toml` is the same
+# attack with the gate open.
+#
+# **THEY ARE DELIBERATELY NOT REMOVED FROM `observe`.** `observe` filters both
+# sides symmetrically, so declaring a kind vanilla never sends is not dead
+# weight — it is the only thing that would catch THIS server emitting a
+# `damage_event` on a substrate where vanilla emits none. Stripping them would
+# turn a silent-but-armed declaration into no declaration at all, and that is
+# a strictly worse trade than the misreading this comment fixes.
+
+# `animate` WAS IN THIS LIST AND IS DELIBERATELY NOT ANY MORE.
+#
+# The swing broadcast to the observer is an *entity* broadcast, and
+# `ChunkMap$TrackedEntity.updatePlayer` gates those on
+# `chunkMap.isChunkTracked(player, entityChunkX, entityChunkZ)` — see `551`,
+# which was vacuous in the gate and absent in a chain dir for exactly that
+# reason. Here it never decided the verdict, because vanilla's attack `sound`
+# is in the same trace and this server sends nothing either way; but it would
+# have started deciding it the moment the sound was implemented, and a check
+# that becomes unstable when the server improves is worse than one that is
+# unstable now.
+#
+# `observe_from = "actor"` for the same reason: the attack sound is at the
+# actor's own position, so the chunk that conjunction tests is the one the
+# actor is standing in. Swing coverage belongs to a check that names
+# `Step::Swing` on purpose, not to this one incidentally.
+
+# WHAT `handleAttack` REFUSES, FROM THE JAR — AND THE PART OF IT I READ WRONG.
+#
+#   handleAttack, from javap -p -c -constants on the pinned jar
+#      12: hasClientLoaded : ifeq 29
+#      19: isSpectator     : ifne 30 -> 29: return
+#      38: getEntityOrPart(packet.entityId)
+#      54: ifnull 72       -> 72: return
+#      58: WorldBorder.isWithinBounds(target.blockPosition())
+#      69: ifne 73         -> 72: return
+#      88: isWithinAttackRange(mainHandItem, target.getBoundingBox(), 3.0d)
+#     102: ifne 106        -> 105: return
+#     106: mainHandItem.has(PIERCING_WEAPON) : ifeq 118 -> 117: return
+#     118: target instanceof ItemEntity | ExperienceOrb | self | unattackable
+#          arrow -> disconnect("multiplayer.disconnect.invalid_entity_attacked")
+#
+# THE `3.0d` IS NOT THE ATTACK RANGE, and this file said it was. Chased down
+# after `551` refuted the prediction built on it:
+#
+#   Player.isWithinAttackRange(stack, aabb, d)
+#     -> getAttackRangeWith(stack)             the item's ATTACK_RANGE
+#        component, or AttackRange.defaultFor(player) when it has none
+#     -> AttackRange.defaultFor(living) = new AttackRange(0, r, 0, r, 0, 1)
+#        with r = getAttributeValue(Attributes.ENTITY_INTERACTION_RANGE)
+#     -> AttackRange.isInRange(living, aabb, d)   <- `d` is the third
+#        argument all the way down, and it is a PADDING added to the reach,
+#        not the reach itself
+#
+# So the reach is an attribute plus three blocks of server-side slack, and
+# **five blocks is comfortably inside it** — measured, not reasoned: the first
+# version of `551` stood at the observer's own offset of 5 and predicted
+# silence, and vanilla played the sound anyway. `AttackRange` also carries
+# separate `minCreativeReach`/`maxCreativeReach` fields, which is a second
+# reason a number read off one call site does not settle this.
+#
+# The walk therefore is not what makes this check work — it would have worked
+# from the spawn — but it is what makes 550 and 551 a *pair*, by putting one
+# of them unambiguously inside the reach and the other unambiguously outside
+# it. Everything stays at relative z >= 0, on one side of the chunk boundary,
+# per this directory's README.
+#
+# The two entries at offset 118 are worth naming even though nothing here
+# does them: attacking a dropped item, an experience orb or yourself is not
+# ignored, it is a **kick**. So a target-resolution bug in the harness that
+# picked the wrong entity would end the session rather than quietly measure
+# nothing — which is the one comforting thing about this handler.
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+# Deliberately NOT a placeable block and NOT a weapon.
+#
+#   * A placeable block would confound this with the block-in-hand ordering
+#     gap, which is a separate named divergence and deserves its own check.
+#   * A sword changes the damage, the sweep and the sound, so the first check
+#     on this verb would be measuring an enchanted-weapon path rather than the
+#     bare mechanic. `PIERCING_WEAPON` above is a hard `return` in the handler,
+#     so "whatever is in hand" is not a neutral choice here at all.
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 3.0]
+
+[[step]]
+do = "attack"
+target = "minecraft:player"

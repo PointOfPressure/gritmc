@@ -1,0 +1,57 @@
+name = "a-dead-coral-dug-with-a-pickaxe-drops-itself"
+about = """
+`045`'s dig with a wooden pickaxe in hand. `Tool.isCorrectForDrops`: the
+pickaxe's rule for `#minecraft:mineable/pickaxe` sets `correct_for_drops`,
+dead corals are in that tag, so `playerDestroy` runs, `dropResources` rolls
+`minecraft:blocks/dead_tube_coral` and `popResource` spawns the coral.
+`add_entity` is not projected — `popResource` places the item with
+`Mth.nextDouble(level.random, -0.25, 0.25)` on three axes and every run lands
+it somewhere else — so the item is graded by what it IS: the
+`set_entity_data` carrying `ItemEntity.DATA_ITEM`, sent in the pairing bundle
+and again on the first tracker tick (the stack is set after the data item is
+defined, so it is still dirty). The pickaxe takes no damage: `Item.mineBlock`
+offsets 26-35 skip `hurtAndBreak` when the destroy time is 0, so no
+container_set_slot either. What would make it fail: no drop, the wrong item,
+one data packet instead of two, or a durability update for an insta-mined
+block.
+"""
+# The console gave this rig its items; `clear` takes them back so the
+# next scenario starts empty-handed, on both servers.
+console_restore = ["clear oracle"]
+# Three blocks out, beyond the digger's pickup box: this check projects
+# container_set_slot, and a pickup of the coral would put one there that this
+# server, with no pickup, never sends (047 and 050 each met one, 2026-10-01).
+observe_from = "both"
+observe = ["set_entity_data", "container_set_slot", "block_update", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "console"
+text = "clear oracle"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:dead_tube_coral"
+
+[[setup]]
+do = "place"
+on = [3, -1, 0]
+face = "up"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:wooden_pickaxe"
+
+[[setup]]
+do = "wait"
+ms = 300
+
+[[step]]
+do = "dig"
+at = [3, 0, 0]
+face = "up"

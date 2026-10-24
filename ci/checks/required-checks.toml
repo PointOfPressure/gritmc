@@ -1,0 +1,165 @@
+# The checks that must EXIST in this tree and must be INVOKED by ci/t0.sh.
+#
+# WHY A MANIFEST AND NOT A GREP
+#
+# `ci/handoff.sh` refuses any branch behind main, so a branch cannot gate with
+# a `ci/` older than main's — that is measured and it is why the vacuous pass
+# found on 2026-08-17 could never reach main through the gate. What it does
+# NOT stop is a branch that removes a check and its `ci/t0.sh` invocation
+# together. Then nothing is inconsistent: no script, no call, no error, and a
+# green T0 that has stopped looking. That is this project's central defect
+# class arriving by deletion instead of by design.
+#
+# This file is the thing such a branch would also have to delete, and
+# `ci/check-checks-present.py` bounds the count in a constant so that deleting
+# a row is a reviewed code change rather than a data edit — the same ratchet
+# discipline the tier-2 floor and the dead-field ceiling already use.
+#
+# ADDING A CHECK: add it here in the same commit that wires it into ci/t0.sh.
+# REMOVING ONE: you must also lower REQUIRED_FLOOR in
+# ci/check-checks-present.py, which is a diff a reviewer sees.
+
+[[required]]
+script = "ci/check-doc-claims.py"
+wired_in = ["ci/t0.sh"]
+why = "refuses a duplicate (doc, section-number) claim, and a heading with no claim or a claim with no heading"
+
+[[required]]
+script = "ci/check-figures.py"
+wired_in = ["ci/t0.sh"]
+why = "refuses a published figure with no artefact or window, and a figure whose print-count in the document drifts from its ledger entry"
+
+[[required]]
+script = "ci/check-conflict-markers.py"
+wired_in = ["ci/t0.sh"]
+why = "refuses a tracked file carrying any git conflict marker, INCLUDING the diff3 '|||||||' middle marker that an outer-markers-only scan misses — regiondiff-live-fixture reached origin carrying exactly that and nothing else"
+
+[[required]]
+script = "ci/check-test-targets.py"
+wired_in = ["ci/t0.sh"]
+why = "refuses a test target no gate selector reaches — the --lib/--bins defect that hid nineteen never-run tests"
+
+[[required]]
+script = "ci/check-use-probe.py"
+wired_in = ["ci/use-golden.sh", "ci/use-item-on-golden.sh"]
+why = "refuses a use-probe stance table that the dumper no longer sweeps. wired_in is the two GOLDEN scripts and not ci/t0.sh deliberately: inside T0 only ci/check-use-probe-falsify.sh runs it, and only against synthetic fixtures. The real-data adjudication is the dumpers'"
+
+[[required]]
+script = "ci/corpus-falsifiable.py"
+wired_in = ["ci/t0.sh"]
+why = "refuses a gameplay scenario whose outcome no mutation of its own measured step can move"
+
+[[required]]
+script = "ci/liveness-proofs.py"
+wired_in = ["ci/t0.sh"]
+why = "refuses a readiness proof that does not reject a log from a subject that never became ready"
+
+[[required]]
+script = "ci/merge-docregions.py"
+wired_in = ["ci/setup-merge-drivers.sh"]
+why = "--check refuses a declared MERGE-REGION whose marker pair is broken, so the attribute cannot promise a behaviour the file no longer declares"
+
+[[required]]
+script = "ci/projection-drops.py"
+wired_in = ["ci/t0.sh"]
+why = "refuses a field the projection removes from the comparison without a `// DROP:` marker and a ranked ledger row, and a row whose stage, observer count or observer names disagree with the tree"
+
+[[required]]
+script = "ci/never-recorded.py"
+wired_in = ["ci/t0.sh"]
+why = "refuses a packet kind `trace::is_housekeeping` drops before `decode` without a ranked row, and a `vacant` row for a packet the pinned jar has learnt to build"
+
+[[required]]
+script = "ci/check-checks-present.py"
+wired_in = ["ci/t0.sh"]
+why = "this file's own guard: refuses a tree missing a required check, a check present but invoked by nothing, and a manifest shorter than the floor. Registered here deliberately — a branch deleting it would also have to lower REQUIRED_FLOOR, which is a diff a reviewer sees. It cannot catch its own deletion; nothing in a tree can, which is why preflight.sh refuses a missing check from outside the tree as well"
+
+[[required]]
+script = "ci/mob-tick-census.py"
+wired_in = ["ci/t0.sh"]
+why = "pins the jar-derived size of the mob surface against this crate's EntityKind constants; the marker inventory reports one entity-behaviour gap and that is a fact about refusal markers, not about how much mob is missing"
+
+[[required]]
+script = "ci/mob-observability.py"
+wired_in = ["ci/t0.sh"]
+why = "refuses a check that can put a mob in the world and has no blindness-ledger entry; without it a mob check can observe two announcement kinds, go green, and be read as mob parity"
+
+[[required]]
+script = "ci/mob-substrate.py"
+wired_in = ["ci/t0.sh"]
+why = "refuses a moved corpus substrate; peaceful plus spawn-monsters=false plus the spawn_mobs game rule is what makes every spawn mechanic unmeasurable here, and a silent change would leave the findings standing"
+
+[[required]]
+script = "ci/marker-density.py"
+wired_in = ["ci/t0.sh"]
+why = "states the bound ci/unported-inventory.py's output must be read under: marker count tracks lines WRITTEN (r = 0.76, permutation p < 0.001 over 58 files), so its silence about a subsystem is not evidence that subsystem has no debt"
+
+[[required]]
+script = "ci/mob-projection-search.py"
+wired_in = ["ci/t0.sh"]
+why = "records whether vanilla agrees with ITSELF under each candidate projection of the mob check — 0/120 as declared, 120/120 for add_entity minus the two yaw fields — and gates the shape of each, because any future mob check rests on which projections are stable"
+
+[[required]]
+script = "ci/survival-substrate-assert-falsify.sh"
+wired_in = ["ci/t0.sh"]
+why = "the falsifier for the survival pass's one load-bearing assertion — that the four creative-gated mechanics actually opened. It ran nowhere until 2026-09-05: not T0, not ci/handoff.sh, not the chain. If the substrate silently stays creative, every survival scenario still runs, every packet still arrives, the comparison is still well-formed, and nothing downstream catches it"
+
+[[required]]
+script = "ci/gameplay-difficulty-falsify.sh"
+wired_in = ["ci/t0.sh"]
+why = "refuses a gameplay corpus whose vanilla and whose subject can be booted on different difficulties, which grades every monster scenario against the harness"
+
+[[required]]
+script = "ci/gameplay-substrate-falsify.sh"
+wired_in = ["ci/t0.sh"]
+why = "refuses a corpus harness that quiets one server and not the other, or that carries a second copy of the substrate rule list the reference cache's key cannot see"
+
+[[required]]
+script = "ci/persistence-applies.py"
+wired_in = ["ci/t0.sh"]
+why = "decides whether ci/handoff.sh stage 7 runs the four persistence gates, and --check refuses a ledger whose declared prefix matches nothing in the tree — which it did on its own first run, on a path that does not exist"
+
+[[required]]
+script = "ci/ambient-falsify.py"
+wired_in = ["ci/t0.sh"]
+why = "refuses a clientbound packet family dropped from the projection without a row in trace::FAMILIES, a row whose stated mechanism the census contradicts, and a family opened to grading that no projection ever reads — the `is_housekeeping` defect, where twelve packet types were thrown away at record time behind a paragraph nothing could redden"
+
+[[required]]
+script = "ci/t0-keepgoing-falsify.sh"
+wired_in = ["ci/t0.sh"]
+why = "proves T0_KEEP_GOING=1 lists every injected red (ten shapes, alone and together), never lets a red reach T0 GREEN or exit 0, leaves the default run byte-identical to plain bash, and rejects seven broken copies of ci/t0-stages.sh"
+
+[[required]]
+script = "ci/t1-par-falsify.sh"
+wired_in = ["ci/t0.sh"]
+why = "proves ci/t1-par.sh (which ci/t1.sh runs its test binaries through) exits 101 on any red including a signal-killed binary, reproduces the serial test-result lines and failure blocks, keeps cargo's cwd and env, and rejects three mutants"
+
+[[required]]
+script = "ci/explosion-falsify.sh"
+wired_in = ["ci/t0.sh"]
+why = "refuses an explosion mutation that no longer applies — a patch that has stopped matching means the sweep ran nothing for that case, and the three explosion goldens' green would then be unbacked for it. T0 runs the DRYRUN arm on a copy in ~1 s; the full seventeen-rebuild sweep is ~10 min and is not in T0"
+
+[[required]]
+script = "ci/check-shell-footguns.py"
+wired_in = ["ci/t0.sh"]
+why = "refuses `| grep -q` anywhere in ci/ shell: under pipefail a match reads as absent when the producer is still writing (SIGPIPE, 141) — 10,218 of 36,000 stressed trials on one gate check, and always once a builtin's output passes 64 KiB — which is a check that can fail on a line that is there"
+
+[[required]]
+script = "ci/cross-check.sh"
+wired_in = ["ci/t0.sh"]
+why = "type-checks the rustmc-server binary for Windows, macOS, FreeBSD, Android and the host; without it a std::os::unix use or a Linux-only extern reaches main and nothing on this Linux box notices"
+
+[[required]]
+script = "ci/cross-check-falsify.sh"
+wired_in = ["ci/t0.sh"]
+why = "the cross-platform stage's red-when-broken evidence: an injected std::os::unix use must be RED for Windows and GREEN for the host, or the stage has stopped looking"
+
+[[required]]
+script = "ci/check-vacuous-green.py"
+wired_in = ["ci/t0.sh"]
+why = "the census ratchet for this project's central defect class — a check nothing invokes, a check that exits 0 saying it could not run, or a `cmd; VAR=$?` whose handler cannot run under set -e. Five instances were found by accident on 2026-09-05, each by a lane looking for something else; this refuses a sixth"
+
+[[required]]
+script = "ci/check-vacuous-green-falsify.sh"
+wired_in = ["ci/t0.sh"]
+why = "the vacuous-green guard's own red-when-broken evidence. Its case 3 injects a census generator that returns nothing, which is the failure that makes every comparison the guard performs succeed vacuously — the shape that let one falsifier pass green on 2026-09-05 by mutating an empty dict"

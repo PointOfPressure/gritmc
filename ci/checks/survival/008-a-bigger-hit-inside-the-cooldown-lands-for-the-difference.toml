@@ -1,0 +1,50 @@
+name = "a-bigger-hit-inside-the-cooldown-lands-for-the-difference"
+about = """
+three console hits 200 and 150 ms apart — 2, then 3, then 1 — all inside one
+hurt cooldown (4 and 7 ticks after the first; the arm is live for 10). `LivingEntity.hurtServer` offsets 184..237: while
+`invulnerableTime > 10.0f` (a float compare, `i2f` at 188) a hit no larger than
+`lastHurt` is refused outright (`fcmpg; ifgt` at 211, `return false` at 215),
+and a larger one deals only `damage - lastHurt` through `actuallyHurt`, sets
+`lastHurt = damage`, and clears the local-8 `fullHit` flag — so it moves health
+and is otherwise SILENT: no `damage_event`, no `markHurt`, no knockback, no
+hurt sound (offsets 285..423 are all under `fullHit`).
+
+So vanilla answers three console lines with ONE `damage_event`, one
+`set_entity_motion`, one hurt sound, and health 20 -> 18 -> 17. The third line
+is refused: 1 <= 3.
+
+The gaps are load-bearing both ways. Under ~500 ms, or the cooldown has
+lapsed; and not 100 ms, which two vanilla runs split differently across the
+step boundary (the next-tick `set_entity_data` landed in step 0 in one run and
+step 1 in the other, 2026-09-30). A console step's default wait is ~800 ms,
+sixteen ticks, and the cooldown arm is live only for the first ten of the
+twenty ticks a full hit sets; see `Step::Console`.
+
+What would make it fail: a server that ignores the cooldown answers three
+`damage_event`s and ends at 14; one that treats the cooldown as a plain skip
+ends at 18 with no second `set_health`; one that deals the whole second hit
+ends at 15.
+"""
+console_restore = ["effect give oracle minecraft:instant_health 1 4 true"]
+# The measured step is the LAST one — the third, smaller hit — and vanilla
+# refuses it in silence (`hurtServer` 206..216 returns before anything is
+# sent). That silence is the claim, so it is declared: two vanilla runs
+# against each other read `mute` without it.
+measured_step = "silent"
+observe_from = "both"
+observe = ["damage_event", "set_health", "set_entity_motion", "set_entity_data", "sound", "entity_event"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "damage oracle 2 minecraft:generic"
+settle_ms = 200
+
+[[step]]
+do = "console"
+text = "damage oracle 3 minecraft:generic"
+settle_ms = 150
+
+[[step]]
+do = "console"
+text = "damage oracle 1 minecraft:generic"

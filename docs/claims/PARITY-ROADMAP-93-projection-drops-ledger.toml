@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 93
+slug   = "projection-drops-ledger"
+title  = "The projection ledger's misfiled row and its stale ranks"
+branch = "proj2-drops-ledger"
+status = "written"

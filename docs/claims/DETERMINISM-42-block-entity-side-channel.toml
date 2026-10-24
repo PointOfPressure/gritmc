@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 42
+slug   = "block-entity-side-channel"
+title  = "The block-entity side channel: what it must carry per class, why nine of the ten remaining types are one item rather than nine, and two figures from section 40 refuted — no resolved contents anywhere in the window, and vault is not a function of its block state"
+branch = "worldgen-block-entities"

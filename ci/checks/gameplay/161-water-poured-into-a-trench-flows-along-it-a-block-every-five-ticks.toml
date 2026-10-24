@@ -1,0 +1,59 @@
+name = "water-poured-into-a-trench-flows-along-it-a-block-every-five-ticks"
+about = "a water bucket emptied into one end of a four-block trench flows along it one block per five game ticks, dropping one level per block — FlowingFluid.tick/spread/getNewLiquid on the fluid tick queue, WaterFluid.getTickDelay 5 and getDropOff 1, graded on the block_update sequence AND its timing"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 2500
+# **The delay is half the claim, so it is compared.** Water's tick delay is
+# `iconst_5` — 250 ms — and each wave of the flow is one fluid tick later than
+# the last: level 1 at +5, level 2 at +10, level 3 at +15. 250 ms is the
+# difference to detect, so it is the bucket; the margin either side is 125 ms.
+timing = { bucket = { ms = 250 } }
+#
+# # The rig, and why it is a trench and not open ground
+#
+# Every workspace's anchor sits on a four-chunk corner (`record.rs`,
+# `WORKSPACE_SPACING` 32, z = 0), and water on open ground reaches seven
+# blocks — into all four chunks, whose broadcast order vanilla does not pin
+# (measured on the parked `open/160-water-spreads.toml`; see
+# `ci/checks/gameplay-unstable.toml`). A trench dug
+# one deep at dx = 1, dz = 0..3 keeps every write in ONE chunk section, so the
+# comparison is an exact sequence and needs no order opt-out.
+#
+# The bucket is aimed, not clicked: `BucketItem` is reached through
+# `use_item`, which carries only the rotation, and the server casts its own
+# ray. (yaw -74.5, pitch 54.5) from the eye at (0, 1.62, 0) crosses y = 0 at
+# (1.114, 0.309) — inside the open top of column (1, 0) — and meets the dirt
+# floor at (1.801, -1, 0.500). The full bucket's ray is
+# `ClipContext.Fluid.NONE`, so it would pass through water too.
+
+[[setup]]
+do = "dig"
+at = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -1, 2]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -1, 3]
+face = "up"
+
+[[setup]]
+do = "look"
+yaw = -74.5
+pitch = 54.5
+
+[[setup]]
+do = "hold"
+item = "minecraft:water_bucket"
+
+[[step]]
+do = "use_item"

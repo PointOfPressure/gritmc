@@ -1,0 +1,141 @@
+name = "clicking-an-empty-chest-slot-changes-nothing"
+about = "the same two clicks as 560 with the first one moved onto an empty slot, so nothing is ever on the cursor and nothing moves — vanilla runs the whole click path and sends no correction, and a server that answered every container click would pass 560 and fail this"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot"]
+settle_ms = 1000
+
+# THE MEASURED STEP ASSERTS A SILENCE, AND SAYS SO.
+#
+# This check's point is that the last `[[step]]` provokes nothing. Its
+# measured step — step 3 — therefore contributes zero declared
+# observations on both sides, and `compare` would otherwise report
+# `mute`: exactly the shape of `607` passing by comparing two silences.
+#
+# Measured, not assumed, and on two independent recordings so that a
+# single run's phase cannot be what is being read: the corpus traces in
+# `work-blueice` (2026-08-08 21:26, 86 scenarios) and `rustmc-cov2`
+# (2026-08-10 13:16, 93 scenarios) both put zero declared observations at
+# this step on both sides. What raw traffic lands there is *not* stable
+# between those two runs — the lid timer's repeat count, an idle-player
+# rebroadcast, a stray `entity_position` — and all of it is either
+# outside this check's `observe` list or deleted by the projection, which
+# is why the declared reading is the one worth writing down.
+#
+# The silence is still compared. A subject that spoke at this step would
+# `Diverge`, which is what this check is for; the declaration suppresses
+# `mute` and nothing else.
+#
+# The distinction is not in the actions — `608`'s measured click and
+# `607`'s are the same `container_click` on the same rig — it is in what
+# the check claims, and only this file knows that. Absent, the field
+# means "must speak", so a check that forgets it goes red rather than
+# quietly green.
+measured_step = "silent"
+
+# The chest lid repeats on a free-running 5-tick timer for as long as the chest
+# is open — `ContainerOpenersCounter.recheckOpeners` re-arms unconditionally
+# (offsets 178-186 call `Level.scheduleTick(pos, block, 5)`) and calls
+# `openerCountChanged` on both paths (offset 84's `if_icmpeq 167` lands on the
+# call itself), and `ChestBlockEntity.signalOpenCount` offsets 0-13 turn that
+# into `level.blockEvent(pos, block, 1, newCount)`. So the same `block_event`
+# goes out every 250 ms, forever.
+#
+# This check does not observe `block_event` and so never saw them declared.
+# It sees them under `strict`, where **how many arrived and which step each
+# was stamped with are set by where a free-running timer's edges fell against
+# this window** — measured on the 2026-08-07 07:10 subset pair, six of the
+# seven scenarios that leave a chest open disagreed on step attribution while
+# agreeing on the total.
+#
+# What stops being tested here: the repeat count and the step attribution of
+# `block_event`. What is still tested: that the lid opens at all, at the right
+# position, with the right viewer count, on the right stream — and the cadence
+# itself, in `rustmc_server::containers::tests::
+# the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`, which measures
+# the gap rather than the count.
+collapse_repeats = ["block_event"]
+
+# THE DEGENERATE HALF OF THE PAIR, AND 560 ALONE IS A TRAP WITHOUT IT.
+#
+# 560 says "click a slot holding something, then click the chest -> two
+# corrections". The cheapest way to reach `match` on that without implementing
+# a container is to answer *every* click with a `container_set_slot` naming the
+# slot that was clicked. That server would be wrong in a way 560 cannot see.
+#
+# This file refuses it. It is 560 with **one number changed**:
+#
+#   560   slot = 54   the hotbar slot holding the stone   then   slot = 0
+#   561   slot =  0   an empty chest slot                 then   slot = 0
+#
+# Same rig, same held items, same count of clicks, same second step *character
+# for character*. What makes the two steps behave differently in 560 is
+# entirely what the first click picked up, which is the property being pinned.
+#
+# ON VANILLA BOTH CLICKS ARE A FULL NO-OP, AND THAT IS DERIVED, NOT ASSUMED.
+#
+# `AbstractContainerMenu.clicked` reaches the PICKUP branch, takes the clicked
+# slot's stack and the carried stack, and with both empty falls through every
+# arm without touching anything:
+#
+#   if (slotItem.isEmpty()) { if (!carried.isEmpty()) { ...place... } }
+#   else if (slot.mayPickup(player)) { ...pick up... }
+#
+# Nothing changed, so `broadcastChanges` finds every slot equal to what the
+# remote is believed to hold and sends nothing. The click was accepted, ran the
+# whole handler, and produced no packet — which is the exact behaviour a server
+# has to reproduce and the exact behaviour an over-eager one will not.
+#
+# IT IS NOT VACUOUS, AND THAT IS BY CONSTRUCTION RATHER THAN BY LUCK.
+#
+# Rule 1 from the attack link: a check that asserts an absence needs positive
+# content in the same scenario, or its non-vacuity rests on whatever incidental
+# packet happens to be nearby. The positive content here is the container
+# opening — `open_screen` and `container_set_content`, both **direct sends down
+# the acting client's own connection**, both unconditional, and both already
+# baselined `match` by four checks. The silence is measured against them.
+#
+# Direct sends, and `observe_from = "actor"`, are also why this check is not
+# exposed to the hazard that reddened the gate on 2026-08-05: an entity or
+# block broadcast is filtered by `ChunkMap.isChunkTracked`, so its arrival
+# depends on whether the recipient had finished streaming a chunk. Nothing in
+# this projection is a broadcast.
+#
+# WHAT IT DOES NOT COVER.
+#
+# The other two silent branches of `handleContainerClick` — a click naming a
+# `containerId` no menu is using, and a slot index outside the menu — are both
+# early returns with no reply, and neither is exercised here. They are worth a
+# check and are unclaimed. The first cannot be written as a scenario at all
+# while the harness refuses to click without an open menu, which it does on
+# purpose.
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 0

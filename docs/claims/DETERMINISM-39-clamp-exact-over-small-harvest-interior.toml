@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 39
+slug   = "clamp-exact-over-small-harvest-interior"
+title  = "The clamp is exact over the interior of a small harvest, and what breaks it is how many chunks were generated at once — 2026-08-17, branch `clamped-floor-probe`"
+branch = "clamped-floor-probe"

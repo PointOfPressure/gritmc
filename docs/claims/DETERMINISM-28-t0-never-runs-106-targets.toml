@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 28
+slug   = "t0-never-runs-106-targets"
+title  = "What else does T0 never run? All 106 targets, enumerated — and the answer is wide and shallow (2026-08-10)"
+branch = "backfill"

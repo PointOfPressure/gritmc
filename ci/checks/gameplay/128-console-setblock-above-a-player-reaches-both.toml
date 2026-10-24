@@ -1,0 +1,29 @@
+name = "console-setblock-above-a-player-reaches-both"
+about = """
+`execute at oracle_eye run setblock ~ ~3 ~ minecraft:oak_stairs[facing=east]`
+from the console writes one block three above the observer, and both players
+are sent it as one `block_update` carrying the east-facing, bottom-half,
+straight, dry stair — the input's named property over the block's defaults
+
+`SetBlockCommand.setBlock` -> `BlockInput.place(level, pos, 2 | 256)`:
+`Block.updateFromNeighbourShapes` (air all round leaves the stair straight),
+`overwriteWithDefinedProperties` (puts `facing=east` back), then
+`level.setBlock`, which records the position for the tick's broadcast; then
+`updateNeighboursOnBlockSet`. A server that ignored the property places a
+north-facing stair, one that resolved `~` against the console's own position
+writes somewhere neither player can see, and one that broadcast the change
+from the command thread rather than the tick puts it at a different place in
+the window — all three move the observation. The success line is the
+console's log, so `chat` is silent.
+
+Level 2, through the console. The restore writes air back into the same
+cell, so no later scenario's rig has a stair hanging over it.
+"""
+console_restore = ["execute at oracle_eye run setblock ~ ~3 ~ minecraft:air"]
+observe_from = "both"
+observe = ["block_update", "section_blocks_update", "chat"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = "execute at oracle_eye run setblock ~ ~3 ~ minecraft:oak_stairs[facing=east]"

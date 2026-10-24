@@ -1,0 +1,86 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/rustmc-proto",
+    "crates/rustmc-world",
+    "crates/rustmc-worldgen",
+    "crates/rustmc-entity",
+    "crates/rustmc-behavior",
+    "crates/rustmc-server",
+    "crates/rustmc-api",
+    "crates/rustmc-data",
+    "crates/rustmc-loot",
+    "plugins/essentials-core",
+    "plugins/permissions",
+    "plugins/worldedit-core",
+    "tools/oracle-runner",
+    "tools/goldengen",
+    "tools/anvil-probe",
+    "tools/region-differ",
+    "tools/worldgen-assembly",
+    "tools/worldgen-dump",
+    "tools/level-probe",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "PolyForm-Noncommercial-1.0.0"
+repository = "https://github.com/PointOfPressure/rustmc"
+
+[workspace.dependencies]
+# External (kept deliberately few; every dep is compile time on the laptop
+# and audit surface — additions go through the orchestrator)
+flate2 = "1"
+# The ONLY reason this is here: `libc::signal`, so that a clean stop saves the
+# world instead of losing up to one autosave interval of it. It has no
+# dependencies of its own, and nothing else in this workspace may use it
+# without saying so here — the point of keeping the external list this short
+# is that every name on it has a sentence.
+libc = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+
+rustmc-proto = { path = "crates/rustmc-proto" }
+rustmc-world = { path = "crates/rustmc-world" }
+rustmc-loot = { path = "crates/rustmc-loot" }
+rustmc-worldgen = { path = "crates/rustmc-worldgen" }
+rustmc-entity = { path = "crates/rustmc-entity" }
+rustmc-behavior = { path = "crates/rustmc-behavior" }
+worldgen-assembly = { path = "tools/worldgen-assembly" }
+rustmc-api = { path = "crates/rustmc-api" }
+rustmc-data = { path = "crates/rustmc-data" }
+
+# The plugin contract, from the `grit-plugins` repo checked out beside this
+# one. **Not a copy.** A mirrored crate would be two copies of a contract, and
+# the first divergence between them would be invisible to both repos' tests;
+# worse, `grit-plugins/host-proof` builds `grit:protect` against the original,
+# so a mirror here would make the server's plugin types a *different* crate and
+# no test could ever load a real first-party plugin into the real server. One
+# crate, reached by path, is what lets that test exist.
+#
+# This makes a sibling checkout a build requirement — see README.md. It is the
+# direction `grit-plugins/docs/DECISIONS.md` D15 names as correct ("the arrow
+# reverses"), and it ends when `grit-plugin-api` is published and this becomes
+# a version.
+grit-plugin-api = { path = "../plugins/crates/grit-plugin-api" }
+
+[workspace.lints.rust]
+# Regionization rule 1 (CRATES.md): no global mutable state, ever.
+static_mut_refs = "deny"
+
+[workspace.lints.clippy]
+# HashMap iteration leaking into behavior-visible output is a bug by
+# definition (ORACLE.md §6); these make the easy mistakes loud.
+iter_over_hash_type = "warn"
+float_arithmetic = "allow"
+
+# ORACLE.md §5: no fast-math, no reassociation — default rustc semantics are
+# already IEEE-strict; nothing here may ever override that.
+[profile.release]
+codegen-units = 1
+lto = "thin"
+
+[profile.bench]
+inherits = "release"

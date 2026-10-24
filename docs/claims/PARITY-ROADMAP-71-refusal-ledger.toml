@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 71
+slug   = "refusal-ledger"
+title  = "The golden generators' refusal ledger"
+branch = "tables-refusal-ledger"
+status = "written"

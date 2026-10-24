@@ -1,0 +1,6 @@
+doc    = "DETERMINISM"
+number = 52
+slug   = "decorate-golden-truncation"
+title  = "The vanilla draw oracle aborted silently for nine days"
+branch = "feat-worldgen-refused"
+status = "written"

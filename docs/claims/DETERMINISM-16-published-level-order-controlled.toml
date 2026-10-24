@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 16
+slug   = "published-level-order-controlled"
+title  = "The published level, re-taken with the order controlled — 2026-08-10"
+branch = "backfill"

@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 39
+slug   = "block-class-predicts-behaviour"
+title  = "Does a block's class predict its behaviour? For `useWithoutItem` yes, for `useItemOn` no — 2026-08-12, branch `gameplay-block-classes`"
+branch = "gameplay-block-classes"

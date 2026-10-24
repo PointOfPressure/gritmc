@@ -1,0 +1,50 @@
+name = "typing-on-a-hanging-sign-you-placed-sets-its-text"
+about = "the one check in this set where a field of a block entity actually moves. Ten of the eleven new types can only be observed at the moment they are created, so all ten would pass on a server that emitted the right constant and stored nothing; this one edits the block entity after it exists and re-reads it, which no constant can survive. It is 570 asked of the other `SignBlockEntity` type — and it is not redundant with it, because 570 cannot tell a server that keeps one sign store keyed by position from one that keeps a store per type"
+observe_from = "actor"
+observe = [
+    "block_entity_data",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+# 771's rig, one step further on — the same relationship 570 has with 460.
+#
+# **The placement is not decoration and cannot be dropped.**
+# `SignBlockEntity.updateSignText` refuses any edit from a player who is not
+# `getPlayerWhoMayEdit()`, and the only thing that sets that is
+# `SignBlock.openTextEdit` from inside the placement. A scenario that sent
+# `sign_update` at a hanging sign it had not placed would be dropped silently
+# and would record this server's silence as agreement.
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_hanging_sign"
+slot = 1
+
+[[setup]]
+do = "place"
+on = [1, 0, 1]
+face = "south"
+
+# The sign is at [1,0,2] — the block the clicked face points at, not the stone
+# that was clicked.
+[[step]]
+do = "sign_update"
+pos = [1, 0, 2]
+front = true
+lines = ["hanging", "", "", ""]

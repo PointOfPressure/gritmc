@@ -1,0 +1,64 @@
+name = "a-different-loom-button-and-dye-make-a-different-banner"
+about = "the same loom as 860 with a blue dye and button 13, which is `cross` in `#minecraft:no_item_required`'s file order: a different pattern id and dye id in the one layer, so a loom that ignored the button or the dye fails one of the two"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1000
+
+# LoomMenu: banner 0, dye 1, pattern 2, result 3, then the 36 — hotbar 0 is
+# 4 + 27 = 31. One data slot, `selectedBannerPatternIndex`. With the pattern
+# slot empty the buttons index `#minecraft:no_item_required` in its tag
+# file's order: 3 is square_top_right, 13 is cross.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:loom"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:white_banner"
+
+[[setup]]
+do = "hold"
+item = "minecraft:blue_dye"
+slot = 1
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 31
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 32
+
+[[step]]
+do = "container_click"
+slot = 1
+
+[[step]]
+do = "container_button_click"
+button = 13
+

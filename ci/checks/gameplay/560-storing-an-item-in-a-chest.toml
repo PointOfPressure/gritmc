@@ -1,0 +1,155 @@
+name = "storing-an-item-in-a-chest"
+about = "picking a block up off the hotbar inside an open chest and putting it into the chest — vanilla answers each click with a `container_set_slot` correcting the slot that moved, and this server, which has no block entities and therefore nowhere to keep an item, answers neither"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot"]
+settle_ms = 1000
+
+# The chest lid repeats on a free-running 5-tick timer for as long as the chest
+# is open — `ContainerOpenersCounter.recheckOpeners` re-arms unconditionally
+# (offsets 178-186 call `Level.scheduleTick(pos, block, 5)`) and calls
+# `openerCountChanged` on both paths (offset 84's `if_icmpeq 167` lands on the
+# call itself), and `ChestBlockEntity.signalOpenCount` offsets 0-13 turn that
+# into `level.blockEvent(pos, block, 1, newCount)`. So the same `block_event`
+# goes out every 250 ms, forever.
+#
+# This check does not observe `block_event` and so never saw them declared.
+# It sees them under `strict`, where **how many arrived and which step each
+# was stamped with are set by where a free-running timer's edges fell against
+# this window** — measured on the 2026-08-07 07:10 subset pair, six of the
+# seven scenarios that leave a chest open disagreed on step attribution while
+# agreeing on the total.
+#
+# What stops being tested here: the repeat count and the step attribution of
+# `block_event`. What is still tested: that the lid opens at all, at the right
+# position, with the right viewer count, on the right stream — and the cadence
+# itself, in `rustmc_server::containers::tests::
+# the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`, which measures
+# the gap rather than the count.
+collapse_repeats = ["block_event"]
+
+# THE FIRST CHECK IN THIS CORPUS THAT PUTS AN ITEM ANYWHERE.
+#
+# Four checks opened a container before this one and not one of them could
+# store anything, because the language had no verb for a click inside a menu.
+# `docs/SERVER.md` has said for weeks that "the first thing that will tell the
+# difference is an item staying where it was put"; this is that sentence with
+# an instrument behind it.
+#
+# WHY EACH CLICK IS ANSWERED AT ALL — the part that is easy to get backwards.
+#
+# `ServerboundContainerClickPacket` carries the client's *prediction* of the
+# result: `changedSlots`, a map of slot to hashed stack, and `carriedItem`.
+# `handleContainerClick` runs `menu.clicked(...)`, then writes those claims
+# into the menu's remote-belief table with `setRemoteSlotUnsafe` /
+# `setRemoteCarried`, then calls `broadcastChanges` — which sends a
+# `container_set_slot` **only where the truth differs from what the client is
+# believed to think**.
+#
+# So a harness that predicted correctly would be answered with silence, and
+# this check, and every storing and crafting check after it, would be vacuous:
+# two servers saying nothing about a chest one of them does not have. The
+# harness sends an empty map and an empty carried item — the only honest claim
+# it can make, since it models no inventory — and vanilla therefore has to
+# correct every slot that moved. That is a property of the verb, not of this
+# file, and it is written down in `Step::ContainerClick`.
+#
+# THE SLOT NUMBERS ARE MENU INDICES, NOT INVENTORY INDICES.
+#
+# `AbstractContainerMenu` numbers the container's own slots first and then
+# appends the player's through `addStandardInventorySlots` — three rows of
+# nine, then the hotbar. A 3-row chest menu is 63 slots:
+#
+#   0..26   the chest
+#   27..53  the player's three inventory rows
+#   54..62  the hotbar        <- 54 is `hold`'s slot 0
+#
+# `Step::Hold`'s numbering is the *other* one: it writes an `InventoryMenu`
+# index, where the same hotbar slot is 36. The two only coincide when no
+# container is open, which is the trap this comment exists to keep out of the
+# file.
+#
+# WHAT THE TWO CLICKS DO ON VANILLA, AND WHY THE SECOND ONE IS THE POINT.
+#
+#   click 54  PICKUP on the hotbar slot holding the stone
+#             -> slot 54 becomes empty, the stone goes on the cursor
+#   click 0   PICKUP on the chest's first slot, cursor holding the stone
+#             -> the stone goes into the chest
+#
+# The first click alone would only prove that vanilla can move an item within
+# the player's own inventory, which needs no container at all. The second is
+# the one that needs somewhere to *keep* it, and it is the one this server
+# cannot answer: `crates/rustmc-server/src/menu.rs` synthesises the slot vector
+# fresh on every open, all empty but the last nine, which are read straight off
+# the hotbar. There is no store to put anything in.
+#
+# ITS PAIR IS 561, AND NEITHER MEANS ANYTHING ALONE.
+#
+# 561 is this file with one number changed — `slot = 54` becomes `slot = 0` —
+# so both of its clicks land on an empty chest slot with an empty cursor and
+# both servers correctly say nothing. That is what forbids the wrong fix: a
+# server that answered *every* container click with a correction would reach
+# `match` here and fail 561.
+#
+# WHAT THIS CHECK'S VERDICT DEPENDS ON BESIDES ITSELF.
+#
+# `open_screen` carries the window id, and `ServerPlayer.nextContainerCounter`
+# is `containerCounter % 100 + 1` on a field that lives as long as the player.
+# One actor plays every scenario, so this check opens the **fifth** menu of the
+# run and vanilla really does put `window=5` on the wire here, because 090,
+# 470, 480 and 490 each opened one before it.
+#
+# **NOTHING IN THAT REACHES THIS CHECK'S VERDICT — MEASURED 2026-08-12.** The
+# sentence that used to end this block said the menu checks were one
+# indivisible item in corpus order and that these three joined the end of it.
+# `compare::rebase_session_counters` rebases `window` onto the scenario, so
+# what is compared is this observation's distance from the first one in this
+# check's own projection, and `ci/window-coupling.py` shifted a whole
+# 109-scenario vanilla recording's counter by +1, +2, +7 and +99 without
+# moving a single verdict. See `docs/PARITY-ROADMAP.md` §42. Vanilla's counter
+# still runs for the whole session; the corpus no longer compares where it has
+# got to. What this check DOES still inherit is what earlier scenarios left in
+# the world and in the actor's inventory — see the `790` rule.
+#
+# WHAT IT LEAVES BEHIND, AND WHO CLEANS IT UP.
+#
+# A stone in a chest 32 blocks west, and — on vanilla — an open menu. The menu
+# is the state-shaped part and it is reset structurally, in `record.rs`, before
+# every scenario and before the walk. Nothing here tidies up after itself; that
+# is the version that works until somebody writes the next scenario.
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Hotbar 0 is overwritten with the stone now that the chest has been placed,
+# so menu slot 54 holds something for the first click to pick up. Creative
+# placement does not consume, so the order here is cosmetic — but the stone has
+# to be in slot 0 and the *selected* item has to be something that will not
+# place, or the step below would build a block on top of the chest instead of
+# opening it.
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0

@@ -1,0 +1,41 @@
+name = "an-orb-four-blocks-away-creeps-to-the-player"
+about = """
+an orb summoned four blocks from the actor, on the ground, follows the nearest
+player inside eight blocks and creeps towards it — `followNearbyPlayer` adds
+`normalize(d) * (1 - |d| / 8)^2 * 0.1` per tick, and grass's 0.6 friction times
+the 0.98 air drag scales all three components while it is grounded — and its
+position goes out every twenty ticks (`updateInterval` 20) as `move_entity`
+deltas — or as `entity_position`, the forced sync `ServerEntity.sendChanges`
+takes when the ground flag changed since the last send, which a summoned orb's
+first landing does — until it is close enough to be touched
+
+Every number in its flight is a function of where it was put and where the
+player stands: a summoned orb draws nothing. So the deltas compare exactly,
+and a server whose orb did not move, moved at the wrong speed, ignored the
+friction or followed the observer (five blocks off in z, further away) diverges
+on them, on the tick of the take, or on both.
+"""
+console_restore = ["xp add oracle -1000000 levels"]
+observe_from = "actor"
+observe = [
+    "add_entity",
+    "move_entity",
+    "entity_position",
+    "set_entity_motion",
+    "take_item_entity",
+    "remove_entities",
+    "set_experience",
+]
+# Four, not the default sixteen: the orb starts four blocks out and only
+# closes, and the observer stands five off in z. Vanilla tells the actor the
+# observer's `entity_position` inside the window (recorded 2026-10-01, `xp-r3`:
+# `[0, 0, 5]`, before the summon) and this server does not; that is the
+# player's sync, not the orb's flight, and at sixteen it made this check
+# diverge on a packet it is not about. Re-compared offline on the same pair:
+# declared and strict both `match`.
+within = 4
+settle_ms = 8000
+
+[[step]]
+do = "console"
+text = "execute at oracle run summon minecraft:experience_orb ~4 ~ ~ {Value:7}"

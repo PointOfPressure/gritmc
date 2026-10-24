@@ -1,0 +1,80 @@
+name = "an-observer-pulses-at-the-block-it-faces"
+about = "an observer answers a change to the block it faces with exactly TWO block updates at its own position, POWERED on and then POWERED off, in that order and from a single step — that count, that order and that position are the whole of what this check tests. It does NOT test how long the pulse lasts, and the `about` said it did until 2026-08-03. The pulse is two game ticks — `ObserverBlock.startSignal` and the `scheduleTick` inside `ObserverBlock.tick` both schedule with `iconst_2`, so 100 ms, and the corpus said one tick until the bytecode was counted — but the measured client-side gap between the two updates is 68-132 ms, a 64 ms run-to-run spread against a 50 ms signal, so no bucket is both wider than the jitter and narrower than one tick. The duration is not observable from this wire at all; the note below has the four measurements and the arithmetic. Still the only check in the corpus that needs the settle window to catch the *second* half of an answer"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+settle_ms = 2500
+
+# **No `timing`, and this is the entry that says why the duration the `about`
+# used to claim is not testable on this wire.**
+#
+# The `about` above was rewritten on 2026-08-03 to stop claiming it. It said
+# "an observer emits a TWO-tick pulse", which is true of vanilla and is not
+# what this check measures: a server that pulsed for one tick or for three
+# would still produce two updates in this order at this position and would
+# still come back `match`. A check whose stated claim is wider than its
+# instrument is the class this project hunts, and leaving the number in the
+# sentence while the note below explains it away is the same fault one
+# indirection deeper. So the claim now stops where the wire does, and the
+# bytecode figure survives as context rather than as coverage.
+#
+# The pulse is TWO game ticks — 100 ms — and the corpus said one until the
+# bytecode was counted: `ObserverBlock.startSignal` schedules with `iconst_2`
+# and so does the `scheduleTick` inside `ObserverBlock.tick`. The measurements
+# below agree with the bytecode and not with the old text: they average 100 ms,
+# not 50. The two `block_update`s the pulse produces (`powered=true` then
+# `powered=false` at the same position) were measured against vanilla on the
+# Threadripper, 2026-08-03, across two selfcheck runs on both streams:
+#
+#     powered=true   at   74, 106, 126,  94 ms
+#     powered=false  at  206, 174, 194, 226 ms
+#     gap                132,  68,  68, 132 ms
+#
+# The gap is bimodal at 68 and 132 ms about a nominal 100 — the 50 ms tick grid
+# aliasing against the arrival timestamps — so the run-to-run spread is
+# **64 ms**. The leading edge alone spans 74..126 ms.
+#
+# A timing bucket has to be wide enough to survive the jitter and narrower than
+# the difference it must detect, and here there is no such number. The
+# difference that matters is one tick: a server that pulsed for one tick or for
+# three would still be wrong, and telling those apart needs 50 ms of
+# resolution while the samples move 64 ms on their own. The same is true of an
+# interval-based projection, which is why this is a property of the wire rather
+# than of the choice of projection: a broadcast is quantised to the server tick
+# and then jittered by the network, and one tick **is** the quantum.
+#
+# So the honest reading of this check is what it can still say — that the
+# observer produces exactly two updates at that position, on and then off,
+# rather than one or none. The *duration* of the pulse is not observable from
+# a client and no bucket makes it so. It would take a server-side instrument
+# (a tick counter, not a packet timestamp) to test the claim as written.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# **An observer faces the way the player is looking, not away from it.**
+# `ObserverBlock.getStateForPlacement` is
+# `FACING = getNearestLookingDirection().getOpposite().getOpposite()` — the
+# two calls are consecutive in the bytecode and cancel, which is a real
+# double negation in Mojang's own source. Every other directional block in
+# this corpus takes a single `getOpposite`, so the natural guess is wrong by
+# exactly 180 degrees: at yaw 0 the observer watches [1, 0, 1], not
+# [1, 0, -1].
+[[setup]]
+do = "hold"
+item = "minecraft:observer"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[step]]
+do = "place"
+on = [1, -1, 1]
+face = "up"

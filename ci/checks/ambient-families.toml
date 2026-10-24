@@ -1,0 +1,289 @@
+# ci/checks/ambient-families.toml — the measurement behind every
+# `trace::FAMILIES` row. WRITTEN BY `ci/ambient-census.sh`; do not
+# hand-edit. `ci/ambient-falsify.py --check` reads it in T0.
+#
+# `self_consistent` is TWO INDEPENDENT VANILLA RUNS agreeing about
+# the ordered sequence of this family's decoded fields, scenario by
+# scenario, over the whole censused set. A family neither run
+# emitted scores `self_consistent = false` and `measured = false`,
+# never a vacuous true: every empty sequence equals every other one,
+# so silence would otherwise read as the most stable family here.
+#
+# `self_consistent_stepped` adds the STEP each observation landed
+# after, which `compare::project` puts into the compared value. It
+# is the one a check lives or dies by and the one `graded` requires;
+# the gap between the two separates `vanilla is nondeterministic`
+# from `vanilla is fine and the harness cannot pin the arrival`.
+#
+# `emitter_sites` is `new` instructions for the packet's class
+# anywhere under net/ in the pinned jar, from
+# `ci/packet-emitter-sites.py`. -1 means the scan did not cover the
+# family (the two synthesised kinds have no class of their own).
+#
+# `projected` counts vanilla observations inside the censused
+# scenarios that name the kind in their own `observe` list — only
+# those reach a projection. A `Class::Graded` row with
+# `projected = 0` is refused.
+
+[census]
+commit = "3e65f5e87e17aaa636c19ce0c56225c538af78f0"
+scenarios = 21
+vanilla_a = "vanilla-a.json"
+vanilla_b = "vanilla-b.json"
+recorder = "oracle-runner 0.1.0"
+
+[[family]]
+kind = "keep_alive"
+id = "KEEP_ALIVE"
+obs_vanilla = 15
+obs_vanilla_a = 7
+obs_vanilla_b = 8
+obs_ours = 8
+scenarios_vanilla = 5
+scenarios_ours = 4
+agreeing_scenarios = 16
+agreeing_scenarios_stepped = 16
+self_consistent = false
+self_consistent_stepped = false
+measured = true
+emitter_sites = 1
+projected = 0
+named_by_a_scenario = false
+
+[[family]]
+kind = "ping"
+id = "PING"
+obs_vanilla = 0
+obs_vanilla_a = 0
+obs_vanilla_b = 0
+obs_ours = 0
+scenarios_vanilla = 0
+scenarios_ours = 0
+agreeing_scenarios = 21
+agreeing_scenarios_stepped = 21
+self_consistent = false
+self_consistent_stepped = false
+measured = false
+emitter_sites = 0
+projected = 0
+named_by_a_scenario = false
+vanilla_sites = []
+
+[[family]]
+kind = "set_time"
+id = "SET_TIME"
+obs_vanilla = 237
+obs_vanilla_a = 115
+obs_vanilla_b = 122
+obs_ours = 115
+scenarios_vanilla = 21
+scenarios_ours = 21
+agreeing_scenarios = 0
+agreeing_scenarios_stepped = 0
+self_consistent = false
+self_consistent_stepped = false
+measured = true
+emitter_sites = 3
+projected = 0
+named_by_a_scenario = false
+
+[[family]]
+kind = "chunk_batch_start"
+id = "CHUNK_BATCH_START"
+obs_vanilla = 74
+obs_vanilla_a = 36
+obs_vanilla_b = 38
+obs_ours = 22
+scenarios_vanilla = 5
+scenarios_ours = 5
+agreeing_scenarios = 19
+agreeing_scenarios_stepped = 19
+self_consistent = false
+self_consistent_stepped = false
+measured = true
+emitter_sites = 1
+projected = 0
+named_by_a_scenario = false
+
+[[family]]
+kind = "chunk_batch_finished"
+id = "CHUNK_BATCH_FINISHED"
+obs_vanilla = 74
+obs_vanilla_a = 36
+obs_vanilla_b = 38
+obs_ours = 22
+scenarios_vanilla = 5
+scenarios_ours = 5
+agreeing_scenarios = 19
+agreeing_scenarios_stepped = 19
+self_consistent = false
+self_consistent_stepped = false
+measured = true
+emitter_sites = 1
+projected = 0
+named_by_a_scenario = false
+
+[[family]]
+kind = "forget_level_chunk"
+id = "FORGET_LEVEL_CHUNK"
+obs_vanilla = 506
+obs_vanilla_a = 253
+obs_vanilla_b = 253
+obs_ours = 207
+scenarios_vanilla = 5
+scenarios_ours = 5
+agreeing_scenarios = 21
+agreeing_scenarios_stepped = 21
+self_consistent = true
+self_consistent_stepped = true
+measured = true
+emitter_sites = 1
+projected = 44
+named_by_a_scenario = true
+
+[[family]]
+kind = "light_update"
+id = "LIGHT_UPDATE"
+obs_vanilla = 0
+obs_vanilla_a = 0
+obs_vanilla_b = 0
+obs_ours = 0
+scenarios_vanilla = 0
+scenarios_ours = 0
+agreeing_scenarios = 21
+agreeing_scenarios_stepped = 21
+self_consistent = false
+self_consistent_stepped = false
+measured = false
+emitter_sites = 1
+projected = 0
+named_by_a_scenario = false
+vanilla_sites = []
+
+[[family]]
+kind = "set_chunk_cache_center"
+id = "SET_CHUNK_CACHE_CENTER"
+obs_vanilla = 46
+obs_vanilla_a = 23
+obs_vanilla_b = 23
+obs_ours = 23
+scenarios_vanilla = 5
+scenarios_ours = 5
+agreeing_scenarios = 21
+agreeing_scenarios_stepped = 21
+self_consistent = true
+self_consistent_stepped = true
+measured = true
+emitter_sites = 1
+projected = 4
+named_by_a_scenario = true
+
+[[family]]
+kind = "player_info_update"
+id = "PLAYER_INFO_UPDATE"
+obs_vanilla = 12
+obs_vanilla_a = 4
+obs_vanilla_b = 8
+obs_ours = 0
+scenarios_vanilla = 5
+scenarios_ours = 0
+agreeing_scenarios = 16
+agreeing_scenarios_stepped = 16
+self_consistent = false
+self_consistent_stepped = false
+measured = true
+emitter_sites = 5
+projected = 0
+named_by_a_scenario = false
+
+[[family]]
+kind = "tab_list"
+id = "TAB_LIST"
+obs_vanilla = 0
+obs_vanilla_a = 0
+obs_vanilla_b = 0
+obs_ours = 0
+scenarios_vanilla = 0
+scenarios_ours = 0
+agreeing_scenarios = 21
+agreeing_scenarios_stepped = 21
+self_consistent = false
+self_consistent_stepped = false
+measured = false
+emitter_sites = 0
+projected = 0
+named_by_a_scenario = false
+vanilla_sites = []
+
+[[family]]
+kind = "update_advancements"
+id = "UPDATE_ADVANCEMENTS"
+obs_vanilla = 0
+obs_vanilla_a = 0
+obs_vanilla_b = 0
+obs_ours = 0
+scenarios_vanilla = 0
+scenarios_ours = 0
+agreeing_scenarios = 21
+agreeing_scenarios_stepped = 21
+self_consistent = false
+self_consistent_stepped = false
+measured = false
+emitter_sites = 1
+projected = 0
+named_by_a_scenario = false
+vanilla_sites = []
+
+[[family]]
+kind = "chunk_no_block_entities"
+id = ""
+obs_vanilla = 506
+obs_vanilla_a = 253
+obs_vanilla_b = 253
+obs_ours = 207
+scenarios_vanilla = 5
+scenarios_ours = 5
+agreeing_scenarios = 21
+agreeing_scenarios_stepped = 21
+self_consistent = true
+self_consistent_stepped = true
+measured = true
+emitter_sites = -1
+projected = 44
+named_by_a_scenario = true
+
+[[family]]
+kind = "move_entity_heartbeat"
+id = ""
+obs_vanilla = 97
+obs_vanilla_a = 50
+obs_vanilla_b = 47
+obs_ours = 59
+scenarios_vanilla = 20
+scenarios_ours = 21
+agreeing_scenarios = 2
+agreeing_scenarios_stepped = 1
+self_consistent = false
+self_consistent_stepped = false
+measured = true
+emitter_sites = -1
+projected = 14
+named_by_a_scenario = true
+
+[[family]]
+kind = "entity_position"
+id = ""
+obs_vanilla = 64
+obs_vanilla_a = 33
+obs_vanilla_b = 31
+obs_ours = 31
+scenarios_vanilla = 9
+scenarios_ours = 7
+agreeing_scenarios = 13
+agreeing_scenarios_stepped = 13
+self_consistent = false
+self_consistent_stepped = false
+measured = true
+emitter_sites = 1
+projected = 0
+named_by_a_scenario = true

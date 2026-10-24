@@ -1,0 +1,463 @@
+# ci/checks/handoff-terminals.toml — every way `ci/handoff.sh` can stop.
+#
+# `ci/handoff.sh` is the only route to `main`. Its record is 41 GREEN / 32 RED,
+# and until 2026-08-18 the chain had never once named a RED: 30 of the 32
+# arrived as "no verdict line" and 2 as another branch's MERGED. Those were
+# repaired where they were read. This file is the other half of the question —
+# whether the gate EMITS an unambiguous verdict for every path it can take —
+# and it is a declaration rather than a comment because a comment about
+# coverage is a comment nobody re-checks.
+#
+# `ci/check-handoff-terminals.py` enforces, on every T0:
+#
+#   * every live `exit` in `ci/handoff.sh` is declared here. A new terminal
+#     cannot be added without saying what it prints and what forces it;
+#   * every declaration still matches the code. A terminal that is deleted or
+#     reworded fails as a stale row rather than rotting into a lie;
+#   * every `word` is in the vocabulary below, with the exit code the
+#     vocabulary gives it. The word and the exit code cannot drift apart;
+#   * the vocabulary is PREFIX-FREE. This is the general form of the
+#     `MERGED-NOT-PUSHED` defect: `grep -E '^MERGED'` matched the state meaning
+#     "the queue is about to wedge";
+#   * every terminal names a positive control, and the control exists — the
+#     file is there and the label is in it;
+#   * `ci/lanes.sh`'s verdict classifier names every word in the vocabulary. It
+#     is the only in-tree consumer, its pattern is hand-written, and a word this
+#     file adds that it does not know reads to it as "no verdict line".
+#
+# `unforced` counts terminals with no control. It is a ratchet: `max_unforced`
+# may go down and never up. A state that cannot be forced is a state nobody has
+# evidence about, and the number is kept here so it is a fact rather than a
+# feeling.
+# THE STATES NOBODY HAS EVIDENCE ABOUT, BY NAME AND NOT ONLY BY COUNT.
+#
+# `max_unforced` is the merge-blocking number and `unforced` is the list it
+# counts. Both are checked, and the list is the one that matters: a bare ceiling
+# can be satisfied by forcing one terminal and un-forcing another, and it cannot
+# distinguish "a repair added two new terminals" from "two controls rotted
+# away". The set must match exactly — adding to it is as loud as removing.
+#
+# It went 5 -> 4 as fixtures landed, then 4 -> 6 when the behind-origin/main
+# repair added two terminals of its own. That is a real increase and it is
+# recorded as one; the forced proportion went 21/25 to 25/31 over the same span,
+# and to 27/33 on 2026-08-19 when the main-writer mutex added two terminals
+# that arrived WITH a control — so the count of terminals rose and this list
+# did not, which is the distinction the list exists to make.
+#
+# Every one has its argument in its own row rather than here, so it cannot drift
+# from the code it is about. Two are unreachable by construction, two are guards
+# git's own exit code makes unfirable — `git checkout` exits 0 after failing to
+# write a file, measured 2026-08-18 — whose real work is done by the
+# post-condition terminals after them, and two belong to the newest repair.
+max_unforced = 6
+unforced = [
+  "root-unreadable",
+  "count-contradicts-history",
+  "branch-checkout-failed",
+  "main-checkout-failed",
+  "local-main-behind-wont-ff",
+  "local-main-behind-held-elsewhere",
+]
+
+# --- CONSUMERS THAT LIVE OUTSIDE THE REPOSITORY -----------------------------
+#
+# `gate-chain.sh` and `chain-keeper.sh` sit in `~/grit/`, beside the checkout
+# rather than in it, and they are the chain whose record is 41 GREEN / 32 RED.
+# Nothing in a gate can enforce a file a gate does not ship — and on 2026-08-18
+# that cost exactly what it sounds like it costs: `gate-chain.sh` still grepped
+# for `MERGED-NOT-PUSHED`, a word that no longer exists, and named neither
+# `ALREADY-MERGED`, `NOT-FF` nor `UNPUSHED`. All three would have logged as
+# `no verdict line at all`, which is the string 30 of those 32 REDs arrived as
+# — reintroduced by the branch that was fixing it.
+#
+# So they are checked WHEN PRESENT. In the canonical checkout, where the chain
+# runs, `path` resolves and the pattern is enforced. In the `.git`-less gate
+# copy it does not resolve and the check says so and passes. That is the right
+# way round: the enforcement happens where the file is, and a gate is not made
+# red by the absence of something it was never given.
+[[out_of_tree_consumer]]
+path = "../gate-chain.sh"
+match = "grep -E '\\^\\(([A-Z|-]+)\\)'"
+why = "It is the chain's verdict reader; a word it cannot name is logged as `no verdict line at all`."
+
+# --- THE VOCABULARY ---------------------------------------------------------
+# The word, the exit code, and — the field that decides what a queue driver
+# does — whether the branch was judged.
+
+[[verdict]]
+word = "MERGED"
+exit = 0
+judged = "green, and it is on origin"
+next = "nothing. Drop the branch from the queue."
+
+[[verdict]]
+word = "ALREADY-MERGED"
+exit = 0
+judged = "was green, by an earlier run"
+next = "nothing. Drop the branch. This is idempotence, not a fresh merge."
+
+[[verdict]]
+word = "GREEN"
+exit = 0
+judged = "green, and NOT merged"
+next = "--dry-run only. The caller merges, or re-runs without --dry-run."
+
+[[verdict]]
+word = "RED"
+exit = 1
+judged = "yes, and it failed"
+next = "read the diff. Do not re-run; it will fail again."
+
+[[verdict]]
+word = "REFUSED"
+exit = 2
+judged = "no"
+next = "fix the local state named, then re-run. Cheap."
+
+[[verdict]]
+word = "NOT-FF"
+exit = 3
+judged = "no"
+next = "rebase onto main and re-gate."
+
+[[verdict]]
+word = "INFRA"
+exit = 4
+judged = "no. Nothing about the branch was measured."
+next = "fix the infrastructure and re-run. The branch is unjudged, NOT bad."
+
+[[verdict]]
+word = "UNPUSHED"
+exit = 5
+judged = "green, and its merge is DONE in local main"
+next = "push main. Nothing else can be gated until main and origin/main agree."
+
+# --- THE TERMINALS ----------------------------------------------------------
+# `match` is a Python regex against a line of ci/handoff.sh with heredoc bodies
+# and comments removed. `count` is how many lines it must match — exactly, so a
+# copied-and-edited terminal cannot hide behind an existing row.
+#
+# `leaves` is the field this file exists for. Four terminals leave `main` and
+# `origin/main` able to disagree, and those four are what turn one failure into
+# a queue-wide outage; the rest leave nothing at all. It is written down per
+# row so the question "which of these can wedge the queue" is a lookup.
+
+[[terminal]]
+id = "root-unreadable"
+match = 'cannot cd into \$ROOT'
+word = "REFUSED"
+exit = 2
+when = "before anything"
+leaves = "nothing"
+control = "none: $ROOT is the parent of the running script's own directory, so a bash that resolved and executed the script can always cd into it. Unreachable without a race against an rmdir between exec and line 1."
+
+[[terminal]]
+id = "main-writer-lock-unopenable"
+match = 'cannot open the main-writer mutex'
+word = "REFUSED"
+exit = 2
+when = "after a full GREEN gate, entering the merge tail"
+leaves = "nothing merged, nothing pushed, the branch still green and still ahead"
+control = "ci/handoff-merge-tail-falsify.sh:a held main-writer mutex refuses"
+
+[[terminal]]
+id = "main-writer-lock-held"
+match = 'another main-writer holds'
+word = "REFUSED"
+exit = 2
+when = "after a full GREEN gate, entering the merge tail, when ci/batch.sh --land or another gate holds the mutex"
+leaves = "nothing merged, nothing pushed, the branch still green and still ahead — re-running merges"
+control = "ci/handoff-merge-tail-falsify.sh:a held main-writer mutex refuses"
+
+[[terminal]]
+id = "no-branch-given"
+match = 'REFUSED  no branch given'
+word = "REFUSED"
+exit = 2
+when = "before anything"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:no branch given"
+
+[[terminal]]
+id = "gate-dir-is-canonical"
+match = 'is the canonical checkout, not a gate dir'
+word = "REFUSED"
+exit = 2
+when = "before anything"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:gate dir is ~/rustmc"
+
+[[terminal]]
+id = "gate-lock-missing"
+match = 'refusing to gate unlocked'
+word = "REFUSED"
+exit = 2
+when = "before the lock"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:gate-lock.sh missing"
+
+[[terminal]]
+id = "gate-lock-not-acquired"
+match = 'gate_lock_acquire .*\|\| exit 2'
+word = "REFUSED"
+exit = 2
+when = "at the lock"
+leaves = "nothing"
+emitted_by = "ci/gate-lock.sh — four shapes: no setpriv, no --pdeathsig, box key held, tree key held"
+control = "ci/gate-lock-falsify.sh:two gates, one box directory: second refuses by name"
+
+[[terminal]]
+id = "infra"
+match = 'the branch is unjudged'
+word = "INFRA"
+exit = 4
+when = "any stage"
+leaves = "nothing on the laptop; the gate dir may be half-prepared"
+emitted_by = "the infra() function"
+control = "ci/handoff-verdict-selftest.sh:ssh never connected"
+# EVERY CALL SITE, AND WHAT FORCES IT. `infra` is one terminal with many
+# causes, so a control on the terminal alone would prove only that the word can
+# be printed — not that each thing meant to reach it does. The checker counts
+# the call sites in the source and fails if this list is not the same length.
+sites = [
+  { cause = "stage 1: ssh exited 255, nothing ran on the box",       control = "ci/handoff-verdict-selftest.sh:ssh never connected" },
+  { cause = "stage 1: the gate directory could not be prepared",     control = "ci/handoff-verdict-selftest.sh:seed data missing" },
+  { cause = "stage 1: exited 0 having produced no output",           control = "ci/handoff-verdict-selftest.sh:stage 1 never ran" },
+  { cause = "stages 2-6: ssh exited 255, that stage never ran",      control = "ci/handoff-verdict-selftest.sh:stage 5 transport" },
+  { cause = "stage 2: the rsync itself failed, no source reached the box", control = "ci/handoff-verdict-selftest.sh:the rsync failed" },
+  { cause = "the gate log lost this run's header while the gate ran", control = "ci/handoff-merge-tail-falsify.sh:log eaten mid-gate is INFRA" },
+]
+
+[[terminal]]
+id = "unpushed"
+match = 'NOTHING ELSE CAN BE GATED'
+word = "UNPUSHED"
+exit = 5
+when = "at entry, or after the merge"
+leaves = "MAIN AHEAD OF ORIGIN/MAIN — the queue is wedged until it is pushed"
+emitted_by = "the unpushed() function"
+control = "ci/handoff-merge-tail-falsify.sh:push failed: the word"
+sites = [
+  { cause = "at entry: main and origin/main have diverged, not repairable by pushing", control = "ci/handoff-merge-tail-falsify.sh:divergence is named" },
+  { cause = "at entry: main was already ahead and the push still fails", control = "ci/handoff-merge-tail-falsify.sh:3b wedge: unrepairable is named" },
+  { cause = "after the merge: three pushes to origin failed",            control = "ci/handoff-merge-tail-falsify.sh:push failed: the word" },
+]
+
+[[terminal]]
+id = "job-cap-invalid"
+match = 'is not a positive integer'
+word = "REFUSED"
+exit = 2
+when = "before the gate"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:job cap not a number"
+
+[[terminal]]
+id = "reference-cache-invalid"
+match = "is not 0 or 1"
+word = "REFUSED"
+exit = 2
+when = "before the gate"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:reference cache is not 0/1"
+
+[[terminal]]
+id = "no-such-branch"
+match = 'REFUSED  no such branch'
+word = "REFUSED"
+exit = 2
+when = "state checks"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:no such branch"
+
+[[terminal]]
+id = "tree-dirty"
+match = 'REFUSED  working tree dirty'
+word = "REFUSED"
+exit = 2
+when = "state checks"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:working tree dirty"
+
+[[terminal]]
+id = "count-contradicts-history"
+match = 'counts 0 commits ahead of main but is not an ancestor'
+word = "REFUSED"
+exit = 2
+when = "state checks"
+leaves = "nothing"
+control = "none: an assertion, not a state. AHEAD is `git rev-list --count main..$BRANCH`, which is 0 if and only if $BRANCH is an ancestor of main, so the two conditions cannot both hold. It is kept because an AHEAD of 0 arrived at some other way — a failed rev-list leaving the variable empty — must refuse rather than fall through."
+
+[[terminal]]
+id = "already-merged"
+match = 'is already in main at'
+word = "ALREADY-MERGED"
+exit = 0
+when = "state checks"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:already merged"
+
+[[terminal]]
+id = "behind-main"
+match = 'behind main — not a fast-forward, rebase it'
+word = "NOT-FF"
+exit = 3
+when = "state checks"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:behind main"
+
+[[terminal]]
+id = "branch-worktree-held"
+match = 'release_worktree "\$BRANCH" \|\| exit 2'
+word = "REFUSED"
+exit = 2
+when = "state checks"
+leaves = "nothing"
+emitted_by = "release_worktree — dirty holder, or a holder that cannot be read"
+control = "ci/handoff-state-falsify.sh:dirty holder refuses"
+
+[[terminal]]
+id = "branch-checkout-failed"
+match = 'REFUSED  could not check out \$BRANCH'
+word = "REFUSED"
+exit = 2
+when = "state checks"
+leaves = "nothing"
+control = "none: git checkout of a ref that exists, in a tree already proved clean and already released from any other worktree, and — measured — git exits 0 even when it cannot write a file. Every failure this line can catch has been excluded above it; the ones it cannot catch are caught by checkout-branch-incomplete below."
+
+[[terminal]]
+id = "lock-anchor-gone"
+match = 'gate_lock_assert_anchored \|\|'
+word = "REFUSED"
+exit = 2
+when = "after stage 6, before the merge"
+leaves = "nothing — asserted at the last moment it can still matter"
+emitted_by = "ci/gate-lock.sh"
+control = "ci/gate-lock-falsify.sh:SIGKILL of a live gate does not wedge the next"
+
+[[terminal]]
+id = "red"
+match = 'no-vanilla-skips='
+word = "RED"
+exit = 1
+when = "after the stages"
+leaves = "nothing; ROOT is left on the branch"
+control = "ci/handoff-verdict-selftest.sh:T0 failed"
+
+[[terminal]]
+id = "dry-run-green"
+match = 'dry run, not merged'
+word = "GREEN"
+exit = 0
+when = "--dry-run only"
+leaves = "nothing; ROOT is left on the branch"
+control = "ci/handoff-verdict-selftest.sh:everything green"
+
+[[terminal]]
+id = "main-worktree-held"
+match = '^release_worktree main \|\|'
+word = "REFUSED"
+exit = 2
+when = "AFTER a full green gate"
+leaves = "nothing merged; the gate is not lost"
+emitted_by = "release_worktree"
+control = "ci/handoff-merge-tail-falsify.sh:main held by a dirty worktree"
+
+[[terminal]]
+id = "main-checkout-failed"
+match = 'could not check out main after a green gate'
+word = "REFUSED"
+exit = 2
+when = "AFTER a full green gate"
+leaves = "nothing merged; the gate is not lost"
+control = "none: same argument as branch-checkout-failed. git exits 0 on the failures this line could catch, so checkout-main-incomplete below is the terminal that fires."
+
+[[terminal]]
+id = "main-moved-under-the-gate"
+match = 'main moved while \$BRANCH was being gated'
+word = "NOT-FF"
+exit = 3
+when = "AFTER a full green gate"
+leaves = "nothing merged; ROOT is left on main"
+control = "ci/handoff-merge-tail-falsify.sh:main moved: names the cause"
+
+[[terminal]]
+id = "merged"
+match = 'MERGED   \$BRANCH -> main'
+word = "MERGED"
+exit = 0
+when = "the end"
+leaves = "main == origin/main, both carrying the branch"
+control = "ci/handoff-merge-tail-falsify.sh:green merges"
+
+[[terminal]]
+id = "checkout-branch-incomplete"
+match = 'the checkout of \$BRANCH did not complete'
+word = "REFUSED"
+exit = 2
+when = "state checks"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:checkout exits 0 and lies"
+
+[[terminal]]
+id = "checkout-main-incomplete"
+match = 'the checkout of main did not complete after a green gate'
+word = "REFUSED"
+exit = 2
+when = "AFTER a full green gate"
+leaves = "nothing merged; the gate is not lost"
+control = "ci/handoff-merge-tail-falsify.sh:checkout of main exits 0 and lies"
+
+[[terminal]]
+id = "log-unwritable"
+match = 'the gate log cannot be written'
+word = "INFRA"
+exit = 4
+when = "before anything is run"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:unwritable gate log"
+
+[[terminal]]
+id = "push-retry-gaps-invalid"
+match = "the only accepted value is 0"
+word = "REFUSED"
+exit = 2
+when = "before the gate"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:push retry gaps not 0"
+
+[[terminal]]
+id = "unrecognised-argument"
+match = "unrecognised argument"
+word = "REFUSED"
+exit = 2
+when = "before anything"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:--dryrun typo"
+
+[[terminal]]
+id = "branch-looks-like-a-flag"
+match = "looks like a flag, not a branch"
+word = "REFUSED"
+exit = 2
+when = "before anything"
+leaves = "nothing"
+control = "ci/handoff-state-falsify.sh:flag before the branch"
+
+[[terminal]]
+id = "local-main-behind-wont-ff"
+match = "behind origin/main and would not fast-forward"
+word = "REFUSED"
+exit = 2
+when = "at entry, before any stage"
+leaves = "nothing"
+control = "none: local main is a strict ancestor of origin/main by the branch this sits in, and the tree was proved clean two checks earlier, so `git merge --ff-only origin/main` has nothing to refuse on. Kept because a fast-forward that fails anyway must not be assumed away."
+
+[[terminal]]
+id = "local-main-behind-held-elsewhere"
+match = "behind origin/main and is checked out elsewhere"
+word = "NOT-FF"
+exit = 3
+when = "at entry, before any stage"
+leaves = "nothing"
+control = "none: needs main behind origin/main AND checked out in a worktree that is not $ROOT, at entry. Reachable; the merge-tail falsifier drives the $ROOT-holds-main path, which is the one the chain actually runs in."

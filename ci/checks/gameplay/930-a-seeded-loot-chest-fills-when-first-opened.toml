@@ -1,0 +1,45 @@
+name = "a-seeded-loot-chest-fills-when-first-opened"
+about = "a chest placed carrying a LootTable and a LootTableSeed opens already stocked — RandomizableContainer.unpackLootTable rolls the table into it on first open, with RandomSource.create(seed), the slot shuffle and shuffleAndSplitItems all drawing from that one generator; a server that never runs a loot table opens it empty"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_event"]
+settle_ms = 1000
+
+# The lid repeats every 5 ticks while the chest is open, and how many repeats
+# land inside settle_ms is this harness's sampling — see 090's header, which
+# measured it. Collapsed for the same reason.
+collapse_repeats = ["block_event"]
+
+# The only route a client has to a chest that carries a loot table:
+# `block_entity_data` on the held stack, which `BlockItem.place` loads through
+# `updateCustomBlockEntityTag` (offset 143). `container_loot` would be the
+# natural component and is `persistent` only — no stream codec, so no client
+# can send it. `LootTableSeed` must be a LONG: `tryLoadLootTable` reads it with
+# `getLongOr`, so an int would arrive as seed 0 and roll from the random
+# sequence instead.
+#
+# `chests/village/village_weaponsmith` at seed 1: every stack it rolls is
+# component-free (golden: iron_ingot x1/x3/x1, iron_boots, bread x1 x2,
+# iron_pickaxe, copper_spear x2), so `trace::read_item_stack` reads the whole
+# content packet rather than stopping at an opaque stack.
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+components = [
+    { type = "minecraft:block_entity_data", block_entity = "minecraft:chest", strings = { LootTable = "minecraft:chests/village/village_weaponsmith" }, longs = { LootTableSeed = 1 } },
+]
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Overwrite the component-bearing stack, so the inventory half of the content
+# packet holds nothing this server does not echo.
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

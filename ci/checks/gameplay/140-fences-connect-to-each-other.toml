@@ -1,0 +1,18 @@
+name = "fences-connect-to-each-other"
+about = "a fence placed beside another makes the FIRST one change too — a connection property, and the one connection family the extracted update_shape table CAN hold. A fence's join is one boolean per direction, so each (state, direction) pair answers with the block's own state and exactly one other, which is precisely ShapeGolden's emission rule; data/vanilla/update_shape.json carries all 128 oak_fence pairs. A stair's corner is NOT in connective, and this said it was until 2026-08-05: data/vanilla/update_shape.json puts stairs in the *refused* set instead, carrying the extractor's own reason — `updateShape read -1,0,0 / 0,0,-1 / 0,0,1 / 1,0,0, not its own neighbour`. StairBlock.updateShape never touches the neighbour state it is handed and calls getStairsShape(state, BlockGetter, pos), so the probe catches it reading four ORTHOGONAL horizontal neighbours; they are not diagonals, and an audit that said diagonals was right about the bucket and wrong about the reason. The distinction is not cosmetic: connective means several answers and could in principle be carried by a wider table, whereas refused means the function is not of the form (state, direction, neighbour-state) at all and no widening can carry it. That is why 180 diverges and this matches. This about said the table 'calls connective and does not carry' fences until 2026-08-04; that was wrong by the table's own rule, and it cost a diverge-map audit a whole group — it grouped four diverging checks with this passing one and could not explain the difference"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_fence"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[step]]
+do = "place"
+on = [2, -1, 0]
+face = "up"

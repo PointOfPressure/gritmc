@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 33
+slug   = "isolated-arm-was-not-a-function-of-its-inputs"
+title  = "§32.3's unexplained ~200 blocks: the isolated arm was not build-sensitive, it was not a function of its inputs at all — one binary, three worlds, and the mechanism is one shared flag — 2026-08-12, branch `worldgen-isolated-drift`"
+branch = "worldgen-isolated-drift"

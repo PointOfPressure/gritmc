@@ -1,0 +1,60 @@
+name = "taking-a-grindstone-result-empties-both-inputs"
+about = "taking the merged pickaxe runs `GrindstoneMenu$4.onTake`: the level-access lambda awards the experience of the inputs' non-curse enchantments — none, so no orb — and plays `levelEvent(1042)`, then both inputs are set EMPTY; the click is answered with the level event, both input slots, the result and the cursor"
+observe_from = "actor"
+observe = ["container_set_slot", "set_cursor_item", "level_event"]
+settle_ms = 1000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:grindstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_pickaxe"
+components = [{ type = "minecraft:damage", varint = 200 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_pickaxe"
+slot = 1
+components = [{ type = "minecraft:damage", varint = 100 }]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+
+[[step]]
+do = "container_click"
+slot = 0
+
+[[step]]
+do = "container_click"
+slot = 31
+
+[[step]]
+do = "container_click"
+slot = 1
+
+[[step]]
+do = "container_click"
+slot = 2

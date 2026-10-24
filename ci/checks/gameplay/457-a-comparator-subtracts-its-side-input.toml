@@ -1,0 +1,77 @@
+name = "a-comparator-subtracts-its-side-input"
+about = "a comparator fed 15 from behind and 15 from a repeater on its side stays on in compare mode (`i == j && COMPARE`) and goes dark the moment it is clicked into subtract mode — `ComparatorBlock.useWithoutItem` cycles MODE, writes it with flags 2 and calls `refreshOutputState` at once, so `15 - 15 = 0` reaches the dust in front without waiting for a tick"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "sound", "block_changed_ack"]
+settle_ms = 2000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_block"
+
+[[setup]]
+do = "place"
+on = [1, -1, -1]
+face = "up"
+
+# Placed with its input already live: `DiodeBlock.setPlacedBy` books a tick
+# in 1 and the comparator turns on before the dust is even placed.
+[[setup]]
+do = "hold"
+item = "minecraft:comparator"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+# Yaw 90 looks west, so this repeater faces EAST: its input is [3, 0, 0]
+# and its output goes west, into the comparator's east side. A diode's
+# FACING is its input side, and `getControlInputSignal` on the comparator's
+# east neighbour asks with EAST, which only an east-facing diode answers.
+[[setup]]
+do = "look"
+yaw = 90.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:repeater"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_block"
+
+[[setup]]
+do = "place"
+on = [3, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+# The click is the measured step. Compare mode with equal inputs is still
+# on, so nothing before this moved the dust; subtract mode is 0.
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

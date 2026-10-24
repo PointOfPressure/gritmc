@@ -1,0 +1,13 @@
+[package]
+name = "rustmc-api"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+rustmc-data.workspace = true
+rustmc-entity.workspace = true
+
+[lints]
+workspace = true

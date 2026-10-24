@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 105
+slug   = "extractability"
+title  = "Is the unported surface extractable or hand-written"
+branch = "extract-classify"
+status = "written"

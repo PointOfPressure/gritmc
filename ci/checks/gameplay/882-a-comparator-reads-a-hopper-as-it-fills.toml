@@ -1,0 +1,77 @@
+name = "a-comparator-reads-a-hopper-as-it-fills"
+about = "a comparator reads the hopper behind it, and the hopper fills from a chest on top: the coal clicked into the chest is pulled on the hopper's next `pushItemsTick`, whose `setChanged()` is `level.updateNeighbourForOutputSignal` — the comparator's `neighborChanged` schedules its two-tick update, `HopperBlock.getAnalogOutputSignal` is `getRedstoneSignalFromBlockEntity` (one coal in five slots is 1), and the comparator turns on and powers the dust in front to 1. A server with no analog read for a hopper leaves the comparator dark; one that reads it but never pushes the change leaves it dark until something beside it moves. Chest menu slot 54 is hotbar 0"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "container_set_slot"]
+settle_ms = 2000
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:comparator"
+
+[[setup]]
+do = "place"
+on = [2, -1, 2]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone"
+
+[[setup]]
+do = "place"
+on = [2, -1, 3]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:hopper"
+
+[[setup]]
+do = "place"
+on = [2, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "sneak"
+on = true
+
+[[setup]]
+do = "place"
+on = [2, 0, 1]
+face = "up"
+
+[[setup]]
+do = "sneak"
+on = false
+
+[[setup]]
+do = "hold"
+item = "minecraft:coal"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [2, 1, 1]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0

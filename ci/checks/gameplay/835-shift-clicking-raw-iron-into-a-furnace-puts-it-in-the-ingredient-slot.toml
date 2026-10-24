@@ -1,0 +1,38 @@
+name = "shift-clicking-raw-iron-into-a-furnace-puts-it-in-the-ingredient-slot"
+about = "raw iron shift-clicked from the hotbar into an open furnace: canSmelt is the menu's furnace_input RecipePropertySet, which holds raw iron, so quickMoveStack sends it to slot 0 — and that write goes through AbstractFurnaceBlockEntity.setItem, so the same broadcastChanges that corrects slots 0 and 30 also sends cookingTotalTime 200 as container_set_data id 3. 834 is the fuel half of the same rule"
+observe_from = "actor"
+observe = ["container_set_slot", "container_set_data"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:furnace"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:raw_iron"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+input = "quick_move"

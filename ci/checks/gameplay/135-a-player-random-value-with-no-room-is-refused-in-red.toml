@@ -1,0 +1,23 @@
+name = "a-player-random-value-with-no-room-is-refused-in-red"
+about = """
+a permission-level-0 player typing `/random value 5..5` is answered with ONE
+red chat line, `commands.random.error.range_too_small`, and nothing else
+
+`/random` is the one root in this change a non-operator can run — it has no
+`requires` — so this is the PLAYER path end to end: the level-0 tree, the
+`minecraft:int_range` parser (`5..5` is a point), the executor, and
+`ExecutionCommandSource.handleError` -> `sendFailure`, which wraps the
+exception's message in `Component.empty().append(m).withStyle(RED)` and sends
+it to the source alone. `RandomCommand.randomSample` raises
+`ERROR_RANGE_TOO_SMALL` when `(long) max - min == 0`, before any random draw,
+so the answer is deterministic — unlike `5..6`, whose value is the level
+random's. A server that treated the range as unparsed (silence), answered
+with the unknown-command pair, or drew a value, moves `chat`.
+"""
+observe_from = "both"
+observe = ["chat"]
+settle_ms = 1500
+
+[[step]]
+do = "command"
+text = "random value 5..5"

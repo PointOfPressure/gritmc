@@ -1,0 +1,89 @@
+name = "a-container-click-puts-the-item-in-your-cursor"
+about = "picking a stack up off the hotbar inside an open chest and looking at where it went — `set_cursor_item`, which vanilla sends 221 times across eight scenarios of the existing corpus and which **no check in it observes**. 264 `container_click` steps in 86 scenarios drive it, and not one of them can tell a server that moved the item into the cursor from one that moved it somewhere else, or nowhere — counted by `ci/scenario-census.py --check`, which reddens when this sentence and the corpus disagree"
+observe_from = "actor"
+observe = [
+    "open_screen",
+    "container_set_content",
+    "container_set_slot",
+    "set_cursor_item",
+]
+settle_ms = 1000
+collapse_repeats = ["block_event"]
+
+# `set_cursor_item` IS `minecraft:set_cursor_item`, AND IT IS COMPARED WHOLE.
+#
+# **This said `packet:0x60` and "trace.rs has no decoder arm for it" until
+# 2026-08-12**, when branch `trace-itemstack-legible` wrote the arm — which is
+# what the paragraph that used to sit here told the next agent to do, so this
+# is that instruction being carried out rather than a change of mind.
+#
+# The strictness it used to claim is not spent. `ClientboundSetCursorItemPacket`
+# is one `ItemStack` and nothing else, and `read_item_stack` either consumes
+# the whole of it — count, item id, and an empty component patch — or stops at
+# the first data component it has no codec for and leaves every remaining byte
+# in `rest`. Nothing leaves the comparison either way. What the arm buys is
+# that a failure now names the item and the count instead of printing two hex
+# strings, and that the item registry gets a numerator
+# (`ci/vanilla-reach-census.py`, `docs/PARITY-ROADMAP.md` §21.4).
+#
+# Its id is not a guess. `ci/corpus-surface.py` derives every clientbound id
+# from `GameProtocols`' registration order in the pinned jar and cross-checks
+# each one against `rustmc-proto`'s own constants, refusing on disagreement;
+# 0x60 is `CLIENTBOUND_SET_CURSOR_ITEM` at index 96.
+#
+# WHY THIS IS THE ONE THAT WAS MISSING, AND NOT AN ARBITRARY EXTRA PACKET.
+#
+# ORACLE.md rule 27 and this directory's README: `container_click` carries the
+# **client's prediction of the result**, and `broadcastChanges` answers only
+# where the prediction is wrong. The harness therefore claims nothing — an
+# empty `changedSlots` and an empty carried item — so that silence cannot be
+# mistaken for agreement. The carried item is half of that claim, and
+# `set_cursor_item` is the exact channel vanilla uses to correct it. Claiming
+# an empty cursor and then never looking at the correction leaves the
+# load-bearing half of rule 27 untested: a server with no cursor at all
+# answers this rig with silence on every kind the corpus watches today.
+#
+# STABILITY IS PART-INHERITED AND PART-MEASURED, AND THE SPLIT MATTERS.
+# `ci/corpus-surface.py --recordings` screens a candidate projection against
+# recordings that already exist. Over 17 independent vanilla runs on
+# sayer-desktop, 2026-08-10, `packet:0x60` is stable in all eight scenarios
+# that produce it — n = 17 each, counts 1, 1, 1, 1, 1, 2, 2, 4. That settles
+# the *kind*: it is not a timing artefact and not a per-run draw. It does not
+# settle *this rig*, which is new and shorter, and that was recorded
+# separately; see docs/PARITY-ROADMAP.md.
+#
+# The rig is `560`'s, minus the second click. `560` stores the item; this stops
+# one click earlier, while the stack is still in the cursor and nowhere else,
+# because the point is the cursor and not the storing.
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+# Hotbar slot 1, so that the click below moves slot 0 and the selected slot is
+# not the one that changes — a server that answered for the held item rather
+# than the clicked one would otherwise be right by accident.
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# 54 is hotbar slot 0 in a single-chest menu: 27 container slots, then 27 of
+# the player's inventory, then the nine of the hotbar.
+[[step]]
+do = "container_click"
+slot = 54

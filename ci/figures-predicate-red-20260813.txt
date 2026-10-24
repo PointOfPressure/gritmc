@@ -1,0 +1,59 @@
+# ci/check-figures.py rules 9-13 — the red-then-green demonstration, in full.
+# Branch ci-figures-ledger off main a106314d, sayer-desktop, 2026-08-13.
+# Bookkeeping only: no dump was generated, no reference read, no number moved.
+#
+# RED A is the tree at 65895aca, which adds rules 9-12 and touches nothing
+# else, so the ledger it reads is main's.
+# RED B is rule 13, added after the audit, run against main's docs/PARITY.md.
+# GREEN is the branch tip: the r=16 restatement withdrawn, the missing
+# floor_note declared, the dump_order set frozen at 11, and the ✅ moved off
+# a withdrawn figure.
+#
+# Reproduce A:  git checkout 65895aca && python3 ci/check-figures.py   # exit 1
+# Reproduce B:  git show main:docs/PARITY.md > docs/PARITY.md && \
+#               python3 ci/check-figures.py                            # exit 1
+# Reproduce GREEN: git checkout ci-figures-ledger && python3 ci/check-figures.py
+
+======================= RED A — rules 9-12 (65895aca) =========================
+
+FIGURES: 82 registered, 29 unquotable, 17 cross-window comparisons, 1 restatements, 6 retired
+FIGURES quotable basis: floor-note 9, kind-exempt 31, override 3, rule-6 10; 12 without dump_order (ceiling 0)
+
+FIGURES RED [FLOOR-UNDECLARED] ow-r16-blindspot-depth: quotable and kind `worldgen`, with neither a `floor` for rule 6 to fire on nor a `floor_note` saying why no floor exists. Rule 6 cannot reach this entry, so its quotability rests on nothing this file checks.
+FIGURES RED [RESTATED-QUOTABILITY] readme-restates-ow-r16-admissible: quotable, but it republishes `ow-r16-admissible-n2`'s own number and that entry is NOT quotable — disqualifier `uncontrolled chunk order`. A restatement cannot out-rank the measurement it restates: `quotable` on a restatement can only mean the restatement is faithful. Withdraw it, or restate an admissible source instead.
+FIGURES RED [RESTATED-WINDOW] readme-restates-ow-r16-admissible: republishes `ow-r16-admissible-n2`'s number but compares on only 7 of its 11 window keys — ['dump_order', 'harvest', 'order', 'ybox'] are not compared. The same number is the same measurement, so there is no key it may differ on, and an omitted key is exactly how a restatement of a disqualified figure passes the window-match rule while disagreeing on the axis that disqualified it.
+FIGURES RED [DUMP-ORDER-UNRECORDED] -: 12 quotable chunk-order-sensitive figures record no `dump_order`, ceiling is 0: ['det-gradient-perchunk', 'det-gradient-rows', 'det-gradient-serialgc', 'det-gradient-taskset', 'end-r16-n6-exact', 'nether-r16-floor-n2', 'nether-r7-basalt-core', 'nether-r7-ssv-core', 'ow-r16-12345-blue-ice-surplus', 'ow-r16-blindspot-depth', 'ow-r16-floor-n2', 'readme-restates-ow-r16-admissible']. Record the order this figure's dump walked, or lower nothing and take the measurement — do not raise the ceiling to admit a new one.
+
+FIGURES RED — 4 failing rule(s)
+
+============ RED B — rule 13, branch tip against main's docs/PARITY.md =========
+
+FIGURES RED [VERDICT-MARKER] ow-r16-admissible-n2: `99.972345%` is not quotable (uncontrolled chunk order) and is published in docs/PARITY.md on a line marked ✅: '✅ **If only one *number* fits, it is 99.972345%, and every word of its window'. Rule 4 is satisfied by a disqualifier anywhere within 4,000 characters; a reader who lands on the ✅ has found an endorsement instead. Move the marker, not the number.
+
+FIGURES RED — 1 failing rule(s)
+
+=========================== GREEN — the branch tip ============================
+
+FIGURES: 82 registered, 30 unquotable, 17 cross-window comparisons, 1 restatements, 6 retired
+FIGURES quotable basis: floor-note 9, kind-exempt 31, override 2, rule-6 10; 11 without dump_order (ceiling 11)
+FIGURES GREEN
+
+exit status 0
+
+==================== ci/check-figures-falsify.py — branch tip ==================
+
+  ok    RESTATED-QUOTABILITY   a restatement marked quotable while its source is withdrawn (the 2026-08-10..13 fault, exactly)
+  ok    RESTATED-QUOTABILITY   the same fault on a figure with no percentage — matched on residual over denominator instead
+  ok    RESTATED-WINDOW        a restatement omitting `dump_order` from compare_keys — the key its source was disqualified on
+  ok    RESTATED-WINDOW        a restatement omitting any one of its source's window keys
+  ok    FLOOR-UNDECLARED       a quotable worldgen level with no floor and no floor_note
+  ok    DUMP-ORDER-UNRECORDED  a quotable worldgen level whose window records no dump_order
+  ok    VERDICT-MARKER         a withdrawn figure printed on a line marked as settled, with rule 4 still green
+  ok    RULE-UNEXERCISED       the last restatement stops being one, leaving rules 9 and 10 unreachable
+  ok    DOC-DRIFT              a claim_count that no longer matches the document
+  ok    WINDOW-MATCH           an r=7 measurement compared against an r=16 target
+  ok    (green control)        a comparison against a withdrawn target, publishing its own number, stays quotable
+  ok    RESTATED-QUOTABILITY   ...and reds the moment it republishes that target's number instead
+  ok    (green control)        an entry repeating its target's claim SENTENCE with a number of its own is not a restatement
+
+check-figures-falsify: 13 passed, 0 failed

@@ -1,0 +1,94 @@
+name = "container-click-throw-drops-one-item"
+about = "pressing Q while hovering a chest slot that holds two stone throws exactly one of them onto the floor — javap -p -c -constants on AbstractContainerMenu.doClick's ContainerInput.THROW arm (offsets 1449..1608) requires the cursor to be empty, then calls Slot.safeTake(1, MAX, player) when button is 0 and Slot.safeTake(getItem().getCount(), MAX, player) otherwise, so button picks between 'one' and 'the rest of the stack'. The rig builds a two-stone stack on purpose: on a one-count stack, button 0 and button 1 take the same single item and this check and its pair, 606, would be indistinguishable. What would make this fail: a server whose THROW ignores the button and always empties the whole slot would leave one stone behind here and none at all, which 606 alone could not tell from correct."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "container_set_slot", "add_entity"]
+settle_ms = 1500
+
+# The chest lid repeats on a free-running 5-tick timer for as long as the chest
+# is open — `ContainerOpenersCounter.recheckOpeners` re-arms unconditionally
+# (offsets 178-186 call `Level.scheduleTick(pos, block, 5)`) and calls
+# `openerCountChanged` on both paths (offset 84's `if_icmpeq 167` lands on the
+# call itself), and `ChestBlockEntity.signalOpenCount` offsets 0-13 turn that
+# into `level.blockEvent(pos, block, 1, newCount)`. So the same `block_event`
+# goes out every 250 ms, forever.
+#
+# This check does not observe `block_event` and so never saw them declared.
+# It sees them under `strict`, where **how many arrived and which step each
+# was stamped with are set by where a free-running timer's edges fell against
+# this window** — measured on the 2026-08-07 07:10 subset pair, six of the
+# seven scenarios that leave a chest open disagreed on step attribution while
+# agreeing on the total.
+#
+# What stops being tested here: the repeat count and the step attribution of
+# `block_event`. What is still tested: that the lid opens at all, at the right
+# position, with the right viewer count, on the right stream — and the cadence
+# itself, in `rustmc_server::containers::tests::
+# the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`, which measures
+# the gap rather than the count.
+collapse_repeats = ["block_event"]
+
+# TWO STONE IN TWO SEPARATE HOTBAR SLOTS, BOTH GIVEN BEFORE ANYTHING OPENS.
+#
+# `[[setup]]` and `[[step]]` are two separate arrays in `Scenario` — TOML
+# collects every `[[setup]]` table into one list and every `[[step]]` table
+# into another, in each list's own file order, regardless of how the two are
+# interleaved on the page. A `hold` written between two `[[step]]` blocks to
+# "refill" a slot mid-sequence would therefore actually run before every
+# step, not between two of them. Giving both stone their own hotbar slot up
+# front sidesteps the question entirely: no step in this file ever needs the
+# harness to hand the player anything a second time.
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+slot = 2
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+# First stone (hotbar slot 0, menu slot 54) into the chest.
+[[step]]
+do = "container_click"
+slot = 54
+
+[[step]]
+do = "container_click"
+slot = 0
+
+# Second stone (hotbar slot 2, menu slot 56) merges into the same chest
+# slot — `AbstractContainerMenu`'s PICKUP branch adds matching stacks rather
+# than swapping them — so slot 0 now holds two stone and the cursor is empty
+# again.
+[[step]]
+do = "container_click"
+slot = 56
+
+[[step]]
+do = "container_click"
+slot = 0
+
+# THE MEASURED CLICK. `button = 0`, `input = "throw"`: takes exactly one.
+[[step]]
+do = "container_click"
+slot = 0
+button = 0
+input = "throw"

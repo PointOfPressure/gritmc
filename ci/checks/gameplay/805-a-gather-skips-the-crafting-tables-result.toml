@@ -1,0 +1,62 @@
+name = "a-gather-skips-the-crafting-tables-result"
+about = "`CraftingMenu.canTakeItemForPickAll` refuses `resultSlots`, so a double-click with oak planks on the cursor gathers the planks in the hotbar and leaves the four the table offers for its log. A server whose gather sweeps every slot takes the result first — slot 0, ascending — and through `onTake` spends the log, answering with the result, the grid cell and a cursor of six"
+observe_from = "actor"
+observe = ["container_set_slot", "set_cursor_item"]
+settle_ms = 1000
+
+# CraftingMenu: result 0, grid 1..9, hotbar k is 37 + k.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:crafting_table"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_log"
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_planks"
+slot = 2
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_planks"
+slot = 3
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 37
+
+[[step]]
+do = "container_click"
+slot = 1
+
+[[step]]
+do = "container_click"
+slot = 39
+
+[[step]]
+do = "container_click"
+slot = 39
+input = "pickup_all"

@@ -1,0 +1,48 @@
+name = "sneaking-with-a-block-in-hand-does-not-open-a-chest"
+about = "552 and 553 pin the sneak-plus-placeable-item gate against a lever; Player.isSecondaryUseActive() is read once, generically, before ServerPlayerGameMode.useItemOn ever dispatches to a block's own use — 552's own text already says 'the branch deciding whether a right-click reaches the block's own use at all', not the lever's — so the same gate should hold for any block with a use, and a chest is the corpus's other interactive block entity. What would make this fail two different ways at once: a server that ignores sneak entirely would open the chest here instead of placing the stone (missing block_update, unwanted open_screen/container_set_content); one that never opens containers at all when something placeable is held, sneaking or not, would place the stone correctly here but also fail 560's non-sneaking chest-store — this file alone cannot catch that second failure, 560 does."
+observe_from = "actor"
+observe = [
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+    "open_screen",
+    "container_set_content",
+    "block_event",
+]
+settle_ms = 1500
+
+# THE POSITIVE CONTENT IS THE STONE LANDING, EXACTLY 552's SHAPE.
+#
+# `open_screen`, `container_set_content` and `block_event` are in `observe`
+# so a server that places the stone correctly (matching 552's own guard
+# against a hardcoded "always place") but ALSO opens the chest as an
+# unwanted side effect is still caught — 552/553's own observe list could not
+# have caught the equivalent bug for a lever, because a lever flip is a
+# block_update and a chest opening is not one at all.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "sneak"
+on = true
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

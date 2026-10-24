@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 17.1
+slug   = "iceberg-closed"
+title  = "The item §17 named, closed — 69,288 -> 7,940, and the floor did not move (2026-08-10)"
+branch = "backfill"

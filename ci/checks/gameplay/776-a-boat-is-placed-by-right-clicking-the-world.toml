@@ -1,0 +1,40 @@
+name = "a-boat-is-placed-by-right-clicking-the-world"
+about = "a boat is the corpus's first entity placed by `use_item` rather than by clicking a block face, and it takes the placer's own yaw"
+observe = ["add_entity", "set_entity_data", "set_entity_motion", "entity_position"]
+settle_ms = 1500
+
+# THE VERB IS THE POINT. `BoatItem` overrides `Item.use` and not
+# `Item.useOn`, so a `use_item_on` never reaches it —
+# `ServerPlayerGameMode.useItemOn` calls `stack.useOn(context)` and stops
+# there. Every other entity in this family arrives through a block face. This one
+# arrives through `getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY)`,
+# a five-block ray from the eye along the view vector, and lands wherever that
+# ray hits. So the whole placement is a function of where the player is
+# standing and where they are looking, and a server that ignores either puts
+# the boat somewhere else.
+#
+# `javap -p -c -constants`, `BoatItem.use`:
+#   185: boat.setYRot(player.getYRot())     <- the pitch/yaw pin
+#   194: level.noCollision(boat, boat.getBoundingBox())  -> FAIL if occupied
+#   219: level.addFreshEntity(boat)
+# and `getBoat` at offsets 21-44 is `boat.setInitialPos(hit.x, hit.y, hit.z)`.
+# There is no random draw on the path and `AbstractBoat` is not a
+# `LivingEntity`, so `y_head_rot` is `Entity.getYHeadRot`'s zero (see 773).
+#
+# pitch 45 rather than 90 on purpose: straight down puts the boat inside the
+# player's own box, `noCollision` is then deciding the check, and what is
+# measured is a refusal. At 45 the ray drops the eye's 1.62 blocks over 1.62
+# blocks of ground, clear of the player, and the probe recorded
+# `at = [0.0, 0.0, -1.62]` identically in both runs.
+
+[[setup]]
+do = "look"
+yaw = 180.0
+pitch = 45.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_boat"
+
+[[step]]
+do = "use_item"

@@ -1,0 +1,48 @@
+name = "a-torch-breaks-on-the-first-hit"
+about = """
+A block with destroy time 0 breaks on START in survival too.
+`BlockBehaviour.getDestroyProgress` divides the player's speed by the destroy
+time, and `1.0F / 0.0F` is +Infinity, which is `>= 1` at
+`handleBlockBreakAction` offsets 351-376: "insta mine", `destroyAndAck`, no
+`destroyPos`, no overlay. So the actor gets the block_update and the ack in
+step 0 and the observer the 2001 and the block_update — and nobody gets a
+block_destruction. The torch is put there by the digger: `give` from the
+console (a survival player cannot `hold`), then an ordinary placement, which
+consumes the one torch. What would make it fail: a server that runs every
+survival dig through the progress clock sends stage 10 to the observer and
+never breaks the block without a STOP; one that treats destroy time 0 as
+unbreakable breaks nothing.
+"""
+# The console gave this rig its items; `clear` takes them back so the
+# next scenario starts empty-handed, on both servers.
+console_restore = ["clear oracle"]
+observe_from = "both"
+observe = ["block_destruction", "level_event", "block_update", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "console"
+text = "clear oracle"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:torch"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "wait"
+ms = 300
+
+[[step]]
+do = "dig"
+at = [1, 0, 0]
+face = "up"

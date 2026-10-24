@@ -1,0 +1,63 @@
+name = "a-second-new-item-moves-the-census-again"
+about = "781 again with a different item nothing else names. One new item moving the census by one is consistent with the census counting scenarios, or files, or almost anything; two new items in two files moving it by two is not. This is the second point that makes the first one a rule"
+
+# WHY A SECOND CONTROL IS WORTH ~9 SECONDS OF CORPUS
+#
+# 781 alone shows the item row moving from 12 to 13 when one new item is
+# named. That is equally consistent with three different rules — one per new
+# item, one per new scenario, one per new stack-bearing observation — and the
+# conclusion this pair is being used to support ("1,537 is a denominator
+# against a vocabulary of 41, not a work queue") needs the first of them.
+#
+# So: a second file, a second item nothing else in `ci/checks/gameplay/` names
+# (`minecraft:golden_apple`, grepped), same shape, no component. If the item
+# row lands at 14 the rule is per-item. If it lands at 15 something is
+# counting the pair 781/783 as two, and the whole reading is wrong.
+#
+# **`minecraft:golden_apple` is not a block item**, which 781's diamond sword
+# is also not, and that similarity is deliberate: a block item would let a
+# `place` slip a second route into the recording and the two files would stop
+# differing in exactly one thing.
+
+observe_from = "actor"
+observe = [
+    "open_screen",
+    "container_set_content",
+    "container_set_slot",
+    "set_cursor_item",
+]
+settle_ms = 1000
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:golden_apple"
+slot = 0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 54

@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 25
+slug   = "pool40-power-law-3x"
+title  = "The window convicts again — pool 40, and the power-law costing was wrong by 3x in the safe direction (2026-08-10)"
+branch = "backfill"

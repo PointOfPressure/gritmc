@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 95
+slug   = "motion-and-combat-rows-were-stale"
+title  = "The two least-explored OPEN rows: combat was already closed and entity motion is one ordering fact — 2026-08-17, branch `gameplay-motion-combat`"
+branch = "gameplay-motion-combat"

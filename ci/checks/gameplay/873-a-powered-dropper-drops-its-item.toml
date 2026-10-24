@@ -1,0 +1,59 @@
+name = "a-powered-dropper-drops-its-item"
+about = "a lever beside a dropper holding one coal: `DispenserBlock.neighborChanged` sees `hasNeighborSignal`, writes `TRIGGERED` with flags 2 and schedules a tick 4 later; the tick is `DropperBlock.dispenseFrom`, which finds no container in front and hands the coal to `DefaultDispenseItemBehavior` — an `ItemEntity` at `getDispensePosition` (centre plus 0.7 along facing, less 0.15625 for a horizontal facing), `levelEvent(1000)` for the click and `levelEvent(2000, facing.get3DDataValue())` for the smoke. The dropper faces north, the opposite of where the player looks, so the smoke's data is 2. The item's movement and spawn yaw are unseeded draws and the projection drops both; its position, type and `DATA_ITEM` are compared"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "level_event", "add_entity", "set_entity_data"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:dropper"
+
+[[setup]]
+do = "place"
+on = [3, -1, 2]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [4, -1, 2]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:coal"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+# Dropper menu: nine slots, so hotbar 0 is 36.
+[[setup]]
+do = "place"
+on = [3, 0, 2]
+face = "up"
+
+[[setup]]
+do = "container_click"
+slot = 36
+
+[[setup]]
+do = "container_click"
+slot = 0
+
+[[setup]]
+do = "close_container"
+
+[[step]]
+do = "place"
+on = [4, 0, 2]
+face = "up"

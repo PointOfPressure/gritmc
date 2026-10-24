@@ -1,0 +1,53 @@
+name = "random-ticks-ripen-a-sweet-berry-bush"
+about = "a sweet berry bush left under random ticks reaches age 3 and stops, read back by breaking it — the observer's `level_event` 2001 names the state that was broken; the draw comes before the light check and the age stops at 3 because `isRandomlyTicking` is `age < 3`"
+observe = ["level_event", "block_update"]
+settle_ms = 1500
+console_restore = ["gamerule random_tick_speed 0"]
+
+# `SweetBerryBushBlock.randomTick` (javap -p -c -constants, 26.2):
+#
+#   15: age = AGE; age < 3                             else return
+#   24: random.nextInt(5) == 0                         else return
+#   38: level.getRawBrightness(pos.above(), 0) >= 9    else return
+#   70: level.setBlock(pos, state.setValue(AGE, age + 1), 2)
+#   84: level.gameEvent(BLOCK_CHANGE, ...)
+#
+# Three successes at 1/5 per pick. As with
+# `970-random-ticks-grow-wheat-to-its-last-age`, the growth is in
+# `[[setup]]` because `Level.random` is unseeded and two ages can share a
+# tick; the end state is vanilla's and the break reads it.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:sweet_berries"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "console"
+text = "gamerule random_tick_speed 4096"
+
+[[setup]]
+do = "wait"
+ms = 20000
+
+[[setup]]
+do = "console"
+text = "gamerule random_tick_speed 0"
+
+[[setup]]
+do = "wait"
+ms = 500
+
+[[step]]
+do = "dig"
+at = [1, 0, 1]
+face = "up"

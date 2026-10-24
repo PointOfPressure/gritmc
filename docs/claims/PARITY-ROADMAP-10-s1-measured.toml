@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 10
+slug   = "s1-measured"
+title  = "S1, measured — 2026-08-08, branch `gameplay-pairing-data`"
+branch = "gameplay-pairing-data"

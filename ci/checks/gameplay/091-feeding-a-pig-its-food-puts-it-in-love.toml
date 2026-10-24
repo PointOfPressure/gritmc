@@ -1,0 +1,83 @@
+name = "feeding-a-pig-its-food-puts-it-in-love"
+about = "a carrot used on an adult pig puts it in love: Animal.mobInteract sees pig food on a pig of age 0 that is not already in love, setInLove broadcasts entity event 18 (the hearts) to its trackers, and SUCCESS_SERVER makes handleInteract swing the player's arm for everyone, the player included"
+observe_from = "actor"
+observe = ["entity_event", "animate"]
+within = 256
+settle_ms = 1500
+
+# THE MECHANISM, read from the pinned jar (`javap -p -c -constants`):
+#
+#   ServerGamePacketListenerImpl.handleInteract
+#                               74-95  isWithinEntityInteractionRange(bb, 3.0)
+#                              139-151 player.interactOn(entity, hand, loc)
+#                              199-217 Success && swingSource == SERVER
+#                                      -> player.swing(hand, true)   animate,
+#                                         trackers AND self
+#   Mob.interact                60-88  mobInteract(player, hand)
+#   Pig.mobInteract             55-61  Animal.mobInteract
+#   Animal.mobInteract           6-11  isFood(stack)  (#pig_food: carrot)
+#                               14-42  getAge() == 0 && canFallInLove()
+#                               45-65  usePlayerItem, setInLove(player),
+#                                      playEatingSound, SUCCESS_SERVER
+#   Animal.setInLove             0-37  inLove = 600; broadcastEntityEvent(this, 18)
+#
+# So the wire carries `entity_event 18` on the pig and then `animate 0` on the
+# player, in that order, on the actor's stream. The eating sound is not
+# observed: `Pig.playEatingSound` takes the sound set of the pig's sound
+# variant, which `finalizeSpawn` draws from `level.random`, so which of three
+# eat sounds plays is not the same on two vanilla runs.
+
+# THE RIG, AND WHY IT IS OUT HERE. The pit is `083`'s: digging [1,-1] and
+# [1,-2] leaves a 1x1 shaft two deep whose floor has no walkable neighbour, so
+# every path a pig in it is ever given is its own node and it never moves —
+# its unseeded `RandomStrollGoal` and look goals cannot reach anything this
+# check observes. The rig sits +240 blocks out on z, past `083`-`089`'s
+# rigs at +-80 and +-160 and alternating sign with its neighbours here (same
+# sign 64 apart on x and 80 on z), so no other scenario's mob is tracked from
+# it and nothing it leaves is tracked from theirs: the actor tracks to 64
+# blocks at view-distance 4. `within` is opened to reach the rig; the observer
+# stays at the workspace and tracks none of it, hence `observe_from = "actor"`.
+# Coordinates in the steps carry the offset.
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 240.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, 241]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, 241]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [1, -3, 241]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:carrot"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, 240.95]
+
+[[setup]]
+do = "wait"
+ms = 1500
+
+[[step]]
+do = "interact"
+target = "minecraft:pig"

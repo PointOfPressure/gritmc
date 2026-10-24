@@ -1,0 +1,81 @@
+name = "a-lead-used-again-on-its-pig-unties-it"
+about = "a second right click with a lead on a pig the player already holds unties it: Entity.interact finds the player is the holder, a creative player gets removeLeash (no lead drops), the link is sent again with no holder, and the result is a client-side SUCCESS, so the server swings nothing"
+observe_from = "actor"
+observe = ["set_entity_link", "animate"]
+within = 256
+settle_ms = 1500
+
+# THE MECHANISM, read from the pinned jar:
+#
+#   Entity.interact            296-387 alive && Leashable && getLeashHolder() ==
+#                                      player: hasInfiniteMaterials()
+#                                      -> removeLeash() else dropLeash();
+#                                      LEAD_UNTIED; SUCCESS.withoutItem()
+#   Leashable.dropLeash(E, b, drop) 0-108  leashData = null; onLeashRemoved
+#                                      (Mob: clearHome); drop -> spawnAtLocation
+#                                      (LEAD) — removeLeash passes false;
+#                                      broadcast -> set_entity_link(pig, null)
+#
+# The first interact is `097` and speaks (the link, the swing); the measured
+# second one must send exactly a link with holder 0 and no `animate`. A
+# server that re-tied, or that answered SUCCESS_SERVER, or that dropped a
+# lead item for a creative player, is visible here.
+
+# THE RIG, AND WHY IT IS OUT HERE. The pit is `083`'s: digging [1,-1] and
+# [1,-2] leaves a 1x1 shaft two deep whose floor has no walkable neighbour, so
+# every path a pig in it is ever given is its own node and it never moves —
+# its unseeded `RandomStrollGoal` and look goals cannot reach anything this
+# check observes. The rig sits -240 blocks out on z, past `083`-`089`'s
+# rigs at +-80 and +-160 and alternating sign with its neighbours here (same
+# sign 64 apart on x and 80 on z), so no other scenario's mob is tracked from
+# it and nothing it leaves is tracked from theirs: the actor tracks to 64
+# blocks at view-distance 4. `within` is opened to reach the rig; the observer
+# stays at the workspace and tracks none of it, hence `observe_from = "actor"`.
+# Coordinates in the steps carry the offset.
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, -240.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, -241]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, -241]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [1, -3, -241]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:lead"
+
+[[setup]]
+do = "walk"
+to = [0.45, 0.0, -239.95]
+
+[[setup]]
+do = "wait"
+ms = 1500
+
+[[step]]
+do = "interact"
+target = "minecraft:pig"
+
+[[step]]
+do = "interact"
+target = "minecraft:pig"

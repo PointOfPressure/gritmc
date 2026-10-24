@@ -1,0 +1,73 @@
+name = "a-carrot-on-a-stick-tempts-a-pig-through-its-own-goal"
+about = "a carrot on a stick is not pig food, and a pig still follows it with its head: Pig.registerGoals installs two TemptGoals at priority 4 and the FIRST one tests CARROT_ON_A_STICK, so a player holding one on the far side of a pit turns the pig's head exactly as a carrot would"
+observe_from = "actor"
+observe = ["rotate_head", "move_entity"]
+within = 176
+settle_ms = 1500
+
+# The rig and the determinism argument are `083`'s — read its header first.
+#
+# THE GOAL. `Pig.registerGoals` adds, in this order:
+#
+#   4  TemptGoal(this, 1.2, stack -> stack.is(CARROT_ON_A_STICK), false)
+#   4  TemptGoal(this, 1.2, stack -> stack.is(ItemTags.PIG_FOOD), false)
+#
+# (`Pig.lambda$registerGoals$0` and `$1`). `GoalSelector.tick` walks
+# `availableGoals` in insertion order and starts the first whose `canUse`
+# answers, so with a carrot on a stick in hand it is the FIRST goal that
+# runs, and `carrot_on_a_stick` is not in `pig_food.json`. A server that folds
+# the two predicates into one tag test, or that never installs the first
+# goal, leaves this pig untempted — and an untempted pig's head is driven by
+# `LookAtPlayerGoal` and `RandomLookAroundGoal`, whose starts are draws on the
+# mob's unseeded random, so it cannot come out as vanilla's one turn.
+#
+# THE TURN. Start (2.90, 0.20): head -132.88 degrees, -94.49 before the
+# floor (byte -95); end (2.90, 2.80): -47.12, -33.51 (byte -34) — 85.76 degrees, one
+# tick, one `rotate_head`. Horizontal 1.91 at both stands: 3D 2.76, the
+# `navigateTowards` arm, as in `084`. Target pitches 56 degrees, clamped at 40.
+
+
+# THE RIG IS OUT AT z = +160, AND `within` IS OPENED TO REACH IT. See the
+# FAR FIELD note in `083`'s header.
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 160.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "dig"
+at = [1, -1, 161]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, 161]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [1, -3, 161]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:carrot_on_a_stick"
+
+[[setup]]
+do = "walk"
+to = [2.9, 0.0, 160.2]
+
+[[setup]]
+do = "wait"
+ms = 1500
+
+[[step]]
+do = "walk"
+to = [2.9, 0.0, 162.8]

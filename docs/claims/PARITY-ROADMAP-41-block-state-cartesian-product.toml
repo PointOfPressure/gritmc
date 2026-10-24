@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 41
+slug   = "block-state-cartesian-product"
+title  = "0.27% of block states is a Cartesian product, not a work queue — 2026-08-12, branch `gameplay-block-placement`"
+branch = "gameplay-block-placement"

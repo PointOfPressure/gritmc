@@ -1,0 +1,57 @@
+name = "random-ticks-kill-grass-under-a-bottom-slab-and-not-under-glass"
+about = "grass under a bottom slab dies to dirt on a random tick and grass under glass does not, although the slab dampens light by 0 and is not opaque — the slab's occlusion SHAPE closes the face between them, which is `getLightDampeningInto`'s 16, not its dampening"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 8000
+
+# `SpreadingSnowyBlock.canStayAlive` (javap -p -c -constants, 26.2):
+#
+#   14: above is SNOW with LAYERS == 1   -> true
+#   45: above.getFluidState().isFull()   -> false
+#   58: LightEngine.getLightDampeningInto(state, above, UP,
+#                                         above.getLightDampening()) < 15
+#
+# `getLightDampeningInto` returns the dampening unless one of the two states
+# has a non-empty occlusion shape (`canOcclude() && useShapeForLightOcclusion()`),
+# and then 16 if `Shapes.mergedFaceOccludes` closes the shared face. Grass
+# itself counts as empty there (`useShapeForLightOcclusion` is false).
+#
+#   glass         dampening 0, no occlusion shape        -> 0  : alive
+#   oak_slab      dampening 0, shape whose DOWN face is   -> 16 : dies
+#   [type=bottom] the whole bottom face
+#
+# So the window carries exactly one change, `grass_block -> dirt` at
+# [3, -1, 1], on the first random tick that lands on it. A port that read
+# opacity or "is anything there" gets this wrong in one direction or the
+# other: dampening kills neither, "covered" kills both.
+
+[[gamerule]]
+rule = "random_tick_speed"
+value = "4096"
+restore = "0"
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:glass"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_slab"
+
+[[setup]]
+do = "place"
+on = [3, -1, 1]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 100

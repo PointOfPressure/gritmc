@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 66
+slug   = "sculk-deep-dark-generates"
+title  = "The sculk gate was off for a reason four commits had already fixed"
+branch = "sculk-deep-dark"
+status = "written"

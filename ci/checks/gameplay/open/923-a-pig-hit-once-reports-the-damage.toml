@@ -1,0 +1,158 @@
+name = "a-pig-hit-once-reports-the-damage"
+about = "a pig is spawned beside the actor and hit once: `LivingEntity.hurtServer` takes the full-hit arm, `ServerLevel.broadcastDamageEvent` sends `ClientboundDamageEventPacket` to every tracking player, and that packet is the ONE thing about hurting a mob that no unseeded generator touches. What would make it fail: a server that answers the attack packet and models no damage arrives here `absent` (it is what this branch's base did — `crate::attack`'s `Outcome::Hurt` was documented as unreachable and deliberately silent); one that writes the damage type as a bare registry id rather than `id + 1` arrives `diverge` on the `source` field; one that writes either entity id without `writeOptionalEntityId`'s `+ 1` arrives `diverge` on `cause` or `direct`."
+observe_from = "actor"
+observe = ["damage_event"]
+settle_ms = 3000
+
+# ============================================================================
+# PARKED 2026-09-06 — VANILLA DISCONNECTS THE ACTOR ON THE ATTACK STEP.
+#
+# This file is in `open/` and is NOT RUN. It was recorded against real vanilla
+# and produced `error`, which is one of the four verdicts that say nothing
+# about either server, so it may not be counted in either direction.
+#
+# WHAT WAS MEASURED, full corpus run on the Threadripper, 2026-09-05:
+#
+#   vanilla   obs = 0,   error = "Broken pipe (os error 32)"
+#   rustmc    obs = 186, no error, and the damage_event is there:
+#             {entity: $7, cause: $1, direct: $1, source: 35}
+#
+# The break is inside THIS scenario and not inherited. The two scenarios
+# before it — `081` and `082` — recorded 44 and 148 observations with no
+# error, and `090-chest-opens-a-screen`, which follows, is `fresh_session =
+# true` in this recording and `fresh_session = false` in the vanilla.json of
+# **every other tree on the box** (nine checked). So vanilla dropped the
+# actor's socket during `083` and the harness reconnected for the next
+# scenario.
+#
+# `ServerGamePacketListenerImpl.handleAttack` has exactly ONE `disconnect` in
+# it — `multiplayer.disconnect.invalid_entity_attacked` at offset 161 — and
+# its four cases are an `ItemEntity`, an `ExperienceOrb`, the attacking player
+# itself, and an `AbstractArrow` that is not attackable. Every other refusal
+# in that method is a bare `return`. **Which of the four fired is not known**,
+# and the vanilla console log that would name it in one line was deleted by
+# `t2-gameplay.sh`'s own cleanup before it could be read (`$VAN_DIR` is
+# `rm -rf`'d on exit unless `T2_GAMEPLAY_KEEP=1`).
+#
+# A `RUSTMC_CHECKS` probe with the world kept was run and **did not answer**:
+# it failed before booting vanilla, because the Threadripper's root filesystem
+# hit **100% (41 MB free of 938 GB)** overnight. That is a separate fault and
+# it is NOT an explanation for the broken pipe — every `No space left on
+# device` in `~/.rustmc-detached/*.log` is timestamped **2026-09-06 07:10 or
+# later**, and this scenario was recorded at ~21:00 on 2026-09-05, hours
+# before. The obvious confound is therefore ruled out rather than left open:
+# vanilla dropped that socket on a disk with room.
+#
+# WHAT THE SWEEP SAID, and it is the reason this file cannot simply be left in
+# the corpus with a baseline row: `ci/corpus-falsifiable.py --sweep` graded it
+# **tier 0 with `killed_by = []`** — no mutation of any measured step could
+# move its outcome, because the reference side has no observations to mutate.
+# A baseline row recorded from that run would pin the crash, and a tier-0 row
+# is this project's definition of a check that cannot fail.
+#
+# WHAT IS ALREADY RULED OUT, so nobody re-runs it:
+#
+#   * the verb. `550-attacking-another-player` and `551` use the same
+#     `Step::Attack` against `minecraft:player` and both are `match`.
+#   * the rig. `081` holds the same `minecraft:pig_spawn_egg` and places it on
+#     the same relative block with the same face, and records 44 observations.
+#   * `wait` in `[[setup]]`. `record.rs`'s setup loop pumps both sockets for
+#     the returned duration into a scratch recording and answers keep-alives
+#     while it does (`client.rs:661`), and `520` and `780` already use the
+#     verb.
+#   * the settle. `QUIET_CAP` is 4000 ms, so a wandering pig cannot hold the
+#     settle open indefinitely.
+#   * target resolution finding nothing. `Client::act`'s `Attack` arm
+#     **refuses rather than sending** when no live entity of the type is
+#     known, and a refusal is a harness error with a different message.
+#   * a full disk under vanilla. See the timestamps above.
+#
+# THE OTHER HALF OF THIS MECHANIC IS GRADED, and that is why parking this
+# costs less than it looks: `crates/rustmc-server/tests/mob_combat.rs` reads
+# the same `damage_event` off a fake client, byte for byte, including both of
+# the `+ 1` conventions below — plus the invulnerability cooldown and the
+# death, which no corpus scenario could express anyway
+# (`docs/cold-start/mob-combat.md` has that refusal and its measurement).
+# ============================================================================
+
+# WHY `damage_event` ALONE, AND WHY IT IS STABLE WHERE THE REST IS NOT
+#
+# `080-spawn-egg-makes-a-mob` cannot ever `match`: the spawn yaw is
+# `level.random.nextFloat() * 360` and the pig's sound variant is
+# `Registry.getRandom`, both unseeded, so `add_entity` and the pairing
+# `set_entity_data` disagree between two runs of VANILLA (15/15 in
+# `gameplay-floor.toml`). Every one of those fields would ride along in a
+# projection that named `add_entity` or `set_entity_data` here.
+#
+# `damage_event` names none of them. Its five fields are the target's entity
+# id, the damage type's registry id, the two source entity ids and an absent
+# position, and `tools/oracle-runner`'s decoder normalises the three entity
+# ids through `entity_ref`. What is left is `source` — a registry index — and
+# the shape. Nothing in it is drawn.
+#
+# THE BYTES, from `ClientboundDamageEventPacket.write`:
+#
+#   writeVarInt(entityId)
+#   DamageType.STREAM_CODEC             -> writeVarInt(registryId + 1)
+#   writeOptionalEntityId(sourceCauseId)  -> writeVarInt(id + 1), -1 => 0
+#   writeOptionalEntityId(sourceDirectId) -> the same
+#   writeOptional(sourcePosition)         -> one bool, here 0
+#
+# The two `+ 1`s are DIFFERENT conventions that look identical:
+# `ByteBufCodecs.holderRegistry` reserves 0 for an inline holder, and
+# `writeOptionalEntityId` reserves 0 for "no entity". A port that used one
+# rule for both is right on three fields and wrong on one.
+#
+# WHY THE CREATIVE SUBSTRATE IS ENOUGH HERE, unlike `ci/checks/survival/001`
+#
+# The four gates `ci/substrate-gate-audit.py` reads out of the jar are all on
+# the player being HURT — `Player.hurtServer`'s `abilities.invulnerable` at
+# offsets 15..32 is a property of the TARGET. A pig has no `abilities`. So a
+# creative player hitting a mob runs the whole of `hurtServer` on both servers
+# and this check needs no survival pass. That is worth saying because the
+# survival corpus was built for exactly the packet this check observes, and
+# the reason it was needed does not apply to a mob.
+#
+# ONE HIT AND NOT TWO, deliberately
+#
+# `hurtServer` offsets 184..240 set `invulnerableTime` to 20 on a full hit and
+# refuse any later hit that is no larger while it is above 10. A second
+# `attack` in this scenario would therefore send NOTHING, and a check whose
+# second step is silent is a check measuring its first step twice.
+# `crates/rustmc-server/tests/mob_combat.rs` grades the cooldown, where the
+# timing is controllable to the tick; a corpus scenario cannot pace two
+# packets ten ticks apart without a `wait` whose length is then part of the
+# measurement.
+#
+# THE RIG is `081`'s: a pig egg on the ground at relative [1, -1, 0], face up,
+# so the pig stands at [1, 0, 0] — one block from the actor, well inside the
+# `0 + 3.0 + 3.0` reach `handleAttack` computes, and on the +x side so the
+# actor's own box is not in the way. No blocks are written, so the
+# one-side-of-z rule in the corpus README does not bite.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Long enough for the spawn tick, the pairing and the attribute sync to be
+# over before the observed step: everything above is `080`'s and `081`'s
+# business and none of it is in this projection, but a step that raced the
+# spawn could attack before the client had been told the pig exists, and
+# `Step::Attack` resolves its target against what the client was told.
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[step]]
+do = "attack"
+target = "minecraft:pig"

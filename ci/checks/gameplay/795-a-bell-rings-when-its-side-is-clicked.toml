@@ -1,0 +1,28 @@
+name = "a-bell-rings-when-its-side-is-clicked"
+about = "right-clicking the side of a floor bell produces a `block_event(1, face)` and a `block.bell.use` sound and writes no block state — `BellBlock.useWithoutItem` -> `onHit(..., true)` -> `attemptToRing`, whose whole output is `Level.blockEvent(pos, block, 1, direction.get3DDataValue())` and `playSound(null, pos, BELL_BLOCK, BLOCKS, 2.0f, 1.0f)`. It is the one right-click in this corpus that consumes the interaction and changes nothing about the world, which is why `use_without_item.json` cannot answer for it: every row of that table is a replacement state. The sound's **volume is 2.0**, not the 1.0 every other block sound here carries, and the `block_event` is delivered only because `BellBlockEntity.triggerEvent` accepts `b0 == 1`; a bell sent any other `b0` would answer false and the packet would never leave the queue. The click is on the **south** face because `isProperHit` for a floor bell demands the hit axis match the bell's `facing`, and the placing look of yaw 0 puts that on the z axis; a hit on the top or the bottom is refused for every attachment and would make this scenario record nothing at all"
+observe_from = "actor"
+observe = ["block_event", "sound", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:bell"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "south"

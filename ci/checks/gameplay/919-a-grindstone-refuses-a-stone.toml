@@ -1,0 +1,41 @@
+name = "a-grindstone-refuses-a-stone"
+about = "`GrindstoneMenu$2.mayPlace` is `isDamageableItem() || hasAnyEnchantments(stack)`, and a stone is neither, so a click carrying one onto the top slot is refused by `safeInsert` and nothing moves — the click is answered only with the cursor, re-sent because the harness claims an empty one; a grindstone whose slots took anything would store the stone, correct slot 0 and send an empty cursor"
+observe_from = "actor"
+observe = ["container_set_slot", "set_cursor_item"]
+settle_ms = 1000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:grindstone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 8
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "container_click"
+slot = 30
+
+[[step]]
+do = "container_click"
+slot = 0

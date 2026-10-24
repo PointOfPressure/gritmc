@@ -1,0 +1,38 @@
+name = "a-bastion-sword-carries-its-damage-before-its-enchantment"
+about = "a seeded chests/bastion_other chest rolls an iron sword through set_damage then enchant_randomly, and the content packet carries both components in that order — damage 224, then enchantments {mending: 1}; a server that sorts the patch by name or drops it writes different bytes"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_event"]
+settle_ms = 1000
+
+# The lid repeats every 5 ticks while the chest is open; collapsed as in 090.
+collapse_repeats = ["block_event"]
+
+# A seeded loot chest, placed the one way a client can: `block_entity_data`
+# on the held chest (see 930). `LootTableSeed` is a LONG.
+#
+# Seed 2: the iron sword in slot 5 is worn (damage 224 of 250) and enchanted
+# with mending I. PatchedDataComponentMap.set appends to a
+# Reference2ObjectArrayMap, so the patch on the wire is in set order:
+# set_damage runs first in the table's function list.
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+components = [
+    { type = "minecraft:block_entity_data", block_entity = "minecraft:chest", strings = { LootTable = "minecraft:chests/bastion_other" }, longs = { LootTableSeed = 2 } },
+]
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# Overwrite the component-bearing chest, so the inventory half of the content
+# packet holds nothing but a stick.
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

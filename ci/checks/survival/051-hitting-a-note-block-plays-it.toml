@@ -1,0 +1,46 @@
+name = "hitting-a-note-block-plays-it"
+about = """
+The first hit of a survival dig reaches the block before the progress clock
+does: `handleBlockBreakAction` offsets 318-329 call `state.attack(level, pos,
+player)`, and `NoteBlock.attack` is `playNote` — the same
+`level.blockEvent(pos, NOTE_BLOCK, 0, 0)` a right-click queues, with no note
+cycle, so the observer and the digger both get the block_event and the
+note's sound on the next block-event drain. Creative never gets here (the
+`instabuild` return at offset 194 is above it), which is why no creative
+check could see it. The dig is never finished, so the scenario asks nothing
+of the progress stream. What would make it fail: a server whose START only
+starts a clock plays nothing.
+"""
+# The console gave this rig its items; `clear` takes them back so the
+# next scenario starts empty-handed, on both servers.
+console_restore = ["clear oracle"]
+observe_from = "both"
+observe = ["block_event", "sound"]
+settle_ms = 1000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "console"
+text = "clear oracle"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:note_block"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "wait"
+ms = 300
+
+[[step]]
+do = "dig"
+at = [1, 0, 0]
+face = "up"

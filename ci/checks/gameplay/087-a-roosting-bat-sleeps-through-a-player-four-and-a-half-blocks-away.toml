@@ -1,0 +1,180 @@
+name = "a-roosting-bat-sleeps-through-a-player-four-and-a-half-blocks-away"
+about = "a bat roosting under stone stays roosted while the player walks up to 4.63 blocks from it: the wake-up test is getNearestPlayer(BAT_RESTING_TARGETING) and that is forNonCombat().range(4.0), so nothing is said at the step — the silence half of 088"
+observe_from = "actor"
+observe = ["level_event", "set_entity_data"]
+within = 176
+settle_ms = 1500
+measured_step = "silent"
+
+# THE MECHANISM, read from the pinned jar:
+#
+#   Bat.customServerAiStep     16-19   isResting() ?
+#                              28-38   block above is a redstone conductor ?
+#                              42-70     YES: nextInt(200) == 0 -> yHeadRot =
+#                                        nextInt(360)          (NOT observed)
+#                              73-81     getNearestPlayer(BAT_RESTING_TARGETING,
+#                                        this) != null ?
+#                              85-101      YES: setResting(false); levelEvent 1025
+#   TargetingConditions.test   95-162  distanceToSqr(target) against
+#                                      max(range * visibility, 2.0)^2
+#                              168-196 checkLineOfSight -> Sensing.hasLineOfSight
+#
+# So a resting bat under a conductor does nothing observable here until a
+# player is within 4 blocks AND in its line of sight. This check stands the
+# player at 4.63 — in line of sight, out of range — and asserts vanilla's
+# silence; `088` is the same rig with the player at 3.67 and asserts the wake.
+# A server that wakes a bat at 5 blocks, or on any player at all, speaks here.
+#
+# THE RIG — why it is shaped like this, since a plainer one cannot be graded:
+#
+#   * The roost is a 1x1x1 stone cell at (5, 1, 1) with the ceiling at
+#     (5, 2, 1), the floor at (5, 0, 1). The egg on the floor puts the bat at
+#     y = 1, and `Bat.tick` (5-43) pins a resting bat to floor(y) + 1 - 0.9,
+#     so it hangs at y = 1.1, eye at 1.55.
+#   * The cell's west face is a bottom slab at (4, 1, 1) under a stone block at
+#     (4, 2, 1): a slot 0.5 tall (y 1.5..2.0). The bat is 0.9 tall and cannot
+#     leave through it; the line from its eye (1.55) to the player's (1.62)
+#     passes through it. A roost with an open side would let the woken bat in
+#     `088` fly off into later checks' workspaces on a random walk.
+#   * The bat is hatched with the player back at the rig's base, 5.81 from the
+#     roost; the observer stays at the workspace, 75 blocks away, so neither
+#     wakes it. The rig itself is built from (2, 0, 0), where
+#     every face is inside the creative block-interaction reach.
+#
+# The rig sits inside one chunk on z (README), in the far field `083` explains.
+
+
+# THE RIG IS OUT AT z = +80, AND `within` IS OPENED TO REACH IT. See the
+# FAR FIELD note in `083`'s header.
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 80.0]
+
+[[setup]]
+do = "wait"
+ms = 1000
+
+[[setup]]
+do = "walk"
+to = [2.0, 0.0, 80.0]
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+# floor of the cell
+[[setup]]
+do = "place"
+on = [5, -1, 81]
+face = "up"
+
+# north wall, on its footing
+[[setup]]
+do = "place"
+on = [5, -1, 80]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [5, 0, 80]
+face = "up"
+
+# south wall, on its footing
+[[setup]]
+do = "place"
+on = [5, -1, 82]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [5, 0, 82]
+face = "up"
+
+# east wall, on its footing
+[[setup]]
+do = "place"
+on = [6, -1, 81]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [6, 0, 81]
+face = "up"
+
+# footing of the west face
+[[setup]]
+do = "place"
+on = [4, -1, 81]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone_slab"
+
+# the bottom slab that closes the lower half of the west face
+[[setup]]
+do = "place"
+on = [4, 0, 81]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+# the block over the slot, on the slab
+[[setup]]
+do = "place"
+on = [4, 1, 81]
+face = "up"
+
+# the ceiling, off the block over the slot
+[[setup]]
+do = "place"
+on = [4, 2, 81]
+face = "east"
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 80.0]
+
+# THE EGG CARRIES `LeftHanded:1b`, AND WITHOUT IT THIS CHECK FLAPS ON EITHER
+# SERVER. `Mob.finalizeSpawn` 63-83 sets handedness from `level.getRandom()
+# .nextFloat() < 0.05`: vanilla's level random is unseeded, and ours is a
+# seeded stream whose position moves with every tick a mob draws on it, so on
+# both servers one bat in twenty pairs with `DATA_MOB_FLAGS_ID` bit 2 set. The
+# step-0 `set_entity_data` then reads `1d9712d93be2c49c` for `0015ab265976fe41`
+# (087 in 1 of the 12 newest cached references, `0c4e740e`; 086 on the
+# be-furnace-brewing corpus of 2026-10-01 for vanilla, and for OURS on the
+# structures-2 gate of 2026-10-03 08:03).
+#
+# `EntityType.create` applies the egg's tag (javap 179) AFTER that roll
+# (javap 168), and `SynchedEntityData.set` marks an entry dirty only when its
+# value changes. So the override has to be TRUE, not false:
+#   * `LeftHanded:0b` fixes the pairing packet but not the first dirty one. A
+#     roll of true then a load of false changes the byte twice, it is dirty at
+#     its default, and the tick-one `set_entity_data` carries `[15, 0, 0]`
+#     (`b36d8f2e368125d6`, ours, `fix-flappers` subset s0-3) where every
+#     other run carries none;
+#   * `LeftHanded:1b` changes the byte from the roll's false (19 in 20) or
+#     leaves the roll's true (1 in 20), and in both it ends set and dirty: the
+#     pairing and the first dirty packet carry `[15, 0, 2]` on every run.
+# Handedness does nothing else to a bat. `Silent:0b` is the default; the
+# harness writes it on every entity_data egg.
+[[setup]]
+do = "hold"
+item = "minecraft:bat_spawn_egg"
+components = [{ type = "minecraft:entity_data", entity = "minecraft:bat", silent = false, left_handed = true }]
+
+# The egg is a MEASURED step, not setup: the bat's pairing `set_entity_data`
+# (DATA_ID_FLAGS = 1, resting — `Bat.<init>` 29-37) is what makes the
+# reference say something, so that the silence of the step after it is a
+# claim and not a vacuous recording. It also puts the bat's `add_entity` in
+# the trace, which gives it a placement.
+[[step]]
+do = "place"
+on = [5, 0, 81]
+face = "up"
+
+[[step]]
+do = "walk"
+to = [1.0, 0.0, 81.5]

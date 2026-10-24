@@ -1,0 +1,31 @@
+name = "console-tellraw-and-a-title-reach-only-their-target"
+about = """
+`tellraw oracle {text:"hello",color:gold,bold:true}` then `title oracle_eye
+title "made it"` from the console: the actor gets one chat line carrying the
+styled component and nothing else, the observer one `set_title_text` carrying
+the bare string and nothing else
+
+`ComponentArgument` reads one SNBT value and decodes it as a component; the
+network codec re-encodes it, so the styled one is a compound of `text`,
+`color` and `bold` (a byte), and the quoted string is a bare `TAG_String`
+even though a compound could have said the same. `TellRawCommand` sends
+`sendSystemMessage(component, false)` to each target and answers the source
+with nothing; `TitleCommand.showTitle` sends one `ClientboundSetTitleTextPacket`
+per target and answers the source — the console's log. A server that
+mis-encoded the style, sent either line to both players, or answered the
+console's command to a player, moves this check.
+
+The restore resets the observer's title, which also clears it.
+"""
+console_restore = ["title oracle_eye reset"]
+observe_from = "both"
+observe = ["chat", "set_title_text"]
+settle_ms = 1500
+
+[[step]]
+do = "console"
+text = 'tellraw oracle {text:"hello",color:gold,bold:true}'
+
+[[step]]
+do = "console"
+text = 'title oracle_eye title "made it"'

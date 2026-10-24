@@ -1,0 +1,27 @@
+name = "sand-falls-when-unsupported"
+about = "breaking the block under sand makes the sand fall — vanilla turns it into a falling-block ENTITY, which is neighborChanged plus an entity and not a shape update, so this check separates the two halves of a block update"
+observe = ["block_update", "section_blocks_update", "add_entity"]
+settle_ms = 2000
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:sand"
+
+[[setup]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
+
+[[step]]
+do = "dig"
+at = [1, 0, 0]
+face = "up"

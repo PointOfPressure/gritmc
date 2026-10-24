@@ -1,0 +1,29 @@
+name = "a-chest-placed-from-a-stocked-stack-opens-stocked"
+about = "a chest placed from a stack carrying minecraft:container (five stone in slot 0, slot 1 empty, one stick in slot 2) opens holding them. BaseContainerBlockEntity.applyImplicitComponents (offsets 40-59) runs ItemContainerContents.copyInto over the block's own list, which sets every slot from the listed position or EMPTY. The component's stream form is a list of optional ItemStackTemplates — item id before count. What would make this fail: a placement that keeps the stack's name but not its contents (945 alone), or one that reads the template count-first and stocks the wrong item."
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_event"]
+settle_ms = 1000
+
+# The lid repeats every 5 ticks while the chest is open; collapsed as in 090.
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+components = [
+    { type = "minecraft:container", container = [{ item = "minecraft:stone", count = 5 }, {}, { item = "minecraft:stick", count = 1 }] },
+]
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

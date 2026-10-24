@@ -1,0 +1,56 @@
+name = "chest-opens-a-screen"
+about = "right-clicking a chest with a non-placeable item opens it — a chest is a block entity, and without one it is a chest-shaped block that does nothing"
+observe_from = "actor"
+observe = ["open_screen", "container_set_content", "block_event"]
+settle_ms = 1000
+
+# **The lid repeats forever and the repeat count is this harness's sampling,
+# not either server's behaviour.**
+#
+# `ContainerOpenersCounter.CHECK_TICK_DELAY` is 5 and `recheckOpeners` re-arms
+# whenever the count is above zero; it calls `openerCountChanged`
+# **unconditionally**, at offset 167, on the path where the count did not
+# change as well as the path where it did. `ChestBlockEntity`'s override is
+# `signalOpenCount` = `level.blockEvent(pos, block, 1, openCount)`. So an open
+# chest emits the same `block_event(1, 1)` every 250 ms for as long as it is
+# open. How many land inside `settle_ms` depends on where the window edge falls
+# against a 5-tick cadence, and `verdict_for` is exact sequence equality, so
+# without this line the count *is* the check.
+#
+# Measured, from the two recordings the red gate of 2026-08-04 compared:
+#
+#   vanilla  6 events   59 254 519 737 987 1237 ms   gaps 195 265 218 250 250
+#   ours     5 events   64 264 514 764 1014     ms   gaps 200 250 250 250
+#
+# Same `b0`/`b1`, same position, same start, mean gap 235.6 ms against 237.5.
+# Our sixth repeat would have landed at 1264 and vanilla's landed at 1237, so a
+# **27 ms band** at the window edge decided the verdict.
+#
+# Everything else stays compared: the collapsed observation still carries `at`,
+# `b0`, `b1` and `block`, so a wrong viewer count, a lid at the wrong position
+# or a lid that never arrives all still fail. What this check stops testing is
+# the **cadence** — a server that signalled once and never repeated would pass
+# here. That coverage moved to a unit test that measures the *gap* rather than
+# the count: `rustmc_server::containers::tests::
+# the_wire_cadence_is_one_signal_every_check_tick_delay_ticks`. The two do not
+# ship separately.
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 45
+slug   = "menu-reachability"
+title  = "Four of the 25 menu types have no opener anywhere in the jar — 2026-08-12, branch `gameplay-container-menus`"
+branch = "gameplay-container-menus"

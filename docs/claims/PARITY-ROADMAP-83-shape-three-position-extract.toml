@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 83
+slug   = "shape-three-position-extract"
+title  = "The three-position extract, and the 164 pairs that balanced a partition from outside it"
+branch = "shape-three-position-extract"
+status = "written"

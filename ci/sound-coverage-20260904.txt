@@ -1,0 +1,68 @@
+SOUND COVERAGE — data/vanilla/use_without_item.json
+
+  usable     1,509   the table names the event and a pitch vanilla chose
+  unusable   2,944   sounds, but vanilla DREW the pitch — needs its class read
+  unreached     16   described, but the rule writes nothing, so the use path never sounds it
+  sounding   4,469
+  events        34   distinct emittable sound events
+
+  the unusable half, by family — all three share nextFloat()*0.1+0.9:
+     1,280  door
+     1,280  trapdoor
+       384  fence_gate
+  emitted    4,453   of 4,469 sounding states
+
+  the unreached bucket, by state:
+    minecraft:decorated_pot[cracked=true,facing=north,waterlogged=true]
+    minecraft:decorated_pot[cracked=true,facing=north,waterlogged=false]
+    minecraft:decorated_pot[cracked=true,facing=south,waterlogged=true]
+    minecraft:decorated_pot[cracked=true,facing=south,waterlogged=false]
+    minecraft:decorated_pot[cracked=true,facing=west,waterlogged=true]
+    minecraft:decorated_pot[cracked=true,facing=west,waterlogged=false]
+    minecraft:decorated_pot[cracked=true,facing=east,waterlogged=true]
+    minecraft:decorated_pot[cracked=true,facing=east,waterlogged=false]
+    minecraft:decorated_pot[cracked=false,facing=north,waterlogged=true]
+    minecraft:decorated_pot[cracked=false,facing=north,waterlogged=false]
+    minecraft:decorated_pot[cracked=false,facing=south,waterlogged=true]
+    minecraft:decorated_pot[cracked=false,facing=south,waterlogged=false]
+    minecraft:decorated_pot[cracked=false,facing=west,waterlogged=true]
+    minecraft:decorated_pot[cracked=false,facing=west,waterlogged=false]
+    minecraft:decorated_pot[cracked=false,facing=east,waterlogged=true]
+    minecraft:decorated_pot[cracked=false,facing=east,waterlogged=false]
+
+    minecraft:block.bamboo_wood_button.click_on
+    minecraft:block.cherry_wood_button.click_on
+    minecraft:block.comparator.click
+    minecraft:block.composter.empty
+    minecraft:block.lever.click
+    minecraft:block.nether_wood_button.click_on
+    minecraft:block.note_block.banjo
+    minecraft:block.note_block.basedrum
+    minecraft:block.note_block.bass
+    minecraft:block.note_block.bell
+    minecraft:block.note_block.bit
+    minecraft:block.note_block.chime
+    minecraft:block.note_block.cow_bell
+    minecraft:block.note_block.didgeridoo
+    minecraft:block.note_block.flute
+    minecraft:block.note_block.guitar
+    minecraft:block.note_block.harp
+    minecraft:block.note_block.hat
+    minecraft:block.note_block.imitate.creeper
+    minecraft:block.note_block.imitate.ender_dragon
+    minecraft:block.note_block.imitate.piglin
+    minecraft:block.note_block.imitate.skeleton
+    minecraft:block.note_block.imitate.wither_skeleton
+    minecraft:block.note_block.imitate.zombie
+    minecraft:block.note_block.iron_xylophone
+    minecraft:block.note_block.pling
+    minecraft:block.note_block.snare
+    minecraft:block.note_block.trumpet
+    minecraft:block.note_block.trumpet_exposed
+    minecraft:block.note_block.trumpet_oxidized
+    minecraft:block.note_block.trumpet_weathered
+    minecraft:block.note_block.xylophone
+    minecraft:block.stone_button.click_on
+    minecraft:block.wooden_button.click_on
+
+STAMP        jar=183c0499c5f8 table=a98a74a02d99 dumper=d39a42daaff8 usable=1509 unusable=2944 unreached=16 events=34 door=1280 trapdoor=1280 gate=384

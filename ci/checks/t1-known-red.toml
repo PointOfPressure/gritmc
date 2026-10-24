@@ -1,0 +1,173 @@
+# The failures `ci/t1.sh` is allowed to have, BY SIGNATURE.
+#
+# A **ratchet over an honestly-red suite**, not a pass list — the same shape as
+# `gameplay-baseline.toml` and for the same reason. `ci/t1-allowlist.py` reads
+# this; `ci/t1-gate.sh` runs the suite and calls it; `ci/handoff.sh` stage 4
+# is where that happens in a merge.
+#
+# # WHY THE ENTRIES CARRY NUMBERS
+#
+# A name-only allowlist lets a known failure get quietly **worse**. 106
+# mismatched blocks becoming 10,600 would still read as "the known red", and
+# the gate would report GREEN over a real regression — which is the
+# stale-baseline defect that let a regression pass as GREEN on 2026-08-04,
+# transplanted into a new file. So every field below is compared exactly, and a
+# change in the *nature* of a known failure is as red as a third failure
+# appearing. A declared red that **stops** failing is red too: a stale caveat
+# list reads as authoritative and is worse than none.
+#
+# # THE TWO ENTRIES ARE ONE DEFECT
+#
+# `carved_chunks_match_vanilla` and `surface_chunks_match_vanilla` print the
+# same 106, the same bands and the same confusion table, byte for byte, because
+# the carver stage runs the surface rule first and inherits its residual whole.
+# It is **106 blocks reported twice**, and it is in the surface rule: seed 0,
+# first example chunk (80, 153). The surface test additionally reports the
+# biome grid, the preliminary surface and the surface depth each 0 wrong, so
+# the divergence is in the rule tree, where calcite and sandstone should win
+# and we fall through to the default. Verified 2026-07-30; nothing in
+# decoration can move it, because both stages run before any feature does.
+#
+# **Do not chase them from a branch that is not about them** — but if your
+# change moves either count, that IS yours, and this file is what will say so.
+#
+# # UPDATING IT
+#
+#     ./ci/t1-allowlist.py --emit <t1.log>
+#
+# prints the block a log implies, for pasting *after* a human has adjudicated
+# the change. It never writes this file. Raising `min_binaries` is a deliberate
+# edit: it exists to catch the number **dropping**, which is what a selector
+# that stopped reaching targets looks like — `--lib` silently missed
+# `tools/oracle-runner`'s 19 tests for that crate's whole life.
+#
+# ONE THING THAT LOOKS LIKE A DISAGREEMENT AND IS NOT. `docs/AGENT-BRIEF.md`
+# writes the confusion table as `calcite -> dirt` 27, `sand -> dirt` 32 and so
+# on. The literal output is `minecraft:calcite -> minecraft:dirt: 27` and
+# `minecraft:calcite -> minecraft:grass_block[snowy=false]: 18` — namespaced,
+# and with the block state where there is one. The brief abbreviates; this file
+# records the bytes, because it is compared to them. Same table.
+#
+# MEASURED 2026-08-05 on the Threadripper in ~/rustmc-chain-0805, tree
+# 8480090, `./ci/t1-gate.sh`: 676 s, exit 101, 95 test binaries, 1,112 tests
+# passed, the two below failed. Every figure matches the signature recorded in
+# `docs/AGENT-BRIEF.md`, which is the claim that was owed before wiring this in.
+
+# RE-MEASURED 2026-08-05 in ~/rustmc-chain-cascade-t1, branch
+# `chain-cascade-signs`, `./ci/t1.sh`: exit 101, **97 test binaries**, the two
+# below failed and nothing else did. The floor is raised 95 -> 97 as the
+# deliberate edit this file's header asks for. The 2026-08-05 record above is
+# left exactly as it was: it says what THAT run reported, and rewriting a
+# measurement to agree with a later one is how a log stops being evidence.
+#
+# The prose in `docs/CI.md`, `ci/t1-gate.sh` and `ci/t1-allowlist.py` said 95
+# and 78 and was corrected in the same commit; T0 is **18**, not the 17 those
+# files claimed, so the T1-only figure is **79**. `ci/handoff.sh` is left
+# alone by instruction.
+#
+# RE-MEASURED 2026-08-07 from a live merge gate: `~/rustmc-gate` on the
+# Threadripper, `ci/logs/t1-20260807-041436.log`, branch `gate-infra-verdict`
+# (`main` plus two commits that touch `ci/handoff.sh` and
+# `ci/handoff-verdict-selftest.sh` only, so the test surface is `main`'s).
+# **106 test binaries, 1,437 passed, 2 failed, 8 ignored**, the two below and
+# nothing else. Floors raised 97 -> 106 as the deliberate edit this file's
+# header asks for. The two earlier records are left exactly as they were.
+min_binaries = 106
+
+# **A floor on tests, because `min_binaries` is a floor on binaries.**
+# `cargo test` reports `test result: ok. 0 passed; 0 failed; N ignored` for a
+# binary in which every test is annotated away, so the binary count is blind to
+# a test that has stopped running. Demonstrated 2026-08-07 on a replica of this
+# workspace: one failing unit test adjudicated `T1-GATE RED — a new red`; the
+# only edit was `#[ignore]` on that test; the same adjudicator over the new log
+# printed `T1-GATE GREEN — 3 test binaries`. Nothing else moved.
+#
+# `min_tests` is the count that **passed** in the run above. A branch that
+# deletes a test lowers it and must say so here, in the same shape as raising
+# `min_binaries`.
+min_tests = 1437
+
+# The 8 currently-ignored tests, all instruments rather than gates and each
+# annotated with its reason in the source:
+#
+#   crates/rustmc-server/src/tiles.rs               RSS measurement
+#   crates/rustmc-server/tests/dig_throughput.rs    throughput instrument
+#   crates/rustmc-worldgen/tests/probe_sulfur_gradient.rs   needs a whole-world diff
+#   crates/rustmc-worldgen/tests/golden_surface_chunk.rs    three searches, not assertions
+#
+# A tenth is a branch silencing a test, and this is what says so. Raising it is
+# a deliberate edit that has to name the new instrument.
+#
+# RAISED 8 -> 9 on 2026-08-18, naming the ninth:
+#
+#   crates/rustmc-worldgen/tests/probe_cluster_boxes.rs   diagnostic, and its
+#       two worlds do not exist
+#
+# `the_servers_piece_boxes_against_ours` iterates
+# `oracle-work/van-ruin--58_28` and `oracle-work/van-ruin--57_42`, `continue`s
+# past any it cannot find, and asserts nothing about how many it found.
+# **Neither exists in the shared `~/rustmc/oracle-work` nor in any of the 250
+# gate directories**, so the loop body has never run and the binary has
+# reported `ok. 1 passed` for its whole life while comparing nothing. Its own
+# module docs describe it as the instrument for separating "wrong piece
+# position" from "right position, wrong contents", which is a diagnostic and
+# not a gate — so it is annotated rather than converted, and the `continue` is
+# now backed by `assert!(visited > 0)` so it cannot return to being a silent
+# no-op if the `#[ignore]` is ever lifted. See docs/PARITY-ROADMAP.md 73.
+#
+# RAISED 9 -> 10 on 2026-08-18, naming the tenth:
+#
+#   crates/rustmc-worldgen/tests/probe_ruin_height.rs   diagnostic, and its
+#       world is a /tmp scratch path
+#
+# `what_the_heightmap_says_under_the_ruin` reads `/tmp/ruin-w/region`, a
+# scratch directory left by whatever one-off run first answered its module
+# docs' question. `/tmp` does not survive a reboot and no gate directory has
+# ever held it, so the test reported `ok. 1 passed` on every run since it was
+# written, having read nothing. **Found by the conversion**: the first full
+# `ci/t1-gate.sh` on branch `t1-audit` went red here and nowhere else. Its own
+# docs pose a question and answer it with a `println!` sweep, which is an
+# instrument; reproduce the world with `ci/dump-chunks.sh` into that path to
+# lift the annotation.
+max_ignored = 10
+
+[[known_red]]
+test = "carved_chunks_match_vanilla"
+wrong = 106
+total = 7077888
+exact = "99.998502"
+seed = 0
+chunk = [80, 153]
+bands = [
+    "32..63: 54",
+    "128..159: 52",
+]
+confusion = [
+    "minecraft:calcite -> minecraft:dirt: 27",
+    "minecraft:calcite -> minecraft:grass_block[snowy=false]: 18",
+    "minecraft:sand -> minecraft:dirt: 32",
+    "minecraft:sandstone -> minecraft:stone: 22",
+    "minecraft:stone -> minecraft:dirt: 5",
+    "minecraft:stone -> minecraft:grass_block[snowy=false]: 2",
+]
+
+[[known_red]]
+test = "surface_chunks_match_vanilla"
+wrong = 106
+total = 7077888
+exact = "99.998502"
+seed = 0
+chunk = [80, 153]
+bands = [
+    "32..63: 54",
+    "128..159: 52",
+]
+confusion = [
+    "minecraft:calcite -> minecraft:dirt: 27",
+    "minecraft:calcite -> minecraft:grass_block[snowy=false]: 18",
+    "minecraft:sand -> minecraft:dirt: 32",
+    "minecraft:sandstone -> minecraft:stone: 22",
+    "minecraft:stone -> minecraft:dirt: 5",
+    "minecraft:stone -> minecraft:grass_block[snowy=false]: 2",
+]
+

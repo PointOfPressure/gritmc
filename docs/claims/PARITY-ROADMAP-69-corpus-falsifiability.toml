@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 69
+slug   = "corpus-falsifiability"
+title  = "What the gameplay corpus's own checks can be made to say"
+branch = "corpus-falsifiability-audit"
+status = "written"

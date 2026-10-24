@@ -1,0 +1,32 @@
+name = "ladder-hangs-off-the-wall-behind-it"
+about = "a ladder takes its facing from whichever neighbour it can attach to, not from the face that was clicked — LadderBlock.getStateForPlacement walks the horizontal directions looking for a solid back and returns null if it finds none, so clicking the ground beside a wall still produces a ladder, facing away from that wall"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [2, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:ladder"
+
+[[step]]
+do = "place"
+on = [2, 0, 0]
+face = "north"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

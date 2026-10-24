@@ -1,0 +1,18 @@
+name = "hoe-turns-grass-into-farmland"
+about = "a hoe used on grass turns it into farmland — the first check here where the ITEM decides what happens to a block it does not place, which is a different path from every placement check: HoeItem's action map, not BlockItem.place"
+observe_from = "actor"
+observe = ["block_update", "section_blocks_update", "block_changed_ack"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:iron_hoe"
+
+[[step]]
+do = "place"
+on = [1, -1, 0]
+face = "up"

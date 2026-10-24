@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 18
+slug   = "s2-already-ported"
+title  = "S2 was already ported, and its emit site was reached by nothing but the corpus — 2026-08-10, branch `gameplay-recipe-book-add`"
+branch = "gameplay-recipe-book-add"

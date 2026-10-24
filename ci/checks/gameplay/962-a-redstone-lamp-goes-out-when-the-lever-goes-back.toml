@@ -1,0 +1,111 @@
+name = "a-redstone-lamp-goes-out-when-the-lever-goes-back"
+about = "the corpus has never once observed a `lit` block un-light — 21 blocks share that schema and every observation of it is `lit=true` — so this flips the lever a second time and requires the lamp to go dark"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 2000
+
+# THE FALLING EDGE HAS NEVER BEEN OBSERVED, AND THAT IS THE WHOLE CHECK.
+#
+# Over the six recordings in `~/rustmc-stackdec` (N=6, 2026-08-12) the `lit`
+# schema — **21 blocks**, from `redstone_lamp` through the candle cakes —
+# appears in exactly one state: `redstone_torch[lit=true]`, from
+# `redstone-torch-powers-wire`. `360-a-lever-lights-a-lamp` produces
+# `redstone_lamp[lit=true]` and stops there.
+#
+# So every `lit` observation in the corpus is `true`. A server that sets `lit`
+# when power arrives and has no path that ever clears it — no falling-edge
+# `neighborChanged`, or a latch — passes `360`, passes
+# `redstone-torch-powers-wire`, and passes every other check in this
+# directory. `ci/block-schema-queue.py --unvaried` prints the schema with its
+# single witnessing state.
+#
+# This is `330`/`335`'s argument exactly: `330-button-unpresses-itself` exists
+# because a button that only ever presses is indistinguishable from a correct
+# one until something watches it come back. Nothing watches `lit` come back.
+#
+# FROM THE JAR, AND THE TWO EDGES ARE NOT THE SAME CODE PATH. `javap -p -c
+# -constants` on `net/minecraft/world/level/block/RedstoneLampBlock`:
+#
+#   neighborChanged:
+#      9: getstatic LIT; getValue; booleanValue      -> was
+#     27: Level.hasNeighborSignal(pos)               -> now
+#     30: if_icmpeq 65                               -> equal: return
+#     35: ifeq 48                                    -> branch on `was`
+#     42:   Level.scheduleTick(pos, this, n)         -> was=true : GOING OUT
+#     51:   getstatic LIT; BlockState.cycle
+#     61:   Level.setBlock(pos, .., 3)               -> was=false: LIGHTING
+#
+#   tick:
+#      1: getValue(LIT) ... 13: ifeq 41
+#     18: ServerLevel.hasNeighborSignal(pos) ... 21: ifne 41
+#     27: getstatic LIT ... setBlock                 -> clears LIT
+#
+# **Lighting is immediate, in `neighborChanged`, through `setBlock`. Going out
+# is deferred, through `scheduleTick`, and the write happens in `tick`.** So
+# the falling edge is not a sign flip of the rising one — it is a second
+# method, on the scheduled-tick path, that nothing in this corpus has ever
+# required a server to have. A server with a complete `neighborChanged` and no
+# lamp entry on the scheduled-tick path passes step 1 and fails step 2.
+#
+# That asymmetry is also why `settle_ms` is 2000 here rather than the 1500 the
+# placement checks use: step 2's packet cannot arrive in the same tick as the
+# interaction that causes it.
+#
+# THE SECOND STEP IS THE CHECK AND THE FIRST IS THE CONTROL. Step 1 repeats
+# what `360` already establishes, and it is here rather than in `setup` for a
+# reason: if step 1 does not produce `lit=true` then step 2 producing no
+# packet means nothing, because a lamp that never lit cannot be observed to go
+# out. A check whose negative result is indistinguishable from a dead rig is
+# the failure mode AGENT-BRIEF calls measuring the instrument, and the fix is
+# to make the rig's own liveness part of the recorded comparison.
+#
+# WHY A STICK. Right-clicking the lever with a placeable item in hand places
+# the item instead of flipping the lever — that is `552`/`553`'s subject.
+# `minecraft:stick` has no `BlockItem`, so the interaction reaches
+# `LeverBlock.useWithoutItem` both times.
+#
+# THE RIG IS ENTIRELY AT z >= +1. `360`'s own rig was moved onto +z for the
+# README's chunk-boundary rule after twelve selfcheck runs found it flapping;
+# this one is built on that side from the start, and the lever goes on the
+# lamp's SOUTH face so nothing in the rig sits at z = 0.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# The lamp at [2,0,1].
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_lamp"
+
+[[setup]]
+do = "place"
+on = [2, -1, 1]
+face = "up"
+
+# The lever on the lamp's south face, so it lands at [2,0,2].
+[[setup]]
+do = "hold"
+item = "minecraft:lever"
+
+[[setup]]
+do = "place"
+on = [2, 0, 1]
+face = "south"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+
+# Step 1 — the control. The lever goes on, the lamp must report `lit=true`.
+[[step]]
+do = "place"
+on = [2, 0, 2]
+face = "south"
+
+# Step 2 — the check. The lever goes back off, and the lamp must report
+# `lit=false`. This state has no precedent anywhere in the corpus.
+[[step]]
+do = "place"
+on = [2, 0, 2]
+face = "south"

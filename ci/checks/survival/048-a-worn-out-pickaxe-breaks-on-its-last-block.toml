@@ -1,0 +1,54 @@
+name = "a-worn-out-pickaxe-breaks-on-its-last-block"
+about = """
+`give oracle minecraft:wooden_pickaxe[damage=58]` — one point from its
+maximum of 59 — then `040`'s grass dig. A pickaxe is no faster than a hand on
+grass (no `mineable/pickaxe` rule matches), but grass has a destroy time of
+0.6, so `Item.mineBlock` still calls `hurtAndBreak(1)`: damage 59 is
+`isBroken()` (`damage >= maxDamage`), the stack shrinks to nothing, and
+`LivingEntity.onEquippedItemBroken` broadcasts entity event 47 (MAINHAND's
+`entityEventForEquipmentBreak`) to the player and everyone tracking it — the
+client plays the break sound from that, the server plays none. Then
+broadcastChanges empties hotbar slot 36. What would make it fail: no
+durability at all (no event, the pickaxe stays), damage without the break,
+or the event sent only to others.
+"""
+# The console gave this rig its items; `clear` takes them back so the
+# next scenario starts empty-handed, on both servers.
+console_restore = ["clear oracle"]
+# Three blocks out, beyond the digger's pickup box: the dirt this dig drops
+# landed by the player in survival pass 1 of 2026-10-01 (c7) and vanilla
+# picked it up (container_set_slot 36), which this server cannot do.
+observe_from = "both"
+observe = ["entity_event", "container_set_slot", "block_update", "block_changed_ack"]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "console"
+text = "clear oracle"
+
+[[setup]]
+do = "console"
+text = "give oracle minecraft:wooden_pickaxe[damage=58]"
+
+[[setup]]
+do = "wait"
+ms = 300
+
+[[step]]
+do = "dig"
+at = [3, -1, 0]
+face = "up"
+
+[[step]]
+do = "wait"
+ms = 1000
+
+[[step]]
+do = "finish_dig"
+at = [3, -1, 0]
+face = "up"

@@ -1,0 +1,6 @@
+doc    = "PARITY-ROADMAP"
+number = 73
+slug   = "t1-skip-guard-blind"
+title  = "T1's skip guard cannot see a skipping test"
+branch = "t1-audit"
+status = "written"

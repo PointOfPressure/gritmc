@@ -1,0 +1,90 @@
+name = "a-log-clicked-on-the-top-and-the-side-lies-two-ways"
+about = "a pillar takes the axis of the face it was clicked on, and `030` only ever clicks one face — this adds the other two, so the 58-block `axis` schema stops being satisfied by a constant"
+observe = ["block_update", "section_blocks_update"]
+settle_ms = 1500
+
+# THIS FILE EXISTS BECAUSE `030` CANNOT FAIL AGAINST A CONSTANT.
+#
+# `030-place-log-axis` is a good check and it clicks exactly one face:
+# `face = "east"`, which produces `axis=x`. Over the six recordings in
+# `~/rustmc-stackdec` (N=6, 2026-08-12) that is the ONLY state of the `axis` schema the corpus has
+# ever caused vanilla to broadcast — one value, from one scenario, standing
+# for **58 blocks**, the largest property-carrying signature in the registry.
+# `ci/block-schema-queue.py --unvaried` prints it as the first line of its
+# report. A server whose `RotatedPillarBlock` returns `Axis.X` unconditionally
+# passes `030` for ever.
+#
+# That is the shape this directory's README names by example — `230`/`235` and
+# `330`/`335` are both a check plus the partner that stops a constant passing
+# it — and here it stands unpartnered over 58 blocks.
+#
+# FROM THE JAR. `javap -p -c -constants` on
+# `net/minecraft/world/level/block/RotatedPillarBlock`, `getStateForPlacement`,
+# the whole method:
+#
+#    1: defaultBlockState()
+#    4: getstatic AXIS
+#    8: BlockPlaceContext.getClickedFace()
+#   11: Direction.getAxis()
+#   14: BlockState.setValue
+#   20: areturn
+#
+# There is no other arm. `axis = clickedFace.getAxis()`, so `up`/`down` give
+# `y`, `north`/`south` give `z`, `east`/`west` give `x`. Two clicks are enough
+# to add both missing values, and together with `030` the domain is closed.
+#
+# WHY THIS DISCRIMINATES AND `030` DOES NOT. Three wrong models pass `030` and
+# fail here:
+#
+#   * `axis` hardcoded to `x` — passes `030`, fails both steps;
+#   * a face->axis table with y and z transposed — passes `030` (x is on its
+#     own axis pair and is unaffected), fails both steps;
+#   * `axis` taken from the PLAYER's facing rather than the clicked face — the
+#     player looks yaw 0 throughout, so this model answers `z` to both steps
+#     and is caught by step 1 alone.
+#
+# The third is the reason the rig does not turn the player between the steps:
+# holding the look fixed is what separates "the face was read" from "the
+# player was read". `040` uses the mirror-image trick on `facing` and this is
+# the same argument applied to `axis`.
+#
+# THE RIG IS ENTIRELY AT RELATIVE z >= +1, per the README's chunk-boundary
+# rule: a rig that writes on both sides of z = 0 gets two bare `block_update`s
+# in an order the per-chunk tracker decides, and the check then measures
+# vanilla's inter-chunk send order. Step 2 places at z = +2, which is still in
+# chunk z 0.
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# A stone pedestal at [1,0,1], so that both measured clicks land on faces of
+# one block that the player is not standing in. The pedestal is placed in
+# setup because its own state carries no properties — it is a member of the
+# empty schema and says nothing.
+[[setup]]
+do = "hold"
+item = "minecraft:stone"
+
+[[setup]]
+do = "place"
+on = [1, -1, 1]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:oak_log"
+
+# Step 1 — the top face. Log lands at [1,1,1] and must be `axis=y`.
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "up"
+
+# Step 2 — a horizontal face on the z axis. Log lands at [1,0,2] and must be
+# `axis=z`. The pedestal's south face is still exposed; step 1 built upwards.
+[[step]]
+do = "place"
+on = [1, 0, 1]
+face = "south"

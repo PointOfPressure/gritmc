@@ -1,0 +1,35 @@
+name = "a-disc-in-a-jukebox-plays-and-names-its-song"
+about = "right-clicking a jukebox with a music disc writes `HAS_RECORD` true with `setBlock(..., 2)` and then sends `level_event(1010, pos, songId)`, in that order — `JukeboxBlockEntity.setTheItem` calls `notifyItemChangedInJukebox` before it starts the player, so the block turns on and only then is the disc heard. **The `songId` is the point of this check.** It is `Registry.getId(JUKEBOX_SONG, holder)` in vanilla, a dynamic-registry index, and three JVM runs of a dumper over `VanillaRegistries.createLookup()` gave three different orders — so no goldengen can produce it and `data/vanilla/jukebox_songs.json` carries the alphabetical rank as an explicitly unverified stand-in, flagged `registryIdIsUnverified`. This recording is the only instrument that can say what the number is, which is what the branch's cold start meant by \"closing this needs a vanilla recording of a disc going in, not another dumper\". A divergence in that one field is the measurement; the block update either side of it is the control that says the rest of the path is right"
+observe_from = "actor"
+observe = [
+    "level_event",
+    "block_update",
+    "section_blocks_update",
+    "block_changed_ack",
+]
+settle_ms = 1500
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:jukebox"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+# `minecraft:music_disc_cat` is `minecraft:cat` in the song registry, which is
+# the key `JukeboxSongs::from_stack` strips the `music_disc_` prefix to reach.
+[[setup]]
+do = "hold"
+item = "minecraft:music_disc_cat"
+
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"

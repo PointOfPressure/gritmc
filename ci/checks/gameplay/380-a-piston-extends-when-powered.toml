@@ -1,0 +1,47 @@
+name = "a-piston-extends-when-powered"
+about = "a piston next to a redstone block shoves its head out — the first mechanic in this corpus that reaches a player through `block_event` rather than a block state, because `PistonBaseBlock.checkIfExtend` calls `Level.blockEvent` and the head only appears when `triggerEvent` runs it at the tick boundary"
+observe_from = "actor"
+observe = [
+    "block_update",
+    "section_blocks_update",
+    "block_event",
+    # `PistonBaseBlock.triggerEvent` offsets 118-142 play
+    # `block.piston.extend` at volume 0.5 with `aconst_null` in the
+    # entity slot, so the player who powered it hears it too. Added
+    # 2026-09-05: this scenario has recorded 120 of vanilla's
+    # piston sounds and projected none of them.
+    "sound",
+    "block_changed_ack",
+]
+settle_ms = 2000
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+# `PistonBaseBlock.getStateForPlacement` is
+# `FACING = getNearestLookingDirection().getOpposite()`, and at yaw 0 the
+# player looks south, so the piston faces **north** and its head goes to
+# [1, 0, -1]. Nothing here asserts that; it is written down so the rig is
+# understood rather than guessed at.
+[[setup]]
+do = "hold"
+item = "minecraft:piston"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:redstone_block"
+
+# The power arrives last, so the extension is the only thing in the measured
+# window. A redstone block signals every side, which takes the placement's
+# own facing out of the question.
+[[step]]
+do = "place"
+on = [2, -1, 0]
+face = "up"

@@ -1,0 +1,5 @@
+doc    = "PARITY-ROADMAP"
+number = 25
+slug   = "block-entity-observable-ceiling"
+title  = "The block-entity row's denominator is 20, not 49 — 2026-08-12, branch `gameplay-block-entities`"
+branch = "gameplay-block-entities"

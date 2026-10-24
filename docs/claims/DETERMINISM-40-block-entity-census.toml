@@ -1,0 +1,5 @@
+doc    = "DETERMINISM"
+number = 40
+slug   = "block-entity-census"
+title  = "The block-entity hole, measured: 173 on the quotable window, a floor of 0..13 with zero content disagreement, and a reachable share of 160"
+branch = "worldgen-block-entities"

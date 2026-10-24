@@ -1,0 +1,156 @@
+name = "a-bat-left-far-away-despawns-and-a-pig-does-not"
+about = "a bat and a pig left 150 and 190 blocks out are BOTH re-announced when the actor walks back to them — at view-distance 4 the bat's chunk stops ticking before any player is 128 blocks away, so Mob.checkDespawn's far rule never reaches it in vanilla. The name is the claim this check was written to test; vanilla refutes it, and the check now grades the refutation"
+observe_from = "actor"
+observe = ["update_attributes"]
+within = 200
+settle_ms = 3000
+
+# **RE-RIGGED 2026-09-24 (`mob-goal-corpus` lane), because the old rig never
+# measured its claim and flapped on what it did measure.**
+#
+# WHAT THE OLD RIG COMPARED. `observe = ["add_entity", "remove_entities"]`
+# under the default `within = 16`. The two `add_entity` it existed for are at
+# z = 150, so the bound dropped both, and the declared projection was the
+# actor's `remove_entities` for the observer and for 080's and 081's pigs as
+# the walk left them behind (`oracle-runner project` on the box's vanilla
+# recordings). 080's pig strolls on its own unseeded random around the
+# 64-block tracking edge from this workspace, so vanilla sent two such removes
+# in two of the box's four recordings and three in the other two — which is
+# what reddened `mob-goal-corpus`'s chain4 T2.
+#
+# WHAT VANILLA ACTUALLY DOES. All four vanilla recordings on the box carry
+# TWO `add_entity` on the walk back (`rustmc-mobgoal`, `-mobs`, `-mobs2`,
+# `-combat`): the bat is never despawned. The jar says why:
+#
+#   Mob.checkDespawn          49-109  nearest player (any range); past
+#                                     category.getDespawnDistance()^2 (128)
+#                                     and removeWhenFarAway -> discard()
+#   ServerLevel's entity loop         calls checkDespawn only for entities in
+#                                     the tick list, i.e. in loaded chunks
+#   DistanceManager.addPlayer 67-78   the PLAYER_SIMULATION ticket (level
+#                                     ENTITY_TICKING - simulation distance)
+#   TicketType.<clinit> 33-51         player_loading flags 2 (LOADING),
+#                                     player_simulation flags 12 (SIMULATION
+#                                     | KEEP_DIMENSION_ACTIVE) — it does NOT load
+#
+# so a chunk stays loaded only through the view-distance ticket, 4 chunks
+# here, and a mob in a loaded chunk is never more than about 90 blocks from
+# the player that loads it. The 128-block rule cannot fire at this substrate's
+# view distance; the bat's chunk unloads with the bat in it, and it is read
+# back from disk when the actor returns.
+#
+# WHAT THIS CHECK OBSERVES, and why it is deterministic:
+#
+#   * `update_attributes` from the re-pairing bundle of each mob. By the time
+#     the actor comes back both mobs have ticked, so both carry a syncable
+#     MOVEMENT_SPEED instance (the path `081`'s header reads out of the jar)
+#     and the pairing sends one `update_attributes` each: one digest for the
+#     bat's snapshot, one for the pig's, identical in all four recordings.
+#     `add_entity` is NOT observed: its yaw is the spawn egg's `level.random`
+#     draw and the bat's position is its random flight.
+#   * TWO distances, so the ORDER is fixed. On the old rig both mobs sat
+#     side by side and were re-paired in one tick, and the order of their two
+#     packets followed the tracked-entity map's hash order of their ids — the
+#     pig first in one of the four recordings, the bat first in three. The
+#     bat is now at z = 150 and the pig at z = 190, 2.5 chunks further, so
+#     the walk out reaches the bat's chunk first and the order is the walk's.
+#   * `remove_entities` is gone from `observe`, taking the tracking-edge pigs
+#     of 080 and 081 with it. `within = 200` reaches z = 190 and admits
+#     nothing else: no other scenario's mob is re-paired on this walk.
+#
+# A server that despawns the bat — one that keeps a chunk ticking with no
+# player in view of it, or applies the far rule to an unticked mob — sends the
+# pig's `update_attributes` alone. That is `diverge`, and it is a real finding
+# about that server, not about this rig.
+#
+# THE WALKS. `walk` hops four blocks a packet (`530`'s header). The actor
+# builds out, returns to the anchor, and the measured step walks to z = 190.
+# The recorder's return to the next workspace after this is ~19 s of walking,
+# which is why `record::run_one` now walks it in 40-block legs and reads the
+# observer between them (a single walk left the observer's keep-alive pending
+# past vanilla's 15 s and errored the next scenario).
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 150.0]
+
+# THE BAT IS SHUT IN, AND THAT IS FOR `083`, NOT FOR THIS CHECK.
+#
+# Hatched on open ground, the bat flew where it liked for the rest of the run,
+# on `Bat.customServerAiStep`'s unseeded random walk, and some runs it came
+# within the actor's 64-block tracking range of `083`'s rig at (-32, 80) from
+# here: in reference `95ef64ea` (2026-10-03, the ranged gate) it ended this
+# window 73.6 blocks from that rig and `083`'s step recorded 15 of its
+# `move_entity` and `rotate_head` (y deltas of +-0.7 a packet, a bat's flap)
+# before the pig's own turn, against 71.9 to 91.8 blocks and none in the five
+# other references whose 082 window shows the bat's whole flight. On the
+# fix-rotate-recorder gate the same leak came from OUR bat. `083` admits every
+# observation of an entity hatched in its own setup (`compare::near` has no
+# placement for it), so a foreign bat there is the step's first observation.
+#
+# So the bat is hatched into a closed one-block cell under the ground: the
+# shaft [1, -1..-2, 150] is dug, glass caps it at [1, -1, 150], and the egg
+# goes on the shaft's floor through the cap — `handleUseItemOn` checks reach
+# (`isWithinBlockInteractionRange(pos, 1.0)`), not line of sight. Glass is not
+# a redstone conductor, so the bat takes off on its first tick exactly as it
+# did on the grass (`086`'s mechanism) and keeps flying, which keeps the
+# MOVEMENT_SPEED instance this check observes; it simply cannot leave. Cap
+# first, egg second: an egg in the open shaft would let the bat out in the
+# ticks before the cap.
+[[setup]]
+do = "hold"
+item = "minecraft:glass"
+
+[[setup]]
+do = "dig"
+at = [1, -1, 150]
+face = "up"
+
+[[setup]]
+do = "dig"
+at = [1, -2, 150]
+face = "up"
+
+[[setup]]
+do = "place"
+on = [0, -1, 150]
+face = "east"
+
+[[setup]]
+do = "hold"
+item = "minecraft:bat_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [1, -3, 150]
+face = "up"
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 190.0]
+
+[[setup]]
+do = "hold"
+item = "minecraft:pig_spawn_egg"
+
+[[setup]]
+do = "place"
+on = [-1, -1, 190]
+face = "up"
+
+[[setup]]
+do = "walk"
+to = [0.0, 0.0, 0.0]
+
+[[setup]]
+do = "wait"
+ms = 2000
+
+[[step]]
+do = "walk"
+to = [0.0, 0.0, 190.0]

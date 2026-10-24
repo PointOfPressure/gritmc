@@ -1,0 +1,61 @@
+name = "a-bystander-sees-a-chest-open"
+about = "the player who opened the chest gets a screen and everyone else gets a lid — `ChestBlockEntity.signalOpenCount` goes out through `Level.blockEvent` to every client tracking the chunk, while `open_screen` goes down one connection, so this is the direct-send/broadcast split measured on the client that is not acting"
+observe_from = "observer"
+# `open_screen` is in this list because of what the `about` above claims.
+#
+# The claim is that the bystander gets **a lid, not a screen**. Until
+# 2026-08-04 the projection named only the three block channels, so a server
+# that wrongly opened a screen on a bystander's connection emitted
+# `open_screen` on the very stream this check watches and the filter dropped
+# it before the comparison — the check could not fail in the one direction
+# its own text says it exists to test. That is the "check that could not
+# fail" family, and this is the fourteenth instance found in this corpus.
+#
+# Adding it does not move the verdict today and is not expected to: measured
+# on the reference recording of 2026-08-03, vanilla's observer stream for
+# this scenario carries 10 `block_event` and 1 `sound` and **zero**
+# `open_screen`, which is the behaviour the `about` describes. The point is
+# that from here a regression in that direction is visible.
+observe = ["block_event", "block_update", "section_blocks_update", "open_screen"]
+settle_ms = 2000
+
+# The same 5-tick lid cadence as `090-chest-opens-a-screen`, sampled through a
+# 2,000 ms window instead of 1,000 — so the same argument applies with roughly
+# eight cadences of accumulated jitter against five, which is why this was the
+# *more* unstable of the pair (3 flaps in 25 against 1 in 25, vanilla against
+# vanilla, and the ratio the window lengths predict). Read the block on 090 for
+# the mechanism and the measured gaps; it is not repeated here.
+#
+# What this check still tests after the collapse is exactly what its `about`
+# claims and nothing less: that the bystander gets a lid **and no screen**.
+# `open_screen` is not in `collapse_repeats`, so a server that wrongly opened a
+# screen on a bystander's connection still fails, and so does a lid with the
+# wrong `b1`, at the wrong position, or absent.
+collapse_repeats = ["block_event"]
+
+[[setup]]
+do = "look"
+yaw = 0.0
+pitch = 0.0
+
+[[setup]]
+do = "hold"
+item = "minecraft:chest"
+
+[[setup]]
+do = "place"
+on = [1, -1, 0]
+face = "up"
+
+[[setup]]
+do = "hold"
+item = "minecraft:stick"
+slot = 1
+
+# The observer stands five blocks away on +z and never acts. If it sees the
+# lid, the broadcast reached a client that did nothing — which is the whole
+# question, and a check reading the actor's stream could not ask it.
+[[step]]
+do = "place"
+on = [1, 0, 0]
+face = "up"
