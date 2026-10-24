@@ -79,7 +79,7 @@ another, and the ordering below is not a ranking:
    built, not imported. Native first-party crates; WASM sandbox for third
    parties.
 
-Licensed under the PolyForm Noncommercial License 1.0.0 (see `LICENSE`): free to use, change and share for any non-commercial purpose. Commercial use needs permission.
+Source-available, not open source: licensed under the PolyForm Noncommercial License 1.0.0 (see `LICENSE`). Free to use, change and share for any non-commercial purpose. Commercial use needs permission.
 
 Start at `docs/VISION.md` (why) → `docs/PRODUCT.md` (what: the 12 decisions)
 → `docs/ORACLE.md` (how it's proven) → `docs/PHASE0.md` (current state).
