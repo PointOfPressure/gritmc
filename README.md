@@ -8,14 +8,14 @@ I didn't write this code by hand. It was built with Claude Code (AI agents), wit
 
 ## Status
 
-Parked. It runs and much of survival works, but it isn't finished and isn't meant for a real server yet.
+Finished experiment, archived. It runs and much of survival works, but it was never completed and isn't meant for a real server.
+
+For a Rust Minecraft server people are still building, see [Pumpkin](https://github.com/Pumpkin-MC/Pumpkin). For a full Rust rewrite of the game, see [Horizon](https://github.com/ludovic111/horizon).
 
 Parity is measured against the unmodified vanilla jar rather than claimed. Over a 33×33 chunk overworld test area, its terrain can't be told apart from a vanilla run of the same seed. The details are in `docs/PARITY.md` and `docs/DETERMINISM.md`.
 
-Building needs the `grit-plugins` repo beside this one, and that repo isn't public yet.
+Building needs the `grit-plugins` repo beside this one, and that repo is private, so this one doesn't build on its own.
 
 ## Licence
 
-Source-available, not open source: [PolyForm Noncommercial 1.0.0](LICENSE). Free to use, change and share for any non-commercial purpose. Commercial use needs permission.
-
-Pull requests are merged only if you agree in writing that your contribution can be relicensed.
+[MIT](LICENSE). It was PolyForm Noncommercial until 25 Oct 2026.

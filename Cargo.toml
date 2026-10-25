@@ -25,8 +25,8 @@ members = [
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-license = "PolyForm-Noncommercial-1.0.0"
-repository = "https://github.com/PointOfPressure/rustmc"
+license = "MIT"
+repository = "https://github.com/PointOfPressure/gritmc"
 
 [workspace.dependencies]
 # External (kept deliberately few; every dep is compile time on the laptop
